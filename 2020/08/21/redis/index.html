@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<meta name="hexo-config" content="{&quot;hostname&quot;:&quot;bubbleboy11.github.io&quot;,&quot;root&quot;:&quot;/&quot;,&quot;images&quot;:&quot;/images&quot;,&quot;scheme&quot;:&quot;Muse&quot;,&quot;version&quot;:&quot;8.3.0&quot;,&quot;exturl&quot;:false,&quot;sidebar&quot;:{&quot;position&quot;:&quot;left&quot;,&quot;display&quot;:&quot;post&quot;,&quot;padding&quot;:18,&quot;offset&quot;:12},&quot;copycode&quot;:true,&quot;bookmark&quot;:{&quot;enable&quot;:false,&quot;color&quot;:&quot;#222&quot;,&quot;save&quot;:&quot;auto&quot;},&quot;fancybox&quot;:false,&quot;mediumzoom&quot;:false,&quot;lazyload&quot;:false,&quot;pangu&quot;:false,&quot;comments&quot;:{&quot;style&quot;:&quot;tabs&quot;,&quot;active&quot;:null,&quot;storage&quot;:true,&quot;lazyload&quot;:false,&quot;nav&quot;:null},&quot;motion&quot;:{&quot;enable&quot;:true,&quot;async&quot;:false,&quot;transition&quot;:{&quot;post_block&quot;:&quot;fadeIn&quot;,&quot;post_header&quot;:&quot;fadeInDown&quot;,&quot;post_body&quot;:&quot;fadeInDown&quot;,&quot;coll_header&quot;:&quot;fadeInLeft&quot;,&quot;sidebar&quot;:&quot;fadeInUp&quot;}},&quot;prism&quot;:false,&quot;i18n&quot;:{&quot;placeholder&quot;:&quot;搜索...&quot;,&quot;empty&quot;:&quot;没有找到任何搜索结果：${query}&quot;,&quot;hits_time&quot;:&quot;找到 ${hits} 个搜索结果（用时 ${time} 毫秒）&quot;,&quot;hits&quot;:&quot;找到 ${hits} 个搜索结果&quot;}}">
+<meta name="description" content="Redis是一种Key-Value存储结构的NoSQL非关系数据库 redis的使用场景  数据存储  数据存储在内存，可以持久化保存至硬盘 高效的数据结构 string（字符串）、hash（哈希）、list（列表）、set（集合）、zset（有序集合）   高速缓存  10万+的QPS（查询次数&#x2F;秒），集群可达百万级以上 首页内容缓存优化（门户、新闻等） 秒杀业务、抢购业务、库存控制等   启动">
+<meta property="og:type" content="article">
+<meta property="og:title" content="redis">
+<meta property="og:url" content="https://bubbleboy11.github.io/2020/08/21/redis/index.html">
+<meta property="og:site_name" content="外心人D的博客">
+<meta property="og:description" content="Redis是一种Key-Value存储结构的NoSQL非关系数据库 redis的使用场景  数据存储  数据存储在内存，可以持久化保存至硬盘 高效的数据结构 string（字符串）、hash（哈希）、list（列表）、set（集合）、zset（有序集合）   高速缓存  10万+的QPS（查询次数&#x2F;秒），集群可达百万级以上 首页内容缓存优化（门户、新闻等） 秒杀业务、抢购业务、库存控制等   启动">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-08-20T16:21:41.000Z">
+<meta property="article:modified_time" content="2021-04-02T12:24:45.722Z">
+<meta property="article:author" content="外心人D">
+<meta property="article:tag" content="redis">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://bubbleboy11.github.io/2020/08/21/redis/">
+
+
+
+<meta name="hexo-config-page" content="{&quot;sidebar&quot;:&quot;&quot;,&quot;isHome&quot;:false,&quot;isPost&quot;:true,&quot;lang&quot;:&quot;zh-CN&quot;}">
+<meta name="hexo-config-calendar" content="">
+<script data-pjax src="/js/load-config.js"></script>
+  <title>redis | 外心人D的博客</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="外心人D的博客" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">外心人D的博客</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-overview-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">外心人D</p>
+  <div class="site-description" itemprop="description">本博客大多内容为慕课和网上博客，并非原创</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">165</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/redis/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          redis
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-04-02 12:24:45" itemprop="dateModified" datetime="2021-04-02T12:24:45Z">2021-04-02</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>Redis是一种Key-Value存储结构的NoSQL非关系数据库</p>
+<p>redis的使用场景</p>
+<ul>
+<li><p>数据存储</p>
+<ul>
+<li>数据存储在内存，可以持久化保存至硬盘</li>
+<li>高效的数据结构 string（字符串）、hash（哈希）、list（列表）、set（集合）、zset（有序集合）</li>
+</ul>
+</li>
+<li><p>高速缓存</p>
+<ul>
+<li>10万+的QPS（查询次数/秒），集群可达百万级以上</li>
+<li>首页内容缓存优化（门户、新闻等）</li>
+<li>秒杀业务、抢购业务、库存控制等</li>
+</ul>
+</li>
+<li><p>启动redis<br><code>&gt;&gt; redis-server redis.windows.conf</code><br>可以做一个包含此命令的bat文件，每次双击启动</p>
+</li>
+<li><p>连接redis<br><code>&gt;&gt; redis-cli</code></p>
+<figure class="highlight plain"><figcaption><span>"password"```登录才有权限，不能漏掉双引号</span></figcaption><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">redis 没有表 缓存经常被读取的热数据的平台</span><br><span class="line">redis里面取出来的数据都是bytes类型的，所以要用decode方法转成字符串</span><br><span class="line"></span><br><span class="line">flushdb 清空逻辑表格</span><br><span class="line">flushall  清空逻辑库数据</span><br><span class="line"></span><br><span class="line">#### 字符串（String）相关操作</span><br><span class="line">- ```set``` -- 设置值</span><br><span class="line">- ```get``` -- 获取值</span><br><span class="line">- ```mset``` -- 设置多个键值对key-value</span><br><span class="line">- ```mget``` -- 获取多个键值对key-value</span><br><span class="line">- ```append``` -- 在字符串结尾添加字符串内容</span><br><span class="line">- ```del``` -- 删除</span><br><span class="line">- ```incr```/```decr``` -- 增加/减少 1</span><br><span class="line">incr num 数字自增加1</span><br><span class="line">incrby num 25 数字加上指定的整数值</span><br><span class="line">incrbyfloat num 2.5 数字加上指定的整数值</span><br><span class="line">decr num 数字自增减1</span><br><span class="line">decrby num 25 数字减去指定的整数值</span><br><span class="line"></span><br><span class="line">```redis</span><br><span class="line">&gt;set email scott@163.com</span><br><span class="line">&gt;get email</span><br><span class="line"></span><br><span class="line">&gt;mset a 10 b 20 c 30</span><br><span class="line">&gt;mget a b c email</span><br><span class="line"></span><br><span class="line">mset username scott sex male </span><br><span class="line">mget username sex  </span><br><span class="line"></span><br><span class="line">append username 123 在字符串结尾追加内容</span><br><span class="line">``` </span><br><span class="line"></span><br><span class="line">```redis</span><br><span class="line">&gt; incr count</span><br><span class="line">(integer) 1</span><br><span class="line">&gt; incr count</span><br><span class="line">(integer) 2</span><br><span class="line">&gt; incr count</span><br><span class="line">(integer) 3</span><br><span class="line">&gt; get count</span><br><span class="line">"3"</span><br><span class="line">&gt; incr count</span><br><span class="line">(integer) 4</span><br><span class="line">&gt; incr count</span><br><span class="line">(integer) 5</span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
+
+
+</li>
+</ul>
+<p>缓存</p>
+<ul>
+<li>内容变化不频繁</li>
+<li>几个小时、几天才变化一次</li>
+<li>重复性工作</li>
+<li>查询数据库</li>
+<li>生成响应数据</li>
+<li>优化一下：不查数据库，缓存内容</li>
+</ul>
+<p>getrange email 0 3 获得截取字符串内容<br>strlen emai 获得字符串长度</p>
+<p>setex 设置带有过期时间（秒）的 key-value<br>setex city 5 Beijing</p>
+<p>数据类型<br>String(字符串)：用来实现<br>简单的 KV 键值对存储，比如计数器</p>
+<p>哈希表 存储彼此相关信息的键值对，用HSET key filed value 来去设置一组相关信息，例如设置用户ID和名字相关联<br>HSET name { id: user_name}<br>hset 8000 ename Tom<br>hset  8000 job salesman<br>hmset 9000 ename Scott job salesman deptno 10</p>
+<p>hget 8000 ename<br>hmget 8000 ename job deptno<br>HGETALL 8000  必须大写</p>
+<p>hkeys 8000 获得所有哈希表字段名,key</p>
+<p>hlen 8000 获得所有哈希表key数量<br>hexists 8000 job 判断哈希表是否存在某个key字段名</p>
+<p>hvals 9000 获得哈希表素有字段值<br>hdel 9000 job deptno 删除哈希表的字段</p>
+<p>hdel 9000 key1 key2 </p>
+<p>HINCRBY 8000 deptno 10让哈希表某个字段加上指定的整数值<br>HINCRBYfloat 8000 sal 6.6</p>
+<p>列表类型：向value 保存序列化的数据，可重复<br>List(链表)：实现双向链表，比如用户的关注，粉丝列表<br>rpush list 1 2 3 # 创建并且依次向右边添加<br>lrange list 0 -1<br>1<br>2<br>3</p>
+<p>lpush list2 1 2 3 创建并且依次向右边添加<br>lrange list2 0 -1<br>3<br>2<br>1</p>
+<p>lpush dname 秘书处   # 在已存在的字段向左边</p>
+<p>lset dname 2 销售部 # 第二个位置<br>lrange dname 0 -1 打印列表第一个元素到最后一个元素<br>秘书处<br>技术部<br>销售部<br>售后部</p>
+<p>llen dname 获得列表长度<br>lindex 数字 获得列表某个元素<br>linsert dname before 秘书处 董事会 在某个位置插入元素之前<br>lpop dname 删除列表最左边的元素<br>rpop dname 删除列表最右边的元素</p>
+<p>rpush employee Scott<br>rpush employee Jack<br>rpush employee Scott<br>lrem employee 1 Scott 删除列表第一个元素<br>lrem employee 2 Scott 删除列表2个元素</p>
+<p>集合类型set 列表中的元素不可以重复 存储不重复元素，比如用户的关注者，没有顺序<br>SADD EMPNO 8000<br>SADD EMPNO 8001 8002<br>SMEMBERS EMPNO  获得集合所有元素，按照哈希值排序</p>
+<p>SCARD EMPNO 获得集合长度<br>sismember EMPNO 8000 判断是否含有某个元素<br>srem EMPNO 8001 删除元素，</p>
+<p>spop empno 随机删除并返回集合的某个元素<br>srandmember empno 33 随机返回集合中的3个元素</p>
+<p>有序集合Sorted Set 带排序功能的集合，按照元素分数值排序<br>zadd keyword 0 ‘JACK’ 0 ‘Miko’ 0 ‘Ashe’ 定义有序集合 先写分数值<br>zincrby keyword 1 ‘JACK’<br>zincrby keyword 5 ‘Ashe’<br>zincrby keyword 3 ‘Miko’<br>zincrby keyword 2 ‘Mikko’  mikko不存在则新建<br>zrange keyword 0 -1 获得有序集合的内容（升序）<br>zrevrange keyword 0 -1 获得有序集合的内容（降序）<br>zrevrange keyword 0 0 分数值最高的元素<br>zrangebyscore 获得分数值区间内容的集合内容（升序）<br>zrangebyscore keyword 0 2<br>zrangebyscore keyword 0 (2  不包括2<br>zrangebyscore keyword 2 +inf 正无穷<br>zrerangebyscore 获得分数值区间内容的集合内容（降序）<br>zrevrangebyscore keyword 3 0<br>zrevrangebyscore keyword (3 0   不包括3</p>
+<p>zcard keyword 获得有序集合长度<br>zcount keyword 2 4 查询某个分数值区间的元素数量<br>zscore keyword ‘Ashe’ 返回元素的分数值</p>
+<p>zrank keyword ‘Ashe’ 获得元素的升序排名（从0开始）<br>zrevrank keyword ‘Ashe’ 获得元素的降序排名（从0开始）<br>zrevrank keyword ‘Ashe’</p>
+<p>zrem keyword  ‘Miko’  ‘Ashe’  删除有序集合中的元素<br>zremrangebyrank keyword 0 2  删除排名区间内的元素<br>zremrangebyscore keyword -inf 2  删除排名区间内的元素</p>
+<p>exists employee 判断是否存在某个key<br>expire employee 5设置过期时间<br>expireat employee 12设置记录的过期时间(UNIX时间戳)<br>move keyword 1 记录迁移到其他逻辑库,1号逻辑库<br>select 1 切换到1号逻辑库<br>rename employee emp<br>presistkeyword 移除过期时间<br>type keyword 判断value数据类型</p>
+<p>为什么要一如线程池<br>如果程序中经常需要用到线程，频繁的创建和销毁线程会浪费很多硬件资源，所以需要把线程和任务分离开。线程可以反复利用，省去了重复创建的麻烦。</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/redis/" rel="tag"># redis</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/08/21/request-mo-kuai/" rel="prev" title="request模块">
+                  <i class="fa fa-chevron-left"></i> request模块
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/08/21/replace/" rel="next" title="replace">
+                  replace <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+<script src="/js/comments.js"></script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">外心人D</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

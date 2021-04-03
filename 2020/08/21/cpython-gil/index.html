@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<meta name="hexo-config" content="{&quot;hostname&quot;:&quot;bubbleboy11.github.io&quot;,&quot;root&quot;:&quot;/&quot;,&quot;images&quot;:&quot;/images&quot;,&quot;scheme&quot;:&quot;Muse&quot;,&quot;version&quot;:&quot;8.3.0&quot;,&quot;exturl&quot;:false,&quot;sidebar&quot;:{&quot;position&quot;:&quot;left&quot;,&quot;display&quot;:&quot;post&quot;,&quot;padding&quot;:18,&quot;offset&quot;:12},&quot;copycode&quot;:true,&quot;bookmark&quot;:{&quot;enable&quot;:false,&quot;color&quot;:&quot;#222&quot;,&quot;save&quot;:&quot;auto&quot;},&quot;fancybox&quot;:false,&quot;mediumzoom&quot;:false,&quot;lazyload&quot;:false,&quot;pangu&quot;:false,&quot;comments&quot;:{&quot;style&quot;:&quot;tabs&quot;,&quot;active&quot;:null,&quot;storage&quot;:true,&quot;lazyload&quot;:false,&quot;nav&quot;:null},&quot;motion&quot;:{&quot;enable&quot;:true,&quot;async&quot;:false,&quot;transition&quot;:{&quot;post_block&quot;:&quot;fadeIn&quot;,&quot;post_header&quot;:&quot;fadeInDown&quot;,&quot;post_body&quot;:&quot;fadeInDown&quot;,&quot;coll_header&quot;:&quot;fadeInLeft&quot;,&quot;sidebar&quot;:&quot;fadeInUp&quot;}},&quot;prism&quot;:false,&quot;i18n&quot;:{&quot;placeholder&quot;:&quot;搜索...&quot;,&quot;empty&quot;:&quot;没有找到任何搜索结果：${query}&quot;,&quot;hits_time&quot;:&quot;找到 ${hits} 个搜索结果（用时 ${time} 毫秒）&quot;,&quot;hits&quot;:&quot;找到 ${hits} 个搜索结果&quot;}}">
+<meta name="description" content="GIL Global Interpreter Lock (全局解释器锁) ，CPython GIL 就是 Cpython解释器的全局解释锁。  Cpython解释器的内存管理并不是线程安全的（如果有多个线程话它可能会同时去修改同一个对象，这样可能会出现一些问题） 保护多线程情况下对Python对象的访问 Cpython使用简单的锁机制避免多线程同时执行字节码  GIL影响 限制了程序的多核执行，单">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CPython GIL">
+<meta property="og:url" content="https://bubbleboy11.github.io/2020/08/21/cpython-gil/index.html">
+<meta property="og:site_name" content="外心人D的博客">
+<meta property="og:description" content="GIL Global Interpreter Lock (全局解释器锁) ，CPython GIL 就是 Cpython解释器的全局解释锁。  Cpython解释器的内存管理并不是线程安全的（如果有多个线程话它可能会同时去修改同一个对象，这样可能会出现一些问题） 保护多线程情况下对Python对象的访问 Cpython使用简单的锁机制避免多线程同时执行字节码  GIL影响 限制了程序的多核执行，单">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-08-20T16:21:41.000Z">
+<meta property="article:modified_time" content="2021-04-02T12:24:45.395Z">
+<meta property="article:author" content="外心人D">
+<meta property="article:tag" content="Leetcode">
+<meta property="article:tag" content="剑指offer">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://bubbleboy11.github.io/2020/08/21/cpython-gil/">
+
+
+
+<meta name="hexo-config-page" content="{&quot;sidebar&quot;:&quot;&quot;,&quot;isHome&quot;:false,&quot;isPost&quot;:true,&quot;lang&quot;:&quot;zh-CN&quot;}">
+<meta name="hexo-config-calendar" content="">
+<script data-pjax src="/js/load-config.js"></script>
+  <title>CPython GIL | 外心人D的博客</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="外心人D的博客" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">外心人D的博客</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#GIL-Global-Interpreter-Lock-%E5%85%A8%E5%B1%80%E8%A7%A3%E9%87%8A%E5%99%A8%E9%94%81-%EF%BC%8C"><span class="nav-text">GIL Global Interpreter Lock (全局解释器锁) ，</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GIL%E5%BD%B1%E5%93%8D"><span class="nav-text">GIL影响</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E8%A7%84%E9%81%BFGIL%E5%BD%B1%E5%93%8D"><span class="nav-text">如何规避GIL影响</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%A6%96%E5%85%88%E5%8C%BA%E5%88%86CPU%E5%92%8CIO%E5%AF%86%E9%9B%86%E7%A8%8B%E5%BA%8F"><span class="nav-text">首先区分CPU和IO密集程序</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GIL%E5%AE%9E%E7%8E%B0"><span class="nav-text">GIL实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GIL%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F"><span class="nav-text">GIL执行顺序</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">外心人D</p>
+  <div class="site-description" itemprop="description">本博客大多内容为慕课和网上博客，并非原创</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">165</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/cpython-gil/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          CPython GIL
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-04-02 12:24:45" itemprop="dateModified" datetime="2021-04-02T12:24:45Z">2021-04-02</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h3 id="GIL-Global-Interpreter-Lock-全局解释器锁-，"><a href="#GIL-Global-Interpreter-Lock-全局解释器锁-，" class="headerlink" title="GIL Global Interpreter Lock (全局解释器锁) ，"></a>GIL Global Interpreter Lock (全局解释器锁) ，</h3><p>CPython GIL 就是 Cpython解释器的全局解释锁。</p>
+<ul>
+<li>Cpython解释器的内存管理并不是线程安全的（如果有多个线程话它可能会同时去修改同一个对象，这样可能会出现一些问题）</li>
+<li>保护多线程情况下对Python对象的访问</li>
+<li>Cpython使用简单的锁机制避免多线程同时执行字节码</li>
+</ul>
+<h3 id="GIL影响"><a href="#GIL影响" class="headerlink" title="GIL影响"></a>GIL影响</h3><ul>
+<li><p>限制了程序的多核执行，单核CPU系统中，不存在真正的并发</p>
+<ul>
+<li>同一个时间只能有一个线程执行字节码，同一进程中假如有多个线程运行，一个线程在运行python程序的时候会霸占python解释器（加了一把锁），使该进程内的其他线程无法运行，等该线程运行完后其他线程才能运行。如果线程运行过程中遇到耗时操作，则解释器锁解开，使其他线程运行。所以在多线程中，线程的运行仍是有先后顺序的，并不是同时进行。</li>
+<li>CPU密集程序难以利用多核优势</li>
+</ul>
+</li>
+<li><p>IO期间会释放GIL，对IO密集程序影响不大<br>解释图：这个图里面有三个线程Thread1，Thread2，Thread3，在处理网络请求的过程中，虽然一个时间只能执行一个线程，但是在等待网络请求的时候来释放全局解释锁切换到不同线程Run运行，这就是对IO密集的程序会小一些。</p>
+</li>
+<li><p>一般程序分为CPU密集还有IO密集，</p>
+<ul>
+<li>CPU密集：把大量时间花在计算上面，磁盘硬盘读写</li>
+<li>IO密集：把大量时间花费在了传输上面。</li>
+</ul>
+</li>
+</ul>
+<h3 id="如何规避GIL影响"><a href="#如何规避GIL影响" class="headerlink" title="如何规避GIL影响"></a>如何规避GIL影响</h3><h4 id="首先区分CPU和IO密集程序"><a href="#首先区分CPU和IO密集程序" class="headerlink" title="首先区分CPU和IO密集程序"></a>首先区分CPU和IO密集程序</h4><ul>
+<li>CPU密集可以使用多进程+进程池来充分利用多核</li>
+<li>IO密集使用 多线程 / 协程</li>
+<li>CPU密集时候还可以用cython编写一些扩展来转换成cython代码。</li>
+<li>（cython不是Cpython解释器它是一个用来把python程序转换成C代码一个扩展）</li>
+</ul>
+<h3 id="GIL实现"><a href="#GIL实现" class="headerlink" title="GIL实现"></a>GIL实现</h3><pre><code>  Cpython里面才会有GIL，其他的实现不一定会有
+</code></pre>
+<p>解释图：每隔一段时间我们尝试去释放当前线程的锁，然后让其它线程尝试去获取锁并且去执行</p>
+<h3 id="GIL执行顺序"><a href="#GIL执行顺序" class="headerlink" title="GIL执行顺序"></a>GIL执行顺序</h3><ol>
+<li>设置GIL</li>
+<li>切换进一个线程去运行</li>
+<li>执行下面操作之一：</li>
+</ol>
+<ul>
+<li>指定数量的字节码指令</li>
+<li>线程主动让出控制权（可以调用time.sleep(0)来完成）</li>
+</ul>
+<ol start="4">
+<li>把线程设置回睡眠状态（切换出线程）</li>
+<li>解锁GIL</li>
+<li>重复上述步骤</li>
+</ol>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">from</span> threading <span class="keyword">import</span> Thread</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 单线程版</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">CountDown</span>(<span class="params">n</span>):</span></span><br><span class="line">    <span class="keyword">while</span> n &gt; <span class="number">0</span>:</span><br><span class="line">        n -= <span class="number">1</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    n = <span class="number">3000000</span></span><br><span class="line">    start_time = time.perf_counter()</span><br><span class="line">    CountDown(n)</span><br><span class="line">    end_time = time.perf_counter()</span><br><span class="line">    print(<span class="string">"n = {}，单线程版耗时{}"</span>.format(n, end_time-start_time))</span><br><span class="line">    <span class="comment"># 多线程版</span></span><br><span class="line">    start_time = time.perf_counter()</span><br><span class="line">    t1 = Thread(target = CountDown, args = [n//<span class="number">2</span>])</span><br><span class="line">    t2 = Thread(target = CountDown, args = [n//<span class="number">2</span>])</span><br><span class="line">    t1.start()</span><br><span class="line">    t2.start()</span><br><span class="line">    t1.join()</span><br><span class="line">    t2.join()</span><br><span class="line">    end_time = time.perf_counter()</span><br><span class="line">    print(<span class="string">"n = {}，多线程版耗时{}"</span>.format(n, end_time-start_time))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 对象引用计数</span></span><br><span class="line">    <span class="keyword">for</span> k <span class="keyword">in</span> range(<span class="number">100</span>):</span><br><span class="line">        a = []</span><br><span class="line">        b = a</span><br><span class="line">        print(sys.getrefcount(a))</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 线程安全</span></span><br><span class="line">        n = <span class="number">0</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">foo</span>():</span></span><br><span class="line">            <span class="keyword">global</span> n</span><br><span class="line">            n += <span class="number">1</span></span><br><span class="line"></span><br><span class="line">        threads = []</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">100</span>):</span><br><span class="line">            t = threading.Thread(target = foo)</span><br><span class="line">            threads.append(t)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> t <span class="keyword">in</span> threads:</span><br><span class="line">            t.start()</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> t <span class="keyword">in</span> threads:</span><br><span class="line">            t.join()</span><br><span class="line"></span><br><span class="line">        print(n)</span><br></pre></td></tr></tbody></table></figure><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Leetcode/" rel="tag"># Leetcode</a>
+              <a href="/tags/%E5%89%91%E6%8C%87offer/" rel="tag"># 剑指offer</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/08/21/csrf/" rel="prev" title="CSRF">
+                  <i class="fa fa-chevron-left"></i> CSRF
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/08/21/3/" rel="next" title="旅游网">
+                  旅游网 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+<script src="/js/comments.js"></script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">外心人D</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

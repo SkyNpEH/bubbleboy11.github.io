@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<meta name="hexo-config" content="{&quot;hostname&quot;:&quot;bubbleboy11.github.io&quot;,&quot;root&quot;:&quot;/&quot;,&quot;images&quot;:&quot;/images&quot;,&quot;scheme&quot;:&quot;Muse&quot;,&quot;version&quot;:&quot;8.3.0&quot;,&quot;exturl&quot;:false,&quot;sidebar&quot;:{&quot;position&quot;:&quot;left&quot;,&quot;display&quot;:&quot;post&quot;,&quot;padding&quot;:18,&quot;offset&quot;:12},&quot;copycode&quot;:true,&quot;bookmark&quot;:{&quot;enable&quot;:false,&quot;color&quot;:&quot;#222&quot;,&quot;save&quot;:&quot;auto&quot;},&quot;fancybox&quot;:false,&quot;mediumzoom&quot;:false,&quot;lazyload&quot;:false,&quot;pangu&quot;:false,&quot;comments&quot;:{&quot;style&quot;:&quot;tabs&quot;,&quot;active&quot;:null,&quot;storage&quot;:true,&quot;lazyload&quot;:false,&quot;nav&quot;:null},&quot;motion&quot;:{&quot;enable&quot;:true,&quot;async&quot;:false,&quot;transition&quot;:{&quot;post_block&quot;:&quot;fadeIn&quot;,&quot;post_header&quot;:&quot;fadeInDown&quot;,&quot;post_body&quot;:&quot;fadeInDown&quot;,&quot;coll_header&quot;:&quot;fadeInLeft&quot;,&quot;sidebar&quot;:&quot;fadeInUp&quot;}},&quot;prism&quot;:false,&quot;i18n&quot;:{&quot;placeholder&quot;:&quot;搜索...&quot;,&quot;empty&quot;:&quot;没有找到任何搜索结果：${query}&quot;,&quot;hits_time&quot;:&quot;找到 ${hits} 个搜索结果（用时 ${time} 毫秒）&quot;,&quot;hits&quot;:&quot;找到 ${hits} 个搜索结果&quot;}}">
+<meta name="description" content="Unix网络编程中提到了5种网络模型  Blocking IO 阻塞式IO，一次只能处理一个请求。 Noblocking IO 非阻塞式IO IO multiplexing IO多路复用（高并发框架使用） Signal Driven IO 信号驱动的IO Asynchronous IO 异步IO  如何提升服务器的并发能力呢？就是如何处理多个客户端连接一些常见的提升并发能力的方式  多线程模型，创">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HTML">
+<meta property="og:url" content="https://bubbleboy11.github.io/2020/08/21/io-duo-lu-fu-yong/index.html">
+<meta property="og:site_name" content="外心人D的博客">
+<meta property="og:description" content="Unix网络编程中提到了5种网络模型  Blocking IO 阻塞式IO，一次只能处理一个请求。 Noblocking IO 非阻塞式IO IO multiplexing IO多路复用（高并发框架使用） Signal Driven IO 信号驱动的IO Asynchronous IO 异步IO  如何提升服务器的并发能力呢？就是如何处理多个客户端连接一些常见的提升并发能力的方式  多线程模型，创">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-08-20T16:21:41.000Z">
+<meta property="article:modified_time" content="2021-04-02T12:24:46.061Z">
+<meta property="article:author" content="外心人D">
+<meta property="article:tag" content="Leetcode">
+<meta property="article:tag" content="剑指offer">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://bubbleboy11.github.io/2020/08/21/io-duo-lu-fu-yong/">
+
+
+
+<meta name="hexo-config-page" content="{&quot;sidebar&quot;:&quot;&quot;,&quot;isHome&quot;:false,&quot;isPost&quot;:true,&quot;lang&quot;:&quot;zh-CN&quot;}">
+<meta name="hexo-config-calendar" content="">
+<script data-pjax src="/js/load-config.js"></script>
+  <title>HTML | 外心人D的博客</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="外心人D的博客" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">外心人D的博客</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-overview-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">外心人D</p>
+  <div class="site-description" itemprop="description">本博客大多内容为慕课和网上博客，并非原创</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">165</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/io-duo-lu-fu-yong/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          HTML
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-04-02 12:24:46" itemprop="dateModified" datetime="2021-04-02T12:24:46Z">2021-04-02</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Markdown/" itemprop="url" rel="index"><span itemprop="name">Markdown</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>Unix网络编程中提到了5种网络模型</p>
+<ul>
+<li>Blocking IO 阻塞式IO，一次只能处理一个请求。</li>
+<li>Noblocking IO 非阻塞式IO</li>
+<li>IO multiplexing IO多路复用（高并发框架使用）</li>
+<li>Signal Driven IO 信号驱动的IO</li>
+<li>Asynchronous IO 异步IO</li>
+</ul>
+<p>如何提升服务器的并发能力呢？就是如何处理多个客户端连接<br>一些常见的提升并发能力的方式</p>
+<ul>
+<li>多线程模型，创建新的线程处理请求</li>
+<li>多进程模型，创建新的进程处理请求</li>
+</ul>
+<p>线程 / 进程创建开销比较大，可以用线程池方式解决<br>线程 / 进程比较占用资源，难以同时创建太多</p>
+<p>现在服务器基本使用 IO多路复用，实现单进程同时处理多个 socket 请求。</p>
+<p>3.什么是IO多路复用？<br>IO多路复用就是操作系统提供的同时监听多个 socket 的机制</p>
+<ul>
+<li>为了实现高并发需要一种机制并发处理多个 socket</li>
+<li>Linux 常见的是 select / poll / epoll 系统调用</li>
+<li>可以使用单线程单进程处理多个 socket<br>为什么 select 就能实现高并发呢？<br>select 可以同时处理多个 socket，有一个就绪应用程序代码就可以处理它<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 使用IO复用代码格式</span></span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    events = sel.select()    <span class="comment"># 系统阻塞在select，直到有一个socket就绪</span></span><br><span class="line">    <span class="keyword">for</span> key,mask <span class="keyword">in</span> events:   <span class="comment"># 当socket就绪之后就遍历事件</span></span><br><span class="line">        callback = key.data</span><br><span class="line">        callback(key.fileobj, mask)</span><br></pre></td></tr></tbody></table></figure>
+
+</li>
+</ul>
+<p>重点是索引就绪文件的时间复杂度，一般优先使用epoll,O(1)</p>
+<p>Python 封装了操作系统的IO多路复用<br>Python 的IO多路复用基于操作系统实现( select / poll / epoll )<br>Python2 select 模块<br>Python3 selectors 模块<br>selectors模块<br>事件类型: </p>
+<ul>
+<li>EVENT_READ 表示socket可读，</li>
+<li>EVENT_WRITE 表示socket可写</li>
+</ul>
+<p>Default selector:自动根据平台选取合适的o模型</p>
+<ul>
+<li>register(fileobj, events, data=None)</li>
+<li>unregister(fileobj)</li>
+<li>modify(fileobj, events, data=None)</li>
+<li>select(timeout=None): returns[(key, events)]</li>
+<li>close()</li>
+</ul>
+<p>下面是一个简单的echo服务器实现 ：异步的TCP回显,它能够并发的处理客户端请求，把客户端发的再发回去，这就是TCP回显服务器。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> selectors</span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"> </span><br><span class="line">sel = selectors.DefaultSelector()</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">accept</span>(<span class="params">sock, mask</span>):</span></span><br><span class="line">    conn, addr = sock.accept()  <span class="comment"># Should be ready</span></span><br><span class="line">    print(<span class="string">'accepted'</span>, conn, <span class="string">'from'</span>, addr)</span><br><span class="line">    conn.setblocking(<span class="literal">False</span>)</span><br><span class="line">    sel.register(conn, selectors.EVENT_READ, read)  <span class="comment"># 注册read回调</span></span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">read</span>(<span class="params">conn, mask</span>):</span></span><br><span class="line">    data = conn.recv(<span class="number">1000</span>)  <span class="comment"># Should be ready</span></span><br><span class="line">    <span class="keyword">if</span> data:</span><br><span class="line">        print(<span class="string">'echoing'</span>, repr(data), <span class="string">'to'</span>, conn)</span><br><span class="line">        conn.send(data)  <span class="comment"># Hope it won't block</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        print(<span class="string">'closing'</span>, conn)</span><br><span class="line">        sel.unregister(conn)</span><br><span class="line">        conn.close()</span><br><span class="line"> </span><br><span class="line"><span class="comment"># 服务端</span></span><br><span class="line">sock = socket.socket()</span><br><span class="line">sock.bind((<span class="string">'localhost'</span>, <span class="number">1234</span>))</span><br><span class="line">sock.listen(<span class="number">100</span>)</span><br><span class="line">sock.setblocking(<span class="literal">False</span>)</span><br><span class="line">sel.register(sock, selectors.EVENT_READ, accept) <span class="comment"># 注册accept回调</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:       <span class="comment"># 事件循环</span></span><br><span class="line">    events = sel.select()</span><br><span class="line">    <span class="keyword">for</span> key, mask <span class="keyword">in</span> events:</span><br><span class="line">        callback = key.data</span><br><span class="line">        callback(key.fileobj, mask)</span><br></pre></td></tr></tbody></table></figure><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Leetcode/" rel="tag"># Leetcode</a>
+              <a href="/tags/%E5%89%91%E6%8C%87offer/" rel="tag"># 剑指offer</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/08/21/lrucache/" rel="prev" title="HTML">
+                  <i class="fa fa-chevron-left"></i> HTML
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/08/21/http-fang-fa/" rel="next" title="HTTP 方法">
+                  HTTP 方法 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+<script src="/js/comments.js"></script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">外心人D</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

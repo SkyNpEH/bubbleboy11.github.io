@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<meta name="hexo-config" content="{&quot;hostname&quot;:&quot;bubbleboy11.github.io&quot;,&quot;root&quot;:&quot;/&quot;,&quot;images&quot;:&quot;/images&quot;,&quot;scheme&quot;:&quot;Muse&quot;,&quot;version&quot;:&quot;8.3.0&quot;,&quot;exturl&quot;:false,&quot;sidebar&quot;:{&quot;position&quot;:&quot;left&quot;,&quot;display&quot;:&quot;post&quot;,&quot;padding&quot;:18,&quot;offset&quot;:12},&quot;copycode&quot;:true,&quot;bookmark&quot;:{&quot;enable&quot;:false,&quot;color&quot;:&quot;#222&quot;,&quot;save&quot;:&quot;auto&quot;},&quot;fancybox&quot;:false,&quot;mediumzoom&quot;:false,&quot;lazyload&quot;:false,&quot;pangu&quot;:false,&quot;comments&quot;:{&quot;style&quot;:&quot;tabs&quot;,&quot;active&quot;:null,&quot;storage&quot;:true,&quot;lazyload&quot;:false,&quot;nav&quot;:null},&quot;motion&quot;:{&quot;enable&quot;:true,&quot;async&quot;:false,&quot;transition&quot;:{&quot;post_block&quot;:&quot;fadeIn&quot;,&quot;post_header&quot;:&quot;fadeInDown&quot;,&quot;post_body&quot;:&quot;fadeInDown&quot;,&quot;coll_header&quot;:&quot;fadeInLeft&quot;,&quot;sidebar&quot;:&quot;fadeInUp&quot;}},&quot;prism&quot;:false,&quot;i18n&quot;:{&quot;placeholder&quot;:&quot;搜索...&quot;,&quot;empty&quot;:&quot;没有找到任何搜索结果：${query}&quot;,&quot;hits_time&quot;:&quot;找到 ${hits} 个搜索结果（用时 ${time} 毫秒）&quot;,&quot;hits&quot;:&quot;找到 ${hits} 个搜索结果&quot;}}">
+<meta name="description" content="实现同步登录及退出实现步骤 第一步，准备登录的Django模板、表单新建accounts\templates12345678910111213141516&#96;&#96;&#96;html&lt;!DOCTYPE html&gt;&lt;html lang&#x3D;&quot;en&quot;&gt;&lt;head&gt;  &lt;meta charset&#x3D;&quot;UTF-8&quot;&gt;  &lt;title&gt;用户的基本信息&lt;&#x2F;titl">
+<meta property="og:type" content="article">
+<meta property="og:title" content="实现同步登录及退出实现步骤">
+<meta property="og:url" content="https://bubbleboy11.github.io/2020/08/21/shi-xian-tong-bu-deng-lu-ji-tui-chu-shi-xian-bu-zou/index.html">
+<meta property="og:site_name" content="外心人D的博客">
+<meta property="og:description" content="实现同步登录及退出实现步骤 第一步，准备登录的Django模板、表单新建accounts\templates12345678910111213141516&#96;&#96;&#96;html&lt;!DOCTYPE html&gt;&lt;html lang&#x3D;&quot;en&quot;&gt;&lt;head&gt;  &lt;meta charset&#x3D;&quot;UTF-8&quot;&gt;  &lt;title&gt;用户的基本信息&lt;&#x2F;titl">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-08-20T16:21:41.000Z">
+<meta property="article:modified_time" content="2021-04-02T12:24:45.962Z">
+<meta property="article:author" content="外心人D">
+<meta property="article:tag" content="django">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://bubbleboy11.github.io/2020/08/21/shi-xian-tong-bu-deng-lu-ji-tui-chu-shi-xian-bu-zou/">
+
+
+
+<meta name="hexo-config-page" content="{&quot;sidebar&quot;:&quot;&quot;,&quot;isHome&quot;:false,&quot;isPost&quot;:true,&quot;lang&quot;:&quot;zh-CN&quot;}">
+<meta name="hexo-config-calendar" content="">
+<script data-pjax src="/js/load-config.js"></script>
+  <title>实现同步登录及退出实现步骤 | 外心人D的博客</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="外心人D的博客" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">外心人D的博客</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E5%90%8C%E6%AD%A5%E7%99%BB%E5%BD%95%E5%8F%8A%E9%80%80%E5%87%BA"><span class="nav-text">实现同步登录及退出</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E6%AD%A5%E9%AA%A4"><span class="nav-text">实现步骤</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E6%88%B7%E9%80%80%E5%87%BA"><span class="nav-text">用户退出</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E6%88%B7%E7%99%BB%E5%BD%95%E3%80%81%E9%80%80%E5%87%BA%E6%8E%A5%E5%8F%A3%E5%BC%80%E5%8F%91"><span class="nav-text">用户登录、退出接口开发</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BC%80%E5%8F%91%E6%AD%A5%E9%AA%A4"><span class="nav-text">开发步骤</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E6%88%B7%E8%AF%A6%E6%83%85%E6%8E%A5%E5%8F%A3%E5%BC%80%E5%8F%91"><span class="nav-text">用户详情接口开发</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BC%80%E5%8F%91%E6%AD%A5%E9%AA%A4-1"><span class="nav-text">开发步骤</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">外心人D</p>
+  <div class="site-description" itemprop="description">本博客大多内容为慕课和网上博客，并非原创</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">165</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/shi-xian-tong-bu-deng-lu-ji-tui-chu-shi-xian-bu-zou/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          实现同步登录及退出实现步骤
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-04-02 12:24:45" itemprop="dateModified" datetime="2021-04-02T12:24:45Z">2021-04-02</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%97%85%E6%B8%B8%E7%BD%91%E9%A1%B9%E7%9B%AE/" itemprop="url" rel="index"><span itemprop="name">旅游网项目</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h3 id="实现同步登录及退出"><a href="#实现同步登录及退出" class="headerlink" title="实现同步登录及退出"></a>实现同步登录及退出</h3><h4 id="实现步骤"><a href="#实现步骤" class="headerlink" title="实现步骤"></a>实现步骤</h4><ul>
+<li>第一步，准备登录的Django模板、表单<br>新建<code>accounts\templates</code><figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">```html</span><br><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html lang="en"&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta charset="UTF-8"&gt;</span><br><span class="line">  &lt;title&gt;用户的基本信息&lt;/title&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;p&gt;</span><br><span class="line">    当前登录的用户是：{{ user.username }}-{{ user.email }}</span><br><span class="line">  &lt;/p&gt;</span><br><span class="line">  {% if user.is_authenticated %}</span><br><span class="line">  &lt;a href="/accounts/user/logout/"&gt;退出登录&lt;/a&gt;</span><br><span class="line">  {% endif %}</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></tbody></table></figure>
+
+</li>
+</ul>
+<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">```html</span><br><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html lang="en"&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta charset="UTF-8"&gt;</span><br><span class="line">  &lt;title&gt;用户登录&lt;/title&gt;</span><br><span class="line">  &lt;style type="text/css"&gt;</span><br><span class="line">    .errorlist {</span><br><span class="line">      color: #f00;</span><br><span class="line">    }</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;h3&gt;用户登录&lt;/h3&gt;</span><br><span class="line">  &lt;form action="." method="post"&gt;</span><br><span class="line">    {% csrf_token %}</span><br><span class="line">{#    {{ form.as_p }}#}</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;!-- 用户名 --&gt;</span><br><span class="line">      {{ form.username.label }}</span><br><span class="line">      {{ form.username }}</span><br><span class="line">      {{ form.username.errors.as_text }}</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;!-- 密码 --&gt;</span><br><span class="line">      {{ form.password.label }}</span><br><span class="line">      {{ form.password }}</span><br><span class="line">      {{ form.password.errors.as_text }}</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      {{ form.non_field_errors.as_text }}</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;input type="submit" value="登录"&gt;</span><br><span class="line">  &lt;/form&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>accounts\forms.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> re</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> django <span class="keyword">import</span> forms</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> accounts.models <span class="keyword">import</span> User</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LoginForm</span>(<span class="params">forms.Form</span>):</span></span><br><span class="line">    <span class="string">""" 登录表单 """</span></span><br><span class="line">    username = forms.CharField(label=<span class="string">'用户名'</span>,</span><br><span class="line">                               max_length=<span class="number">100</span>,</span><br><span class="line">                               required=<span class="literal">False</span>,</span><br><span class="line">                               help_text=<span class="string">'使用帮助'</span>,</span><br><span class="line">                               initial=<span class="string">'admin'</span>)</span><br><span class="line">    password = forms.CharField(label=<span class="string">'密码'</span>, max_length=<span class="number">200</span>, min_length=<span class="number">6</span>,</span><br><span class="line">                               widget=forms.PasswordInput)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">clean_username</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="string">""" 验证用户名 hook 钩子函数 """</span></span><br><span class="line">        username = self.cleaned_data[<span class="string">'username'</span>]</span><br><span class="line">        pattern = <span class="string">r'^1[0-9]{10}$'</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> re.search(pattern, username):</span><br><span class="line">            <span class="keyword">raise</span> forms.ValidationError(<span class="string">'手机号%s输入不正确'</span>,</span><br><span class="line">                                        code=<span class="string">'invalid_phone'</span>,</span><br><span class="line">                                        params=(username, ))</span><br><span class="line">        <span class="keyword">return</span> username</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">clean</span>(<span class="params">self</span>):</span></span><br><span class="line">        data = super().clean()</span><br><span class="line">        print(data)</span><br><span class="line">        <span class="comment"># 如果单个字段有错误，直接返回，不执行后面的验证</span></span><br><span class="line">        <span class="keyword">if</span> self.errors:</span><br><span class="line">            <span class="keyword">return</span></span><br><span class="line">        username = data[<span class="string">'username'</span>]</span><br><span class="line">        password = data[<span class="string">'password'</span>]</span><br><span class="line">        <span class="comment"># username = data.get('username', None)</span></span><br><span class="line">        <span class="comment"># password = data.get('password', None)</span></span><br><span class="line">        <span class="keyword">if</span> username <span class="keyword">and</span> password:</span><br><span class="line">            <span class="comment"># 查询用户名和密码匹配的用户</span></span><br><span class="line">            user_list = User.objects.filter(username=username)</span><br><span class="line">            err_list = []</span><br><span class="line">            <span class="keyword">if</span> user_list.count() == <span class="number">0</span>:</span><br><span class="line">                err_list.append(forms.ValidationError(<span class="string">'用户名不存在'</span>))</span><br><span class="line">                <span class="comment"># raise forms.ValidationError('用户名不存在')</span></span><br><span class="line">            <span class="comment"># 验证密码是否正确</span></span><br><span class="line">            <span class="comment"># TODO 使用加密算法进行验证</span></span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> user_list.filter(password=password).exists():</span><br><span class="line">                <span class="comment"># raise forms.ValidationError('密码不正确')</span></span><br><span class="line">                err_list.append(forms.ValidationError(<span class="string">'密码不正确'</span>))</span><br><span class="line">            <span class="keyword">if</span> err_list:</span><br><span class="line">                <span class="keyword">raise</span> forms.ValidationError(err_list)</span><br><span class="line">        <span class="keyword">return</span> data</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>accounts\views.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.contrib.auth <span class="keyword">import</span> logout</span><br><span class="line"><span class="keyword">from</span> django.contrib.auth.decorators <span class="keyword">import</span> login_required</span><br><span class="line"><span class="keyword">from</span> django.shortcuts <span class="keyword">import</span> render, redirect</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> accounts.forms <span class="keyword">import</span> LoginForm</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">user_login</span>(<span class="params">request</span>):</span></span><br><span class="line">    <span class="string">""" 用户登录 """</span></span><br><span class="line">    <span class="keyword">if</span> request.method == <span class="string">'POST'</span>:</span><br><span class="line">        form = LoginForm(data=request.POST)</span><br><span class="line">        <span class="keyword">if</span> form.is_valid():</span><br><span class="line">            form.do_login(request)</span><br><span class="line">            print(<span class="string">'表单验证通过'</span>)</span><br><span class="line">            <span class="keyword">return</span> redirect(<span class="string">'/accounts/user/info/'</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            print(form.errors)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        form = LoginForm()</span><br><span class="line">    <span class="keyword">return</span> render(request, <span class="string">'user_login.html'</span>, {</span><br><span class="line">        <span class="string">'form'</span>: form</span><br><span class="line">    })</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># @login_required(login_url='/accounts/user/login/')</span></span><br><span class="line"><span class="meta">@login_required</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">user_info</span>(<span class="params">request</span>):</span></span><br><span class="line">    <span class="string">""" 用户信息 """</span></span><br><span class="line">    print(request.user)</span><br><span class="line">    <span class="keyword">return</span> render(request, <span class="string">'user_info.html'</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>accounts\urls.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.urls <span class="keyword">import</span> path</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> accounts <span class="keyword">import</span> views</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    <span class="comment"># 用户登录表单</span></span><br><span class="line">    path(<span class="string">'user/login/'</span>, views.user_login, name=<span class="string">'user_login'</span>),</span><br><span class="line">    path(<span class="string">'user/info/'</span>, views.user_info, name=<span class="string">'user_info'</span>),</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>trip\urls.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">urlpatterns = [</span><br><span class="line">    path(<span class="string">'admin/'</span>, admin.site.urls),</span><br><span class="line">    <span class="comment"># 用户账户模块</span></span><br><span class="line">    path(<span class="string">'accounts/'</span>, include(<span class="string">'accounts.urls'</span>)),</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
+
+<ul>
+<li><p>第二步，设计用户模型<br><code>accounts\models.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Profile</span>(<span class="params">models.Model</span>):</span></span><br><span class="line">    <span class="string">""" 用户详细信息 """</span></span><br><span class="line">    <span class="comment"># 性别</span></span><br><span class="line">    <span class="comment"># 手机号码</span></span><br><span class="line">    <span class="comment"># 年龄</span></span><br><span class="line">    <span class="comment"># 生日</span></span><br><span class="line">    <span class="comment"># 真实姓名</span></span><br><span class="line">    SEX_CHOICES = (</span><br><span class="line">        (<span class="number">1</span>, <span class="string">'男'</span>),</span><br><span class="line">        (<span class="number">0</span>, <span class="string">'女'</span>),</span><br><span class="line">    )</span><br><span class="line">    username = models.CharField(<span class="string">'用户名'</span>, max_length=<span class="number">64</span>, unique=<span class="literal">True</span>, editable=<span class="literal">False</span>)</span><br><span class="line">    user = models.OneToOneField(User, related_name=<span class="string">'profile'</span>, on_delete=models.CASCADE)</span><br><span class="line">    real_name = models.CharField(<span class="string">'真实姓名'</span>, max_length=<span class="number">32</span>)</span><br><span class="line">    email = models.CharField(<span class="string">'电子邮箱'</span>, max_length=<span class="number">128</span>, null=<span class="literal">True</span>, blank=<span class="literal">True</span>)</span><br><span class="line">    is_email_valid = models.BooleanField(<span class="string">'邮箱是否已经验证'</span>, default=<span class="literal">False</span>)</span><br><span class="line">    phone_no = models.CharField(<span class="string">'手机号码'</span>, max_length=<span class="number">20</span>, null=<span class="literal">True</span>, blank=<span class="literal">True</span>)</span><br><span class="line">    is_phone_valid = models.BooleanField(<span class="string">'是否已经验证'</span>, default=<span class="literal">False</span>)</span><br><span class="line">    sex = models.SmallIntegerField(<span class="string">'性别'</span>, default=<span class="number">1</span>, choices=SEX_CHOICES)</span><br><span class="line">    age = models.SmallIntegerField(<span class="string">'年龄'</span>, default=<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">    source = models.CharField(<span class="string">'登录的来源'</span>, max_length=<span class="number">16</span>, null=<span class="literal">True</span>)</span><br><span class="line">    version = models.CharField(<span class="string">'登录的版本'</span>, max_length=<span class="number">16</span>, null=<span class="literal">True</span>)</span><br><span class="line">    created_at = models.DateTimeField(<span class="string">'创建时间'</span>, auto_now_add=<span class="literal">True</span>)</span><br><span class="line">    updated_at = models.DateTimeField(<span class="string">'修改时间'</span>, auto_now=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        db_table = <span class="string">'accounts_user_profile'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LoginRecord</span>(<span class="params">models.Model</span>):</span></span><br><span class="line">    <span class="string">""" 用户登录日志 """</span></span><br><span class="line">    <span class="comment"># 关联用户</span></span><br><span class="line">    <span class="comment"># 登录账号</span></span><br><span class="line">    <span class="comment"># 登录的时间</span></span><br><span class="line">    <span class="comment"># ip</span></span><br><span class="line">    <span class="comment"># 登录的来源</span></span><br><span class="line">    <span class="comment"># 登录的客户端版本号</span></span><br><span class="line">    user = models.ForeignKey(User, related_name=<span class="string">'login_records'</span>, on_delete=models.CASCADE)</span><br><span class="line">    username = models.CharField(<span class="string">'登录的账号'</span>, max_length=<span class="number">64</span>)</span><br><span class="line">    ip = models.CharField(<span class="string">'IP'</span>, max_length=<span class="number">32</span>)</span><br><span class="line">    address = models.CharField(<span class="string">'地址'</span>, max_length=<span class="number">32</span>, null=<span class="literal">True</span>, blank=<span class="literal">True</span>)</span><br><span class="line">    source = models.CharField(<span class="string">'登录的来源'</span>, max_length=<span class="number">16</span>, null=<span class="literal">True</span>)</span><br><span class="line">    version = models.CharField(<span class="string">'登录的版本'</span>, max_length=<span class="number">16</span>, null=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    created_at = models.DateTimeField(<span class="string">'登录时间'</span>, auto_now_add=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        db_table = <span class="string">'accounts_login_record'</span></span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt;python manage.py check</span><br><span class="line">&gt;python manage.py makemigrations</span><br><span class="line">&gt;python manage.py migrate  </span><br></pre></td></tr></tbody></table></figure>
+</li>
+<li><p>第三步，实现用户的同步登录</p>
+</li>
+<li><p>第四步，添加登录拦截，用户登录了可以看用户信息，没登陆看用户信息先登录</p>
+</li>
+<li><p>第五步，实现退出登录的功能用户登录</p>
+</li>
+<li><p>步骤一：认证用户<br><code>user = authenticate(username='john', password='secret')</code><br><code>accounts\forms.py</code></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> re</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> django <span class="keyword">import</span> forms</span><br><span class="line"><span class="keyword">from</span> django.contrib.auth <span class="keyword">import</span> authenticate, login</span><br><span class="line"><span class="keyword">from</span> django.utils.timezone <span class="keyword">import</span> now</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> accounts.models <span class="keyword">import</span> User</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LoginForm</span>(<span class="params">forms.Form</span>):</span></span><br><span class="line">    <span class="string">""" 登录表单 """</span></span><br><span class="line">    username = forms.CharField(label=<span class="string">'用户名'</span>,</span><br><span class="line">                               max_length=<span class="number">100</span>,</span><br><span class="line">                               required=<span class="literal">False</span>,</span><br><span class="line">                               help_text=<span class="string">'使用帮助'</span>,</span><br><span class="line">                               initial=<span class="string">'admin'</span>)</span><br><span class="line">    password = forms.CharField(label=<span class="string">'密码'</span>,</span><br><span class="line">                               max_length=<span class="number">200</span>,</span><br><span class="line">                               min_length=<span class="number">6</span>,</span><br><span class="line">                               widget=forms.PasswordInput)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, *args, **kwargs</span>):</span></span><br><span class="line">        super().__init__(*args, **kwargs)</span><br><span class="line">        <span class="comment"># 当前登录的用户</span></span><br><span class="line">        self.user = <span class="literal">None</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">clean_username</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="string">""" 验证用户名 hook 钩子函数 """</span></span><br><span class="line">        username = self.cleaned_data[<span class="string">'username'</span>]</span><br><span class="line">        pattern = <span class="string">r'^1[0-9]{10}$'</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> re.search(pattern, username):</span><br><span class="line">            <span class="keyword">raise</span> forms.ValidationError(<span class="string">'手机号%s输入不正确'</span>,</span><br><span class="line">                                        code=<span class="string">'invalid_phone'</span>,</span><br><span class="line">                                        params=(username,))</span><br><span class="line">        <span class="keyword">return</span> username</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">clean</span>(<span class="params">self</span>):</span></span><br><span class="line">        data = super().clean()</span><br><span class="line">        print(data)</span><br><span class="line">        <span class="comment"># 如果单个字段有错误，直接返回，不执行后面的验证</span></span><br><span class="line">        <span class="keyword">if</span> self.errors:</span><br><span class="line">            <span class="keyword">return</span></span><br><span class="line">        username = data.get(<span class="string">'username'</span>, <span class="literal">None</span>)</span><br><span class="line">        password = data.get(<span class="string">'password'</span>, <span class="literal">None</span>)</span><br><span class="line">        user = authenticate(username=username, password=password)</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> user:</span><br><span class="line">            <span class="keyword">raise</span> forms.ValidationError(<span class="string">'用户名或者是密码不正确'</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> user.is_active:</span><br><span class="line">                <span class="keyword">raise</span> forms.ValidationError(<span class="string">'该用户已经被禁用'</span>)</span><br><span class="line">        self.user = user</span><br><span class="line">        <span class="keyword">return</span> data</span><br></pre></td></tr></tbody></table></figure>
+</li>
+<li><p>步骤二：判断认证后的用户是否为None<br>用户不为None则表示用户认证通过</p>
+</li>
+<li><p>步骤三：调用<code>login(request, user, backend=None)</code>函数登录用户<br><code>accounts\forms.py</code></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> re</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> django <span class="keyword">import</span> forms</span><br><span class="line"><span class="keyword">from</span> django.contrib.auth <span class="keyword">import</span> authenticate, login</span><br><span class="line"><span class="keyword">from</span> django.utils.timezone <span class="keyword">import</span> now</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> accounts.models <span class="keyword">import</span> User</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LoginForm</span>(<span class="params">forms.Form</span>):</span></span><br><span class="line">    <span class="string">""" 登录表单 """</span></span><br><span class="line">    username = forms.CharField(label=<span class="string">'用户名'</span>)</span><br><span class="line">    password = forms.CharField(label=<span class="string">'密码'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, *args, **kwargs</span>):</span></span><br><span class="line">        super().__init__(*args, **kwargs)</span><br><span class="line">        <span class="comment"># 当前登录的用户</span></span><br><span class="line">        self.user = <span class="literal">None</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">do_login</span>(<span class="params">self, request</span>):</span></span><br><span class="line">        <span class="string">""" 执行用户登录 """</span></span><br><span class="line">        user = self.user</span><br><span class="line">        <span class="comment"># 调用登录</span></span><br><span class="line">        login(request, user)</span><br><span class="line">        <span class="comment"># 修改最后登录的时间</span></span><br><span class="line">        user.last_login = now()</span><br><span class="line">        user.save()</span><br><span class="line">        <span class="comment"># TODO 保存登录历史</span></span><br><span class="line">        <span class="keyword">return</span> user</span><br></pre></td></tr></tbody></table></figure>
+
+</li>
+</ul>
+<p><code>accounts/views.py</code></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.contrib.auth <span class="keyword">import</span> logout</span><br><span class="line"><span class="keyword">from</span> django.contrib.auth.decorators <span class="keyword">import</span> login_required</span><br><span class="line"><span class="keyword">from</span> django.shortcuts <span class="keyword">import</span> render, redirect</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> accounts.forms <span class="keyword">import</span> LoginForm</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">user_login</span>(<span class="params">request</span>):</span></span><br><span class="line">    <span class="string">""" 用户登录 """</span></span><br><span class="line">    <span class="keyword">if</span> request.method == <span class="string">'POST'</span>:</span><br><span class="line">        form = LoginForm(data=request.POST)</span><br><span class="line">        <span class="keyword">if</span> form.is_valid():</span><br><span class="line">            form.do_login(request)</span><br><span class="line">            print(<span class="string">'表单验证通过'</span>)</span><br><span class="line">            <span class="keyword">return</span> redirect(<span class="string">'/accounts/user/info/'</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            print(form.errors)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        form = LoginForm()</span><br><span class="line">    <span class="keyword">return</span> render(request, <span class="string">'user_login.html'</span>, {</span><br><span class="line">        <span class="string">'form'</span>: form</span><br><span class="line">    })</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 需要登录以后才能访问user_info，</span></span><br><span class="line"><span class="comment"># 否则跳转到登录地址http://127.0.0.1:8000/accounts/user/login/?next=/accounts/user/info/</span></span><br><span class="line"><span class="comment"># 方式一</span></span><br><span class="line"><span class="comment"># @login_required(login_url='/accounts/user/login/')</span></span><br><span class="line"><span class="comment"># 方式二  trip/settings.py加上LOGIN_URL = '/accounts/user/login/'</span></span><br><span class="line"><span class="meta">@login_required</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">user_info</span>(<span class="params">request</span>):</span></span><br><span class="line">    <span class="string">""" 用户信息 """</span></span><br><span class="line">    print(request.user)</span><br><span class="line">    <span class="keyword">return</span> render(request, <span class="string">'user_info.html'</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>trip/settings.py</code></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LOGIN_URL = <span class="string">'/accounts/user/login/'</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>accounts/urls.py</code></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">urlpatterns = [</span><br><span class="line">    <span class="comment"># 用户登录表单</span></span><br><span class="line">    path(<span class="string">'user/login/'</span>, views.user_login, name=<span class="string">'user_login'</span>),</span><br><span class="line">    path(<span class="string">'user/info/'</span>, views.user_info, name=<span class="string">'user_info'</span>),</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="用户退出"><a href="#用户退出" class="headerlink" title="用户退出"></a>用户退出</h3><ul>
+<li>使用<code>logout</code>函数退出当前登录的用户<br><code>accounts/views.py</code><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.contrib.auth <span class="keyword">import</span> logout</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">user_logout</span>(<span class="params">request</span>):</span></span><br><span class="line">    <span class="string">""" 用户退出登录 """</span></span><br><span class="line">    logout(request)</span><br><span class="line">    <span class="keyword">return</span> redirect(<span class="string">'/accounts/user/info/'</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+</li>
+</ul>
+<p><code>accounts/urls.py</code></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">urlpatterns = [</span><br><span class="line">    <span class="comment"># 用户退出登录</span></span><br><span class="line">    path(<span class="string">'user/logout/'</span>, views.user_logout, name=<span class="string">'user_logout'</span>),</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="用户登录、退出接口开发"><a href="#用户登录、退出接口开发" class="headerlink" title="用户登录、退出接口开发"></a>用户登录、退出接口开发</h3><h4 id="开发步骤"><a href="#开发步骤" class="headerlink" title="开发步骤"></a>开发步骤</h4><ul>
+<li>第一步，设计接口返回内容及字段</li>
+<li>第二步，编写接口代码</li>
+<li>第三步，模拟HTTP请求，测试验证接口</li>
+</ul>
+<p><code>accounts/urls.py</code></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">urlpatterns = [</span><br><span class="line">    <span class="comment"># 登录和退出的接口</span></span><br><span class="line">    path(<span class="string">'user/api/login/'</span>, views.user_api_login, name=<span class="string">'user_api_login'</span>),</span><br><span class="line">    path(<span class="string">'user/api/logout/'</span>, views.user_api_logout, name=<span class="string">'user_api_logout'</span>),</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>utils/response.py</code></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.http <span class="keyword">import</span> JsonResponse</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BadRequestJsonResponse</span>(<span class="params">JsonResponse</span>):</span></span><br><span class="line">    <span class="string">""" 表单请求验证没有通过，错误显示 """</span></span><br><span class="line">    status_code = <span class="number">400</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, err_list=[], *args, **kwargs</span>):</span></span><br><span class="line">        data = {</span><br><span class="line">            <span class="string">"error_code"</span>: <span class="string">"400000"</span>,</span><br><span class="line">            <span class="string">"error_msg"</span>: <span class="string">"参数格式不正确"</span>,</span><br><span class="line">            <span class="string">"error_list"</span>: err_list</span><br><span class="line">        }</span><br><span class="line">        super().__init__(data, *args, **kwargs)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MethodNotAllowedJsonResponse</span>(<span class="params">JsonResponse</span>):</span></span><br><span class="line">    <span class="string">""" 请求方式不被允许 """</span></span><br><span class="line">    status_code = <span class="number">405</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, *args, **kwargs</span>):</span></span><br><span class="line">        data = {</span><br><span class="line">            <span class="string">"error_code"</span>: <span class="string">"405000"</span>,</span><br><span class="line">            <span class="string">"error_msg"</span>: <span class="string">"请求方式不被允许"</span>,</span><br><span class="line">        }</span><br><span class="line">        super().__init__(data, *args, **kwargs)</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>accounts/serializers.py</code></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> utils.serializers <span class="keyword">import</span> BaseSerializer</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserSerializer</span>(<span class="params">BaseSerializer</span>):</span></span><br><span class="line">    <span class="string">""" 用户的基础信息 """</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">to_dict</span>(<span class="params">self</span>):</span></span><br><span class="line">        user = self.obj</span><br><span class="line">        <span class="keyword">return</span> {</span><br><span class="line">            <span class="string">'username'</span>: user.username,</span><br><span class="line">            <span class="string">'nickname'</span>: user.nickname,</span><br><span class="line">            <span class="string">'avatar'</span>: user.avatar.url</span><br><span class="line">        }</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserProfileSerializer</span>(<span class="params">BaseSerializer</span>):</span></span><br><span class="line">    <span class="string">""" 用户的详细信息 """</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">to_dict</span>(<span class="params">self</span>):</span></span><br><span class="line">        profile = self.obj</span><br><span class="line">        <span class="keyword">return</span> {</span><br><span class="line">            <span class="string">'real_name'</span>: profile.real_name,</span><br><span class="line">            <span class="string">'sex'</span>: profile.sex,</span><br><span class="line">            <span class="string">'sex_display'</span>: profile.get_sex_display(),</span><br><span class="line">        }</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>accounts/views.py</code></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> json</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> django <span class="keyword">import</span> http</span><br><span class="line"><span class="keyword">from</span> django.contrib.auth <span class="keyword">import</span> logout</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> accounts <span class="keyword">import</span> serializers</span><br><span class="line"><span class="keyword">from</span> accounts.forms <span class="keyword">import</span> LoginForm</span><br><span class="line"><span class="keyword">from</span> utils.response <span class="keyword">import</span> UnauthorizedJsonResponse</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">user_api_login</span>(<span class="params">request</span>):</span></span><br><span class="line">    <span class="string">""" 用户登录接口-POST """</span></span><br><span class="line">    <span class="comment"># 获取输入的内容</span></span><br><span class="line">    <span class="keyword">if</span> request.method == <span class="string">'POST'</span>:</span><br><span class="line">        <span class="comment"># 表单验证</span></span><br><span class="line">        form = LoginForm(request.POST)</span><br><span class="line">        <span class="comment"># 如果通过了验证，执行登录</span></span><br><span class="line">        <span class="keyword">if</span> form.is_valid():</span><br><span class="line">            user = form.do_login(request)</span><br><span class="line">            <span class="comment"># 返回内容：用户的信息（用户的基本信息、详细详细）</span></span><br><span class="line">            profile = user.profile</span><br><span class="line">            data = {</span><br><span class="line">                <span class="string">'user'</span>: serializers.UserSerializer(user).to_dict(),</span><br><span class="line">                <span class="string">'profile'</span>: serializers.UserProfileSerializer(profile).to_dict()</span><br><span class="line">            }</span><br><span class="line">            <span class="keyword">return</span> http.JsonResponse(data)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="comment"># 如果没有通过表单验证，返回表单的错误信息</span></span><br><span class="line">            err = json.loads(form.errors.as_json())</span><br><span class="line">            <span class="keyword">return</span> BadRequestJsonResponse(err)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="comment"># GET请求不被允许</span></span><br><span class="line">        <span class="keyword">return</span> MethodNotAllowedJsonResponse()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">user_api_logout</span>(<span class="params">request</span>):</span></span><br><span class="line">    <span class="string">""" 用户退出接口 """</span></span><br><span class="line">    logout(request)</span><br><span class="line">    <span class="keyword">return</span> http.HttpResponse(status=<span class="number">201</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="用户详情接口开发"><a href="#用户详情接口开发" class="headerlink" title="用户详情接口开发"></a>用户详情接口开发</h3><h4 id="开发步骤-1"><a href="#开发步骤-1" class="headerlink" title="开发步骤"></a>开发步骤</h4><ul>
+<li>第一步，设计接口返回内容及字段</li>
+<li>第二步，编写接口代码</li>
+<li>第三步，模拟HTTP请求，测试验证接口<br><code>accounts/urls.py</code><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">urlpatterns = [</span><br><span class="line">    <span class="comment"># 用户详细信息接口</span></span><br><span class="line">    path(<span class="string">'user/api/info/'</span>, views.UserDetailView.as_view(), name=<span class="string">'user_api_info'</span>),</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
+
+</li>
+</ul>
+<p><code>utils/response.py</code></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.http <span class="keyword">import</span> JsonResponse</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UnauthorizedJsonResponse</span>(<span class="params">JsonResponse</span>):</span></span><br><span class="line">    status_code = <span class="number">401</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, *args, **kwargs</span>):</span></span><br><span class="line">        data = {</span><br><span class="line">            <span class="string">"error_code"</span>: <span class="string">"401000"</span>,</span><br><span class="line">            <span class="string">"error_msg"</span>: <span class="string">"请登录"</span>,</span><br><span class="line">        }</span><br><span class="line">        super().__init__(data, *args, **kwargs)</span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>accounts/views.py</code></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> json</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> django <span class="keyword">import</span> http</span><br><span class="line"><span class="keyword">from</span> django.views <span class="keyword">import</span> View</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> accounts <span class="keyword">import</span> serializers</span><br><span class="line"><span class="keyword">from</span> utils.response <span class="keyword">import</span> BadRequestJsonResponse, MethodNotAllowedJsonResponse, UnauthorizedJsonResponse</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserDetailView</span>(<span class="params">View</span>):</span></span><br><span class="line">    <span class="string">""" 用户详细接口 """</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span>(<span class="params">self, request</span>):</span></span><br><span class="line">        <span class="comment"># 获取用户信息</span></span><br><span class="line">        user = request.user</span><br><span class="line">        <span class="comment"># 用户：是游客吗？数据库中是否存在</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> user.is_authenticated:</span><br><span class="line">            <span class="comment"># 返回401状态码</span></span><br><span class="line">            <span class="keyword">return</span> UnauthorizedJsonResponse()</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="comment"># 返回详细信息</span></span><br><span class="line">            profile = user.profile</span><br><span class="line">            data = {</span><br><span class="line">                <span class="string">'user'</span>: serializers.UserSerializer(user).to_dict(),</span><br><span class="line">                <span class="string">'profile'</span>: serializers.UserProfileSerializer(profile).to_dict()</span><br><span class="line">            }</span><br><span class="line">            <span class="keyword">return</span> http.JsonResponse(data)</span><br></pre></td></tr></tbody></table></figure>
+
+
+
+
+
+<p>Parser功能是配置文件进行预处理，因此，每一次更新都会执行一次Parser，因此自定义规则会永远存在，只要你不删除Parser。<br>修改<code>parsers</code></p>
+<pre class=" language-yaml"><code class="language-yaml"><span class="token key atrule">parsers</span><span class="token punctuation">:</span>
+  <span class="token punctuation">-</span> <span class="token key atrule">url</span><span class="token punctuation">:</span> https<span class="token punctuation">:</span>//example.com/profile.yaml
+    <span class="token key atrule">yaml</span><span class="token punctuation">:</span>
+      <span class="token key atrule">prepend-rules</span><span class="token punctuation">:</span>
+        <span class="token punctuation">-</span> DOMAIN<span class="token punctuation">,</span>test.com<span class="token punctuation">,</span>DIRECT <span class="token comment" spellcheck="true"># rules最前面增加一个规则</span>
+      <span class="token key atrule">append-proxies</span><span class="token punctuation">:</span>
+        <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> test <span class="token comment" spellcheck="true"># proxies最后面增加一个服务</span>
+          <span class="token key atrule">type</span><span class="token punctuation">:</span> http
+          <span class="token key atrule">server</span><span class="token punctuation">:</span> 123.123.123.123
+          <span class="token key atrule">port</span><span class="token punctuation">:</span> <span class="token number">456</span>
+</code></pre>
+<p>url：改成本人的订阅地址，如果不知道，可以直接在Profiles下点击当前订阅的Change imformation，复制其中的URL即可。<br>prepen-rules 数组合并至原配置rules数组前 此处添加你的自定义规则，每一条占一行，按照规则类型，值，代理策略排列，使用逗号分隔。注意的是，每一行都需要以一个短横线 - 加一个空格 开头，同时注意对齐。具体的自定义规则如何书写在本文的后半部分有说明。<br>点击右下角保存，<br>在Profiles里更新订阅，这样就可以将新的规则添加上了。可以点击Edit rules查看规则进行验证。之后打开相应网页看是否生效。</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/django/" rel="tag"># django</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/08/21/wen-jian-cao-zuo/" rel="prev" title="文件操作">
+                  <i class="fa fa-chevron-left"></i> 文件操作
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/08/21/sql/" rel="next" title="HTML">
+                  HTML <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+<script src="/js/comments.js"></script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">外心人D</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

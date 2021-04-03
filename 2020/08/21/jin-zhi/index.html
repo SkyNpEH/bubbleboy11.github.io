@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<meta name="hexo-config" content="{&quot;hostname&quot;:&quot;bubbleboy11.github.io&quot;,&quot;root&quot;:&quot;/&quot;,&quot;images&quot;:&quot;/images&quot;,&quot;scheme&quot;:&quot;Muse&quot;,&quot;version&quot;:&quot;8.3.0&quot;,&quot;exturl&quot;:false,&quot;sidebar&quot;:{&quot;position&quot;:&quot;left&quot;,&quot;display&quot;:&quot;post&quot;,&quot;padding&quot;:18,&quot;offset&quot;:12},&quot;copycode&quot;:true,&quot;bookmark&quot;:{&quot;enable&quot;:false,&quot;color&quot;:&quot;#222&quot;,&quot;save&quot;:&quot;auto&quot;},&quot;fancybox&quot;:false,&quot;mediumzoom&quot;:false,&quot;lazyload&quot;:false,&quot;pangu&quot;:false,&quot;comments&quot;:{&quot;style&quot;:&quot;tabs&quot;,&quot;active&quot;:null,&quot;storage&quot;:true,&quot;lazyload&quot;:false,&quot;nav&quot;:null},&quot;motion&quot;:{&quot;enable&quot;:true,&quot;async&quot;:false,&quot;transition&quot;:{&quot;post_block&quot;:&quot;fadeIn&quot;,&quot;post_header&quot;:&quot;fadeInDown&quot;,&quot;post_body&quot;:&quot;fadeInDown&quot;,&quot;coll_header&quot;:&quot;fadeInLeft&quot;,&quot;sidebar&quot;:&quot;fadeInUp&quot;}},&quot;prism&quot;:false,&quot;i18n&quot;:{&quot;placeholder&quot;:&quot;搜索...&quot;,&quot;empty&quot;:&quot;没有找到任何搜索结果：${query}&quot;,&quot;hits_time&quot;:&quot;找到 ${hits} 个搜索结果（用时 ${time} 毫秒）&quot;,&quot;hits&quot;:&quot;找到 ${hits} 个搜索结果&quot;}}">
+<meta name="description" content="python整数类型为Unifying Long Integers，无限长整数类型，没有 32 &#x2F; 64 位 int long 等不同长度等概念，但肯定是大于 32 位 八进制：包括0-7的数字 十六进制表示：包括0-9的数字，及字母a-f，A-F，a表示10 Python 中浮点数的运算存在误差计算机底层运算的时候操作的是二进制，当带小数点的十进制转换成二进制的时候可能存在小数部分乘不尽的情况">
+<meta property="og:type" content="article">
+<meta property="og:title" content="进制">
+<meta property="og:url" content="https://bubbleboy11.github.io/2020/08/21/jin-zhi/index.html">
+<meta property="og:site_name" content="外心人D的博客">
+<meta property="og:description" content="python整数类型为Unifying Long Integers，无限长整数类型，没有 32 &#x2F; 64 位 int long 等不同长度等概念，但肯定是大于 32 位 八进制：包括0-7的数字 十六进制表示：包括0-9的数字，及字母a-f，A-F，a表示10 Python 中浮点数的运算存在误差计算机底层运算的时候操作的是二进制，当带小数点的十进制转换成二进制的时候可能存在小数部分乘不尽的情况">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-08-20T16:21:41.000Z">
+<meta property="article:modified_time" content="2021-04-02T12:24:46.228Z">
+<meta property="article:author" content="外心人D">
+<meta property="article:tag" content="Leetcode">
+<meta property="article:tag" content="剑指offer">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://bubbleboy11.github.io/2020/08/21/jin-zhi/">
+
+
+
+<meta name="hexo-config-page" content="{&quot;sidebar&quot;:&quot;&quot;,&quot;isHome&quot;:false,&quot;isPost&quot;:true,&quot;lang&quot;:&quot;zh-CN&quot;}">
+<meta name="hexo-config-calendar" content="">
+<script data-pjax src="/js/load-config.js"></script>
+  <title>进制 | 外心人D的博客</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="外心人D的博客" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">外心人D的博客</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%A1%A5%E7%A0%81%E7%89%B9%E6%80%A7%EF%BC%9A"><span class="nav-text">补码特性：</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">外心人D</p>
+  <div class="site-description" itemprop="description">本博客大多内容为慕课和网上博客，并非原创</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">165</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/jin-zhi/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          进制
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-04-02 12:24:46" itemprop="dateModified" datetime="2021-04-02T12:24:46Z">2021-04-02</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>python整数类型为Unifying Long Integers，无限长整数类型，<br>没有 32 / 64 位 int long 等不同长度等概念，但肯定是大于 32 位</p>
+<p>八进制：包括0-7的数字</p>
+<p>十六进制表示：包括0-9的数字，及字母a-f，A-F，a表示10</p>
+<p>Python 中浮点数的运算存在误差<br>计算机底层运算的时候操作的是二进制，<br>当带小数点的十进制转换成二进制的时候可能存在小数部分乘不尽的情况</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">print(<span class="number">1.2</span> - <span class="number">1.0</span>)  <span class="comment"># 0.19999999999999996</span></span><br><span class="line">print(<span class="number">0.1</span> + <span class="number">0.2</span>)  <span class="comment"># 0.30000000000000004</span></span><br><span class="line">print(<span class="number">0.1</span> + <span class="number">2</span>)  <span class="comment"># 2.1</span></span><br><span class="line">print(<span class="number">0.1</span> * <span class="number">2</span>)  <span class="comment"># 0.2</span></span><br><span class="line"></span><br><span class="line">print(<span class="number">1.2</span> - <span class="number">1.0</span> == <span class="number">0.2</span>)  <span class="comment"># False</span></span><br><span class="line">print(type(<span class="number">2</span> / <span class="number">2</span>))  <span class="comment"># &lt;class 'float'&gt;</span></span><br><span class="line"></span><br><span class="line">print(float(<span class="number">1</span>))   <span class="comment"># 1.0</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>python中<code>0b</code>(数字0和小写字母B前缀)代表二进制数字</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">print(<span class="number">0b101</span>)  <span class="comment"># 5  </span></span><br><span class="line">print(<span class="number">0b11</span>)  <span class="comment"># 3  </span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>java中以<code>0</code>开头代表八进制数字，如：037，056<br>python中<code>0o</code>(数字0和小写字母O前缀)代表八进制数字，</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">print(<span class="number">0o11</span>)  <span class="comment"># 9  </span></span><br><span class="line">print(<span class="number">0o110</span>)  <span class="comment"># 72  </span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>java中以<code>0x</code>或<code>0X</code>开头代表十六进制数字，如：0x12，0xabcf，0XABCF<br>python中<code>0x</code>(数字0和小写字母X前缀)代表十六进制数字</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">print(<span class="number">0x101</span>)  <span class="comment"># 257   </span></span><br><span class="line">print(<span class="number">0x1F</span>)  <span class="comment"># 31</span></span><br><span class="line">print(<span class="number">0x1f</span>)  <span class="comment"># 31</span></span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight plain"><figcaption><span>代表不同类型数据转换为10进制数字</span></figcaption><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">```oct()```  代表不同类型数据转换为8进制数字</span><br><span class="line"></span><br><span class="line">```hex(x)```，将不同类型进制整数转换为以“0x”为前缀的小写十六进制数的字符串。如果 x 不是 Python int 对象，则必须定义返回整数的 __index__() 方法。</span><br><span class="line"></span><br><span class="line">```python</span><br><span class="line">print(hex(1))  # 0x1 补码</span><br><span class="line">print(hex(-1))  # -0x1 负号 + 原码 （Python 特色，Java 会直接输出补码）</span><br><span class="line"></span><br><span class="line">print(hex(3), type(hex(3)))  # 0x3 &lt;class 'str'&gt;</span><br><span class="line">print(hex(0b11))  # 0x3  将2进制数字转换为2=16进制</span><br></pre></td></tr></tbody></table></figure>
+
+<p>如果要将整数转换为大写或小写的十六进制字符串，并可选择有无“0x”前缀，则可以使用如下方法：</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">print(<span class="string">'%#x'</span> % <span class="number">3</span>, <span class="string">'%x'</span> % <span class="number">3</span>, <span class="string">'%X'</span> % <span class="number">3</span>, )</span><br><span class="line"><span class="comment"># 0x3 3 3</span></span><br><span class="line"></span><br><span class="line">print(format(<span class="number">3</span>, <span class="string">'#x'</span>), format(<span class="number">3</span>, <span class="string">'x'</span>), format(<span class="number">3</span>, <span class="string">'X'</span>))</span><br><span class="line"><span class="comment"># 0x3 3 3</span></span><br><span class="line">print(f'{3:#x}', f'{3:x}', f'{3:X}')</span><br><span class="line"><span class="comment"># 0x3 3 3</span></span><br><span class="line"></span><br><span class="line">print(<span class="string">'%#x'</span> % <span class="number">-3</span>, <span class="string">'%x'</span> % <span class="number">-3</span>, <span class="string">'%X'</span> % <span class="number">-3</span>, )</span><br><span class="line"><span class="comment"># -0x3 -3 -3</span></span><br><span class="line"></span><br><span class="line">print(format(<span class="number">-3</span>, <span class="string">'#x'</span>), format(<span class="number">-3</span>, <span class="string">'x'</span>), format(<span class="number">-3</span>, <span class="string">'X'</span>))</span><br><span class="line"><span class="comment"># -0x3 -3 -3</span></span><br><span class="line">print(f'{-3:#x}', f'{-3:x}', f'{-3:X}')</span><br><span class="line"><span class="comment"># -0x3 -3 -3</span></span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight plain"><figcaption><span>将一个不同类型进制整数转变为一个前缀为“0b”的二进制数的字符串。结果是一个合法的 Python 表达式。</span></figcaption><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">如果 x 不是 Python 的 ```int``` 对象，那它需要定义 ```__index__()``` 方法返回一个整数。</span><br><span class="line">bin一个正数（十进制表示），输出的是它的原码的二进制表示</span><br><span class="line">bin一个负数（十进制表示），输出的是它的原码的二进制表示加上个负号，而不是补码的形式。</span><br><span class="line">```python</span><br><span class="line">print(bin(3), type(bin(3)))  # 0b11 &lt;class 'str'&gt;</span><br><span class="line">print(bin(-3))  # -0b11</span><br></pre></td></tr></tbody></table></figure>
+
+<p>对数值进行与操作就获得补码形式的二进制表示 </p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">print(bin(<span class="number">-3</span> &amp; <span class="number">0b111</span>))  </span><br><span class="line"><span class="comment"># 0b101</span></span><br><span class="line">print(bin(<span class="number">-3</span> &amp; <span class="number">0b1111111111111111</span>))</span><br><span class="line"><span class="comment"># 0b1111111111111101</span></span><br><span class="line">---</span><br><span class="line">title: HTML</span><br><span class="line">date: <span class="number">2020</span><span class="number">-08</span><span class="number">-20</span> <span class="number">16</span>:<span class="number">21</span>:<span class="number">41</span></span><br><span class="line">author: 外心人D</span><br><span class="line">toc: true</span><br><span class="line">mathjax: false</span><br><span class="line">summary: 爱编程</span><br><span class="line">categories: Markdown</span><br><span class="line">tags:</span><br><span class="line">  - Leetcode</span><br><span class="line">  - 剑指offer</span><br><span class="line">---</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">```py</span><br><span class="line">print(bin(<span class="number">-5</span>))</span><br><span class="line"><span class="comment"># -0b101</span></span><br><span class="line"></span><br><span class="line">print(bin(<span class="number">-5</span> &amp; <span class="number">0b1111</span>))  </span><br><span class="line"><span class="comment"># 0b1011</span></span><br><span class="line"></span><br><span class="line">print(bin(<span class="number">-5</span> &amp; <span class="number">0b11111</span>))  </span><br><span class="line"><span class="comment"># 0b11011</span></span><br><span class="line"></span><br><span class="line">print(bin(<span class="number">-5</span> &amp; <span class="number">0b1111111111111111</span>))</span><br><span class="line"><span class="comment"># 0b1111111111111011</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># bin一个负数（十六进制表示），输出的是对应的二进制表示。</span></span><br><span class="line">print(bin(<span class="number">-3</span> &amp; <span class="number">0xffffffff</span>))</span><br><span class="line"><span class="comment"># 0b11111111111111111111111111111101</span></span><br><span class="line">print(bin(<span class="number">0xfffffffd</span>))</span><br><span class="line"><span class="comment"># 0b11111111111111111111111111111101</span></span><br><span class="line"></span><br><span class="line">print(bin(<span class="number">0o7</span>))  <span class="comment"># 0b111 将8进制数字转换为2进制</span></span><br><span class="line">print(bin(<span class="number">0xE</span>))  <span class="comment"># 0b1110 将16进制数字转换为2进制</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>If prefix “0b” is desired or not, you can use either of the following ways.<br>如果不一定需要前缀“0b”，还可以使用如下的方法。<br>用format字符串获取一个int的binary表示：</p>
+<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">```f"{a:030b}"```：将a转换成binary的str，并在前面补0使其总位数是30。</span><br><span class="line"></span><br><span class="line">```py</span><br><span class="line">format(14, '#b'), format(14, 'b')</span><br><span class="line"># ('0b1110', '1110')</span><br><span class="line">f'{14:#b}', f'{14:b}'</span><br><span class="line"># ('0b1110', '1110')</span><br></pre></td></tr></tbody></table></figure>
+
+<p>4bit有符号整型， 其数值范围为[-8， 7]<br>-2 + 3 可以通过补码计算 1110 + 0011 =(1) 0001</p>
+<figure class="highlight angelscript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">    <span class="number">1</span> <span class="number">1</span> <span class="number">1</span> <span class="number">0</span></span><br><span class="line">+   <span class="number">0</span> <span class="number">0</span> <span class="number">1</span> <span class="number">1</span></span><br><span class="line">-----------</span><br><span class="line">(<span class="number">1</span>) <span class="number">0</span> <span class="number">0</span> <span class="number">0</span> <span class="number">1</span> # 注意溢出</span><br></pre></td></tr></tbody></table></figure>
+
+<p>python 由于不知道符号位具体是第几位，因此需要进行的操作是</p>
+<ol>
+<li>将输入数字转化成无符号整数</li>
+<li>计算无符号整数相加并的到结果</li>
+<li>讲结果根据范围判定，映射为有符号整型</li>
+</ol>
+<p>转化为4bit无符号整数</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">a &amp;= <span class="number">0xF</span> <span class="comment"># a = a &amp; 0b1111 = 1110 = 14</span></span><br><span class="line">b &amp;= <span class="number">0xF</span> <span class="comment"># b = 0011 = 3</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>原码：直接将一个数值转化为二进制，其首位代表符号，<code>0</code> 为正， <code>1</code> 为负<br>正数：原码 = 反码 = 补码<br>负数反码：原码最高位符号位不变，其余为取反<br>负数补码：负数反码+1，即 符号位不变，各位取反再加 1</p>
+<h4 id="补码特性："><a href="#补码特性：" class="headerlink" title="补码特性："></a>补码特性：</h4><p>1、一个负整数（或原码）与其补数（或补码）相加，和为模。<br>2、对一个整数的补码再求补码，等于该整数自身。<br>3、补码的正零与负零表示方法相同</p>
+<ul>
+<li>Python 负数的存储：<ul>
+<li>获取负数的补码：<br>将整数与 0xffffffff 相与，<br>可理解为该数从 32 位开始到最高位全部置零，最高位为0为正数<br>从无限长度变为一个 32 位内二进制可以表示的正整数<br>一直循环左移并不会存在溢出的现象，模拟其他语言的32位溢出机制。<br>一个负整数（或原码）与其补数（或补码）相加，和为模。2 的32 次方 是模。<br>那么就是 2 的32 次方 然后 + n  这是在取一个负数的补码<br>就相当于  n &amp; 0xffffffff<br>高位第一位的数字取决于此数字是正数还是负数，是正数则为 0 ，是负数则为 1</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">print(hex(<span class="number">1</span> &amp; <span class="number">0xffffffff</span>))  <span class="comment"># 0x1 正数补码</span></span><br><span class="line">print(hex(<span class="number">-1</span> &amp; <span class="number">0xffffffff</span>))  <span class="comment"># 0xffffffff 负数补码</span></span><br><span class="line">print(<span class="number">-1</span> &amp; <span class="number">0xffffffff</span>)  <span class="comment"># 4294967295（Python 将其认为正数）</span></span><br></pre></td></tr></tbody></table></figure>
+<ul>
+<li>返回前数字还原 补码转原码：<br>若补码 a 为负数（第 32位是 1），<br>a ^ 0xffffffff 运算将 1 至 32 位按位取反；<br>~ 运算是将所有位的数字会取反；<br>因此， ~(a ^ 0xffffffff) 是将低的 1 至 32 位不变。<br>32 位以上的位取反，即 32位以上所有位全部置 1了，<br>对于32位的数字来说最高位是1则说明此数为负数<br>把这个负数补码恢复到 超过32位的 python 存储负数的形式，</li>
+</ul>
+<p>如果不对负数特殊处理，那么负数的前32位里的最高位还可能存在 0，最后输出的是大于32位的正数</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Leetcode/" rel="tag"># Leetcode</a>
+              <a href="/tags/%E5%89%91%E6%8C%87offer/" rel="tag"># 剑指offer</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/08/21/luo-ji-yun-suan-fu/" rel="prev" title="HTML">
+                  <i class="fa fa-chevron-left"></i> HTML
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/08/21/she-ji-mo-shi/" rel="next" title="HTML">
+                  HTML <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+<script src="/js/comments.js"></script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">外心人D</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
