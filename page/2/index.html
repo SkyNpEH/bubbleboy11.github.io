@@ -167,7 +167,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/cpython-gil/">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/csrf/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -180,7 +180,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/cpython-gil/" class="post-title-link" itemprop="url">CPython GIL</a>
+          <a href="/2020/08/21/csrf/" class="post-title-link" itemprop="url">CSRF</a>
         </h2>
 
         <div class="post-meta-container">
@@ -198,7 +198,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-02 12:24:45" itemprop="dateModified" datetime="2021-04-02T12:24:45Z">2021-04-02</time>
+        <time title="修改时间：2021-04-02 12:24:46" itemprop="dateModified" datetime="2021-04-02T12:24:46Z">2021-04-02</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -206,7 +206,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
         </span>
     </span>
 
@@ -220,52 +220,25 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h3 id="GIL-Global-Interpreter-Lock-全局解释器锁-，"><a href="#GIL-Global-Interpreter-Lock-全局解释器锁-，" class="headerlink" title="GIL Global Interpreter Lock (全局解释器锁) ，"></a>GIL Global Interpreter Lock (全局解释器锁) ，</h3><p>CPython GIL 就是 Cpython解释器的全局解释锁。</p>
-<ul>
-<li>Cpython解释器的内存管理并不是线程安全的（如果有多个线程话它可能会同时去修改同一个对象，这样可能会出现一些问题）</li>
-<li>保护多线程情况下对Python对象的访问</li>
-<li>Cpython使用简单的锁机制避免多线程同时执行字节码</li>
-</ul>
-<h3 id="GIL影响"><a href="#GIL影响" class="headerlink" title="GIL影响"></a>GIL影响</h3><ul>
-<li><p>限制了程序的多核执行，单核CPU系统中，不存在真正的并发</p>
-<ul>
-<li>同一个时间只能有一个线程执行字节码，同一进程中假如有多个线程运行，一个线程在运行python程序的时候会霸占python解释器（加了一把锁），使该进程内的其他线程无法运行，等该线程运行完后其他线程才能运行。如果线程运行过程中遇到耗时操作，则解释器锁解开，使其他线程运行。所以在多线程中，线程的运行仍是有先后顺序的，并不是同时进行。</li>
-<li>CPU密集程序难以利用多核优势</li>
-</ul>
-</li>
-<li><p>IO期间会释放GIL，对IO密集程序影响不大<br>解释图：这个图里面有三个线程Thread1，Thread2，Thread3，在处理网络请求的过程中，虽然一个时间只能执行一个线程，但是在等待网络请求的时候来释放全局解释锁切换到不同线程Run运行，这就是对IO密集的程序会小一些。</p>
-</li>
-<li><p>一般程序分为CPU密集还有IO密集，</p>
-<ul>
-<li>CPU密集：把大量时间花在计算上面，磁盘硬盘读写</li>
-<li>IO密集：把大量时间花费在了传输上面。</li>
-</ul>
-</li>
-</ul>
-<h3 id="如何规避GIL影响"><a href="#如何规避GIL影响" class="headerlink" title="如何规避GIL影响"></a>如何规避GIL影响</h3><h4 id="首先区分CPU和IO密集程序"><a href="#首先区分CPU和IO密集程序" class="headerlink" title="首先区分CPU和IO密集程序"></a>首先区分CPU和IO密集程序</h4><ul>
-<li>CPU密集可以使用多进程+进程池来充分利用多核</li>
-<li>IO密集使用 多线程 / 协程</li>
-<li>CPU密集时候还可以用cython编写一些扩展来转换成cython代码。</li>
-<li>（cython不是Cpython解释器它是一个用来把python程序转换成C代码一个扩展）</li>
-</ul>
-<h3 id="GIL实现"><a href="#GIL实现" class="headerlink" title="GIL实现"></a>GIL实现</h3><pre><code>  Cpython里面才会有GIL，其他的实现不一定会有
-</code></pre>
-<p>解释图：每隔一段时间我们尝试去释放当前线程的锁，然后让其它线程尝试去获取锁并且去执行</p>
-<h3 id="GIL执行顺序"><a href="#GIL执行顺序" class="headerlink" title="GIL执行顺序"></a>GIL执行顺序</h3><ol>
-<li>设置GIL</li>
-<li>切换进一个线程去运行</li>
-<li>执行下面操作之一：</li>
+          <p>CSRF：Cross-site request forgery 跨站请求伪造<br>利用网站对已认证的权限去执行未授权的命令的一种恶意攻击<br>攻击者它们会利用登录过的用户在浏览器中的认证信息，欺骗用户的浏览器去访问以你的身份在一个自己曾经认证过的网站上模拟发送请求，，然后做了一些没有经过你授权的一些行为，比发邮件，发消息，甚至财产操作如转账和购买商品。<br>由于浏览器曾经认证过，所以被访问的网站会认为是真正的用户操作而去运行。</p>
+<p>这利用了web中用户身份验证的一个漏洞：简单的身份验证只能保证请求发自某个用户的浏览器，却不能保证请求本身是用户自愿发出的或者批准发送的</p>
+<ol>
+<li>用户C打开浏览器，访问受信任网站A，输入用户名和密码请求登录网站A；</li>
+<li>在用户信息通过验证后，网站A产生Cookie信息并返回给浏览器，此时用户登录网站A成功，可以正常发送请求到网站A；</li>
+<li>用户未退出网站A之前，在同一浏览器中，打开一个TAB页访问网站B；</li>
+<li>网站B接收到用户请求后，返回一些攻击性代码，并发出一个请求要求访问第三方站点A；</li>
+<li>浏览器在接收到这些攻击性代码后，根据网站B的请求，在用户不知情的情况下携带Cookie信息，向网站A发出请求。网站A并不知道该请求其实是由B发起的，所以会根据用户C的Cookie信息以C的权限处理该请求，导致来自网站B的恶意代码被执行。</li>
 </ol>
-<ul>
-<li>指定数量的字节码指令</li>
-<li>线程主动让出控制权（可以调用time.sleep(0)来完成）</li>
-</ul>
-<ol start="4">
-<li>把线程设置回睡眠状态（切换出线程）</li>
-<li>解锁GIL</li>
-<li>重复上述步骤</li>
-</ol>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">from</span> threading <span class="keyword">import</span> Thread</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 单线程版</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">CountDown</span>(<span class="params">n</span>):</span></span><br><span class="line">    <span class="keyword">while</span> n &gt; <span class="number">0</span>:</span><br><span class="line">        n -= <span class="number">1</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    n = <span class="number">3000000</span></span><br><span class="line">    start_time = time.perf_counter()</span><br><span class="line">    CountDown(n)</span><br><span class="line">    end_time = time.perf_counter()</span><br><span class="line">    print(<span class="string">"n = {}，单线程版耗时{}"</span>.format(n, end_time-start_time))</span><br><span class="line">    <span class="comment"># 多线程版</span></span><br><span class="line">    start_time = time.perf_counter()</span><br><span class="line">    t1 = Thread(target = CountDown, args = [n//<span class="number">2</span>])</span><br><span class="line">    t2 = Thread(target = CountDown, args = [n//<span class="number">2</span>])</span><br><span class="line">    t1.start()</span><br><span class="line">    t2.start()</span><br><span class="line">    t1.join()</span><br><span class="line">    t2.join()</span><br><span class="line">    end_time = time.perf_counter()</span><br><span class="line">    print(<span class="string">"n = {}，多线程版耗时{}"</span>.format(n, end_time-start_time))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 对象引用计数</span></span><br><span class="line">    <span class="keyword">for</span> k <span class="keyword">in</span> range(<span class="number">100</span>):</span><br><span class="line">        a = []</span><br><span class="line">        b = a</span><br><span class="line">        print(sys.getrefcount(a))</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 线程安全</span></span><br><span class="line">        n = <span class="number">0</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">foo</span>():</span></span><br><span class="line">            <span class="keyword">global</span> n</span><br><span class="line">            n += <span class="number">1</span></span><br><span class="line"></span><br><span class="line">        threads = []</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">100</span>):</span><br><span class="line">            t = threading.Thread(target = foo)</span><br><span class="line">            threads.append(t)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> t <span class="keyword">in</span> threads:</span><br><span class="line">            t.start()</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> t <span class="keyword">in</span> threads:</span><br><span class="line">            t.join()</span><br><span class="line"></span><br><span class="line">        print(n)</span><br></pre></td></tr></tbody></table></figure><script>
+<p>Csrf 是利用网站本身的漏洞，比如一个网站a用cookie就可以登录，不需要用户重新输入用户名和密码。那么我们就可以利用csrf攻击，携带cookie去登录网站a，进行钱的转账<br>Xss是在网站a里面注入恶意的脚本，我们一访问这个网站a，那么就执行恶意的代码</p>
+<p>Csrf是需要登录的，xss是不需要进行登录的。</p>
+<p>2.CSRF产生的条件<br>要完成一个 CSRF攻击，需要具备两个条件<br>受害者已经登录到目标网站并且没有退出( 保持登录状态 ）<br>受害者访问了攻击者发布的链接或者表单按钮<br>二者必须缺一不可</p>
+<p>3.如何防范 CSRF？使用CSRF保护（针对同步提交，比如注册页面）<br>    在使用Get请求的时候非常容易伪造链接，所以尽量不要在GET请求里有任务数据修改操作。目前所有Python主流的web 框架所采用的的方式令牌同步。</p>
+<p>令牌同步(Synchronizer token pattern , 简称STP)：在用户请求的表单中嵌入一个隐藏的<code>csrf_token</code>，服务端验证其是否与cookie中的一致(基于同源策略其他网站是无法获取cookie中的<code>csrf_token</code>)。黑客是拿不到你cookie中的 <code>csrftoken</code>值的，前提是网站本身没有 xss漏洞。</p>
+<p>如果是 js 提交需要先从cookie获取csrf_token作为 X-CSRFToken请求头提交<br>    1. 在MIDDLEWARE设置中激活CSRF中间件<br>django.middleware.csrf.CsrfViewMiddleware<br>    2. </p><form>元素中使用<code>csrf_token</code>标签（POST请求)<br>Html<br>    1    <code>&lt;form class="xxx" method="post" action="."&gt;</code><br>    2    <code>{% csrf_token %}</code><br>    3. 选择合适的渲染方式<br>视图函数中，确保使用RequestContext来渲染（或者render()函数）</form><p></p>
+<p>其他：检测来源HTTP Referer(容易被伪造)；验证码方式(安全但是繁琐)</p>
+<p>开启使用CSRF保护之后，浏览器源码会生成一个隐藏的表单域。这个表单中自动生成了唯一的value值（每一次request都会有不同的value值），提交表单时候会将其一并提交，因为value值唯一，就不会有重复提交的情况。</p>
+<p>图解：左边是用户，右边是需要登陆的网站。一个用户A通过自己的身份验证，去登陆网站SNS，网站会返回一个cookie值Cookie: sid=1234567890用来标识这个用户。然后中间一个攻击者给你发一个链接或者给你一个图片你可能会对它进行一个点击，比如发给你一个图<code>&lt;img src="http://example.com/msg?q=你好"&gt;</code>误导你来去点击，这个链接是发送评论的请求地址，如果你点击这个地址它就会以你的名义来发送这个你好。这个时候假如你误点这个图片就会触发这个链接的操作，然后你就会携带你的Cookie去请求SNS网站。这个时候你就会发现你实际上并没有想去发送你好这个评论。但是你通过攻击者留下的链接陷阱点进去之后然后你就误发这个评论。</p>
+<script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
