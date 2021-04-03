@@ -1,274 +1,267 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html  lang="zh-CN" >
 <head>
   <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-<meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 5.0.2">
-
-
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
-  <link rel="mask-icon" href="/images/logo.svg" color="#222">
-
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="theme-color" content="#fff" id="theme-color">
+  <meta name="description" content="本博客大多内容为慕课和网上博客，并非原创">
+  <link rel="icon" href="/img/logo.png">
+  <title>文件操作</title>
+  
+  
+  <meta property="og:title" content="文件操作">
+  
+  
+  <meta property="og:url" content="https://bubbleboy11.github.io/2020/08/21/wen-jian-cao-zuo/index.html">
+  
+  
+  <meta property="og:img" content="/img/author_img.png">
+  
+  
+  <meta property="og:img" content="本博客大多内容为慕课和网上博客，并非原创">
+  
+  
+  <meta property="og:type" content="article">
+  <meta property="og:article:published_time" content="2020-08-20">
+  <meta property="og:article:modified_time" content="2021-04-02">
+  <meta property="og:article:author" content="外心人D">
+  
+  
+  
+  
+  
+  <script>
+    // control reverse button
+    var reverseDarkList = {
+      dark: 'light',
+      light: 'dark'
+    };
+    var themeColor = {
+      dark: '#1c1c1e',
+      light: '#fff'
+    }
+    // get the data of css prefers-color-scheme
+    var getCssMediaQuery = function() {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    };
+    // reverse current darkmode setting function
+    var reverseDarkModeSetting = function() {
+      var setting = localStorage.getItem('user-color-scheme');
+      if(reverseDarkList[setting]) {
+        setting = reverseDarkList[setting];
+      } else if(setting === null) {
+        setting = reverseDarkList[getCssMediaQuery()];
+      } else {
+        return;
+      }
+      localStorage.setItem('user-color-scheme', setting);
+      return setting;
+    };
+    // apply current darkmode setting
+    var setDarkmode = function(mode) {
+      var setting = mode || localStorage.getItem('user-color-scheme');
+      if(setting === getCssMediaQuery()) {
+        document.documentElement.removeAttribute('data-user-color-scheme');
+        localStorage.removeItem('user-color-scheme');
+        document.getElementById('theme-color').content = themeColor[setting];
+      } else if(reverseDarkList[setting]) {
+        document.documentElement.setAttribute('data-user-color-scheme', setting);
+        document.getElementById('theme-color').content = themeColor[setting];
+      } else {
+        document.documentElement.removeAttribute('data-user-color-scheme');
+        localStorage.removeItem('user-color-scheme');
+        document.getElementById('theme-color').content = themeColor[getCssMediaQuery()];
+      }
+    };
+    setDarkmode();
+  </script>
+  <script>
+    function loadScript(url, cb) {
+      var script = document.createElement('script');
+      script.src = url;
+      if (cb) script.onload = cb;
+      script.async = true;
+      document.body.appendChild(script);
+    }
+  </script>
+  
+  <link rel="preload" href="//at.alicdn.com/t/font_1946621_i1kgafibvw.css" as="style" >
+  <link rel="preload" href="//at.alicdn.com/t/font_1952792_89b4ac4k4up.css" as="style" >
+  
+  <link rel="preload" href="/js/lib/lightbox/baguetteBox.min.js" as="script">
+  <link rel="preload" href="/js/lib/lightbox/baguetteBox.min.css" as="style" >
+  
+  
+  <link rel="preload" href="/js/lib/lozad.min.js" as="script">
+  
+  
+  
+  
+  
+  <link rel="prefetch" href="//cdn.jsdelivr.net/npm/mathjax@3.0.5/es5/tex-svg.js" as="script">
+  
+  
+  
+  
+  
 <link rel="stylesheet" href="/css/main.css">
 
-
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
-
-<meta name="hexo-config" content="{&quot;hostname&quot;:&quot;bubbleboy11.github.io&quot;,&quot;root&quot;:&quot;/&quot;,&quot;images&quot;:&quot;/images&quot;,&quot;scheme&quot;:&quot;Muse&quot;,&quot;version&quot;:&quot;8.3.0&quot;,&quot;exturl&quot;:false,&quot;sidebar&quot;:{&quot;position&quot;:&quot;left&quot;,&quot;display&quot;:&quot;post&quot;,&quot;padding&quot;:18,&quot;offset&quot;:12},&quot;copycode&quot;:true,&quot;bookmark&quot;:{&quot;enable&quot;:false,&quot;color&quot;:&quot;#222&quot;,&quot;save&quot;:&quot;auto&quot;},&quot;fancybox&quot;:false,&quot;mediumzoom&quot;:false,&quot;lazyload&quot;:false,&quot;pangu&quot;:false,&quot;comments&quot;:{&quot;style&quot;:&quot;tabs&quot;,&quot;active&quot;:null,&quot;storage&quot;:true,&quot;lazyload&quot;:false,&quot;nav&quot;:null},&quot;motion&quot;:{&quot;enable&quot;:true,&quot;async&quot;:false,&quot;transition&quot;:{&quot;post_block&quot;:&quot;fadeIn&quot;,&quot;post_header&quot;:&quot;fadeInDown&quot;,&quot;post_body&quot;:&quot;fadeInDown&quot;,&quot;coll_header&quot;:&quot;fadeInLeft&quot;,&quot;sidebar&quot;:&quot;fadeInUp&quot;}},&quot;prism&quot;:false,&quot;i18n&quot;:{&quot;placeholder&quot;:&quot;搜索...&quot;,&quot;empty&quot;:&quot;没有找到任何搜索结果：${query}&quot;,&quot;hits_time&quot;:&quot;找到 ${hits} 个搜索结果（用时 ${time} 毫秒）&quot;,&quot;hits&quot;:&quot;找到 ${hits} 个搜索结果&quot;}}">
-<meta name="description" content="文件读写模式open(file, mode&#x3D;&#39;r&#39;, buffering&#x3D;-1, encoding&#x3D;None, errors&#x3D;None, newline&#x3D;None, closefd&#x3D;True, opener&#x3D;None)打开一个文件，生成并且返回文件对象，在对文件进行处理过程（创建、读写操作）都需要使用到这个函数，如果该文件无法被打开，会抛出 OSError。默认的创建的目录在当前程序所在的目录，文">
-<meta property="og:type" content="article">
-<meta property="og:title" content="文件操作">
-<meta property="og:url" content="https://bubbleboy11.github.io/2020/08/21/wen-jian-cao-zuo/index.html">
-<meta property="og:site_name" content="外心人D的博客">
-<meta property="og:description" content="文件读写模式open(file, mode&#x3D;&#39;r&#39;, buffering&#x3D;-1, encoding&#x3D;None, errors&#x3D;None, newline&#x3D;None, closefd&#x3D;True, opener&#x3D;None)打开一个文件，生成并且返回文件对象，在对文件进行处理过程（创建、读写操作）都需要使用到这个函数，如果该文件无法被打开，会抛出 OSError。默认的创建的目录在当前程序所在的目录，文">
-<meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2020-08-20T16:21:41.000Z">
-<meta property="article:modified_time" content="2021-04-02T12:24:45.778Z">
-<meta property="article:author" content="外心人D">
-<meta name="twitter:card" content="summary">
-
-
-<link rel="canonical" href="https://bubbleboy11.github.io/2020/08/21/wen-jian-cao-zuo/">
-
-
-
-<meta name="hexo-config-page" content="{&quot;sidebar&quot;:&quot;&quot;,&quot;isHome&quot;:false,&quot;isPost&quot;:true,&quot;lang&quot;:&quot;zh-CN&quot;}">
-<meta name="hexo-config-calendar" content="">
-<script data-pjax src="/js/load-config.js"></script>
-  <title>文件操作 | 外心人D的博客</title>
   
+  
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1946621_i1kgafibvw.css">
 
+  
+  
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1952792_89b4ac4k4up.css">
 
+  
+  
+<link rel="stylesheet" href="/js/lib/lightbox/baguetteBox.min.css">
 
-
-  <noscript>
-    <link rel="stylesheet" href="/css/noscript.css">
-  </noscript>
-<link rel="alternate" href="/atom.xml" title="外心人D的博客" type="application/atom+xml">
+  
+  
+  
+  
+<meta name="generator" content="Hexo 5.0.2"><link rel="alternate" href="/atom.xml" title="外心人D的博客" type="application/atom+xml">
 <link rel="stylesheet" href="/css/prism.css" type="text/css"></head>
 
-<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
-  <div class="headband"></div>
 
-  <main class="main">
-    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-container">
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="切换导航栏" role="button">
-    </div>
+<body>
+  <div class="wrapper">
+    
+    <nav class="navbar">
+  <div class="navbar-logo">
+    <span class="navbar-logo-main">
+      
+      <img class="navbar-logo-img" src="/img/logo.png" alt="logo">
+      
+      <span class="navbar-logo-dsc">外心人D</span>
+    </span>
   </div>
-
-  <div class="site-meta">
-
-    <a href="/" class="brand" rel="start">
-      <i class="logo-line"></i>
-      <h1 class="site-title">外心人D的博客</h1>
-      <i class="logo-line"></i>
+  <div class="navbar-menu">
+    
+    <a href="/" class="navbar-menu-item">
+    
+    首页
+    
     </a>
+    
+    <a href="/archives" class="navbar-menu-item">
+    
+    归档
+    
+    </a>
+    
+    <a href="/tags" class="navbar-menu-item">
+    
+    标签
+    
+    </a>
+    
+    <a href="/categories" class="navbar-menu-item">
+    
+    分类
+    
+    </a>
+    
+    <a href="/about" class="navbar-menu-item">
+    
+    关于
+    
+    </a>
+    
+    <a href="/links" class="navbar-menu-item">
+    
+    友链
+    
+    </a>
+    
+    <a class="navbar-menu-item darknavbar" id="dark"><i class="iconfont icon-weather"></i></a>
+    <a class="navbar-menu-item searchnavbar" id="search"><i class="iconfont icon-search" style="font-size: 1.2rem; font-weight: 400;"></i></a>
   </div>
-
-  <div class="site-nav-right">
-    <div class="toggle popup-trigger">
+</nav>
+    
+    <div id="local-search" style="display: none;">
+      <input class="navbar-menu-item" id="search-input" placeholder="请输入搜索内容...">
+      <div id="search-content"></div>
     </div>
+    
+    <div class="section-wrap">
+      <div class="container">
+        <div class="columns">
+          <main class="main-column">
+<article class="card card-content">
+  <header>
+    <h1 class="post-title">
+      文件操作
+    </h1>
+  </header>
+  <div class="post-meta post-show-meta">
+    <time datetime="2020-08-20T16:21:41.000Z">
+      <i class="iconfont icon-calendar" style="margin-right: 2px;"></i>
+      <span>2020-08-20</span>
+    </time>
+    
+    <span class="dot"></span>
+    
+    <a href="/categories/python/" class="post-meta-link">python</a>
+    
+    
+    
+    <span class="dot"></span>
+    <span>6.6k 字</span>
+    
   </div>
-</div>
-
-
-
-
-
-
-
-</div>
-        
   
-  <div class="toggle sidebar-toggle" role="button">
-    <span class="toggle-line"></span>
-    <span class="toggle-line"></span>
-    <span class="toggle-line"></span>
-  </div>
-
-  <aside class="sidebar">
-
-    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
-      <ul class="sidebar-nav">
-        <li class="sidebar-nav-toc">
-          文章目录
-        </li>
-        <li class="sidebar-nav-overview">
-          站点概览
-        </li>
-      </ul>
-
-      <div class="sidebar-panel-container">
-        <!--noindex-->
-        <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E8%AF%BB%E5%86%99%E6%A8%A1%E5%BC%8F"><span class="nav-text">文件读写模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8with%E8%AF%AD%E6%B3%95%EF%BC%8C%E5%88%B0%E8%BE%BE%E8%AF%A5%E8%AF%AD%E5%8F%A5%E6%9C%AA%E5%B0%BE%E6%97%B6%EF%BC%8C%E5%B0%86%E8%87%AA%E5%8A%A8close-%E5%85%B3%E9%97%AD%E6%96%87%E4%BB%B6%E9%87%8A%E6%94%BE%E8%B5%84%E6%BA%90%EF%BC%8C%E5%8D%B3%E4%BE%BF%E5%87%BA%E7%8E%B0%E5%BC%82%E5%B8%B8%E4%BA%A6%E5%A6%82%E6%AD%A4"><span class="nav-text">使用with语法，到达该语句未尾时，将自动close()关闭文件释放资源，即便出现异常亦如此</span></a></li></ol></li></ol></div>
-        </div>
-        <!--/noindex-->
-
-        <div class="site-overview-wrap sidebar-panel">
-          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">外心人D</p>
-  <div class="site-description" itemprop="description">本博客大多内容为慕课和网上博客，并非原创</div>
-</div>
-<div class="site-state-wrap site-overview-item animated">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-          <a href="/archives">
-          <span class="site-state-item-count">165</span>
-          <span class="site-state-item-name">日志</span>
-        </a>
-      </div>
-      <div class="site-state-item site-state-categories">
-            <a href="/categories/">
-        <span class="site-state-item-count">17</span>
-        <span class="site-state-item-name">分类</span></a>
-      </div>
-      <div class="site-state-item site-state-tags">
-            <a href="/tags/">
-        <span class="site-state-item-count">25</span>
-        <span class="site-state-item-name">标签</span></a>
-      </div>
-  </nav>
-</div>
-
-
-
-        </div>
-      </div>
-        <div class="back-to-top animated" role="button" aria-label="返回顶部">
-          <i class="fa fa-arrow-up"></i>
-          <span>0%</span>
-        </div>
-    </div>
-  </aside>
-  <div class="sidebar-dimmer"></div>
-
-
-    </header>
-
-    
-
-<noscript>
-  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
-</noscript>
-
-
-    <div class="main-inner post posts-expand">
-
-
-  
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/wen-jian-cao-zuo/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          文件操作
-        </h1>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-02 12:24:45" itemprop="dateModified" datetime="2021-04-02T12:24:45Z">2021-04-02</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-        <h2 id="文件读写模式"><a href="#文件读写模式" class="headerlink" title="文件读写模式"></a>文件读写模式</h2><p><code>open(file, mode='r', buffering=-1, encoding=None, errors=None, newline=None, closefd=True, opener=None)</code><br>打开一个文件，生成并且返回文件对象，在对文件进行处理过程（创建、读写操作）都需要使用到这个函数，如果该文件无法被打开，会抛出 OSError。<br>默认的创建的目录在当前程序所在的目录，文件不存在，则在当前目录创建该文件<br>file：一个包含了你要访问的文件路径的字符串值。</p>
+  </header>
+  <div id="section" class="post-content">
+    <h2 id="文件读写模式"><a href="#文件读写模式" class="headerlink" title="文件读写模式"></a>文件读写模式</h2><p><code>open(file, mode='r', buffering=-1, encoding=None, errors=None, newline=None, closefd=True, opener=None)</code><br>打开一个文件，生成并且返回文件对象，在对文件进行处理过程（创建、读写操作）都需要使用到这个函数，如果该文件无法被打开，会抛出 OSError。<br>默认的创建的目录在当前程序所在的目录，文件不存在，则在当前目录创建该文件<br>file：一个包含了你要访问的文件路径的字符串值。</p>
 <p>buffering: 设置缓冲<br>buffering:如果buffering的值被设为0，就不会有寄存。<br>如果buffering的值取1，访问文件时会寄存行。<br>如果将buffering的值设为大于1的整数，表明了这就是的寄存区的缓冲大小。<br>如果取负值，寄存区的缓冲大小则为系统默认。</p>
 <p>encoding: Windows系统在写入中文时需要设置编码格式，一般使用utf8<br>errors: 报错级别<br>newline: 区分换行符<br>closefd: 传入的file参数类型<br>opener: 设置自定义开启器，开启器的返回值必须是一个打开的文件描述符。</p>
 <p>mode 模式是一个可选非强制字符串，指定打开文件的模式。</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">```'w'```写入模式，打开一个文件只用于写入。打开一个文件只用于写入。如果该文件已存在则打开文件，并从开头开始编辑，即原有内容会被覆盖删除。如果该文件不存在，创建新文件。</span><br><span class="line">指针在开始</span><br><span class="line"></span><br><span class="line">```'a'```追加(Attach)模式，如果该文件已存在，文件指针将会放在文件的结尾。也就是说，新的内容将会被写入到已有内容之后。如果该文件不存在，创建新文件进行写入。</span><br><span class="line">打开一个文件用于追加。如果该文件已存在，文件指针将会放在文件的结尾。</span><br><span class="line"></span><br><span class="line">```'b'```二进制模式（与其他模式结合使用）binary mode doesn't take an encoding argument，b模式不能再加上encoding</span><br><span class="line"></span><br><span class="line">```'ab'``` 以二进制格式打开一个文件用于追加。如果该文件已存在，文件指针将会放在文件的结尾。也就是说，新的内容将会被写入到已有内容之后。如果该文件不存在，创建新文件进行写入。</span><br><span class="line"></span><br><span class="line">```'rb'```    以二进制格式打开一个文件用于只读。文件指针将会放在文件的开头。</span><br><span class="line"></span><br><span class="line">```+```读写模式（与其他模式结合使用），打开一个文件进行更新(可读可写)。</span><br><span class="line"></span><br><span class="line">```'r+```打开一个文件用于读写。文件指针将会放在文件的开头。</span><br><span class="line">```'W+'```以读写的方式打开文件。打开一个文件用于读写。如果该文件已存在则打开文件，并从开头开始编辑，即原有内容会被覆盖删除。如果该文件不存在，创建新文件。</span><br><span class="line"></span><br><span class="line">```'a+'```如果该文件已存在，文件指针将会放在文件的结尾。文件打开时会是读写追加模式。如果该文件不存在，创建新文件用于读写</span><br><span class="line"></span><br><span class="line">```'ab+```以二进制格式打开一个文件用于追加。</span><br><span class="line">如果该文件已存在，文件指针将会放在文件的结尾。</span><br><span class="line">如果该文件不存在，创建新文件用于写入。</span><br><span class="line"></span><br><span class="line">```'rb+'```    以二进制格式打开一个文件用于读写。文件指针将会放在文件的开头。一般用于非文本文件如图片等。</span><br><span class="line"></span><br><span class="line">```'wb'```以二进制格式打开一个文件只用于写入。如果该文件已存在则打开文件，并从开头开始编辑，即原有内容会被删除。如果该文件不存在，以二进制格式创建新文件。一般用于非文本文件如图片等。比特类型bytes，字符前缀```b```</span><br><span class="line"></span><br><span class="line">```'wb+'```    以二进制格式打开一个文件用于读写。如果该文件已存在则将其覆盖。如果该文件不存在，创建新文件。</span><br><span class="line"></span><br><span class="line">不使用with语句写法</span><br><span class="line">```py</span><br><span class="line">file=open('文件路径'，访问模式) </span><br><span class="line">data = file.read()</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre class=" language-hljs 'r'```读取(read)模式（默认值），指针将会放在文件的开头"><code class="language-hljs 'r'```读取(read)模式（默认值），指针将会放在文件的开头">```'w'```写入模式，打开一个文件只用于写入。打开一个文件只用于写入。如果该文件已存在则打开文件，并从开头开始编辑，即原有内容会被覆盖删除。如果该文件不存在，创建新文件。<br>指针在开始<br><br>```'a'```追加(Attach)模式，如果该文件已存在，文件指针将会放在文件的结尾。也就是说，新的内容将会被写入到已有内容之后。如果该文件不存在，创建新文件进行写入。<br>打开一个文件用于追加。如果该文件已存在，文件指针将会放在文件的结尾。<br><br>```'b'```二进制模式（与其他模式结合使用）binary mode doesn't take an encoding argument，b模式不能再加上encoding<br><br>```'ab'``` 以二进制格式打开一个文件用于追加。如果该文件已存在，文件指针将会放在文件的结尾。也就是说，新的内容将会被写入到已有内容之后。如果该文件不存在，创建新文件进行写入。<br><br>```'rb'```    以二进制格式打开一个文件用于只读。文件指针将会放在文件的开头。<br><br>```+```读写模式（与其他模式结合使用），打开一个文件进行更新(可读可写)。<br><br>```'r+```打开一个文件用于读写。文件指针将会放在文件的开头。<br>```'W+'```以读写的方式打开文件。打开一个文件用于读写。如果该文件已存在则打开文件，并从开头开始编辑，即原有内容会被覆盖删除。如果该文件不存在，创建新文件。<br><br>```'a+'```如果该文件已存在，文件指针将会放在文件的结尾。文件打开时会是读写追加模式。如果该文件不存在，创建新文件用于读写<br><br>```'ab+```以二进制格式打开一个文件用于追加。<br>如果该文件已存在，文件指针将会放在文件的结尾。<br>如果该文件不存在，创建新文件用于写入。<br><br>```'rb+'```    以二进制格式打开一个文件用于读写。文件指针将会放在文件的开头。一般用于非文本文件如图片等。<br><br>```'wb'```以二进制格式打开一个文件只用于写入。如果该文件已存在则打开文件，并从开头开始编辑，即原有内容会被删除。如果该文件不存在，以二进制格式创建新文件。一般用于非文本文件如图片等。比特类型bytes，字符前缀```b```<br><br>```'wb+'```    以二进制格式打开一个文件用于读写。如果该文件已存在则将其覆盖。如果该文件不存在，创建新文件。<br><br>不使用with语句写法<br>```py<br>file=open('文件路径'，访问模式) <br>data = file.read()<br></code></pre></td></tr></tbody></table></figure>
 
 <h3 id="使用with语法，到达该语句未尾时，将自动close-关闭文件释放资源，即便出现异常亦如此"><a href="#使用with语法，到达该语句未尾时，将自动close-关闭文件释放资源，即便出现异常亦如此" class="headerlink" title="使用with语法，到达该语句未尾时，将自动close()关闭文件释放资源，即便出现异常亦如此"></a>使用with语法，到达该语句未尾时，将自动close()关闭文件释放资源，即便出现异常亦如此</h3><p>中文字体写入默认是GB2312编码。</p>
 <ul>
 <li><p>不指定编码格式</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> open（<span class="string">"file_path"</span>) <span class="keyword">as</span> file：</span><br><span class="line">    do_something(file)</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre class=" language-hljs py"><span class="hljs-keyword">with</span> open（<span class="hljs-string">"file_path"</span>) <span class="hljs-keyword"><code class="language-hljs py"><span class="hljs-keyword">with</span> open（<span class="hljs-string">"file_path"</span>) <span class="hljs-keyword">as</span> file：<br>    do_something(file)<br></code></pre></td></tr></tbody></table></figure>
 </li>
 <li><p>指定编码格式：<br>指定编码写入，需要打开文件的时候按指定的编码写入，open写encoding编码方式。</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1. 打开</span></span><br><span class="line">file = open(<span class="string">"readme.txt"</span>, <span class="string">"a"</span>, encoding=<span class="string">'utf-8'</span>)  <span class="comment"># a 以追加的方式打开</span></span><br><span class="line"><span class="comment"># 2. 写入文件</span></span><br><span class="line">file.write(<span class="string">"123 hello"</span>)</span><br><span class="line"><span class="comment"># 3. 关闭</span></span><br><span class="line">file.close()</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre class=" language-hljs py"><span class="hljs-comment"># 1. 打开</span><br>file = open(<span class="hljs-string">"readme.txt"</span>, <span class="hljs-string">"a"</span>, encoding=<span class="hljs-string">'utf-8'</span>)  <span class="hljs-comment"># a 以追加的方式打开</span><br><span class="hljs-comment"># 2. 写入文件</span><br>file.write(<span class="hljs-string">"123 hello"</span>)<br><span class="hljs-comment"><code class="language-hljs py"><span class="hljs-comment"># 1. 打开</span><br>file = open(<span class="hljs-string">"readme.txt"</span>, <span class="hljs-string">"a"</span>, encoding=<span class="hljs-string">'utf-8'</span>)  <span class="hljs-comment"># a 以追加的方式打开</span><br><span class="hljs-comment"># 2. 写入文件</span><br>file.write(<span class="hljs-string">"123 hello"</span>)<br><span class="hljs-comment"># 3. 关闭</span><br>file.close()<br></code></pre></td></tr></tbody></table></figure>
 
 </li>
 </ul>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">当一个文件对象的引用被重新指定给另一个文件时，Python 会关闭之前的文件。</span><br><span class="line">用来关闭文件并立即释放它使用的所有系统资源。如果你没有显式地关闭文件，Python的垃圾回收器最终将销毁该对象并为你关闭打开的文件，但这个文件可能会保持打开状态一段时间。</span><br><span class="line"></span><br><span class="line">一是可能忘记关闭文件句柄；</span><br><span class="line">二是文件读取数据发生异常，没有做异常处理</span><br><span class="line"></span><br><span class="line">一个文件被打开后，你有一个file对象，你可以得到有关该文件对象相关的所有属性的</span><br><span class="line">属性    描述</span><br><span class="line">```file.closed```    返回true如果文件已被关闭，否则返回false。</span><br><span class="line">```file.mode```    返回被打开文件的访问模式。</span><br><span class="line">```file.name```    返回文件的路径。</span><br><span class="line">```py</span><br><span class="line">fo = open("代码\pi_digits.txt", "w")</span><br><span class="line">print("文件路径: ", fo.name)  # 文件路径:  代码\pi_digits.txt</span><br><span class="line">print("是否已关闭 : ", fo.closed)  # 是否已关闭 :  False</span><br><span class="line">print("访问模式 : ", fo.mode)  # 访问模式 :  w</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre class=" language-hljs file.close()```刷新缓冲区里任何还没写入的信息，并关闭该文件，这之后便不能再进行写入。"><code class="language-hljs file.close()```刷新缓冲区里任何还没写入的信息，并关闭该文件，这之后便不能再进行写入。">当一个文件对象的引用被重新指定给另一个文件时，Python 会关闭之前的文件。<br>用来关闭文件并立即释放它使用的所有系统资源。如果你没有显式地关闭文件，Python的垃圾回收器最终将销毁该对象并为你关闭打开的文件，但这个文件可能会保持打开状态一段时间。<br><br>一是可能忘记关闭文件句柄；<br>二是文件读取数据发生异常，没有做异常处理<br><br>一个文件被打开后，你有一个file对象，你可以得到有关该文件对象相关的所有属性的<br>属性    描述<br>```file.closed```    返回true如果文件已被关闭，否则返回false。<br>```file.mode```    返回被打开文件的访问模式。<br>```file.name```    返回文件的路径。<br>```py<br>fo = open("代码\pi_digits.txt", "w")<br>print("文件路径: ", fo.name)  # 文件路径:  代码\pi_digits.txt<br>print("是否已关闭 : ", fo.closed)  # 是否已关闭 :  False<br>print("访问模式 : ", fo.mode)  # 访问模式 :  w<br></code></pre></td></tr></tbody></table></figure>
 
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">如果使用read读了多次，那么后面继续使用read读取的数据是从上次读完后的位置开始的</span><br><span class="line"></span><br><span class="line">```readline([count])```：对文件的数据按行读取，（行的划分是\n）.每次只读取一行。如果有多次读取的话，下面一次读取的偏移量是上面读取后的偏移量。</span><br><span class="line"></span><br><span class="line">```readlines()```：按照行的方式把整个文件中的内容进行一次性读取，读取所有行(直到结束符 EOF)并返回一个列表，其中每一行（按着换行符进行判断一行）的数据为一个元素。</span><br><span class="line"></span><br><span class="line">```write(“string”)```函数向打开的文件对象写入指定字符串，如果文件不存在那么创建，如果存在那么就先清空文件(覆盖)，然后写入数据到文件里。Python字符串可以是二进制数据，而不是仅仅是文字。不会在字符串的结尾添加换行符('\n')</span><br><span class="line"></span><br><span class="line">```writelines(string_list)```函数向打开的文件对象写入多行内容</span><br><span class="line">以往后遇加的模式与入文件</span><br><span class="line"></span><br><span class="line">在默认模式下读取文本文件时（二进制文件不可以），文件中的换行符会转换为'\n'形式。</span><br><span class="line"></span><br><span class="line">在默认模式下写入文件时，文本中的'\n'会转换为换行符。</span><br><span class="line"></span><br><span class="line">```tell()```方法告诉你文件内的当前位置, 换句话说，下一次的读写会发生在文件开头这么多字节之后。</span><br><span class="line"></span><br><span class="line">```seek(offset [,from])```方法改变当前文件的位置。Offset变量表示要移动的字节数。From变量指定开始移动字节的参考位置。</span><br><span class="line"></span><br><span class="line">如果from被设为0，这意味着将文件的开头作为移动字节的参考位置。如果设为1，则使用当前的位置作为参考位置。如果它被设为2，那么该文件的末尾将作为参考位置。</span><br><span class="line"></span><br><span class="line">```seek(3)```从文件起始位置偏移3个字符从第4个字符位置开始读取</span><br><span class="line">```seek(0，0)```重新从文件启始位置读取</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">```py</span><br><span class="line">import os</span><br><span class="line"></span><br><span class="line">current_path = os.getcwd()</span><br><span class="line">with open(current_path + '/' + 'test1.txt', 'w+',</span><br><span class="line">          encoding='utf-8') as file_object:</span><br><span class="line">    file_object.write('Ashe正在学习Python')</span><br><span class="line">    content = file_object.read()</span><br><span class="line">    print(content, type(content))</span><br><span class="line">    #  &lt;class 'str'&gt; 注意前面有一个空格表示content是空字符串</span><br><span class="line">    # 因为此时读取的是最后一个字符，写完内容之后就是空字符串</span><br><span class="line">    file_object.seek(0)</span><br><span class="line">    content = file_object.read()</span><br><span class="line">    print(content, type(content))</span><br><span class="line">    # Ashe正在学习Python &lt;class 'str'&gt;</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre class=" language-hljs fileObject.read([count])```：文件打开后，如果没有传入count或者为负，读取文件中所有内容，并且返回的数据类型为字符串类型，可以指定参数，表示要从已打开文件中读取的数据的长度（字符个数），虽然说是byte。但是有中文时实际按字符返回的。该方法从文件的开头开始读入，其中空格也代表一个字符，"><code class="language-hljs fileObject.read([count])```：文件打开后，如果没有传入count或者为负，读取文件中所有内容，并且返回的数据类型为字符串类型，可以指定参数，表示要从已打开文件中读取的数据的长度（字符个数），虽然说是byte。但是有中文时实际按字符返回的。该方法从文件的开头开始读入，其中空格也代表一个字符，">如果使用read读了多次，那么后面继续使用read读取的数据是从上次读完后的位置开始的<br><br>```readline([count])```：对文件的数据按行读取，（行的划分是\n）.每次只读取一行。如果有多次读取的话，下面一次读取的偏移量是上面读取后的偏移量。<br><br>```readlines()```：按照行的方式把整个文件中的内容进行一次性读取，读取所有行(直到结束符 EOF)并返回一个列表，其中每一行（按着换行符进行判断一行）的数据为一个元素。<br><br>```write(“string”)```函数向打开的文件对象写入指定字符串，如果文件不存在那么创建，如果存在那么就先清空文件(覆盖)，然后写入数据到文件里。Python字符串可以是二进制数据，而不是仅仅是文字。不会在字符串的结尾添加换行符('\n')<br><br>```writelines(string_list)```函数向打开的文件对象写入多行内容<br>以往后遇加的模式与入文件<br><br>在默认模式下读取文本文件时（二进制文件不可以），文件中的换行符会转换为'\n'形式。<br><br>在默认模式下写入文件时，文本中的'\n'会转换为换行符。<br><br>```tell()```方法告诉你文件内的当前位置, 换句话说，下一次的读写会发生在文件开头这么多字节之后。<br><br>```seek(offset [,from])```方法改变当前文件的位置。Offset变量表示要移动的字节数。From变量指定开始移动字节的参考位置。<br><br>如果from被设为0，这意味着将文件的开头作为移动字节的参考位置。如果设为1，则使用当前的位置作为参考位置。如果它被设为2，那么该文件的末尾将作为参考位置。<br><br>```seek(3)```从文件起始位置偏移3个字符从第4个字符位置开始读取<br>```seek(0，0)```重新从文件启始位置读取<br><br><br>```py<br>import os<br><br>current_path = os.getcwd()<br>with open(current_path + '/' + 'test1.txt', 'w+',<br>          encoding='utf-8') as file_object:<br>    file_object.write('Ashe正在学习Python')<br>    content = file_object.read()<br>    print(content, type(content))<br>    #  <class 'str'> 注意前面有一个空格表示content是空字符串<br>    # 因为此时读取的是最后一个字符，写完内容之后就是空字符串<br>    file_object.seek(0)<br>    content = file_object.read()<br>    print(content, type(content))<br>    # Ashe正在学习Python <class 'str'><br></code></pre></td></tr></tbody></table></figure>
 
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line">current_path = os.getcwd()</span><br><span class="line"><span class="keyword">with</span> open(current_path + <span class="string">'/'</span> + <span class="string">'test1.txt'</span>, <span class="string">'ab+'</span>) <span class="keyword">as</span> file_object:</span><br><span class="line">    string = <span class="string">b'Ashe Python'</span></span><br><span class="line">    file_object.write(string)</span><br><span class="line">    content = file_object.read()</span><br><span class="line">    print(content, type(content))</span><br><span class="line">    <span class="comment"># b'' &lt;class 'bytes'&gt; 注意前面有一个空格表示content是空字符串</span></span><br><span class="line">    <span class="comment"># 因为此时读取的是最后一个字符，写完内容之后就是空字符串</span></span><br><span class="line">    file_object.seek(<span class="number">0</span>)</span><br><span class="line">    content = file_object.read()</span><br><span class="line">    print(content, type(content))</span><br><span class="line">    <span class="comment"># b'Ashe Python' &lt;class 'bytes'&gt;</span></span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre class=" language-hljs py"><span class="hljs-keyword">import</span> os<br><br>current_path = os.getcwd()<br><span class="hljs-keyword">with</span> open(current_path + <span class="hljs-string">'/'</span> + <span class="hljs-string">'test1.txt'</span>, <span class="hljs-string">'ab+'</span>) <span class="hljs-keyword">as</span> file_object:<br>    string = <span class="hljs-string">b'Ashe Python'</span><br>    file_object.write(string)<br>    content = file_object.read()<br>    print(content, type(content))<br>    <span class="hljs-comment"># b'' &lt;class 'bytes'&gt; 注意前面有一个空格表示content是空字符串</span><br>    <span class="hljs-comment"># 因为此时读取的是最后一个字符，写完内容之后就是空字符串</span><br>    file_object.seek(<span class="hljs-number">0</span>)<br>    content = file_object.read()<br>    print(content, type(content))<br>    <span class="hljs-comment"><code class="language-hljs py"><span class="hljs-keyword">import</span> os<br><br>current_path = os.getcwd()<br><span class="hljs-keyword">with</span> open(current_path + <span class="hljs-string">'/'</span> + <span class="hljs-string">'test1.txt'</span>, <span class="hljs-string">'ab+'</span>) <span class="hljs-keyword">as</span> file_object:<br>    string = <span class="hljs-string">b'Ashe Python'</span><br>    file_object.write(string)<br>    content = file_object.read()<br>    print(content, type(content))<br>    <span class="hljs-comment"># b'' &lt;class 'bytes'&gt; 注意前面有一个空格表示content是空字符串</span><br>    <span class="hljs-comment"># 因为此时读取的是最后一个字符，写完内容之后就是空字符串</span><br>    file_object.seek(<span class="hljs-number">0</span>)<br>    content = file_object.read()<br>    print(content, type(content))<br>    <span class="hljs-comment"># b'Ashe Python' <class 'bytes'></span><br></code></pre></td></tr></tbody></table></figure>
 
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line">filename = <span class="string">'代码\generate_text.txt'</span></span><br><span class="line"><span class="comment"># 使用‘w’来提醒python用写入的方式打开 指定编码为</span></span><br><span class="line"><span class="keyword">with</span> open(filename, <span class="string">'w'</span>, encoding=<span class="string">'utf-8'</span>) <span class="keyword">as</span> fileobject:</span><br><span class="line">    fileobject.write(<span class="string">'I love your name!'</span></span><br><span class="line">                     <span class="string">'\nI love your cloth!'</span></span><br><span class="line">                     <span class="string">'\nI love your shoes!'</span></span><br><span class="line">                     <span class="string">'\nI love your hair!'</span>)</span><br><span class="line"><span class="comment"># 使用‘a’来提醒python用附加模式的方式打开指定编码为'utf-8'</span></span><br><span class="line"><span class="keyword">with</span> open(filename, <span class="string">'a'</span>, encoding=<span class="string">'utf-8'</span>) <span class="keyword">as</span> fileobject:</span><br><span class="line">    fileobject.write(<span class="string">'\nI an superman.我是超人'</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用‘a’来提醒python用附加模式的方式打开不指定编码为'utf-8'</span></span><br><span class="line"><span class="keyword">with</span> open(filename, <span class="string">'a'</span>) <span class="keyword">as</span> fileobject:</span><br><span class="line">    fileobject.write(<span class="string">'\nI an superman.我是超人'</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'代码\generate_text.txt'</span>, <span class="string">'r'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    content = f.readline()</span><br><span class="line">    print(<span class="string">"第一次读取:%s"</span> % content)</span><br><span class="line">    <span class="comment"># 第一次读取:I love your name!</span></span><br><span class="line">    print(<span class="string">"第一次读取:"</span>, content)</span><br><span class="line">    <span class="comment"># 第一次读取:I love your name!</span></span><br><span class="line"></span><br><span class="line">    content = f.readline()</span><br><span class="line">    print(<span class="string">"第二次读取:%s"</span> % content)</span><br><span class="line">    <span class="comment"># 第二次读取:I love your cloth!</span></span><br><span class="line"></span><br><span class="line">    content = f.read(<span class="number">6</span>)</span><br><span class="line">    print(<span class="string">"第三次读取:%s"</span> % content)</span><br><span class="line">    <span class="comment"># 第三次读取:I love</span></span><br><span class="line"></span><br><span class="line">    position = f.tell()</span><br><span class="line">    print(<span class="string">"当前文件位置 : "</span>, position)</span><br><span class="line">    <span class="comment"># 当前文件位置 :  45</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 把指针再次重新定位到文件开头</span></span><br><span class="line">    position = f.seek(<span class="number">0</span>, <span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">    str = f.read(<span class="number">16</span>)</span><br><span class="line">    print(<span class="string">"读取的字符串是 : "</span>, str)</span><br><span class="line">    <span class="comment"># 读取的字符串是 :  I love your name</span></span><br><span class="line">    position = f.tell()</span><br><span class="line">    print(<span class="string">"当前文件位置 : "</span>, position)</span><br><span class="line">    <span class="comment"># 当前文件位置 :  16</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'代码\generate_text.txt'</span>, <span class="string">'r'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    content = f.read()</span><br><span class="line">    print(<span class="string">"读取:%s"</span> % content)</span><br><span class="line">    <span class="comment"># 读取:I love your name!</span></span><br><span class="line">    <span class="comment"># I love your cloth!</span></span><br><span class="line">    <span class="comment"># I love your shoes!</span></span><br><span class="line">    <span class="comment"># I love your hair!</span></span><br><span class="line">    <span class="comment"># I an superman.鎴戞槸瓒呬汉</span></span><br><span class="line">    <span class="comment"># I an superman.我是超人</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 注意如果用read（），读取全部，后面再加read(num),就没有内容可读了。返回空字符串</span></span><br><span class="line">    content = f.read(<span class="number">6</span>)</span><br><span class="line">    print(<span class="string">":%s"</span> % content)</span><br><span class="line">    <span class="comment"># :</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'代码\generate_text.txt'</span>, <span class="string">'r'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    content = f.readlines()</span><br><span class="line">    print(<span class="string">"读取:%s"</span> % content)</span><br><span class="line"><span class="comment">#     读取:['I love your name!\n', 'I love your cloth!\n', 'I love your </span></span><br><span class="line"><span class="comment"># shoes!\n', 'I love your hair!\n', 'I an superman.鎴戞槸瓒呬汉\n', </span></span><br><span class="line"><span class="comment"># 'I an superman.我是超人']</span></span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre class=" language-hljs py">filename = <span class="hljs-string">'代码\generate_text.txt'</span><br><span class="hljs-comment"># 使用‘w’来提醒python用写入的方式打开 指定编码为</span><br><span class="hljs-keyword">with</span> open(filename, <span class="hljs-string">'w'</span>, encoding=<span class="hljs-string">'utf-8'</span>) <span class="hljs-keyword">as</span> fileobject:<br>    fileobject.write(<span class="hljs-string">'I love your name!'</span><br>                     <span class="hljs-string">'\nI love your cloth!'</span><br>                     <span class="hljs-string">'\nI love your shoes!'</span><br>                     <span class="hljs-string">'\nI love your hair!'</span>)<br><span class="hljs-comment"># 使用‘a’来提醒python用附加模式的方式打开指定编码为'utf-8'</span><br><span class="hljs-keyword">with</span> open(filename, <span class="hljs-string">'a'</span>, encoding=<span class="hljs-string">'utf-8'</span>) <span class="hljs-keyword">as</span> fileobject:<br>    fileobject.write(<span class="hljs-string">'\nI an superman.我是超人'</span>)<br><br><span class="hljs-comment"># 使用‘a’来提醒python用附加模式的方式打开不指定编码为'utf-8'</span><br><span class="hljs-keyword">with</span> open(filename, <span class="hljs-string">'a'</span>) <span class="hljs-keyword">as</span> fileobject:<br>    fileobject.write(<span class="hljs-string">'\nI an superman.我是超人'</span>)<br><br><span class="hljs-keyword">with</span> open(<span class="hljs-string">'代码\generate_text.txt'</span>, <span class="hljs-string">'r'</span>) <span class="hljs-keyword">as</span> f:<br>    content = f.readline()<br>    print(<span class="hljs-string">"第一次读取:%s"</span> % content)<br>    <span class="hljs-comment"># 第一次读取:I love your name!</span><br>    print(<span class="hljs-string">"第一次读取:"</span>, content)<br>    <span class="hljs-comment"># 第一次读取:I love your name!</span><br><br>    content = f.readline()<br>    print(<span class="hljs-string">"第二次读取:%s"</span> % content)<br>    <span class="hljs-comment"># 第二次读取:I love your cloth!</span><br><br>    content = f.read(<span class="hljs-number">6</span>)<br>    print(<span class="hljs-string">"第三次读取:%s"</span> % content)<br>    <span class="hljs-comment"># 第三次读取:I love</span><br><br>    position = f.tell()<br>    print(<span class="hljs-string">"当前文件位置 : "</span>, position)<br>    <span class="hljs-comment"># 当前文件位置 :  45</span><br><br>    <span class="hljs-comment"># 把指针再次重新定位到文件开头</span><br>    position = f.seek(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>)<br><br>    str = f.read(<span class="hljs-number">16</span>)<br>    print(<span class="hljs-string">"读取的字符串是 : "</span>, str)<br>    <span class="hljs-comment"># 读取的字符串是 :  I love your name</span><br>    position = f.tell()<br>    print(<span class="hljs-string">"当前文件位置 : "</span>, position)<br>    <span class="hljs-comment"># 当前文件位置 :  16</span><br><br><span class="hljs-keyword">with</span> open(<span class="hljs-string">'代码\generate_text.txt'</span>, <span class="hljs-string">'r'</span>) <span class="hljs-keyword">as</span> f:<br>    content = f.read()<br>    print(<span class="hljs-string">"读取:%s"</span> % content)<br>    <span class="hljs-comment"># 读取:I love your name!</span><br>    <span class="hljs-comment"># I love your cloth!</span><br>    <span class="hljs-comment"># I love your shoes!</span><br>    <span class="hljs-comment"># I love your hair!</span><br>    <span class="hljs-comment"># I an superman.鎴戞槸瓒呬汉</span><br>    <span class="hljs-comment"># I an superman.我是超人</span><br><br>    <span class="hljs-comment"># 注意如果用read（），读取全部，后面再加read(num),就没有内容可读了。返回空字符串</span><br>    content = f.read(<span class="hljs-number">6</span>)<br>    print(<span class="hljs-string">":%s"</span> % content)<br>    <span class="hljs-comment"># :</span><br><br><br><span class="hljs-keyword">with</span> open(<span class="hljs-string">'代码\generate_text.txt'</span>, <span class="hljs-string">'r'</span>) <span class="hljs-keyword">as</span> f:<br>    content = f.readlines()<br>    print(<span class="hljs-string">"读取:%s"</span> % content)<br><span class="hljs-comment">#     读取:['I love your name!\n', 'I love your cloth!\n', 'I love your </span><br><span class="hljs-comment"># shoes!\n', 'I love your hair!\n', 'I an superman.鎴戞槸瓒呬汉\n', </span><br><span class="hljs-comment"><code class="language-hljs py">filename = <span class="hljs-string">'代码\generate_text.txt'</span><br><span class="hljs-comment"># 使用‘w’来提醒python用写入的方式打开 指定编码为</span><br><span class="hljs-keyword">with</span> open(filename, <span class="hljs-string">'w'</span>, encoding=<span class="hljs-string">'utf-8'</span>) <span class="hljs-keyword">as</span> fileobject:<br>    fileobject.write(<span class="hljs-string">'I love your name!'</span><br>                     <span class="hljs-string">'\nI love your cloth!'</span><br>                     <span class="hljs-string">'\nI love your shoes!'</span><br>                     <span class="hljs-string">'\nI love your hair!'</span>)<br><span class="hljs-comment"># 使用‘a’来提醒python用附加模式的方式打开指定编码为'utf-8'</span><br><span class="hljs-keyword">with</span> open(filename, <span class="hljs-string">'a'</span>, encoding=<span class="hljs-string">'utf-8'</span>) <span class="hljs-keyword">as</span> fileobject:<br>    fileobject.write(<span class="hljs-string">'\nI an superman.我是超人'</span>)<br><br><span class="hljs-comment"># 使用‘a’来提醒python用附加模式的方式打开不指定编码为'utf-8'</span><br><span class="hljs-keyword">with</span> open(filename, <span class="hljs-string">'a'</span>) <span class="hljs-keyword">as</span> fileobject:<br>    fileobject.write(<span class="hljs-string">'\nI an superman.我是超人'</span>)<br><br><span class="hljs-keyword">with</span> open(<span class="hljs-string">'代码\generate_text.txt'</span>, <span class="hljs-string">'r'</span>) <span class="hljs-keyword">as</span> f:<br>    content = f.readline()<br>    print(<span class="hljs-string">"第一次读取:%s"</span> % content)<br>    <span class="hljs-comment"># 第一次读取:I love your name!</span><br>    print(<span class="hljs-string">"第一次读取:"</span>, content)<br>    <span class="hljs-comment"># 第一次读取:I love your name!</span><br><br>    content = f.readline()<br>    print(<span class="hljs-string">"第二次读取:%s"</span> % content)<br>    <span class="hljs-comment"># 第二次读取:I love your cloth!</span><br><br>    content = f.read(<span class="hljs-number">6</span>)<br>    print(<span class="hljs-string">"第三次读取:%s"</span> % content)<br>    <span class="hljs-comment"># 第三次读取:I love</span><br><br>    position = f.tell()<br>    print(<span class="hljs-string">"当前文件位置 : "</span>, position)<br>    <span class="hljs-comment"># 当前文件位置 :  45</span><br><br>    <span class="hljs-comment"># 把指针再次重新定位到文件开头</span><br>    position = f.seek(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>)<br><br>    str = f.read(<span class="hljs-number">16</span>)<br>    print(<span class="hljs-string">"读取的字符串是 : "</span>, str)<br>    <span class="hljs-comment"># 读取的字符串是 :  I love your name</span><br>    position = f.tell()<br>    print(<span class="hljs-string">"当前文件位置 : "</span>, position)<br>    <span class="hljs-comment"># 当前文件位置 :  16</span><br><br><span class="hljs-keyword">with</span> open(<span class="hljs-string">'代码\generate_text.txt'</span>, <span class="hljs-string">'r'</span>) <span class="hljs-keyword">as</span> f:<br>    content = f.read()<br>    print(<span class="hljs-string">"读取:%s"</span> % content)<br>    <span class="hljs-comment"># 读取:I love your name!</span><br>    <span class="hljs-comment"># I love your cloth!</span><br>    <span class="hljs-comment"># I love your shoes!</span><br>    <span class="hljs-comment"># I love your hair!</span><br>    <span class="hljs-comment"># I an superman.鎴戞槸瓒呬汉</span><br>    <span class="hljs-comment"># I an superman.我是超人</span><br><br>    <span class="hljs-comment"># 注意如果用read（），读取全部，后面再加read(num),就没有内容可读了。返回空字符串</span><br>    content = f.read(<span class="hljs-number">6</span>)<br>    print(<span class="hljs-string">":%s"</span> % content)<br>    <span class="hljs-comment"># :</span><br><br><br><span class="hljs-keyword">with</span> open(<span class="hljs-string">'代码\generate_text.txt'</span>, <span class="hljs-string">'r'</span>) <span class="hljs-keyword">as</span> f:<br>    content = f.readlines()<br>    print(<span class="hljs-string">"读取:%s"</span> % content)<br><span class="hljs-comment">#     读取:['I love your name!\n', 'I love your cloth!\n', 'I love your </span><br><span class="hljs-comment"># shoes!\n', 'I love your hair!\n', 'I an superman.鎴戞槸瓒呬汉\n', </span><br><span class="hljs-comment"># 'I an superman.我是超人']</span><br></code></pre></td></tr></tbody></table></figure>
 
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 相对文件路径 （优先使用）</span></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'牛客网剑指offer66题思路分析\代码\pi_digits.txt'</span>) <span class="keyword">as</span> file_object:</span><br><span class="line">    contents = file_object.read()</span><br><span class="line">    <span class="comment"># 多出一个空行的情况下可以使用 rstrip() 来去除字符串后面的空白</span></span><br><span class="line">    print(contents.rstrip())</span><br><span class="line">    <span class="comment"># 3.1415926535  </span></span><br><span class="line">    <span class="comment">#   8979323846  </span></span><br><span class="line">    <span class="comment">#   2643383279  </span></span><br><span class="line">    <span class="comment"># 'abc  '     </span></span><br><span class="line">    <span class="comment"># '  abc'     </span></span><br><span class="line">    <span class="comment"># abc</span></span><br><span class="line">    <span class="comment">#   abc  </span></span><br><span class="line">    print(<span class="string">'******'</span>)</span><br><span class="line">    print(contents.lstrip())</span><br><span class="line">    <span class="comment"># 3.1415926535  </span></span><br><span class="line">    <span class="comment">#   8979323846  </span></span><br><span class="line">    <span class="comment">#   2643383279  </span></span><br><span class="line">    <span class="comment"># 'abc  '     </span></span><br><span class="line">    <span class="comment"># '  abc'     </span></span><br><span class="line">    <span class="comment"># abc</span></span><br><span class="line">    <span class="comment">#   abc </span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 绝对文件路径</span></span><br><span class="line">file_path = <span class="string">'C:\python代码\牛客网剑指offer66题思路分析\代码\pi_digits.txt'</span></span><br><span class="line"><span class="keyword">with</span> open(file_path) <span class="keyword">as</span> file_object:</span><br><span class="line">    print(<span class="string">'----'</span>)</span><br><span class="line">    print(file_object.read())</span><br><span class="line"></span><br><span class="line"><span class="comment"># 逐行 读取文件的信息</span></span><br><span class="line">file_path = <span class="string">'牛客网剑指offer66题思路分析\代码\pi_digits.txt'</span></span><br><span class="line"><span class="keyword">with</span> open(file_path) <span class="keyword">as</span> file_object:</span><br><span class="line">    print(<span class="string">'======'</span>)</span><br><span class="line">    <span class="keyword">for</span> line <span class="keyword">in</span> file_object:</span><br><span class="line">        <span class="comment"># 多出一个空行的情况下可以使用 rstrip() 来去除字符串后面的空白</span></span><br><span class="line">        print(line.rstrip())  </span><br><span class="line"></span><br><span class="line"><span class="comment"># 逐行 读取文件的信息 使用readlines()</span></span><br><span class="line">file_path = <span class="string">'牛客网剑指offer66题思路分析\代码\pi_digits.txt'</span></span><br><span class="line"><span class="keyword">with</span> open(file_path) <span class="keyword">as</span> file_object:</span><br><span class="line">    print(<span class="string">'^^^^^^^'</span>)</span><br><span class="line">    lines = file_object.readlines()</span><br><span class="line">    print(lines)</span><br><span class="line">    <span class="comment"># ['3.1415926535\n', '  8979323846\n', '  2643383279\n', "'abc  '\n", "'  abc'\n", 'abc\n', '  abc']</span></span><br><span class="line">    <span class="comment"># 遍历列表，将读取的内容显示出来，按照原来文件的行划分。</span></span><br><span class="line">    <span class="keyword">for</span> line <span class="keyword">in</span> lines:</span><br><span class="line">        <span class="comment"># 多出一个空行的情况下可以使用 rstrip() 来去除字符串后面的空白</span></span><br><span class="line">        print(line.rstrip())串后面的空白</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre class=" language-hljs py"><span class="hljs-comment"># 相对文件路径 （优先使用）</span><br><span class="hljs-keyword">with</span> open(<span class="hljs-string">'牛客网剑指offer66题思路分析\代码\pi_digits.txt'</span>) <span class="hljs-keyword">as</span> file_object:<br>    contents = file_object.read()<br>    <span class="hljs-comment"># 多出一个空行的情况下可以使用 rstrip() 来去除字符串后面的空白</span><br>    print(contents.rstrip())<br>    <span class="hljs-comment"># 3.1415926535  </span><br>    <span class="hljs-comment">#   8979323846  </span><br>    <span class="hljs-comment">#   2643383279  </span><br>    <span class="hljs-comment"># 'abc  '     </span><br>    <span class="hljs-comment"># '  abc'     </span><br>    <span class="hljs-comment"># abc</span><br>    <span class="hljs-comment">#   abc  </span><br>    print(<span class="hljs-string">'******'</span>)<br>    print(contents.lstrip())<br>    <span class="hljs-comment"># 3.1415926535  </span><br>    <span class="hljs-comment">#   8979323846  </span><br>    <span class="hljs-comment">#   2643383279  </span><br>    <span class="hljs-comment"># 'abc  '     </span><br>    <span class="hljs-comment"># '  abc'     </span><br>    <span class="hljs-comment"># abc</span><br>    <span class="hljs-comment">#   abc </span><br><br><span class="hljs-comment"># 绝对文件路径</span><br>file_path = <span class="hljs-string">'C:\python代码\牛客网剑指offer66题思路分析\代码\pi_digits.txt'</span><br><span class="hljs-keyword">with</span> open(file_path) <span class="hljs-keyword">as</span> file_object:<br>    print(<span class="hljs-string">'----'</span>)<br>    print(file_object.read())<br><br><span class="hljs-comment"># 逐行 读取文件的信息</span><br>file_path = <span class="hljs-string">'牛客网剑指offer66题思路分析\代码\pi_digits.txt'</span><br><span class="hljs-keyword">with</span> open(file_path) <span class="hljs-keyword">as</span> file_object:<br>    print(<span class="hljs-string">'======'</span>)<br>    <span class="hljs-keyword">for</span> line <span class="hljs-keyword">in</span> file_object:<br>        <span class="hljs-comment"># 多出一个空行的情况下可以使用 rstrip() 来去除字符串后面的空白</span><br>        print(line.rstrip())  <br><br><span class="hljs-comment"># 逐行 读取文件的信息 使用readlines()</span><br>file_path = <span class="hljs-string">'牛客网剑指offer66题思路分析\代码\pi_digits.txt'</span><br><span class="hljs-keyword">with</span> open(file_path) <span class="hljs-keyword">as</span> file_object:<br>    print(<span class="hljs-string">'^^^^^^^'</span>)<br>    lines = file_object.readlines()<br>    print(lines)<br>    <span class="hljs-comment"># ['3.1415926535\n', '  8979323846\n', '  2643383279\n', "'abc  '\n", "'  abc'\n", 'abc\n', '  abc']</span><br>    <span class="hljs-comment"># 遍历列表，将读取的内容显示出来，按照原来文件的行划分。</span><br>    <span class="hljs-keyword">for</span> line <span class="hljs-keyword">in</span> lines:<br>        <span class="hljs-comment"><code class="language-hljs py"><span class="hljs-comment"># 相对文件路径 （优先使用）</span><br><span class="hljs-keyword">with</span> open(<span class="hljs-string">'牛客网剑指offer66题思路分析\代码\pi_digits.txt'</span>) <span class="hljs-keyword">as</span> file_object:<br>    contents = file_object.read()<br>    <span class="hljs-comment"># 多出一个空行的情况下可以使用 rstrip() 来去除字符串后面的空白</span><br>    print(contents.rstrip())<br>    <span class="hljs-comment"># 3.1415926535  </span><br>    <span class="hljs-comment">#   8979323846  </span><br>    <span class="hljs-comment">#   2643383279  </span><br>    <span class="hljs-comment"># 'abc  '     </span><br>    <span class="hljs-comment"># '  abc'     </span><br>    <span class="hljs-comment"># abc</span><br>    <span class="hljs-comment">#   abc  </span><br>    print(<span class="hljs-string">'******'</span>)<br>    print(contents.lstrip())<br>    <span class="hljs-comment"># 3.1415926535  </span><br>    <span class="hljs-comment">#   8979323846  </span><br>    <span class="hljs-comment">#   2643383279  </span><br>    <span class="hljs-comment"># 'abc  '     </span><br>    <span class="hljs-comment"># '  abc'     </span><br>    <span class="hljs-comment"># abc</span><br>    <span class="hljs-comment">#   abc </span><br><br><span class="hljs-comment"># 绝对文件路径</span><br>file_path = <span class="hljs-string">'C:\python代码\牛客网剑指offer66题思路分析\代码\pi_digits.txt'</span><br><span class="hljs-keyword">with</span> open(file_path) <span class="hljs-keyword">as</span> file_object:<br>    print(<span class="hljs-string">'----'</span>)<br>    print(file_object.read())<br><br><span class="hljs-comment"># 逐行 读取文件的信息</span><br>file_path = <span class="hljs-string">'牛客网剑指offer66题思路分析\代码\pi_digits.txt'</span><br><span class="hljs-keyword">with</span> open(file_path) <span class="hljs-keyword">as</span> file_object:<br>    print(<span class="hljs-string">'======'</span>)<br>    <span class="hljs-keyword">for</span> line <span class="hljs-keyword">in</span> file_object:<br>        <span class="hljs-comment"># 多出一个空行的情况下可以使用 rstrip() 来去除字符串后面的空白</span><br>        print(line.rstrip())  <br><br><span class="hljs-comment"># 逐行 读取文件的信息 使用readlines()</span><br>file_path = <span class="hljs-string">'牛客网剑指offer66题思路分析\代码\pi_digits.txt'</span><br><span class="hljs-keyword">with</span> open(file_path) <span class="hljs-keyword">as</span> file_object:<br>    print(<span class="hljs-string">'^^^^^^^'</span>)<br>    lines = file_object.readlines()<br>    print(lines)<br>    <span class="hljs-comment"># ['3.1415926535\n', '  8979323846\n', '  2643383279\n', "'abc  '\n", "'  abc'\n", 'abc\n', '  abc']</span><br>    <span class="hljs-comment"># 遍历列表，将读取的内容显示出来，按照原来文件的行划分。</span><br>    <span class="hljs-keyword">for</span> line <span class="hljs-keyword">in</span> lines:<br>        <span class="hljs-comment"># 多出一个空行的情况下可以使用 rstrip() 来去除字符串后面的空白</span><br>        print(line.rstrip())串后面的空白<br></code></pre></td></tr></tbody></table></figure>
 
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 使用文件的内容 读取/拼接</span></span><br><span class="line"><span class="comment"># 逐行 读取文件的信息 使用readlines()</span></span><br><span class="line">file_path = <span class="string">'牛客网剑指offer66题思路分析\代码\pi_digits.txt'</span></span><br><span class="line"><span class="keyword">with</span> open(file_path) <span class="keyword">as</span> file_object:</span><br><span class="line">    lines = file_object.readlines()  <span class="comment"># 读取文件中每行的信息</span></span><br><span class="line">pi_string = <span class="string">''</span>  <span class="comment"># 创建一个字符串</span></span><br><span class="line"><span class="keyword">for</span> line <span class="keyword">in</span> lines:  <span class="comment"># 遍历读取到的文件的每行信息 存储到line中</span></span><br><span class="line">    pi_string += line.strip()  <span class="comment"># 读取到的每行信息+创建的字符串  并用strip()去除两端的空格</span></span><br><span class="line">print(pi_string)  <span class="comment"># 输出拼接之后的信息</span></span><br><span class="line"><span class="comment"># 3.141592653589793238462643383279'abc  ''  abc'abcabc</span></span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre class=" language-hljs py"><span class="hljs-comment"># 使用文件的内容 读取/拼接</span><br><span class="hljs-comment"># 逐行 读取文件的信息 使用readlines()</span><br>file_path = <span class="hljs-string">'牛客网剑指offer66题思路分析\代码\pi_digits.txt'</span><br><span class="hljs-keyword">with</span> open(file_path) <span class="hljs-keyword">as</span> file_object:<br>    lines = file_object.readlines()  <span class="hljs-comment"># 读取文件中每行的信息</span><br>pi_string = <span class="hljs-string">''</span>  <span class="hljs-comment"># 创建一个字符串</span><br><span class="hljs-keyword">for</span> line <span class="hljs-keyword">in</span> lines:  <span class="hljs-comment"># 遍历读取到的文件的每行信息 存储到line中</span><br>    pi_string += line.strip()  <span class="hljs-comment"># 读取到的每行信息+创建的字符串  并用strip()去除两端的空格</span><br>print(pi_string)  <span class="hljs-comment"># 输出拼接之后的信息</span><br><span class="hljs-comment"><code class="language-hljs py"><span class="hljs-comment"># 使用文件的内容 读取/拼接</span><br><span class="hljs-comment"># 逐行 读取文件的信息 使用readlines()</span><br>file_path = <span class="hljs-string">'牛客网剑指offer66题思路分析\代码\pi_digits.txt'</span><br><span class="hljs-keyword">with</span> open(file_path) <span class="hljs-keyword">as</span> file_object:<br>    lines = file_object.readlines()  <span class="hljs-comment"># 读取文件中每行的信息</span><br>pi_string = <span class="hljs-string">''</span>  <span class="hljs-comment"># 创建一个字符串</span><br><span class="hljs-keyword">for</span> line <span class="hljs-keyword">in</span> lines:  <span class="hljs-comment"># 遍历读取到的文件的每行信息 存储到line中</span><br>    pi_string += line.strip()  <span class="hljs-comment"># 读取到的每行信息+创建的字符串  并用strip()去除两端的空格</span><br>print(pi_string)  <span class="hljs-comment"># 输出拼接之后的信息</span><br><span class="hljs-comment"># 3.141592653589793238462643383279'abc  ''  abc'abcabc</span><br></code></pre></td></tr></tbody></table></figure>
 
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 读取一个百万位的大型文件</span></span><br><span class="line"><span class="comment"># 逐行 读取文件的信息 使用readlines()</span></span><br><span class="line">file_path = <span class="string">'牛客网剑指offer66题思路分析\代码\pi_digits.txt'</span></span><br><span class="line"><span class="keyword">with</span> open(file_path) <span class="keyword">as</span> file_object:</span><br><span class="line">    lines = file_object.readlines()  <span class="comment"># 读取文件中每行的信息</span></span><br><span class="line">pi_string = <span class="string">''</span>  <span class="comment"># 创建一个字符串</span></span><br><span class="line"><span class="keyword">for</span> line <span class="keyword">in</span> lines:  <span class="comment"># 遍历读取到的文件的每行信息 存储到line中</span></span><br><span class="line">    <span class="comment"># 读取到的每行信息+创建的字符串  并用strip()去除两端的空格</span></span><br><span class="line">    pi_string += line.strip()</span><br><span class="line"><span class="comment"># 输出拼接之后的信息 只输出列表中的前9位 如果输出百万位 把9改为1000000</span></span><br><span class="line">print(pi_string[:<span class="number">9</span>] + <span class="string">'...'</span>)</span><br><span class="line"><span class="comment"># 输出拼接之后的信息的字符串长度</span></span><br><span class="line">print(len(pi_string))</span><br><span class="line"><span class="comment"># 3.1415926...</span></span><br><span class="line"><span class="comment"># 52</span></span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre class=" language-hljs py"><span class="hljs-comment"># 读取一个百万位的大型文件</span><br><span class="hljs-comment"># 逐行 读取文件的信息 使用readlines()</span><br>file_path = <span class="hljs-string">'牛客网剑指offer66题思路分析\代码\pi_digits.txt'</span><br><span class="hljs-keyword">with</span> open(file_path) <span class="hljs-keyword">as</span> file_object:<br>    lines = file_object.readlines()  <span class="hljs-comment"># 读取文件中每行的信息</span><br>pi_string = <span class="hljs-string">''</span>  <span class="hljs-comment"># 创建一个字符串</span><br><span class="hljs-keyword">for</span> line <span class="hljs-keyword">in</span> lines:  <span class="hljs-comment"># 遍历读取到的文件的每行信息 存储到line中</span><br>    <span class="hljs-comment"># 读取到的每行信息+创建的字符串  并用strip()去除两端的空格</span><br>    pi_string += line.strip()<br><span class="hljs-comment"># 输出拼接之后的信息 只输出列表中的前9位 如果输出百万位 把9改为1000000</span><br>print(pi_string[:<span class="hljs-number">9</span>] + <span class="hljs-string">'...'</span>)<br><span class="hljs-comment"># 输出拼接之后的信息的字符串长度</span><br>print(len(pi_string))<br><span class="hljs-comment"># 3.1415926...</span><br><span class="hljs-comment"><code class="language-hljs py"><span class="hljs-comment"># 读取一个百万位的大型文件</span><br><span class="hljs-comment"># 逐行 读取文件的信息 使用readlines()</span><br>file_path = <span class="hljs-string">'牛客网剑指offer66题思路分析\代码\pi_digits.txt'</span><br><span class="hljs-keyword">with</span> open(file_path) <span class="hljs-keyword">as</span> file_object:<br>    lines = file_object.readlines()  <span class="hljs-comment"># 读取文件中每行的信息</span><br>pi_string = <span class="hljs-string">''</span>  <span class="hljs-comment"># 创建一个字符串</span><br><span class="hljs-keyword">for</span> line <span class="hljs-keyword">in</span> lines:  <span class="hljs-comment"># 遍历读取到的文件的每行信息 存储到line中</span><br>    <span class="hljs-comment"># 读取到的每行信息+创建的字符串  并用strip()去除两端的空格</span><br>    pi_string += line.strip()<br><span class="hljs-comment"># 输出拼接之后的信息 只输出列表中的前9位 如果输出百万位 把9改为1000000</span><br>print(pi_string[:<span class="hljs-number">9</span>] + <span class="hljs-string">'...'</span>)<br><span class="hljs-comment"># 输出拼接之后的信息的字符串长度</span><br>print(len(pi_string))<br><span class="hljs-comment"># 3.1415926...</span><br><span class="hljs-comment"># 52</span><br></code></pre></td></tr></tbody></table></figure>
 
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 写入文件 执行完之后 文件目录中 会生成一个generate_text.txt的文件 </span></span><br><span class="line"><span class="comment"># 内容就是‘正在学习Python’ 在读取写入的文件内容和文件长度</span></span><br><span class="line">file_path = <span class="string">'牛客网剑指offer66题思路分析\代码\generate_doc.txt'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> open(file_path, <span class="string">'w'</span>) <span class="keyword">as</span> file_object:</span><br><span class="line">    file_object.write(<span class="string">'Ashe正在学习Python'</span> + <span class="string">'\n'</span>)</span><br><span class="line">    file_object.write(<span class="string">'Ashe正在学习Python1'</span> + <span class="string">'\n'</span>)</span><br><span class="line"><span class="keyword">with</span> open(file_path, <span class="string">'a'</span>) <span class="keyword">as</span> file_object:</span><br><span class="line">    file_object.write(<span class="string">'Ashe正在学习Python'</span> + <span class="string">'\n'</span>)</span><br><span class="line"><span class="keyword">with</span> open(file_path, <span class="string">'r'</span>) <span class="keyword">as</span> file_object:</span><br><span class="line">    lines = file_object.readlines()</span><br><span class="line">    <span class="keyword">for</span> line <span class="keyword">in</span> lines:</span><br><span class="line">        print(line.strip())</span><br><span class="line">        print(len(line))</span><br><span class="line">        <span class="comment"># Ashe正在学习Python</span></span><br><span class="line">        <span class="comment"># 15</span></span><br><span class="line">        <span class="comment"># Ashe正在学习Python1</span></span><br><span class="line">        <span class="comment"># 16</span></span><br><span class="line">        <span class="comment"># Ashe正在学习Python</span></span><br><span class="line">        <span class="comment"># 15</span></span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre class=" language-hljs py"><span class="hljs-comment"># 写入文件 执行完之后 文件目录中 会生成一个generate_text.txt的文件 </span><br><span class="hljs-comment"># 内容就是‘正在学习Python’ 在读取写入的文件内容和文件长度</span><br>file_path = <span class="hljs-string">'牛客网剑指offer66题思路分析\代码\generate_doc.txt'</span><br><br><span class="hljs-keyword">with</span> open(file_path, <span class="hljs-string">'w'</span>) <span class="hljs-keyword">as</span> file_object:<br>    file_object.write(<span class="hljs-string">'Ashe正在学习Python'</span> + <span class="hljs-string">'\n'</span>)<br>    file_object.write(<span class="hljs-string">'Ashe正在学习Python1'</span> + <span class="hljs-string">'\n'</span>)<br><span class="hljs-keyword">with</span> open(file_path, <span class="hljs-string">'a'</span>) <span class="hljs-keyword">as</span> file_object:<br>    file_object.write(<span class="hljs-string">'Ashe正在学习Python'</span> + <span class="hljs-string">'\n'</span>)<br><span class="hljs-keyword">with</span> open(file_path, <span class="hljs-string">'r'</span>) <span class="hljs-keyword">as</span> file_object:<br>    lines = file_object.readlines()<br>    <span class="hljs-keyword">for</span> line <span class="hljs-keyword">in</span> lines:<br>        print(line.strip())<br>        print(len(line))<br>        <span class="hljs-comment"># Ashe正在学习Python</span><br>        <span class="hljs-comment"># 15</span><br>        <span class="hljs-comment"># Ashe正在学习Python1</span><br>        <span class="hljs-comment"># 16</span><br>        <span class="hljs-comment"># Ashe正在学习Python</span><br>        <span class="hljs-comment"><code class="language-hljs py"><span class="hljs-comment"># 写入文件 执行完之后 文件目录中 会生成一个generate_text.txt的文件 </span><br><span class="hljs-comment"># 内容就是‘正在学习Python’ 在读取写入的文件内容和文件长度</span><br>file_path = <span class="hljs-string">'牛客网剑指offer66题思路分析\代码\generate_doc.txt'</span><br><br><span class="hljs-keyword">with</span> open(file_path, <span class="hljs-string">'w'</span>) <span class="hljs-keyword">as</span> file_object:<br>    file_object.write(<span class="hljs-string">'Ashe正在学习Python'</span> + <span class="hljs-string">'\n'</span>)<br>    file_object.write(<span class="hljs-string">'Ashe正在学习Python1'</span> + <span class="hljs-string">'\n'</span>)<br><span class="hljs-keyword">with</span> open(file_path, <span class="hljs-string">'a'</span>) <span class="hljs-keyword">as</span> file_object:<br>    file_object.write(<span class="hljs-string">'Ashe正在学习Python'</span> + <span class="hljs-string">'\n'</span>)<br><span class="hljs-keyword">with</span> open(file_path, <span class="hljs-string">'r'</span>) <span class="hljs-keyword">as</span> file_object:<br>    lines = file_object.readlines()<br>    <span class="hljs-keyword">for</span> line <span class="hljs-keyword">in</span> lines:<br>        print(line.strip())<br>        print(len(line))<br>        <span class="hljs-comment"># Ashe正在学习Python</span><br>        <span class="hljs-comment"># 15</span><br>        <span class="hljs-comment"># Ashe正在学习Python1</span><br>        <span class="hljs-comment"># 16</span><br>        <span class="hljs-comment"># Ashe正在学习Python</span><br>        <span class="hljs-comment"># 15</span><br></code></pre></td></tr></tbody></table></figure>
 
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 提示用户输入自己的姓名 再将用户输入的姓名写入到文件中输出</span></span><br><span class="line"></span><br><span class="line">file_path = <span class="string">'牛客网剑指offer66题思路分析\代码\generate_input.txt'</span></span><br><span class="line"><span class="keyword">with</span> open(file_path, <span class="string">'w'</span>) <span class="keyword">as</span> file_object:  <span class="comment"># w:表示写入(Write)到这个文件中</span></span><br><span class="line">    message = input(<span class="string">'input your name：'</span>)</span><br><span class="line">    file_object.write(message)</span><br><span class="line">    <span class="comment"># input: Ashe</span></span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre class=" language-hljs py"><span class="hljs-comment"># 提示用户输入自己的姓名 再将用户输入的姓名写入到文件中输出</span><br><br>file_path = <span class="hljs-string">'牛客网剑指offer66题思路分析\代码\generate_input.txt'</span><br><span class="hljs-keyword">with</span> open(file_path, <span class="hljs-string">'w'</span>) <span class="hljs-keyword">as</span> file_object:  <span class="hljs-comment"># w:表示写入(Write)到这个文件中</span><br>    message = input(<span class="hljs-string">'input your name：'</span>)<br>    file_object.write(message)<br>    <span class="hljs-comment"><code class="language-hljs py"><span class="hljs-comment"># 提示用户输入自己的姓名 再将用户输入的姓名写入到文件中输出</span><br><br>file_path = <span class="hljs-string">'牛客网剑指offer66题思路分析\代码\generate_input.txt'</span><br><span class="hljs-keyword">with</span> open(file_path, <span class="hljs-string">'w'</span>) <span class="hljs-keyword">as</span> file_object:  <span class="hljs-comment"># w:表示写入(Write)到这个文件中</span><br>    message = input(<span class="hljs-string">'input your name：'</span>)<br>    file_object.write(message)<br>    <span class="hljs-comment"># input: Ashe</span><br></code></pre></td></tr></tbody></table></figure>
 
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> json</span><br><span class="line"></span><br><span class="line"><span class="comment"># 将列表数据number存储在number.json 文件中</span></span><br><span class="line">number = [<span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">11</span>, <span class="number">13</span>]</span><br><span class="line">filename = <span class="string">'number.json'</span></span><br><span class="line"><span class="keyword">with</span> open(filename, <span class="string">'w'</span>) <span class="keyword">as</span> f_obj:</span><br><span class="line">    <span class="comment"># f_obj:存入到的文件的位置</span></span><br><span class="line">    <span class="comment"># json.dump用来存储。</span></span><br><span class="line">    json.dump(number, f_obj)</span><br><span class="line">    print(<span class="string">'数据存储到'</span> + filename + <span class="string">'完成！'</span>)</span><br><span class="line">    <span class="comment"># 数据存储到number.json完成！</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 读取前面写入到number.json文件的数据内容</span></span><br><span class="line"><span class="keyword">with</span> open(filename, <span class="string">'r'</span>) <span class="keyword">as</span> f_obj:</span><br><span class="line">    <span class="comment"># json.load用来读取。</span></span><br><span class="line">    <span class="comment"># f_obj:读取的数据源的位置</span></span><br><span class="line">    numbers = json.load(f_obj)</span><br><span class="line">    print(numbers)</span><br><span class="line">    <span class="comment"># [2, 3, 4, 5, 7, 11, 13]</span></span><br><span class="line"><span class="comment"># for循环遍历输出读取到的文件中的每条列表中的数据 并 打印输出</span></span><br><span class="line"><span class="keyword">for</span> number <span class="keyword">in</span> numbers:</span><br><span class="line">    print(number)</span><br><span class="line">    <span class="comment"># 2</span></span><br><span class="line">    <span class="comment"># 3</span></span><br><span class="line">    <span class="comment"># 4</span></span><br><span class="line">    <span class="comment"># 5</span></span><br><span class="line">    <span class="comment"># 7</span></span><br><span class="line">    <span class="comment"># 11</span></span><br><span class="line">    <span class="comment"># 13</span></span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre class=" language-hljs py"><span class="hljs-keyword">import</span> json<br><br><span class="hljs-comment"># 将列表数据number存储在number.json 文件中</span><br>number = [<span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-number">7</span>, <span class="hljs-number">11</span>, <span class="hljs-number">13</span>]<br>filename = <span class="hljs-string">'number.json'</span><br><span class="hljs-keyword">with</span> open(filename, <span class="hljs-string">'w'</span>) <span class="hljs-keyword">as</span> f_obj:<br>    <span class="hljs-comment"># f_obj:存入到的文件的位置</span><br>    <span class="hljs-comment"># json.dump用来存储。</span><br>    json.dump(number, f_obj)<br>    print(<span class="hljs-string">'数据存储到'</span> + filename + <span class="hljs-string">'完成！'</span>)<br>    <span class="hljs-comment"># 数据存储到number.json完成！</span><br><br><span class="hljs-comment"># 读取前面写入到number.json文件的数据内容</span><br><span class="hljs-keyword">with</span> open(filename, <span class="hljs-string">'r'</span>) <span class="hljs-keyword">as</span> f_obj:<br>    <span class="hljs-comment"># json.load用来读取。</span><br>    <span class="hljs-comment"># f_obj:读取的数据源的位置</span><br>    numbers = json.load(f_obj)<br>    print(numbers)<br>    <span class="hljs-comment"># [2, 3, 4, 5, 7, 11, 13]</span><br><span class="hljs-comment"># for循环遍历输出读取到的文件中的每条列表中的数据 并 打印输出</span><br><span class="hljs-keyword">for</span> number <span class="hljs-keyword">in</span> numbers:<br>    print(number)<br>    <span class="hljs-comment"># 2</span><br>    <span class="hljs-comment"># 3</span><br>    <span class="hljs-comment"># 4</span><br>    <span class="hljs-comment"># 5</span><br>    <span class="hljs-comment"># 7</span><br>    <span class="hljs-comment"># 11</span><br>    <span class="hljs-comment"><code class="language-hljs py"><span class="hljs-keyword">import</span> json<br><br><span class="hljs-comment"># 将列表数据number存储在number.json 文件中</span><br>number = [<span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-number">7</span>, <span class="hljs-number">11</span>, <span class="hljs-number">13</span>]<br>filename = <span class="hljs-string">'number.json'</span><br><span class="hljs-keyword">with</span> open(filename, <span class="hljs-string">'w'</span>) <span class="hljs-keyword">as</span> f_obj:<br>    <span class="hljs-comment"># f_obj:存入到的文件的位置</span><br>    <span class="hljs-comment"># json.dump用来存储。</span><br>    json.dump(number, f_obj)<br>    print(<span class="hljs-string">'数据存储到'</span> + filename + <span class="hljs-string">'完成！'</span>)<br>    <span class="hljs-comment"># 数据存储到number.json完成！</span><br><br><span class="hljs-comment"># 读取前面写入到number.json文件的数据内容</span><br><span class="hljs-keyword">with</span> open(filename, <span class="hljs-string">'r'</span>) <span class="hljs-keyword">as</span> f_obj:<br>    <span class="hljs-comment"># json.load用来读取。</span><br>    <span class="hljs-comment"># f_obj:读取的数据源的位置</span><br>    numbers = json.load(f_obj)<br>    print(numbers)<br>    <span class="hljs-comment"># [2, 3, 4, 5, 7, 11, 13]</span><br><span class="hljs-comment"># for循环遍历输出读取到的文件中的每条列表中的数据 并 打印输出</span><br><span class="hljs-keyword">for</span> number <span class="hljs-keyword">in</span> numbers:<br>    print(number)<br>    <span class="hljs-comment"># 2</span><br>    <span class="hljs-comment"># 3</span><br>    <span class="hljs-comment"># 4</span><br>    <span class="hljs-comment"># 5</span><br>    <span class="hljs-comment"># 7</span><br>    <span class="hljs-comment"># 11</span><br>    <span class="hljs-comment"># 13</span><br></code></pre></td></tr></tbody></table></figure>
 
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> json</span><br><span class="line">data_list = [{</span><br><span class="line">    <span class="string">'href'</span>: <span class="string">'https://bubbleboy11.github.io/'</span>,</span><br><span class="line">    <span class="string">'text'</span>: <span class="string">' 首页'</span></span><br><span class="line">}, {</span><br><span class="line">    <span class="string">'href'</span>: <span class="string">'https://bubbleboy11.github.io/'</span>,</span><br><span class="line">    <span class="string">'text'</span>: <span class="string">' python'</span></span><br><span class="line">}]</span><br><span class="line"><span class="comment"># python按行写入文件</span></span><br><span class="line"><span class="keyword">for</span> item <span class="keyword">in</span> data_list:</span><br><span class="line">    <span class="keyword">with</span> open(<span class="string">'代码\generate_data.json'</span>, <span class="string">'a+'</span>, encoding=<span class="string">'utf-8'</span>) <span class="keyword">as</span> f:</span><br><span class="line">        line = json.dumps(item, ensure_ascii=<span class="literal">False</span>)</span><br><span class="line">        f.write(line + <span class="string">'\n'</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 按行读取文件的操作方法</span></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'代码\generate_data.json'</span>, <span class="string">'r'</span>, encoding=<span class="string">"utf-8"</span>) <span class="keyword">as</span> f:</span><br><span class="line">    <span class="comment"># 读取所有行 每行会是一个字符串</span></span><br><span class="line">    <span class="keyword">for</span> jsonstr <span class="keyword">in</span> f.readlines():</span><br><span class="line">        <span class="comment"># 将josn字符串转化为dict字典</span></span><br><span class="line">        jsonstr = json.loads(jsonstr)</span><br><span class="line">        print(jsonstr)</span><br><span class="line">        <span class="comment"># {"href": "https://bubbleboy11.github.io/", "text": " 首页"}</span></span><br><span class="line">        <span class="comment"># {"href": "https://bubbleboy11.github.io/", "text": " python"}</span></span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre class=" language-hljs py"><span class="hljs-keyword">import</span> json<br>data_list = [{<br>    <span class="hljs-string">'href'</span>: <span class="hljs-string">'https://bubbleboy11.github.io/'</span>,<br>    <span class="hljs-string">'text'</span>: <span class="hljs-string">' 首页'</span><br>}, {<br>    <span class="hljs-string">'href'</span>: <span class="hljs-string">'https://bubbleboy11.github.io/'</span>,<br>    <span class="hljs-string">'text'</span>: <span class="hljs-string">' python'</span><br>}]<br><span class="hljs-comment"># python按行写入文件</span><br><span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> data_list:<br>    <span class="hljs-keyword">with</span> open(<span class="hljs-string">'代码\generate_data.json'</span>, <span class="hljs-string">'a+'</span>, encoding=<span class="hljs-string">'utf-8'</span>) <span class="hljs-keyword">as</span> f:<br>        line = json.dumps(item, ensure_ascii=<span class="hljs-literal">False</span>)<br>        f.write(line + <span class="hljs-string">'\n'</span>)<br><br><span class="hljs-comment"># 按行读取文件的操作方法</span><br><span class="hljs-keyword">with</span> open(<span class="hljs-string">'代码\generate_data.json'</span>, <span class="hljs-string">'r'</span>, encoding=<span class="hljs-string">"utf-8"</span>) <span class="hljs-keyword">as</span> f:<br>    <span class="hljs-comment"># 读取所有行 每行会是一个字符串</span><br>    <span class="hljs-keyword">for</span> jsonstr <span class="hljs-keyword">in</span> f.readlines():<br>        <span class="hljs-comment"># 将josn字符串转化为dict字典</span><br>        jsonstr = json.loads(jsonstr)<br>        print(jsonstr)<br>        <span class="hljs-comment"># {"href": "https://bubbleboy11.github.io/", "text": " 首页"}</span><br>        <span class="hljs-comment"><code class="language-hljs py"><span class="hljs-keyword">import</span> json<br>data_list = [{<br>    <span class="hljs-string">'href'</span>: <span class="hljs-string">'https://bubbleboy11.github.io/'</span>,<br>    <span class="hljs-string">'text'</span>: <span class="hljs-string">' 首页'</span><br>}, {<br>    <span class="hljs-string">'href'</span>: <span class="hljs-string">'https://bubbleboy11.github.io/'</span>,<br>    <span class="hljs-string">'text'</span>: <span class="hljs-string">' python'</span><br>}]<br><span class="hljs-comment"># python按行写入文件</span><br><span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> data_list:<br>    <span class="hljs-keyword">with</span> open(<span class="hljs-string">'代码\generate_data.json'</span>, <span class="hljs-string">'a+'</span>, encoding=<span class="hljs-string">'utf-8'</span>) <span class="hljs-keyword">as</span> f:<br>        line = json.dumps(item, ensure_ascii=<span class="hljs-literal">False</span>)<br>        f.write(line + <span class="hljs-string">'\n'</span>)<br><br><span class="hljs-comment"># 按行读取文件的操作方法</span><br><span class="hljs-keyword">with</span> open(<span class="hljs-string">'代码\generate_data.json'</span>, <span class="hljs-string">'r'</span>, encoding=<span class="hljs-string">"utf-8"</span>) <span class="hljs-keyword">as</span> f:<br>    <span class="hljs-comment"># 读取所有行 每行会是一个字符串</span><br>    <span class="hljs-keyword">for</span> jsonstr <span class="hljs-keyword">in</span> f.readlines():<br>        <span class="hljs-comment"># 将josn字符串转化为dict字典</span><br>        jsonstr = json.loads(jsonstr)<br>        print(jsonstr)<br>        <span class="hljs-comment"># {"href": "https://bubbleboy11.github.io/", "text": " 首页"}</span><br>        <span class="hljs-comment"># {"href": "https://bubbleboy11.github.io/", "text": " python"}</span><br></code></pre></td></tr></tbody></table></figure>
 
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">import</span> shutil</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line">seconds = time.time()</span><br><span class="line">print(seconds)</span><br><span class="line">localtime = time.localtime(seconds)</span><br><span class="line">print(localtime)</span><br><span class="line">print(localtime.tm_year)</span><br><span class="line">print(localtime.tm_mon)</span><br><span class="line">print(localtime.tm_mday)</span><br><span class="line">asctime = time.asctime(localtime)</span><br><span class="line">print(asctime)</span><br><span class="line">strtime = time.strftime(<span class="string">'%Y-%m-%d %H:%M:%S'</span>, localtime)</span><br><span class="line">print(strtime)</span><br><span class="line">mydate = time.strptime(<span class="string">'2018-1-1'</span>, <span class="string">'%Y-%m-%d'</span>)</span><br><span class="line">print(mydate)</span><br><span class="line"></span><br><span class="line">shutil.copy(<span class="string">'/Users/Hao/hello.py'</span>, <span class="string">'/Users/Hao/Desktop/first.py'</span>)</span><br><span class="line">os.system(<span class="string">'ls -l'</span>)</span><br><span class="line">os.chdir(<span class="string">'/Users/Hao'</span>)</span><br><span class="line">os.system(<span class="string">'ls -l'</span>)</span><br><span class="line">os.mkdir(<span class="string">'test'</span>)</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre class=" language-hljs py"><span class="hljs-keyword">import</span> time<br><span class="hljs-keyword">import</span> shutil<br><span class="hljs-keyword">import</span> os<br><br>seconds = time.time()<br>print(seconds)<br>localtime = time.localtime(seconds)<br>print(localtime)<br>print(localtime.tm_year)<br>print(localtime.tm_mon)<br>print(localtime.tm_mday)<br>asctime = time.asctime(localtime)<br>print(asctime)<br>strtime = time.strftime(<span class="hljs-string">'%Y-%m-%d %H:%M:%S'</span>, localtime)<br>print(strtime)<br>mydate = time.strptime(<span class="hljs-string">'2018-1-1'</span>, <span class="hljs-string">'%Y-%m-%d'</span>)<br>print(mydate)<br><br>shutil.copy(<span class="hljs-string">'/Users/Hao/hello.py'</span>, <span class="hljs-string">'/Users/Hao/Desktop/first.py'</span>)<br>os.system(<span class="hljs-string">'ls -l'</span>)<br>os.chdir(<span class="hljs-string">'/Users/Hao'</span>)<br>os.system(<span class="hljs-string">'ls -l'</span>)<br>os.mkdir(<span class="hljs-string"><code class="language-hljs py"><span class="hljs-keyword">import</span> time<br><span class="hljs-keyword">import</span> shutil<br><span class="hljs-keyword">import</span> os<br><br>seconds = time.time()<br>print(seconds)<br>localtime = time.localtime(seconds)<br>print(localtime)<br>print(localtime.tm_year)<br>print(localtime.tm_mon)<br>print(localtime.tm_mday)<br>asctime = time.asctime(localtime)<br>print(asctime)<br>strtime = time.strftime(<span class="hljs-string">'%Y-%m-%d %H:%M:%S'</span>, localtime)<br>print(strtime)<br>mydate = time.strptime(<span class="hljs-string">'2018-1-1'</span>, <span class="hljs-string">'%Y-%m-%d'</span>)<br>print(mydate)<br><br>shutil.copy(<span class="hljs-string">'/Users/Hao/hello.py'</span>, <span class="hljs-string">'/Users/Hao/Desktop/first.py'</span>)<br>os.system(<span class="hljs-string">'ls -l'</span>)<br>os.chdir(<span class="hljs-string">'/Users/Hao'</span>)<br>os.system(<span class="hljs-string">'ls -l'</span>)<br>os.mkdir(<span class="hljs-string">'test'</span>)<br></code></pre></td></tr></tbody></table></figure>
 
 <p>在项目中需要进行很多重复的操作，如要给代码的源文件添加相同的代码，这个时候一个文件一个文件的操作就很浪费时间了，<br>通过python批处理一秒不到全部添加完成，本代码只是一个抛砖引玉的效果，只要是有特征的文本修改均可由代码完成，解放双手！</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> shutil</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">text_edit_vhd</span>(<span class="params">filepath</span>):</span></span><br><span class="line">    <span class="keyword">with</span> open(filepath, <span class="string">'r+'</span>) <span class="keyword">as</span> file_head:</span><br><span class="line">        content = file_head.read()</span><br><span class="line">        file_head.seek(<span class="number">0</span>, <span class="number">0</span>)</span><br><span class="line">        file_head.write(<span class="string">"`protect begin \n"</span> + content)</span><br><span class="line">        file_head.seek(<span class="number">0</span>, <span class="number">2</span>)</span><br><span class="line">        file_head.write(<span class="string">"\n`protect end "</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">text_edit_v</span>(<span class="params">filepath</span>):</span></span><br><span class="line">    <span class="keyword">with</span> open(filepath, <span class="string">'r+'</span>) <span class="keyword">as</span> file_head:</span><br><span class="line">        content = file_head.read()</span><br><span class="line">        file_head.seek(<span class="number">0</span>, <span class="number">0</span>)</span><br><span class="line">        file_head.write(<span class="string">"`protect \n"</span> + content)</span><br><span class="line">        file_head.seek(<span class="number">0</span>, <span class="number">2</span>)</span><br><span class="line">        file_head.write(<span class="string">" \n`endprotect "</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add_text</span>(<span class="params">srcpath</span>):</span>  <span class="comment"># 寻找本文件夹及子文件夹下所以符合要求的文本进行处理</span></span><br><span class="line">    srcdirs = os.listdir(srcpath)</span><br><span class="line">    <span class="keyword">for</span> dir <span class="keyword">in</span> srcdirs:</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> os.path.isfile(os.path.join(srcpath, dir)):  <span class="comment"># 判断dir属性，为文件或者文件夹</span></span><br><span class="line">            add_text(os.path.join(srcpath, dir))</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">if</span> <span class="string">'.vhd'</span> == dir[<span class="number">-4</span>:]:</span><br><span class="line">                print(<span class="string">"正在处理文件中，文件路径为："</span> + os.path.join(srcpath, dir))</span><br><span class="line">                text_edit_vhd(os.path.join(srcpath, dir))</span><br><span class="line">                print(<span class="string">"文件处理完成！"</span>)</span><br><span class="line">            <span class="keyword">elif</span> <span class="string">'.v'</span> == dir[<span class="number">-2</span>:]:</span><br><span class="line">                print(<span class="string">"正在处理文件中，文件路径为："</span> + os.path.join(srcpath, dir))</span><br><span class="line">                text_edit_v(os.path.join(srcpath, dir))</span><br><span class="line">                print(<span class="string">"文件处理完成！"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">current_path = os.getcwd()</span><br><span class="line">print(<span class="string">'当前文件路径为：'</span> + current_path)</span><br><span class="line">os.chdir(<span class="string">'..'</span>)</span><br><span class="line">root_path = os.getcwd()</span><br><span class="line">handle_path = root_path + <span class="string">'\handle'</span></span><br><span class="line">print(<span class="string">'当前文件路径为：'</span> + handle_path)</span><br><span class="line">shutil.copytree(path, handle_path)  <span class="comment"># 备份后进行数据处理</span></span><br><span class="line">add_text(handle_path)</span><br><span class="line">print(<span class="string">"run done\n"</span>)</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre class=" language-hljs py"><span class="hljs-keyword">import</span> os<br><span class="hljs-keyword">import</span> shutil<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">text_edit_vhd</span>(<span class="hljs-params">filepath</span>):</span><br>    <span class="hljs-keyword">with</span> open(filepath, <span class="hljs-string">'r+'</span>) <span class="hljs-keyword">as</span> file_head:<br>        content = file_head.read()<br>        file_head.seek(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>)<br>        file_head.write(<span class="hljs-string">"`protect begin \n"</span> + content)<br>        file_head.seek(<span class="hljs-number">0</span>, <span class="hljs-number">2</span>)<br>        file_head.write(<span class="hljs-string">"\n`protect end "</span>)<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">text_edit_v</span>(<span class="hljs-params">filepath</span>):</span><br>    <span class="hljs-keyword">with</span> open(filepath, <span class="hljs-string">'r+'</span>) <span class="hljs-keyword">as</span> file_head:<br>        content = file_head.read()<br>        file_head.seek(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>)<br>        file_head.write(<span class="hljs-string">"`protect \n"</span> + content)<br>        file_head.seek(<span class="hljs-number">0</span>, <span class="hljs-number">2</span>)<br>        file_head.write(<span class="hljs-string">" \n`endprotect "</span>)<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">add_text</span>(<span class="hljs-params">srcpath</span>):</span>  <span class="hljs-comment"># 寻找本文件夹及子文件夹下所以符合要求的文本进行处理</span><br>    srcdirs = os.listdir(srcpath)<br>    <span class="hljs-keyword">for</span> dir <span class="hljs-keyword">in</span> srcdirs:<br>        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> os.path.isfile(os.path.join(srcpath, dir)):  <span class="hljs-comment"># 判断dir属性，为文件或者文件夹</span><br>            add_text(os.path.join(srcpath, dir))<br>        <span class="hljs-keyword">else</span>:<br>            <span class="hljs-keyword">if</span> <span class="hljs-string">'.vhd'</span> == dir[<span class="hljs-number">-4</span>:]:<br>                print(<span class="hljs-string">"正在处理文件中，文件路径为："</span> + os.path.join(srcpath, dir))<br>                text_edit_vhd(os.path.join(srcpath, dir))<br>                print(<span class="hljs-string">"文件处理完成！"</span>)<br>            <span class="hljs-keyword">elif</span> <span class="hljs-string">'.v'</span> == dir[<span class="hljs-number">-2</span>:]:<br>                print(<span class="hljs-string">"正在处理文件中，文件路径为："</span> + os.path.join(srcpath, dir))<br>                text_edit_v(os.path.join(srcpath, dir))<br>                print(<span class="hljs-string">"文件处理完成！"</span>)<br><br><br>current_path = os.getcwd()<br>print(<span class="hljs-string">'当前文件路径为：'</span> + current_path)<br>os.chdir(<span class="hljs-string">'..'</span>)<br>root_path = os.getcwd()<br>handle_path = root_path + <span class="hljs-string">'\handle'</span><br>print(<span class="hljs-string">'当前文件路径为：'</span> + handle_path)<br>shutil.copytree(path, handle_path)  <span class="hljs-comment"># 备份后进行数据处理</span><br>add_text(handle_path)<br>print(<span class="hljs-string"><code class="language-hljs py"><span class="hljs-keyword">import</span> os<br><span class="hljs-keyword">import</span> shutil<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">text_edit_vhd</span>(<span class="hljs-params">filepath</span>):</span><br>    <span class="hljs-keyword">with</span> open(filepath, <span class="hljs-string">'r+'</span>) <span class="hljs-keyword">as</span> file_head:<br>        content = file_head.read()<br>        file_head.seek(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>)<br>        file_head.write(<span class="hljs-string">"`protect begin \n"</span> + content)<br>        file_head.seek(<span class="hljs-number">0</span>, <span class="hljs-number">2</span>)<br>        file_head.write(<span class="hljs-string">"\n`protect end "</span>)<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">text_edit_v</span>(<span class="hljs-params">filepath</span>):</span><br>    <span class="hljs-keyword">with</span> open(filepath, <span class="hljs-string">'r+'</span>) <span class="hljs-keyword">as</span> file_head:<br>        content = file_head.read()<br>        file_head.seek(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>)<br>        file_head.write(<span class="hljs-string">"`protect \n"</span> + content)<br>        file_head.seek(<span class="hljs-number">0</span>, <span class="hljs-number">2</span>)<br>        file_head.write(<span class="hljs-string">" \n`endprotect "</span>)<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">add_text</span>(<span class="hljs-params">srcpath</span>):</span>  <span class="hljs-comment"># 寻找本文件夹及子文件夹下所以符合要求的文本进行处理</span><br>    srcdirs = os.listdir(srcpath)<br>    <span class="hljs-keyword">for</span> dir <span class="hljs-keyword">in</span> srcdirs:<br>        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> os.path.isfile(os.path.join(srcpath, dir)):  <span class="hljs-comment"># 判断dir属性，为文件或者文件夹</span><br>            add_text(os.path.join(srcpath, dir))<br>        <span class="hljs-keyword">else</span>:<br>            <span class="hljs-keyword">if</span> <span class="hljs-string">'.vhd'</span> == dir[<span class="hljs-number">-4</span>:]:<br>                print(<span class="hljs-string">"正在处理文件中，文件路径为："</span> + os.path.join(srcpath, dir))<br>                text_edit_vhd(os.path.join(srcpath, dir))<br>                print(<span class="hljs-string">"文件处理完成！"</span>)<br>            <span class="hljs-keyword">elif</span> <span class="hljs-string">'.v'</span> == dir[<span class="hljs-number">-2</span>:]:<br>                print(<span class="hljs-string">"正在处理文件中，文件路径为："</span> + os.path.join(srcpath, dir))<br>                text_edit_v(os.path.join(srcpath, dir))<br>                print(<span class="hljs-string">"文件处理完成！"</span>)<br><br><br>current_path = os.getcwd()<br>print(<span class="hljs-string">'当前文件路径为：'</span> + current_path)<br>os.chdir(<span class="hljs-string">'..'</span>)<br>root_path = os.getcwd()<br>handle_path = root_path + <span class="hljs-string">'\handle'</span><br>print(<span class="hljs-string">'当前文件路径为：'</span> + handle_path)<br>shutil.copytree(path, handle_path)  <span class="hljs-comment"># 备份后进行数据处理</span><br>add_text(handle_path)<br>print(<span class="hljs-string">"run done\n"</span>)<br></code></pre></td></tr></tbody></table></figure>
 
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Description   : Checks to see if a directory exists in the users home directory, if not then create it</span></span><br><span class="line"><span class="comment"># 检查主目录中是否存在某文件夹，若不存在则创建</span></span><br><span class="line"><span class="keyword">import</span> os  <span class="comment"># Import the OS module</span></span><br><span class="line"></span><br><span class="line">MESSAGE = <span class="string">'The directory already exists.'</span></span><br><span class="line">TESTDIR = <span class="string">'testdir'</span></span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    <span class="comment"># Set the variable home by expanding the user's set home directory</span></span><br><span class="line">    home = os.path.expanduser(<span class="string">"~"</span>)</span><br><span class="line">    print(home)  <span class="comment"># Print the location</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># os.path.join() for making a full path safely</span></span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> os.path.exists(os.path.join(home, TESTDIR)):</span><br><span class="line">        <span class="comment"># If not create the directory, inside their home directory</span></span><br><span class="line">        os.makedirs(os.path.join(home, TESTDIR))</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        print(MESSAGE)</span><br><span class="line"><span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">    print(e)</span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># coding:utf-8</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">create_package</span>(<span class="params">path</span>):</span></span><br><span class="line">    <span class="keyword">if</span> os.path.exists(path):</span><br><span class="line">        <span class="keyword">raise</span> Exception(<span class="string">'%s 已经存在不可创建'</span> % path)</span><br><span class="line">    os.makedirs(path)</span><br><span class="line">    init_path = os.path.join(path, <span class="string">'__init__.py'</span>)</span><br><span class="line">    f = open(init_path, <span class="string">'w'</span>)</span><br><span class="line">    f.write(<span class="string">'# coding:utf-8\n'</span>)</span><br><span class="line">    f.close()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Open</span>(<span class="params">object</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, path, mode=<span class="string">'w'</span>, is_return=True</span>):</span></span><br><span class="line">        self.path = path</span><br><span class="line">        self.mode = mode</span><br><span class="line">        self.is_return = is_return</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">write</span>(<span class="params">self, message</span>):</span></span><br><span class="line">        f = open(self.path, mode=self.mode)</span><br><span class="line">        <span class="keyword">if</span> self.is_return:</span><br><span class="line">            message = <span class="string">'%s\n'</span> % message</span><br><span class="line">        f.write(message)</span><br><span class="line">        f.close()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">read</span>(<span class="params">self, is_strip=True</span>):</span></span><br><span class="line">        result = []</span><br><span class="line">        <span class="keyword">with</span> open(self.path, mode=self.mode) <span class="keyword">as</span> f:</span><br><span class="line">            data = f.readlines()</span><br><span class="line">        <span class="keyword">for</span> line <span class="keyword">in</span> data:</span><br><span class="line">            <span class="keyword">if</span> is_strip == <span class="literal">True</span>:</span><br><span class="line">                temp = line.strip()</span><br><span class="line">                <span class="keyword">if</span> temp != <span class="string">""</span>:</span><br><span class="line">                    result.append(temp)</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="keyword">if</span> line != <span class="string">''</span>:</span><br><span class="line">                    result.append(line)</span><br><span class="line">        <span class="keyword">return</span> result</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    current_path = os.getcwd()</span><br><span class="line">    <span class="comment"># path = os.path.join(current_path, 'test1')</span></span><br><span class="line">    <span class="comment"># create_package(path)</span></span><br><span class="line">    <span class="comment"># open_path = os.path.join(current_path, 'b.txt')</span></span><br><span class="line">    o = Open(<span class="string">'package_datetime.py'</span>, mode=<span class="string">'r'</span>)</span><br><span class="line">    <span class="comment"># o.write('你好 小慕')</span></span><br><span class="line">    data = o.read(is_strip=<span class="literal">False</span>)</span><br><span class="line">    print(data)</span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre class=" language-hljs py"><span class="hljs-comment"># Description   : Checks to see if a directory exists in the users home directory, if not then create it</span><br><span class="hljs-comment"># 检查主目录中是否存在某文件夹，若不存在则创建</span><br><span class="hljs-keyword">import</span> os  <span class="hljs-comment"># Import the OS module</span><br><br>MESSAGE = <span class="hljs-string">'The directory already exists.'</span><br>TESTDIR = <span class="hljs-string">'testdir'</span><br><span class="hljs-keyword">try</span>:<br>    <span class="hljs-comment"># Set the variable home by expanding the user's set home directory</span><br>    home = os.path.expanduser(<span class="hljs-string">"~"</span>)<br>    print(home)  <span class="hljs-comment"># Print the location</span><br><br>    <span class="hljs-comment"># os.path.join() for making a full path safely</span><br>    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> os.path.exists(os.path.join(home, TESTDIR)):<br>        <span class="hljs-comment"># If not create the directory, inside their home directory</span><br>        os.makedirs(os.path.join(home, TESTDIR))<br>    <span class="hljs-keyword">else</span>:<br>        print(MESSAGE)<br><span class="hljs-keyword">except</span> Exception <span class="hljs-keyword"><code class="language-hljs py"><span class="hljs-comment"># Description   : Checks to see if a directory exists in the users home directory, if not then create it</span><br><span class="hljs-comment"># 检查主目录中是否存在某文件夹，若不存在则创建</span><br><span class="hljs-keyword">import</span> os  <span class="hljs-comment"># Import the OS module</span><br><br>MESSAGE = <span class="hljs-string">'The directory already exists.'</span><br>TESTDIR = <span class="hljs-string">'testdir'</span><br><span class="hljs-keyword">try</span>:<br>    <span class="hljs-comment"># Set the variable home by expanding the user's set home directory</span><br>    home = os.path.expanduser(<span class="hljs-string">"~"</span>)<br>    print(home)  <span class="hljs-comment"># Print the location</span><br><br>    <span class="hljs-comment"># os.path.join() for making a full path safely</span><br>    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> os.path.exists(os.path.join(home, TESTDIR)):<br>        <span class="hljs-comment"># If not create the directory, inside their home directory</span><br>        os.makedirs(os.path.join(home, TESTDIR))<br>    <span class="hljs-keyword">else</span>:<br>        print(MESSAGE)<br><span class="hljs-keyword">except</span> Exception <span class="hljs-keyword">as</span> e:<br>    print(e)<br><br></code></pre></td></tr></tbody></table></figure>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre class=" language-hljs py"><span class="hljs-comment"># coding:utf-8</span><br><br><span class="hljs-keyword">import</span> os<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">create_package</span>(<span class="hljs-params">path</span>):</span><br>    <span class="hljs-keyword">if</span> os.path.exists(path):<br>        <span class="hljs-keyword">raise</span> Exception(<span class="hljs-string">'%s 已经存在不可创建'</span> % path)<br>    os.makedirs(path)<br>    init_path = os.path.join(path, <span class="hljs-string">'__init__.py'</span>)<br>    f = open(init_path, <span class="hljs-string">'w'</span>)<br>    f.write(<span class="hljs-string">'# coding:utf-8\n'</span>)<br>    f.close()<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Open</span>(<span class="hljs-params">object</span>):</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self, path, mode=<span class="hljs-string">'w'</span>, is_return=True</span>):</span><br>        self.path = path<br>        self.mode = mode<br>        self.is_return = is_return<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">write</span>(<span class="hljs-params">self, message</span>):</span><br>        f = open(self.path, mode=self.mode)<br>        <span class="hljs-keyword">if</span> self.is_return:<br>            message = <span class="hljs-string">'%s\n'</span> % message<br>        f.write(message)<br>        f.close()<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">read</span>(<span class="hljs-params">self, is_strip=True</span>):</span><br>        result = []<br>        <span class="hljs-keyword">with</span> open(self.path, mode=self.mode) <span class="hljs-keyword">as</span> f:<br>            data = f.readlines()<br>        <span class="hljs-keyword">for</span> line <span class="hljs-keyword">in</span> data:<br>            <span class="hljs-keyword">if</span> is_strip == <span class="hljs-literal">True</span>:<br>                temp = line.strip()<br>                <span class="hljs-keyword">if</span> temp != <span class="hljs-string">""</span>:<br>                    result.append(temp)<br>            <span class="hljs-keyword">else</span>:<br>                <span class="hljs-keyword">if</span> line != <span class="hljs-string">''</span>:<br>                    result.append(line)<br>        <span class="hljs-keyword">return</span> result<br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">'__main__'</span>:<br>    current_path = os.getcwd()<br>    <span class="hljs-comment"># path = os.path.join(current_path, 'test1')</span><br>    <span class="hljs-comment"># create_package(path)</span><br>    <span class="hljs-comment"># open_path = os.path.join(current_path, 'b.txt')</span><br>    o = Open(<span class="hljs-string">'package_datetime.py'</span>, mode=<span class="hljs-string">'r'</span>)<br>    <span class="hljs-comment"># o.write('你好 小慕')</span><br>    data = o.read(is_strip=<span class="hljs-literal"><code class="language-hljs py"><span class="hljs-comment"># coding:utf-8</span><br><br><span class="hljs-keyword">import</span> os<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">create_package</span>(<span class="hljs-params">path</span>):</span><br>    <span class="hljs-keyword">if</span> os.path.exists(path):<br>        <span class="hljs-keyword">raise</span> Exception(<span class="hljs-string">'%s 已经存在不可创建'</span> % path)<br>    os.makedirs(path)<br>    init_path = os.path.join(path, <span class="hljs-string">'__init__.py'</span>)<br>    f = open(init_path, <span class="hljs-string">'w'</span>)<br>    f.write(<span class="hljs-string">'# coding:utf-8\n'</span>)<br>    f.close()<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Open</span>(<span class="hljs-params">object</span>):</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self, path, mode=<span class="hljs-string">'w'</span>, is_return=True</span>):</span><br>        self.path = path<br>        self.mode = mode<br>        self.is_return = is_return<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">write</span>(<span class="hljs-params">self, message</span>):</span><br>        f = open(self.path, mode=self.mode)<br>        <span class="hljs-keyword">if</span> self.is_return:<br>            message = <span class="hljs-string">'%s\n'</span> % message<br>        f.write(message)<br>        f.close()<br><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">read</span>(<span class="hljs-params">self, is_strip=True</span>):</span><br>        result = []<br>        <span class="hljs-keyword">with</span> open(self.path, mode=self.mode) <span class="hljs-keyword">as</span> f:<br>            data = f.readlines()<br>        <span class="hljs-keyword">for</span> line <span class="hljs-keyword">in</span> data:<br>            <span class="hljs-keyword">if</span> is_strip == <span class="hljs-literal">True</span>:<br>                temp = line.strip()<br>                <span class="hljs-keyword">if</span> temp != <span class="hljs-string">""</span>:<br>                    result.append(temp)<br>            <span class="hljs-keyword">else</span>:<br>                <span class="hljs-keyword">if</span> line != <span class="hljs-string">''</span>:<br>                    result.append(line)<br>        <span class="hljs-keyword">return</span> result<br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">'__main__'</span>:<br>    current_path = os.getcwd()<br>    <span class="hljs-comment"># path = os.path.join(current_path, 'test1')</span><br>    <span class="hljs-comment"># create_package(path)</span><br>    <span class="hljs-comment"># open_path = os.path.join(current_path, 'b.txt')</span><br>    o = Open(<span class="hljs-string">'package_datetime.py'</span>, mode=<span class="hljs-string">'r'</span>)<br>    <span class="hljs-comment"># o.write('你好 小慕')</span><br>    data = o.read(is_strip=<span class="hljs-literal">False</span>)<br>    print(data)<br><br></code></pre></td></tr></tbody></table></figure>
 
 <script>
         document.querySelectorAll('.github-emoji')
@@ -289,74 +282,429 @@
             document.body.appendChild(img);
           });
       </script>
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-
-        
-
-          <div class="post-nav">
-            <div class="post-nav-item">
-                <a href="/2020/08/21/lu-you-wang-yan-zheng-ma-huo-qu-jie-kou-lian-diao/" rel="prev" title="验证码获取接口联调">
-                  <i class="fa fa-chevron-left"></i> 验证码获取接口联调
-                </a>
-            </div>
-            <div class="post-nav-item">
-                <a href="/2020/08/21/shi-xian-tong-bu-deng-lu-ji-tui-chu-shi-xian-bu-zou/" rel="next" title="实现同步登录及退出实现步骤">
-                  实现同步登录及退出实现步骤 <i class="fa fa-chevron-right"></i>
-                </a>
-            </div>
-          </div>
-    </footer>
-  </article>
-</div>
-
-
-
-
-
-<script src="/js/comments.js"></script>
-</div>
-  </main>
-
-  <footer class="footer">
-    <div class="footer-inner">
-
-
-<div class="copyright">
-  &copy; 
-  <span itemprop="copyrightYear">2021</span>
-  <span class="with-love">
-    <i class="fa fa-heart"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">外心人D</span>
-</div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
   </div>
+  <div>
+  
+  <div class="post-note note-warning copyright" style="margin-top: 42px">
+    <p><span style="font-weight: bold;">作者：</span><a target="_blank" rel="nofollow noopener noreferrer" href="https://bubbleboy11.github.io/about">外心人D</a></p>
+    <p><span style="font-weight: bold;">文章链接：</span><a target="_blank" rel="nofollow noopener noreferrer" href="https://bubbleboy11.github.io/2020/08/21/wen-jian-cao-zuo/">https://bubbleboy11.github.io/2020/08/21/wen-jian-cao-zuo/</a></p>
+    <p><span style="font-weight: bold;">版权声明：</span>本博客所有文章除特别声明外，均采用<a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">CC BY-NC-SA 4.0 协议</a>。转载请注明出处！</p>
+  </div>
+  
+  </div>
+</article>
+<div class="nav">
+  
+  <div class="nav-item-prev">
+    <a href="/2020/08/21/shi-xian-tong-bu-deng-lu-ji-tui-chu-shi-xian-bu-zou/" class="nav-link">
+      <i class="iconfont icon-left nav-prev-icon"></i>
+      <div>
+        <div class="nav-label">上一篇</div>
+        
+        <div class="nav-title">实现同步登录及退出实现步骤 </div>
+        
+      </div>
+    </a>
+  </div>
+  
+  
+  <div class="nav-item-next">
+    <a href="/2020/08/21/lu-you-wang-yan-zheng-ma-huo-qu-jie-kou-lian-diao/" class="nav-link">
+      <div>
+        <div class="nav-label">下一篇</div>
+        
+        <div class="nav-title">验证码获取接口联调 </div>
+        
+      </div>
+      <i class="iconfont icon-right nav-next-icon"></i>
+    </a>
+  </div>
+  
+</div>
 
+<div class="card card-content toc-card" id="mobiletoc">
+  <div class="toc-header"><i class="iconfont icon-menu" style="padding-right: 2px;"></i>目录</div>
+<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E8%AF%BB%E5%86%99%E6%A8%A1%E5%BC%8F"><span class="toc-text">文件读写模式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8with%E8%AF%AD%E6%B3%95%EF%BC%8C%E5%88%B0%E8%BE%BE%E8%AF%A5%E8%AF%AD%E5%8F%A5%E6%9C%AA%E5%B0%BE%E6%97%B6%EF%BC%8C%E5%B0%86%E8%87%AA%E5%8A%A8close-%E5%85%B3%E9%97%AD%E6%96%87%E4%BB%B6%E9%87%8A%E6%94%BE%E8%B5%84%E6%BA%90%EF%BC%8C%E5%8D%B3%E4%BE%BF%E5%87%BA%E7%8E%B0%E5%BC%82%E5%B8%B8%E4%BA%A6%E5%A6%82%E6%AD%A4"><span class="toc-text">使用with语法，到达该语句未尾时，将自动close()关闭文件释放资源，即便出现异常亦如此</span></a></li></ol></li></ol>
+</div></main>
+          <aside class="left-column">
+            
+            <div class="card card-author">
+              
+<img src="/img/author_img.png" class="author-img">
+
+<p class="author-name">外心人D</p>
+<p class="author-description">passion & patient</p>
+<div class="author-message">
+  <a class="author-posts-count" href="/archives">
+    <span>165</span>
+    <span>文章</span>
+  </a>
+  <a class="author-categories-count" href="/categories">
+    <span>17</span>
+    <span>分类</span>
+  </a>
+  <a class="author-tags-count" href="/tags">
+    <span>25</span>
+    <span>标签</span>
+  </a>
+</div>
+
+<div class="author-card-society">
+  
+    <div class="author-card-society-icon">
+      <a target="_blank" rel="noopener" href="https://www.baidu.com">
+        <i class="iconfont icon-github society-icon"></i>
+      </a>
     </div>
-  </footer>
+  
+    <div class="author-card-society-icon">
+      <a target="_blank" rel="noopener" href="https://www.baidu.com">
+        <i class="iconfont icon-bilibili society-icon"></i>
+      </a>
+    </div>
+  
+    <div class="author-card-society-icon">
+      <a target="_blank" rel="noopener" href="https://www.baidu.com">
+        <i class="iconfont icon-stackflow society-icon"></i>
+      </a>
+    </div>
+  
+</div>
+
+            </div>
+            
+            <div class="sticky-tablet">
+  
+  
+  <article class="display-when-two-columns spacer">
+    <div class="card card-content toc-card">
+      <div class="toc-header"><i class="iconfont icon-menu" style="padding-right: 2px;"></i>目录</div>
+<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E8%AF%BB%E5%86%99%E6%A8%A1%E5%BC%8F"><span class="toc-text">文件读写模式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8with%E8%AF%AD%E6%B3%95%EF%BC%8C%E5%88%B0%E8%BE%BE%E8%AF%A5%E8%AF%AD%E5%8F%A5%E6%9C%AA%E5%B0%BE%E6%97%B6%EF%BC%8C%E5%B0%86%E8%87%AA%E5%8A%A8close-%E5%85%B3%E9%97%AD%E6%96%87%E4%BB%B6%E9%87%8A%E6%94%BE%E8%B5%84%E6%BA%90%EF%BC%8C%E5%8D%B3%E4%BE%BF%E5%87%BA%E7%8E%B0%E5%BC%82%E5%B8%B8%E4%BA%A6%E5%A6%82%E6%AD%A4"><span class="toc-text">使用with语法，到达该语句未尾时，将自动close()关闭文件释放资源，即便出现异常亦如此</span></a></li></ol></li></ol>
+    </div>
+  </article>
+  
+  
+  <article class="card card-content categories-widget">
+    <div class="categories-card">
+  <div class="categories-header"><i class="iconfont icon-fenlei" style="padding-right: 2px;"></i>分类</div>
+  <div class="categories-list">
+    
+      <a href="/categories/旅游网项目/">
+        <div class="categories-list-item">
+          旅游网项目
+          <span class="categories-list-item-badge">26</span>
+        </div>
+      </a>
+    
+      <a href="/categories/django/">
+        <div class="categories-list-item">
+          django
+          <span class="categories-list-item-badge">8</span>
+        </div>
+      </a>
+    
+      <a href="/categories/python/">
+        <div class="categories-list-item">
+          python
+          <span class="categories-list-item-badge">38</span>
+        </div>
+      </a>
+    
+      <a href="/categories/Markdown/">
+        <div class="categories-list-item">
+          Markdown
+          <span class="categories-list-item-badge">63</span>
+        </div>
+      </a>
+    
+      <a href="/categories/计算机网络/">
+        <div class="categories-list-item">
+          计算机网络
+          <span class="categories-list-item-badge">3</span>
+        </div>
+      </a>
+    
+      <a href="/categories/web/">
+        <div class="categories-list-item">
+          web
+          <span class="categories-list-item-badge">2</span>
+        </div>
+      </a>
+    
+      <a href="/categories/测试/">
+        <div class="categories-list-item">
+          测试
+          <span class="categories-list-item-badge">2</span>
+        </div>
+      </a>
+    
+      <a href="/categories/docker/">
+        <div class="categories-list-item">
+          docker
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+      <a href="/categories/hexo/">
+        <div class="categories-list-item">
+          hexo
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+      <a href="/categories/java/">
+        <div class="categories-list-item">
+          java
+          <span class="categories-list-item-badge">2</span>
+        </div>
+      </a>
+    
+      <a href="/categories/数据库/">
+        <div class="categories-list-item">
+          数据库
+          <span class="categories-list-item-badge">2</span>
+        </div>
+      </a>
+    
+      <a href="/categories/markdown/">
+        <div class="categories-list-item">
+          markdown
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+      <a href="/categories/数据结构与算法/">
+        <div class="categories-list-item">
+          数据结构与算法
+          <span class="categories-list-item-badge">10</span>
+        </div>
+      </a>
+    
+      <a href="/categories/面试/">
+        <div class="categories-list-item">
+          面试
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+      <a href="/categories/vue/">
+        <div class="categories-list-item">
+          vue
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+      <a href="/categories/linux/">
+        <div class="categories-list-item">
+          linux
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+      <a href="/categories/前端/">
+        <div class="categories-list-item">
+          前端
+          <span class="categories-list-item-badge">1</span>
+        </div>
+      </a>
+    
+  </div>
+</div>
+  </article>
+  
+  <article class="card card-content tags-widget">
+    <div class="tags-card">
+  <div class="tags-header"><i class="iconfont icon-biaoqian" style="padding-right: 2px;"></i>热门标签</div>
+  <div class="tags-list">
+    
+    <a href="/tags/剑指offer/" title="剑指offer"><div class="tags-list-item">剑指offer</div></a>
+    
+    <a href="/tags/Leetcode/" title="Leetcode"><div class="tags-list-item">Leetcode</div></a>
+    
+    <a href="/tags/django/" title="django"><div class="tags-list-item">django</div></a>
+    
+    <a href="/tags/Vue/" title="Vue"><div class="tags-list-item">Vue</div></a>
+    
+    <a href="/tags/python/" title="python"><div class="tags-list-item">python</div></a>
+    
+    <a href="/tags/测试/" title="测试"><div class="tags-list-item">测试</div></a>
+    
+    <a href="/tags/redis/" title="redis"><div class="tags-list-item">redis</div></a>
+    
+    <a href="/tags/排序/" title="排序"><div class="tags-list-item">排序</div></a>
+    
+    <a href="/tags/sql/" title="sql"><div class="tags-list-item">sql</div></a>
+    
+    <a href="/tags/前端/" title="前端"><div class="tags-list-item">前端</div></a>
+    
+    <a href="/tags/linux/" title="linux"><div class="tags-list-item">linux</div></a>
+    
+    <a href="/tags/数据结构和算法/" title="数据结构和算法"><div class="tags-list-item">数据结构和算法</div></a>
+    
+    <a href="/tags/Unicode/" title="Unicode"><div class="tags-list-item">Unicode</div></a>
+    
+    <a href="/tags/ASCII/" title="ASCII"><div class="tags-list-item">ASCII</div></a>
+    
+    <a href="/tags/编码/" title="编码"><div class="tags-list-item">编码</div></a>
+    
+    <a href="/tags/vue/" title="vue"><div class="tags-list-item">vue</div></a>
+    
+  </div>
+</div>
+  </article>
+  
+  
+</div>
+          </aside>
+          <aside class="right-column">
+            <div class="sticky-widescreen">
+  
+  
+  <article class="card card-content toc-card">
+    <div class="toc-header"><i class="iconfont icon-menu" style="padding-right: 2px;"></i>目录</div>
+<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E8%AF%BB%E5%86%99%E6%A8%A1%E5%BC%8F"><span class="toc-text">文件读写模式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8with%E8%AF%AD%E6%B3%95%EF%BC%8C%E5%88%B0%E8%BE%BE%E8%AF%A5%E8%AF%AD%E5%8F%A5%E6%9C%AA%E5%B0%BE%E6%97%B6%EF%BC%8C%E5%B0%86%E8%87%AA%E5%8A%A8close-%E5%85%B3%E9%97%AD%E6%96%87%E4%BB%B6%E9%87%8A%E6%94%BE%E8%B5%84%E6%BA%90%EF%BC%8C%E5%8D%B3%E4%BE%BF%E5%87%BA%E7%8E%B0%E5%BC%82%E5%B8%B8%E4%BA%A6%E5%A6%82%E6%AD%A4"><span class="toc-text">使用with语法，到达该语句未尾时，将自动close()关闭文件释放资源，即便出现异常亦如此</span></a></li></ol></li></ol>
+  </article>
+  
+  
+  <article class="card card-content">
+    <div class="recent-posts-card">
+  <div class="recent-posts-header"><i class="iconfont icon-wenzhang_huaban" style="padding-right: 2px;"></i>最近文章</div>
+  <div class="recent-posts-list">
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2021-04-02</div>
+        <a href="/2021/04/03/admin-de-yi-xie-you-hua-pei-zhi/"><div class="recent-posts-item-content">admin的一些优化配置</div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2021-04-02</div>
+        <a href="/2021/04/02/django-hou-tai-guan-li/"><div class="recent-posts-item-content">Django后台管理</div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2021-04-01</div>
+        <a href="/2021/04/02/lu-you-wang-shan-chu-ding-dan-jie-kou-lian-diao/"><div class="recent-posts-item-content">旅游网删除订单接口联调</div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2021-04-01</div>
+        <a href="/2021/04/02/lu-you-wang-qu-xiao-ding-dan-jie-kou-lian-diao/"><div class="recent-posts-item-content">旅游网取消订单接口联调</div></a>
+      </div>
+    
+  </div>
+</div>
+  </article>
+  
+  
+</div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <footer class="footer">
+  <div class="footer-container">
+    <div>
+      <div class="footer-dsc">
+        <span>Copyright ©
+          
+          2021 -
+          
+          2021
+        </span>
+        &nbsp;
+        <a href="/" class="footer-link">外心人D </a>
+      </div>
+    </div>
+
+    
+    <div class="footer-dsc">
+      
+      Powered by
+      <a href="https://hexo.io/" class="footer-link" target="_blank" rel="nofollow noopener noreferrer">&nbsp;Hexo </a>
+      
+      
+      <span>&nbsp;|&nbsp;</span>
+      
+      
+      Theme -
+      <a href="https://github.com/theme-kaze" class="footer-link" target="_blank"
+        rel="nofollow noopener noreferrer">&nbsp;Kaze</a>
+      
+    </div>
+    
+    
+    
+    
+</footer>
+  <a role="button" id="scrollbutton" class="basebutton"  aria-label="回到顶部">
+  <i class="iconfont icon-arrowleft button-icon"></i>
+</a>
+<a role="button" id="menubutton" class="basebutton">
+  <i class="iconfont icon-menu button-icon"></i>
+</a>
+<a role="button" id="popbutton" class="basebutton" aria-label="控制中心">
+  <i class="iconfont icon-expand button-icon"></i>
+</a>
+<a role="button" id="darkbutton" class="basebutton darkwidget" aria-label="夜色模式">
+  <i class="iconfont icon-weather button-icon"></i>
+</a>
+<a role="button" id="searchbutton" class="basebutton searchwidget" aria-label="搜索">
+  <i class="iconfont icon-search button-icon"></i>
+</a>
 
   
-  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
-<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
-
+  
   
 
-
-
-
-
+  
+  
+  <script>
+  var addImgLayout = function () {
+    var img = document.querySelectorAll('.post-content img');
+    var i;
+    for (i = 0; i < img.length; i++) {
+      var wrapper = document.createElement('a');
+      wrapper.setAttribute('href', img[i].getAttribute('data-src'));
+      wrapper.setAttribute('aria-label', 'illustration');
+      wrapper.style.cssText = 'width: 100%; display: flex; justify-content: center;';
+      if (img[i].alt) wrapper.dataset.caption = img[i].alt;
+      wrapper.dataset.nolink = true;
+      img[i].before(wrapper);
+      wrapper.append(img[i]);
+      var divWrap = document.createElement('div');
+      divWrap.classList.add('gallery');
+      wrapper.before(divWrap);
+      divWrap.append(wrapper);
+    }
+    baguetteBox.run('.gallery');
+  }
+</script>
+<script>loadScript("/js/lib/lightbox/baguetteBox.min.js", addImgLayout)</script>
+  
+  
+  
+<script src="/js/main.js"></script>
 
   
-
-
-
-
-
+  
+  <script>
+    var addLazyload = function () {
+      var observer = lozad('.lozad', {
+        load: function (el) {
+          el.srcset = el.getAttribute('data-src');
+        },
+        loaded: function (el) {
+          el.classList.add('loaded');
+        }
+      });
+      observer.observe();
+    }
+  </script>
+  <script>loadScript("/js/lib/lozad.min.js", addLazyload)</script>
+  
+  
 </body>
+
 </html>
