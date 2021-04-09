@@ -20,15 +20,15 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
 
 <meta name="hexo-config" content="{&quot;hostname&quot;:&quot;bubbleboy11.github.io&quot;,&quot;root&quot;:&quot;/&quot;,&quot;images&quot;:&quot;/images&quot;,&quot;scheme&quot;:&quot;Muse&quot;,&quot;version&quot;:&quot;8.3.0&quot;,&quot;exturl&quot;:false,&quot;sidebar&quot;:{&quot;position&quot;:&quot;left&quot;,&quot;display&quot;:&quot;post&quot;,&quot;padding&quot;:18,&quot;offset&quot;:12},&quot;copycode&quot;:true,&quot;bookmark&quot;:{&quot;enable&quot;:false,&quot;color&quot;:&quot;#222&quot;,&quot;save&quot;:&quot;auto&quot;},&quot;fancybox&quot;:false,&quot;mediumzoom&quot;:false,&quot;lazyload&quot;:false,&quot;pangu&quot;:false,&quot;comments&quot;:{&quot;style&quot;:&quot;tabs&quot;,&quot;active&quot;:null,&quot;storage&quot;:true,&quot;lazyload&quot;:false,&quot;nav&quot;:null},&quot;motion&quot;:{&quot;enable&quot;:true,&quot;async&quot;:false,&quot;transition&quot;:{&quot;post_block&quot;:&quot;fadeIn&quot;,&quot;post_header&quot;:&quot;fadeInDown&quot;,&quot;post_body&quot;:&quot;fadeInDown&quot;,&quot;coll_header&quot;:&quot;fadeInLeft&quot;,&quot;sidebar&quot;:&quot;fadeInUp&quot;}},&quot;prism&quot;:false,&quot;i18n&quot;:{&quot;placeholder&quot;:&quot;搜索...&quot;,&quot;empty&quot;:&quot;没有找到任何搜索结果：${query}&quot;,&quot;hits_time&quot;:&quot;找到 ${hits} 个搜索结果（用时 ${time} 毫秒）&quot;,&quot;hits&quot;:&quot;找到 ${hits} 个搜索结果&quot;}}">
-<meta name="description" content="Unix网络编程中提到了5种网络模型  Blocking IO 阻塞式IO，一次只能处理一个请求。 Noblocking IO 非阻塞式IO IO multiplexing IO多路复用（高并发框架使用） Signal Driven IO 信号驱动的IO Asynchronous IO 异步IO  如何提升服务器的并发能力呢？就是如何处理多个客户端连接一些常见的提升并发能力的方式  多线程模型，创">
+<meta name="description" content="Unix网络编程中提到了5种网络模型  Blocking IO 阻塞式IO，一次只能处理一个请求。 Noblocking IO 非阻塞式IO IO multiplexing IO多路复用（高并发框架使用） Signal Driven IO 信号驱动的IO Asynchronous IO 异步IO  现在服务器基本使用 IO多路复用，实现单进程同时处理多个 socket 请求。 IO多路复用？IO多">
 <meta property="og:type" content="article">
 <meta property="og:title" content="HTML">
 <meta property="og:url" content="https://bubbleboy11.github.io/2020/08/21/io-duo-lu-fu-yong/index.html">
 <meta property="og:site_name" content="外心人D的博客">
-<meta property="og:description" content="Unix网络编程中提到了5种网络模型  Blocking IO 阻塞式IO，一次只能处理一个请求。 Noblocking IO 非阻塞式IO IO multiplexing IO多路复用（高并发框架使用） Signal Driven IO 信号驱动的IO Asynchronous IO 异步IO  如何提升服务器的并发能力呢？就是如何处理多个客户端连接一些常见的提升并发能力的方式  多线程模型，创">
+<meta property="og:description" content="Unix网络编程中提到了5种网络模型  Blocking IO 阻塞式IO，一次只能处理一个请求。 Noblocking IO 非阻塞式IO IO multiplexing IO多路复用（高并发框架使用） Signal Driven IO 信号驱动的IO Asynchronous IO 异步IO  现在服务器基本使用 IO多路复用，实现单进程同时处理多个 socket 请求。 IO多路复用？IO多">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-08-20T16:21:41.000Z">
-<meta property="article:modified_time" content="2021-04-02T12:24:46.061Z">
+<meta property="article:modified_time" content="2021-04-05T14:11:43.152Z">
 <meta property="article:author" content="外心人D">
 <meta property="article:tag" content="剑指offer">
 <meta property="article:tag" content="Leetcode">
@@ -97,7 +97,7 @@
 
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-overview-active">
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           文章目录
@@ -110,6 +110,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8%EF%BC%9F"><span class="nav-text">IO多路复用？</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -122,7 +123,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">172</span>
+          <span class="site-state-item-count">178</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -133,7 +134,7 @@
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
-        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-count">31</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -203,7 +204,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-02 12:24:46" itemprop="dateModified" datetime="2021-04-02T12:24:46Z">2021-04-02</time>
+        <time title="修改时间：2021-04-05 14:11:43" itemprop="dateModified" datetime="2021-04-05T14:11:43Z">2021-04-05</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -233,14 +234,8 @@
 <li>Signal Driven IO 信号驱动的IO</li>
 <li>Asynchronous IO 异步IO</li>
 </ul>
-<p>如何提升服务器的并发能力呢？就是如何处理多个客户端连接<br>一些常见的提升并发能力的方式</p>
-<ul>
-<li>多线程模型，创建新的线程处理请求</li>
-<li>多进程模型，创建新的进程处理请求</li>
-</ul>
-<p>线程 / 进程创建开销比较大，可以用线程池方式解决<br>线程 / 进程比较占用资源，难以同时创建太多</p>
 <p>现在服务器基本使用 IO多路复用，实现单进程同时处理多个 socket 请求。</p>
-<p>3.什么是IO多路复用？<br>IO多路复用就是操作系统提供的同时监听多个 socket 的机制</p>
+<h3 id="IO多路复用？"><a href="#IO多路复用？" class="headerlink" title="IO多路复用？"></a>IO多路复用？</h3><p>IO多路复用就是操作系统提供的同时监听多个 socket 的机制</p>
 <ul>
 <li>为了实现高并发需要一种机制并发处理多个 socket</li>
 <li>Linux 常见的是 select / poll / epoll 系统调用</li>
@@ -298,13 +293,13 @@
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2020/08/21/mvc/" rel="prev" title="MVC">
-                  <i class="fa fa-chevron-left"></i> MVC
+                <a href="/2020/08/21/lrucache/" rel="prev" title="HTML">
+                  <i class="fa fa-chevron-left"></i> HTML
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2020/08/21/lrucache/" rel="next" title="HTML">
-                  HTML <i class="fa fa-chevron-right"></i>
+                <a href="/2020/08/21/http-fang-fa/" rel="next" title="HTTP 方法">
+                  HTTP 方法 <i class="fa fa-chevron-right"></i>
                 </a>
             </div>
           </div>
