@@ -28,7 +28,7 @@
 <meta property="og:description" content="GIL Global Interpreter Lock (全局解释器锁) 这个GIL并不是python的特性，他是在Cpython解释器里引入的一个概念，而在其他的语言编写的解释器里就没有这个GIL CPython GIL 就是 Cpython解释器的全局解释锁。  全局锁是主要的作用影响 因为多线程的编程方式，使得线程之间数据的一致性和状态同步难以把控，为了解决数据不能同步的问题，设计了GIL全">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-08-20T16:21:41.000Z">
-<meta property="article:modified_time" content="2021-04-09T05:47:26.054Z">
+<meta property="article:modified_time" content="2021-04-11T03:57:24.857Z">
 <meta property="article:author" content="外心人D">
 <meta name="twitter:card" content="summary">
 
@@ -121,7 +121,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">178</span>
+          <span class="site-state-item-count">179</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -132,7 +132,7 @@
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
-        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-count">32</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -202,7 +202,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-09 05:47:26" itemprop="dateModified" datetime="2021-04-09T05:47:26Z">2021-04-09</time>
+        <time title="修改时间：2021-04-11 03:57:24" itemprop="dateModified" datetime="2021-04-11T03:57:24Z">2021-04-11</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -242,21 +242,17 @@
 <li>在Cpython解释器中，同一进程中假如有多个线程运行，当python代码有一个线程开始访问解释器的时候，一个线程在运行python程序的时候会霸占python解释器（加了一把锁），GIL会把这个线程给锁上，<br>此时此刻使该进程内的其他线程无法运行，无法对解释器的资源进行访问，需要等这个线程分配的时间到了、该线程运行完后这个线程把GIL释放掉，其他线程才能运行。如果线程运行过程中遇到耗时操作，则解释器锁解开，使其他线程运行。所以在多线程中，线程的运行仍是有先后顺序的，并不是同时进行。其实这无疑也是一个单线程。<br>这类似于给线程加锁 <code>threading.Lock().acquire() </code>，解锁 <code>threading.Lock().release()</code> 一样。</li>
 <li>单个进程内的并发任务：如果你需要在单个进程内继续使用并发的特性，可以考虑使用<code>threading</code>模块，不能利用多核CPU，<br>如果想要充分地使用多核CPU的资源，在python中大部分情况需要使用多进程<code>multiprocessing</code>模块。</li>
 </ul>
-<ul>
-<li>CPU密集程序难以利用多核优势</li>
-<li>IO期间会释放GIL，对IO密集程序影响不大<br>解释图：这个图里面有三个线程Thread1，Thread2，Thread3，在处理网络请求的过程中，虽然一个时间只能执行一个线程，但是在等待网络请求的时候来释放全局解释锁切换到不同线程Run运行，这就是对IO密集的程序会小一些。</li>
-</ul>
 <h4 id="首先区分CPU和IO密集程序"><a href="#首先区分CPU和IO密集程序" class="headerlink" title="首先区分CPU和IO密集程序"></a>首先区分CPU和IO密集程序</h4><ul>
 <li>一般程序分为CPU密集还有IO密集，<ul>
-<li>CPU密集：把大量时间花在计算上面，磁盘硬盘读写</li>
-<li>IO密集：把大量时间花费在了等待上面。(比如传输、文件操作，网络爬虫)<br>在等待时间中CPU是不需要工作的，那你在此期间提供双CPU资源也是利用不上的，那么为什么多线程会对IO密集型代码有用呢？这时因为python碰到等待会释放GIL供新的线程使用，实现了线程间的切换。</li>
+<li>CPU密集：把大量时间花在计算上面，磁盘硬盘读写，难以利用多核优势</li>
+<li>IO密集：把大量时间花费在了等待上面。(比如传输、文件操作，网络爬虫)<br>在等待时间中CPU是不需要工作的，那你在此期间提供双CPU资源也是利用不上的，那么为什么多线程会对IO密集型代码有用呢？这时因为python碰到等待会释放GIL供新的线程使用，实现了线程间的切换。<br>IO期间会释放GIL，对IO密集程序影响不大<br>解释图：这个图里面有三个线程Thread1，Thread2，Thread3，在处理网络请求的过程中，虽然一个时间只能执行一个线程，但是在等待网络请求的时候来释放全局解释锁切换到不同线程Run运行，这就是对IO密集的程序会小一些。</li>
 </ul>
 </li>
 </ul>
 <h3 id="如何规避GIL影响"><a href="#如何规避GIL影响" class="headerlink" title="如何规避GIL影响"></a>如何规避GIL影响</h3><ul>
 <li>CPU密集可以使用多进程+进程池来充分利用多核，2个CPU干活肯定比一个CPU快很多。<br>用cython编写一些扩展来转换成cython代码。</li>
 <li>（cython不是Cpython解释器，它是一个用来把python程序转换成C代码一个扩展）</li>
-<li>IO密集型任务：使用多线程 / 协程。原因是一个线程在IO时被阻塞，会被切换到另一个线程。</li>
+<li>IO密集型任务：使用多线程 / 协程。原因是一个线程在IO时被阻塞，会被切换到另一个线程，线程切换后，I/O 操作仍然在进行，线程 1 在进行 I/O 操作时，线程 2 可以获得 CPU 资源进行计算，虽然增加了切换成本，却提高了效率。</li>
 <li>通过<code>pypy</code>解释器来执行python脚本不含有GIL</li>
 </ul>
 <h3 id="GIL实现"><a href="#GIL实现" class="headerlink" title="GIL实现"></a>GIL实现</h3><p>解释图：每隔一段时间我们尝试去释放当前线程的锁，然后让其它线程尝试去获取锁并且去执行</p>
@@ -310,8 +306,8 @@
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2021/04/01/lu-you-wang-men-piao-xiang-xi-xin-xi-jie-kou-lian-diao/" rel="next" title="门票详细信息接口联调">
-                  门票详细信息接口联调 <i class="fa fa-chevron-right"></i>
+                <a href="/2021/01/08/zip/" rel="next" title="Python zip">
+                  Python zip <i class="fa fa-chevron-right"></i>
                 </a>
             </div>
           </div>
