@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<meta name="hexo-config" content="{&quot;hostname&quot;:&quot;bubbleboy11.github.io&quot;,&quot;root&quot;:&quot;/&quot;,&quot;images&quot;:&quot;/images&quot;,&quot;scheme&quot;:&quot;Muse&quot;,&quot;version&quot;:&quot;8.3.0&quot;,&quot;exturl&quot;:false,&quot;sidebar&quot;:{&quot;position&quot;:&quot;left&quot;,&quot;display&quot;:&quot;post&quot;,&quot;padding&quot;:18,&quot;offset&quot;:12},&quot;copycode&quot;:true,&quot;bookmark&quot;:{&quot;enable&quot;:false,&quot;color&quot;:&quot;#222&quot;,&quot;save&quot;:&quot;auto&quot;},&quot;fancybox&quot;:false,&quot;mediumzoom&quot;:false,&quot;lazyload&quot;:false,&quot;pangu&quot;:false,&quot;comments&quot;:{&quot;style&quot;:&quot;tabs&quot;,&quot;active&quot;:null,&quot;storage&quot;:true,&quot;lazyload&quot;:false,&quot;nav&quot;:null},&quot;motion&quot;:{&quot;enable&quot;:true,&quot;async&quot;:false,&quot;transition&quot;:{&quot;post_block&quot;:&quot;fadeIn&quot;,&quot;post_header&quot;:&quot;fadeInDown&quot;,&quot;post_body&quot;:&quot;fadeInDown&quot;,&quot;coll_header&quot;:&quot;fadeInLeft&quot;,&quot;sidebar&quot;:&quot;fadeInUp&quot;}},&quot;prism&quot;:false,&quot;i18n&quot;:{&quot;placeholder&quot;:&quot;搜索...&quot;,&quot;empty&quot;:&quot;没有找到任何搜索结果：${query}&quot;,&quot;hits_time&quot;:&quot;找到 ${hits} 个搜索结果（用时 ${time} 毫秒）&quot;,&quot;hits&quot;:&quot;找到 ${hits} 个搜索结果&quot;}}">
+<meta name="description" content="进程间通信-生产者消费者模型与队列演示了生产者和消费者的场景。  生产者生产货物，然后把货物放到一个队列之类的数据结构中，生产货物所要花费的时间无法预先确定。 消费者消耗生产者生产的货物的时间也是不确定的。通过queue队列来实现进程间的通信  下例中创建了两个线程，一个负责生成，一个负责消费，所生成的产品存放在queue里，实现了不同线程间沟通。 123456789101112131415161">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python的进程间通信-生产者消费者模型与队列">
+<meta property="og:url" content="https://bubbleboy11.github.io/2021/04/05/python-jin-cheng-jian-tong-xin-sheng-chan-zhe-xiao-fei-zhe-mo-xing-yu-dui-lie/index.html">
+<meta property="og:site_name" content="外心人D的博客">
+<meta property="og:description" content="进程间通信-生产者消费者模型与队列演示了生产者和消费者的场景。  生产者生产货物，然后把货物放到一个队列之类的数据结构中，生产货物所要花费的时间无法预先确定。 消费者消耗生产者生产的货物的时间也是不确定的。通过queue队列来实现进程间的通信  下例中创建了两个线程，一个负责生成，一个负责消费，所生成的产品存放在queue里，实现了不同线程间沟通。 123456789101112131415161">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-04-04T16:21:41.000Z">
+<meta property="article:modified_time" content="2021-04-12T13:38:20.473Z">
+<meta property="article:author" content="外心人D">
+<meta property="article:tag" content="线程">
+<meta property="article:tag" content="进程">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://bubbleboy11.github.io/2021/04/05/python-jin-cheng-jian-tong-xin-sheng-chan-zhe-xiao-fei-zhe-mo-xing-yu-dui-lie/">
+
+
+
+<meta name="hexo-config-page" content="{&quot;sidebar&quot;:&quot;&quot;,&quot;isHome&quot;:false,&quot;isPost&quot;:true,&quot;lang&quot;:&quot;zh-CN&quot;}">
+<meta name="hexo-config-calendar" content="">
+<script data-pjax src="/js/load-config.js"></script>
+  <title>python的进程间通信-生产者消费者模型与队列 | 外心人D的博客</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="外心人D的博客" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">外心人D的博客</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1-%E7%94%9F%E4%BA%A7%E8%80%85%E6%B6%88%E8%B4%B9%E8%80%85%E6%A8%A1%E5%9E%8B%E4%B8%8E%E9%98%9F%E5%88%97"><span class="nav-text">进程间通信-生产者消费者模型与队列</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Lock%E7%89%88%E6%9C%AC%E7%94%9F%E4%BA%A7%E8%80%85%E5%92%8C%E6%B6%88%E8%B4%B9%E8%80%85%E6%A8%A1%E5%BC%8F%EF%BC%9A"><span class="nav-text">Lock版本生产者和消费者模式：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E4%B8%AD%E7%9A%84-Condition-%E6%9D%A1%E4%BB%B6%E5%AF%B9%E8%B1%A1"><span class="nav-text">线程中的 Condition 条件对象</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">外心人D</p>
+  <div class="site-description" itemprop="description">本博客大多内容为慕课和网上博客，并非原创</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">190</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">35</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/04/05/python-jin-cheng-jian-tong-xin-sheng-chan-zhe-xiao-fei-zhe-mo-xing-yu-dui-lie/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          python的进程间通信-生产者消费者模型与队列
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-04-04 16:21:41" itemprop="dateCreated datePublished" datetime="2021-04-04T16:21:41Z">2021-04-04</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-04-12 13:38:20" itemprop="dateModified" datetime="2021-04-12T13:38:20Z">2021-04-12</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="进程间通信-生产者消费者模型与队列"><a href="#进程间通信-生产者消费者模型与队列" class="headerlink" title="进程间通信-生产者消费者模型与队列"></a>进程间通信-生产者消费者模型与队列</h2><p>演示了生产者和消费者的场景。</p>
+<ul>
+<li>生产者生产货物，然后把货物放到一个队列之类的数据结构中，生产货物所要花费的时间无法预先确定。</li>
+<li>消费者消耗生产者生产的货物的时间也是不确定的。<br>通过<code>queue</code>队列来实现进程间的通信</li>
+</ul>
+<p>下例中创建了两个线程，一个负责生成，一个负责消费，所生成的产品存放在queue里，实现了不同线程间沟通。</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> queue <span class="keyword">import</span> Queue</span><br><span class="line"><span class="keyword">import</span> random, threading, time</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 生产者类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Producer</span>(<span class="params">threading.Thread</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, name, queue</span>):</span></span><br><span class="line">        threading.Thread.__init__(self, name=name)</span><br><span class="line">        self.queue = queue</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">run</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, <span class="number">5</span>):</span><br><span class="line">            print(<span class="string">"{} is producing {} to the queue!"</span>.format(self.getName(), i))</span><br><span class="line">            self.queue.put(i)</span><br><span class="line">            time.sleep(random.randrange(<span class="number">10</span>) / <span class="number">5</span>)</span><br><span class="line">        print(<span class="string">"%s finished!"</span> % self.getName())</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 消费者类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Consumer</span>(<span class="params">threading.Thread</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, name, queue</span>):</span></span><br><span class="line">        threading.Thread.__init__(self, name=name)</span><br><span class="line">        self.queue = queue</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">run</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, <span class="number">5</span>):</span><br><span class="line">            val = self.queue.get()</span><br><span class="line">            print(<span class="string">"{} is consuming {} in the queue."</span>.format(</span><br><span class="line">                self.getName(), val))</span><br><span class="line">            time.sleep(random.randrange(<span class="number">10</span>))</span><br><span class="line">        print(<span class="string">"%s finished!"</span> % self.getName())</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span>():</span></span><br><span class="line">    queue = Queue()</span><br><span class="line">    producer = Producer(<span class="string">'Producer'</span>, queue)</span><br><span class="line">    consumer = Consumer(<span class="string">'Consumer'</span>, queue)</span><br><span class="line"></span><br><span class="line">    producer.start()</span><br><span class="line">    consumer.start()</span><br><span class="line"></span><br><span class="line">    producer.join()</span><br><span class="line">    consumer.join()</span><br><span class="line">    print(<span class="string">'All threads finished!'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight angelscript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Producer <span class="keyword">is</span> producing <span class="number">1</span> to the queue!</span><br><span class="line">Consumer <span class="keyword">is</span> consuming <span class="number">1</span> <span class="keyword">in</span> the queue.</span><br><span class="line">Producer <span class="keyword">is</span> producing <span class="number">2</span> to the queue!</span><br><span class="line">Consumer <span class="keyword">is</span> consuming <span class="number">2</span> <span class="keyword">in</span> the queue.</span><br><span class="line">Producer <span class="keyword">is</span> producing <span class="number">3</span> to the queue!</span><br><span class="line">Consumer <span class="keyword">is</span> consuming <span class="number">3</span> <span class="keyword">in</span> the queue.</span><br><span class="line">Producer <span class="keyword">is</span> producing <span class="number">4</span> to the queue!</span><br><span class="line">Consumer <span class="keyword">is</span> consuming <span class="number">4</span> <span class="keyword">in</span> the queue.</span><br><span class="line">Producer finished!</span><br><span class="line">Consumer finished!</span><br><span class="line">All threads finished!</span><br></pre></td></tr></tbody></table></figure>
+
+
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> multiprocessing</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">from</span> multiprocessing <span class="keyword">import</span> Queue</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Producer</span>(<span class="params">multiprocessing.Process</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, queue</span>):</span></span><br><span class="line">        super(Producer, self).__init__()</span><br><span class="line">        self.queue = queue</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">run</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">13</span>):</span><br><span class="line">            <span class="comment">#往队列添加内容</span></span><br><span class="line">            self.queue.put(i)</span><br><span class="line">            print(<span class="string">"生产者传递的消息为%s"</span> % (i))</span><br><span class="line">        <span class="keyword">return</span> self.queue</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Consumer</span>(<span class="params">multiprocessing.Process</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, queue</span>):</span></span><br><span class="line">        super(Consumer, self).__init__()</span><br><span class="line">        self.queue = queue</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">run</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="comment">#获取队列内容</span></span><br><span class="line">        <span class="comment">#get会自动判断队列是否为空,如果是空， 跳出循环， 不会再去从队列获取数据;</span></span><br><span class="line">        <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">            print(<span class="string">"进程获取消息为：%s"</span> % (self.queue.get()))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    queue = Queue(maxsize=<span class="number">100</span>)</span><br><span class="line">    p = Producer(queue)</span><br><span class="line">    p.start()</span><br><span class="line">    c = Consumer(queue)</span><br><span class="line">    c.start()</span><br><span class="line">    p.join()</span><br><span class="line">    c.join(<span class="number">2</span>)</span><br><span class="line">    c.terminate()  <span class="comment">#终止进程</span></span><br><span class="line">    print(<span class="string">"进程间通信结束"</span>)</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight angelscript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">生产者传递的消息为<span class="number">0</span></span><br><span class="line">生产者传递的消息为<span class="number">1</span></span><br><span class="line">进程获取消息为：<span class="number">0</span></span><br><span class="line">进程获取消息为：<span class="number">1</span></span><br><span class="line">生产者传递的消息为<span class="number">2</span></span><br><span class="line">进程获取消息为：<span class="number">2</span></span><br><span class="line">进程获取消息为：<span class="number">3</span></span><br><span class="line">生产者传递的消息为<span class="number">3</span></span><br><span class="line">生产者传递的消息为<span class="number">4</span></span><br><span class="line">进程获取消息为：<span class="number">4</span></span><br><span class="line">生产者传递的消息为<span class="number">5</span></span><br><span class="line">生产者传递的消息为<span class="number">6</span></span><br><span class="line">进程获取消息为：<span class="number">5</span></span><br><span class="line">生产者传递的消息为<span class="number">7</span></span><br><span class="line">进程获取消息为：<span class="number">6</span></span><br><span class="line">生产者传递的消息为<span class="number">8</span></span><br><span class="line">进程获取消息为：<span class="number">7</span></span><br><span class="line">生产者传递的消息为<span class="number">9</span></span><br><span class="line">进程获取消息为：<span class="number">8</span></span><br><span class="line">生产者传递的消息为<span class="number">10</span></span><br><span class="line">进程获取消息为：<span class="number">9</span></span><br><span class="line">生产者传递的消息为<span class="number">11</span></span><br><span class="line">进程获取消息为：<span class="number">10</span></span><br><span class="line">生产者传递的消息为<span class="number">12</span></span><br><span class="line">进程获取消息为：<span class="number">11</span></span><br><span class="line">进程获取消息为：<span class="number">12</span></span><br><span class="line">进程间通信结束</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="Lock版本生产者和消费者模式："><a href="#Lock版本生产者和消费者模式：" class="headerlink" title="Lock版本生产者和消费者模式："></a>Lock版本生产者和消费者模式：</h2><p>‘’’<br>生产者和消费者模式是多线程开发中经常见到的一种模式。<br>生产者的线程专门用来生产一些数据，然后存放到一个中间的变量中。<br>消费者再从这个中间的变量中取出数据进行消费。<br>但是因为要使用中间变量，中间变量经常是一些全局变量，因此需要使用锁来保证数据完整性。<br>使用threading.Lock锁实现的“生产者与消费者模式”的一个例子：<br>‘’’</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> random</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">gMoney = <span class="number">1000</span></span><br><span class="line">glock = threading.Lock()</span><br><span class="line"><span class="comment"># 记录生产者生产的次数，达到10次就不再生产</span></span><br><span class="line">gtime = <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 生产者</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Producer</span>(<span class="params">threading.Thread</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">run</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">global</span> gMoney</span><br><span class="line">        <span class="keyword">global</span> gtime</span><br><span class="line">        <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">            Money = random.randint(<span class="number">100</span>,<span class="number">1000</span>)</span><br><span class="line">            glock.acquire()</span><br><span class="line">            <span class="keyword">if</span> gtime &gt;= <span class="number">10</span>:</span><br><span class="line">                <span class="comment"># 解锁返回</span></span><br><span class="line">                glock.release()</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">            gMoney += Money</span><br><span class="line">            print(<span class="string">'%s存入了%d元钱，还剩%d元钱'</span>%(threading.current_thread(),Money,gMoney))</span><br><span class="line">            time.sleep(<span class="number">0.5</span>)</span><br><span class="line">            gtime += <span class="number">1</span></span><br><span class="line">            glock.release()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 消费者</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Consumer</span>(<span class="params">threading.Thread</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">run</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">global</span> gMoney</span><br><span class="line">        <span class="keyword">global</span> gtime</span><br><span class="line">        <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">            Money = random.randint(<span class="number">100</span>, <span class="number">1000</span>)</span><br><span class="line">            glock.acquire()</span><br><span class="line">            <span class="keyword">if</span> gMoney &gt; Money:</span><br><span class="line">                gMoney -= Money</span><br><span class="line">                print(<span class="string">'%s消费了%d元钱，还剩%d元钱'</span> % (threading.current_thread(), Money, gMoney))</span><br><span class="line">                time.sleep(<span class="number">0.5</span>)</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="comment"># 如果钱不够了，有可能是已经超过了次数，这时候就判断一下</span></span><br><span class="line">                <span class="keyword">if</span> gtime &gt;= <span class="number">10</span>:</span><br><span class="line">                    glock.release()</span><br><span class="line">                    <span class="keyword">break</span></span><br><span class="line">                print(<span class="string">'%s消费了%d元钱，还剩%d元钱，不足！！！'</span> % (threading.current_thread(), Money, gMoney))</span><br><span class="line">            glock.release()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span>():</span></span><br><span class="line">    <span class="keyword">for</span> x <span class="keyword">in</span> range(<span class="number">3</span>):</span><br><span class="line">        c1 = Consumer(name=<span class="string">'消费者线程数%s'</span>%x)</span><br><span class="line">        c1.start()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> x <span class="keyword">in</span> range(<span class="number">5</span>):</span><br><span class="line">        p1 = Producer(name=<span class="string">'生产者线程数%s'</span>%x)</span><br><span class="line">        p1.start()</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="线程中的-Condition-条件对象"><a href="#线程中的-Condition-条件对象" class="headerlink" title="线程中的 Condition 条件对象"></a>线程中的 Condition 条件对象</h3><figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line">条件变量对象，使得一个线程等待另一个线程满足特定的“条件”，比如改变状态或某个数据值</span><br><span class="line">confition方法适合```生产-消费```的工作模型，消费者会等待生产者生产数据生消费者再对数据进行处理。</span><br><span class="line"></span><br><span class="line">- ```acquire()```：请求底层锁。</span><br><span class="line">- ```release()```：释放底层锁。</span><br><span class="line">- ```wait(timeout=None)```：等待直到被通知或发生超时。如果线程在调用此方法时没有获得锁，将会引发RuntimeError异常。</span><br><span class="line">- ```wait_for(predicate, timeout=None)```：等待，直到条件计算为真。</span><br><span class="line">- ```notify()```：默认唤醒一个等待这个条件的线程。</span><br><span class="line">- ```notify_all()```：唤醒所有正在等待这个条件的线程。</span><br><span class="line">```py</span><br><span class="line">import threading</span><br><span class="line">import logging</span><br><span class="line">import time</span><br><span class="line"></span><br><span class="line">logging.basicConfig(</span><br><span class="line">    level=logging.DEBUG,</span><br><span class="line">    format='%(asctime)s %(levelname)s [%(threadName)s] %(message)s')</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class Message:</span><br><span class="line">    def __init__(self, message):</span><br><span class="line">        self.message = message</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def consumer(cond, message):</span><br><span class="line">    with cond:</span><br><span class="line">        cond.wait()</span><br><span class="line">        logging.debug("consumer {0}".format(message.message))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def producer(cond, message):</span><br><span class="line">    with cond:</span><br><span class="line">        print('====')</span><br><span class="line">        time.sleep(2)</span><br><span class="line">        message.message = 'ha ha ha '</span><br><span class="line">        logging.debug("producer {0}".format(message.message))</span><br><span class="line">        cond.notify_all()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">if __name__ == '__main__':</span><br><span class="line">    message = Message(None)</span><br><span class="line">    cond = threading.Condition()</span><br><span class="line">    c1 = threading.Thread(target=consumer,</span><br><span class="line">                          args=(cond, message),</span><br><span class="line">                          name="consumer-1")</span><br><span class="line">    c1.start()</span><br><span class="line">    c2 = threading.Thread(target=consumer,</span><br><span class="line">                          args=(cond, message),</span><br><span class="line">                          name="consumer-2")</span><br><span class="line">    c2.start()</span><br><span class="line"></span><br><span class="line">    p = threading.Thread(target=producer,</span><br><span class="line">                         args=(cond, message),</span><br><span class="line">                         name="producer")</span><br><span class="line">    p.start()</span><br><span class="line"># ====</span><br><span class="line"># 2021-04-04 17:21:08,955 DEBUG [producer] producer ha ha ha</span><br><span class="line"># 2021-04-04 17:21:08,958 DEBUG [consumer-1] consumer ha ha ha</span><br><span class="line">2021-04-04 17:24:03,358 DEBUG [consumer-1] consumer ha ha ha</span><br><span class="line">2021-04-04 17:24:03,358 DEBUG [consumer-2] consumer ha ha ha</span><br></pre></td></tr></tbody></table></figure>
+
+<p>定义了一个<code>producer</code>方法用于生产数据，<code>consumer</code>方法用于消费数据，当运行上边代码后，先是输出了<code>====</code>，再等待2秒后输出了 <code>2021-04-04 17:21:08,955 DEBUG [producer] producer ha ha ha</code>，接着跟着输出了<code>2021-04-04 17:24:03,358 DEBUG [consumer-1] consumer ha ha ha</code>和<code>2016-08-21 17:29:16,212 DEBUG [consumer-2] consumer ha ha ha</code></p>
+<p>consumer线程是在producer线程运行之后才运行，即等待生产者生产数据。</p>
+<p>用<code>event</code>实现一个生产线程和消费线程的通信：</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">product_event = threading.Event()</span><br><span class="line">print(<span class="string">f"product_event state: <span class="subst">{product_event.is_set()}</span>"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">produce</span>():</span></span><br><span class="line">    print(<span class="string">"start produce ..."</span>)</span><br><span class="line">    time.sleep(<span class="number">5</span>)</span><br><span class="line">    print(<span class="string">"product produced."</span>)</span><br><span class="line">    product_event.set()</span><br><span class="line">    print(<span class="string">f"product_event state: <span class="subst">{product_event.is_set()}</span>"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">consume</span>():</span></span><br><span class="line">    print(<span class="string">"consumer start wait ..."</span>)</span><br><span class="line">    product_event.wait(timeout=<span class="number">10</span>)</span><br><span class="line">    print(<span class="string">f"product_event state: <span class="subst">{product_event.is_set()}</span>"</span>)</span><br><span class="line">    product_event.clear()</span><br><span class="line">    print(<span class="string">"product consumed."</span>)</span><br><span class="line">    print(<span class="string">f"product_event state: <span class="subst">{product_event.is_set()}</span>"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">t_pro = threading.Thread(name=<span class="string">"producer"</span>, target=produce)</span><br><span class="line">t_con = threading.Thread(name=<span class="string">"consumer"</span>, target=consume)</span><br><span class="line"></span><br><span class="line">t_pro.start()</span><br><span class="line">t_con.start()</span><br><span class="line"><span class="comment"># product_event state: False</span></span><br><span class="line"><span class="comment"># start produce ...</span></span><br><span class="line"><span class="comment"># consumer start wait ...</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 等待10秒</span></span><br><span class="line"><span class="comment"># product produced.</span></span><br><span class="line"><span class="comment"># product_event state: True</span></span><br><span class="line"><span class="comment"># product_event state: True</span></span><br><span class="line"><span class="comment"># product consumed.</span></span><br><span class="line"><span class="comment"># product_event state: False</span></span><br></pre></td></tr></tbody></table></figure><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%BA%BF%E7%A8%8B/" rel="tag"># 线程</a>
+              <a href="/tags/%E8%BF%9B%E7%A8%8B/" rel="tag"># 进程</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/04/04/django-yong-hu-guan-li/" rel="prev" title="django用户管理">
+                  <i class="fa fa-chevron-left"></i> django用户管理
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/04/05/kong-2/" rel="next" title="vue生命周期函数">
+                  vue生命周期函数 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+<script src="/js/comments.js"></script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">外心人D</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
