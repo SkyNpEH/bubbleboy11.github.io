@@ -118,7 +118,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">200</span>
+          <span class="site-state-item-count">204</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -158,6 +158,117 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/lu-you-wang-ding-dan-mo-kuai-orm-mo-xing-she-ji/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/lu-you-wang-ding-dan-mo-kuai-orm-mo-xing-she-ji/" class="post-title-link" itemprop="url">旅游网订单模块ORM模型设计</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-04-16 05:21:38" itemprop="dateModified" datetime="2021-04-16T05:21:38Z">2021-04-16</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%97%85%E6%B8%B8%E7%BD%91%E9%A1%B9%E7%9B%AE/" itemprop="url" rel="index"><span itemprop="name">旅游网项目</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="订单模块ORM模型设计"><a href="#订单模块ORM模型设计" class="headerlink" title="订单模块ORM模型设计"></a>订单模块ORM模型设计</h1><figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python manage.py startapp</span><br></pre></td></tr></tbody></table></figure>
+
+
+<p><code>order\models.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.contrib.contenttypes.fields <span class="keyword">import</span> GenericForeignKey</span><br><span class="line"><span class="keyword">from</span> django.contrib.contenttypes.models <span class="keyword">import</span> ContentType</span><br><span class="line"><span class="keyword">from</span> django.db <span class="keyword">import</span> models</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> accounts.models <span class="keyword">import</span> User</span><br><span class="line"><span class="keyword">from</span> order.choices <span class="keyword">import</span> OrderStatus, OrderTypes</span><br><span class="line"><span class="keyword">from</span> utils.models <span class="keyword">import</span> CommonModel</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Order</span>(<span class="params">CommonModel</span>):</span></span><br><span class="line">    <span class="string">""" 订单 """</span></span><br><span class="line">    sn = models.CharField(<span class="string">'订单编号'</span>, max_length=<span class="number">32</span>)</span><br><span class="line">    user = models.ForeignKey(User, related_name=<span class="string">'orders'</span>, on_delete=models.PROTECT)</span><br><span class="line">    buy_count = models.IntegerField(<span class="string">'购买数量'</span>, default=<span class="number">1</span>)</span><br><span class="line">    buy_amount = models.FloatField(<span class="string">'总价'</span>)</span><br><span class="line"></span><br><span class="line">    to_user = models.CharField(<span class="string">'收货人'</span>, max_length=<span class="number">32</span>)</span><br><span class="line">    to_area = models.CharField(<span class="string">'省市区'</span>, max_length=<span class="number">32</span>, default=<span class="string">''</span>)</span><br><span class="line">    to_address = models.CharField(<span class="string">'详细地址'</span>, max_length=<span class="number">256</span>, default=<span class="string">''</span>)</span><br><span class="line">    to_phone = models.CharField(<span class="string">'手机号码'</span>, max_length=<span class="number">32</span>)</span><br><span class="line"></span><br><span class="line">    remark = models.CharField(<span class="string">'备注'</span>, max_length=<span class="number">255</span>, null=<span class="literal">True</span>, blank=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 快递信息</span></span><br><span class="line">    express_type = models.CharField(<span class="string">'快递'</span>, max_length=<span class="number">32</span>, null=<span class="literal">True</span>, blank=<span class="literal">True</span>)</span><br><span class="line">    express_no = models.CharField(<span class="string">'单号'</span>, max_length=<span class="number">32</span>, null=<span class="literal">True</span>, blank=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    status = models.SmallIntegerField(<span class="string">'订单状态'</span>,</span><br><span class="line">                                      choices=OrderStatus.choices,</span><br><span class="line">                                      default=OrderStatus.SUBMIT)</span><br><span class="line">    types = models.SmallIntegerField(<span class="string">'订单类型'</span>,</span><br><span class="line">                                     choices=OrderTypes.choices,</span><br><span class="line">                                     default=OrderTypes.SIGHT_TICKET)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        db_table = <span class="string">'order'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">OrderItem</span>(<span class="params">CommonModel</span>):</span></span><br><span class="line">    <span class="string">""" 订单明细 """</span></span><br><span class="line">    user = models.ForeignKey(User, related_name=<span class="string">'order_items'</span>,</span><br><span class="line">                             on_delete=models.CASCADE)</span><br><span class="line">    order = models.ForeignKey(Order, verbose_name=<span class="string">'订单'</span>,</span><br><span class="line">                              related_name=<span class="string">'order_items'</span>,</span><br><span class="line">                              null=<span class="literal">True</span>,</span><br><span class="line">                              on_delete=models.CASCADE)</span><br><span class="line">    <span class="comment"># 商品快照</span></span><br><span class="line">    flash_name = models.CharField(<span class="string">'商品名称'</span>, max_length=<span class="number">128</span>)</span><br><span class="line">    flash_img = models.ImageField(<span class="string">'商品的主图'</span>)</span><br><span class="line">    flash_price = models.FloatField(<span class="string">'兑换价格'</span>)</span><br><span class="line">    flash_origin_price = models.FloatField(<span class="string">'原价'</span>)</span><br><span class="line">    flash_discount = models.FloatField(<span class="string">'折扣'</span>)</span><br><span class="line"></span><br><span class="line">    count = models.PositiveIntegerField(<span class="string">'购买数量'</span>)</span><br><span class="line">    amount = models.FloatField(<span class="string">'总额'</span>)</span><br><span class="line"></span><br><span class="line">    status = models.SmallIntegerField(<span class="string">'状态'</span>,</span><br><span class="line">                                      choices=OrderStatus.choices,</span><br><span class="line">                                      default=OrderStatus.SUBMIT)</span><br><span class="line">    remark = models.CharField(<span class="string">'备注'</span>, max_length=<span class="number">255</span>, null=<span class="literal">True</span>, blank=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 复合关联</span></span><br><span class="line">    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)</span><br><span class="line">    object_id = models.PositiveIntegerField()</span><br><span class="line">    content_object = GenericForeignKey(<span class="string">'content_type'</span>, <span class="string">'object_id'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        db_table = <span class="string">'order_item'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Payment</span>(<span class="params">CommonModel</span>):</span></span><br><span class="line">    <span class="string">""" 支付凭证 """</span></span><br><span class="line"></span><br><span class="line">    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name=<span class="string">'payments'</span>)</span><br><span class="line">    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name=<span class="string">'payments'</span>)</span><br><span class="line">    amount = models.FloatField(<span class="string">'金额'</span>, help_text=<span class="string">'支付实际的金额'</span>)</span><br><span class="line">    sn = models.CharField(<span class="string">'流水号'</span>, max_length=<span class="number">32</span>)</span><br><span class="line">    third_sn = models.CharField(<span class="string">'第三方订单号'</span>, max_length=<span class="number">128</span>, null=<span class="literal">True</span>, blank=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    status = models.SmallIntegerField(<span class="string">'支付状态'</span>, default=<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">    meta = models.CharField(<span class="string">'其他数据'</span>, max_length=<span class="number">128</span>, null=<span class="literal">True</span>, blank=<span class="literal">True</span>)</span><br><span class="line">    remark = models.CharField(<span class="string">'备注信息'</span>, max_length=<span class="number">128</span>, null=<span class="literal">True</span>, blank=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        db_table = <span class="string">'order_payment'</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>trip\settings.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">INSTALLED_APPS = [</span><br><span class="line">    <span class="comment"># 订单模块</span></span><br><span class="line">    <span class="string">'order.apps.OrderConfig'</span></span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
+<p><code>order\choices.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.db <span class="keyword">import</span> models</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">OrderStatus</span>(<span class="params">models.IntegerChoices</span>):</span></span><br><span class="line">    <span class="string">""" 订单状态 """</span></span><br><span class="line">    SUBMIT = <span class="number">11</span>, <span class="string">'待支付'</span></span><br><span class="line">    PAID = <span class="number">12</span>, <span class="string">'已支付'</span></span><br><span class="line">    CANCELED = <span class="number">13</span>, <span class="string">'已取消'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">OrderTypes</span>(<span class="params">models.IntegerChoices</span>):</span></span><br><span class="line">    <span class="string">""" 订单类型 """</span></span><br><span class="line">    SIGHT_TICKET = <span class="number">10</span>, <span class="string">'门票'</span></span><br><span class="line">    HOTEL = <span class="number">11</span>, <span class="string">'酒店'</span></span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python manage.py check</span><br><span class="line">python manage.py makemigrations</span><br><span class="line">python manage.py migrate</span><br></pre></td></tr></tbody></table></figure>
+
+
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1166,145 +1277,8 @@
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/ce-shi-gong-ju/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/ce-shi-gong-ju/" class="post-title-link" itemprop="url">测试工具</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-02 12:24:45" itemprop="dateModified" datetime="2021-04-02T12:24:45Z">2021-04-02</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Markdown/" itemprop="url" rel="index"><span itemprop="name">Markdown</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>接口测试三剑客<br>抓包工具fiddler,接口测试工具postman,Python开发测试工具。</p>
-<h2 id="fiddler"><a href="#fiddler" class="headerlink" title="fiddler"></a>fiddler</h2><p>http协议调试代理工具，它能够记录并检查所有你的电脑和互联网之间http通讯，设置断点，查看所有的“进出”fiddler的数据。</p>
-<p>fiddler的工作原理：在电脑端设置一个代理，电脑发起的所有http请求都会经过这个代理，fiddler代理把收到的请求后再将这个请求发给服务器，服务器收fiddler的请求处理后在返回给fiddler，fiddler收到服务端返回的数据同样再返回给我们的电脑</p>
-<p>默认端口8888，逍遥模拟器wifi端口改成8888</p>
-<p>fiddler的运用：</p>
-<ul>
-<li>查看接口请求方式</li>
-<li>查看请求数据、响应数据：<br>请求方式<br>测试请求方式为post，提交数据添加header,cookie，body;<br>请求方式为get：接口地址？多个请求数据用&amp;连接 前为key，后面数参数数据，添加也是在header里面添加键、值，</li>
-<li>接口返回状态</li>
-<li>设置代理（用于移动端抓包）</li>
-<li>header和cookie</li>
-<li>设置断点</li>
-<li>添加筛选</li>
-<li>fiddler进行接口测试</li>
-</ul>
-<p>rules- automatic breakpoint -before request上不了网络 disable正常上网</p>
-<p>快捷键<br>删除全部请求：<code>Ctrl+X</code><br>保留选中请求，删除其他：<code>Shift+Del</code></p>
-<h2 id="Postman"><a href="#Postman" class="headerlink" title="Postman"></a>Postman</h2><p>自动反复测试一个需要携带header的post请求，并且对针对线上、测试环境同一个数据进行测试。<br>并对实际结果做比较，以作为测试结果<br>关键字：自动 反复 线上  线下</p>
-<p>Postman是一种网页调试与发送网页http请求的chrome插件。我们可以用来很方便的模拟get或者post或者其他方式的请求来调试接口</p>
-<p>使用Postman如果通过自己拼接url，自己造数据，是非常麻烦的。因此选择Postman+Postman interceptor，使用Postman interceptor可以拦截到网页请求，同时传到postman的history列表中，然后我们只需要在postman中修改一下url就可以直接send了。</p>
-<p>主要功能包括</p>
-<ul>
-<li><p>模拟各种 HTTP requests</p>
-</li>
-<li><p>Collection 功能（测试集合）栏保存有常用的接口，可以按接口类型或者业务类型放在不同的文件夹下。<br>把接口放到collections里同一个文件夹下可以进行接口的批量执行，需要把所有要测试的接口放在一个文件夹下，点击右边的三角形，然后点击run，进行运行<br>iteration：迭代次数</p>
-</li>
-<li><p>post的headers旁边的body里有内容，get会把数据都放到url中，body不可以点击。</p>
-</li>
-</ul>
-<p>需要header或者cookie时候，则要填写header才可以成功请求，cookie的值也是填写到header中，添加cookie和header之后添加入参到Body中</p>
-<ul>
-<li><p>人性化的 Response 整理</p>
-</li>
-<li><p>内置测试脚本语言，点击右边的code，可以选择自己熟悉的代码，选择之后，根据选择生成接口测试的代码。 生成对应语言的http请求的代码。</p>
-</li>
-<li><p>设定变量与环境 enviroment：右上角的设置按钮，选择manage environment，输入环境名称和url<br>如设置线上和测试环境的地址名称，这样可以自由地切换不同的测试环境来执行接口测试。</p>
-</li>
-<li><p>通过tests栏设置相关内容可以判断测试结果是pass还是fail。<br>在返回数据查uid，如果查到了就说明接口是成功的<br><code>tests["Body matches string"]=responseBody.has（"uid"）;</code></p>
-</li>
-</ul>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/14/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/14/">14</a><span class="page-number current">15</span><a class="page-number" href="/page/16/">16</a><span class="space">&hellip;</span><a class="page-number" href="/page/20/">20</a><a class="extend next" rel="next" href="/page/16/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/14/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/14/">14</a><span class="page-number current">15</span><a class="page-number" href="/page/16/">16</a><span class="space">&hellip;</span><a class="page-number" href="/page/21/">21</a><a class="extend next" rel="next" href="/page/16/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 <script src="/js/comments.js"></script>
 </div>

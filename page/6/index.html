@@ -118,7 +118,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">200</span>
+          <span class="site-state-item-count">204</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -158,6 +158,262 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/http-fang-fa/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/http-fang-fa/" class="post-title-link" itemprop="url">HTTP 方法</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-04-02 12:24:45" itemprop="dateModified" datetime="2021-04-02T12:24:45Z">2021-04-02</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">计算机网络</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>常见的 HTTP 方法、接口的分类： </p>
+<p>GET 请求</p>
+<ul>
+<li>可以用浏览器直接访问</li>
+<li>请求参数直接放在URL后面，明文传递</li>
+</ul>
+<p>POST请求</p>
+<ul>
+<li>不能使用浏览器直接访问</li>
+<li>可以用来上传文件、登录注册等需求</li>
+<li>通过 request body传递参数，加密传递数据</li>
+</ul>
+<p>幂等性(Idempotent): 是一个数学上的概念，在这里表示发送一次和多次请求引起的边界效应是一致的，<br>幂等方法是无论调用多少次都得到相同请求结果的 HTTP 方法<br>幂等的方法客户端可以安全地重新请求，因为不会对服务器上的数据造成什么影响。<br>例如：a = 4 是幂等的，但是 a += 4 就是非幂等的</p>
+<p>GET 是幂等的，就是对服务器没有副作用；POST 非幂等，就是每一次创建一个新的东西会影响数据库的数据。<br>    • GET请求参数放到url(明文显示)，长度限制，没有请求体；POST放在Http报文实体的主体请求体，更安全。<br>    post请求携带的数据量比get请求大，多，常用于传输大文本的时候<br>    • get请求所包含的参数会被缓存(浏览器cache)，而post不会<br>    • get的url能被存为标签，post不会<br>    • get只能被url编码，而post可以被多种编码<br>    • get只接受ASCII字符，而post没有限制<br>    • get后退无害，而post后退会再次发送请求</p>
+<p>高级区别：<br>HTTP的底层是TCP/IP。所以GET和POST的底层也是TCP/IP，也就是说，GET/POST都是TCP链接。<br>GET和POST能做的事情是一样一样的。你要给GET加上request body，给POST带上url参数，技术上是完全行的通的。<br>    • get产生一个tcp数据包，post产生两个数据包。<br>对于GET方式的请求，浏览器会把http header和data一并发送出去，服务器响应200（返回数据）；<br>而对于POST，浏览器先发送header，服务器响应100 continue，浏览器再发送data，服务器响应200 ok（返回数据）。</p>
+<p>也就是说，GET只需要汽车跑一趟就把货送到了，而POST得跑两趟，第一趟，先去和服务器打个招呼“嗨，我等下要送一批货来，你们打开门迎接我”，然后再回头把货送过去。</p>
+<p>因为POST需要两步，时间上消耗的要多一点，看起来GET比POST更有效。因此Yahoo团队有推荐用GET替换POST来优化网站性能。但这是一个坑！跳入需谨慎。为什么？</p>
+<ol>
+<li>GET与POST都有自己的语义，不能随便混用。</li>
+<li>据研究，在网络环境好的情况下，发一次包的时间和发两次包的时间差别基本可以无视。而在网络环境差的情况下，两次包的TCP在验证数据包完整性上，有非常大的优点。</li>
+<li>并不是所有浏览器都会在POST中发送两次包，Firefox就只发送一次。</li>
+</ol>
+<p>（1）web开发中 Post 和 Get 有哪些区别，各适合用于什么情况 ？<br>    一般向服务器请求数据资源用Get；<br>    向服务器发送处理数据用Post。</p>
+<p>（2）http协议中get、post的区别详解？<br> ① 功能差异：<br>    get ：获取数据，客户端去服务器端取数据。</p>
+<pre><code>post：提交数据，从客户端向服务器上传数据。
+</code></pre>
+<p>② 数据传输：<br>   get：通过URL里面加上参数去把数据传输给服务器端，然后服务器端根据发送过来参数返回对应内容。<br>   get把请求的数据拼接在URL后面，在地址栏里提交(长度受地址栏限制<br>   浏览器的地址栏会显示出来当前URL，get会把所有的数据放到url部分，数据会以明文显示对于用户来说是可见的，并且浏览器会有历史记录的功能。</p>
+<p>  post：URL唯一标识，通过唯一标识向唯一标识路径下提交一些数据，数据在Body部分放着不在URL里面，<br>  Post把所有请求的数据放到WebForm里Body里面提交给服务器，以表单的形式提交,服务器会把Body(消息主题)里面的数据存储到服务器端数据库。<br>  post会把所有的数据放到Body部分，这一部分是浏览器无法记录，地址栏也是无法直接发送一个post请求，post请求一般在页面里面通过form表单或者Ajax等方式发送一个请求给服务器端。post把所有数据放到Body部分对于用户来说是不可见的</p>
+<p>③ 安全性：post相对于get更安全。安全指的是是否会修改数据。<br>安全性：GET,HEAD 和 OPTIONS 均被认为是安全的方法，因为它们旨在实现对数据的获取，并不具有’边界效应(side effect)’<br>无论是get还是post如果传输的数据未经过加密，通过第三方抓包工具依然是可以把数据抓取到的，一旦抓取到数据还是可以看到传输的数据内容都包含哪些。<br>为了保证传输的内容安全，一般对关键信息或者敏感信息都会采用这种加密的形式。<br>GET 方法是从指定的资源请求数据<br>GET 请求可被缓存<br>GET 请求保留在浏览器历史记录中<br>GET 请求可被收藏为书签<br>GET 请求不应在处理敏感数据时使用<br>GET 请求有长度限制GET 请求只应当用于取回数据</p>
+<p>POST 方法向指定资源提交要被处理的数据<br>POST 请求不会被缓存<br>POST 请求不会保留在浏览器历史记录中<br>POST 不能被收藏为书签</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/io-duo-lu-fu-yong/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/io-duo-lu-fu-yong/" class="post-title-link" itemprop="url">HTML</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-04-05 14:11:43" itemprop="dateModified" datetime="2021-04-05T14:11:43Z">2021-04-05</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Markdown/" itemprop="url" rel="index"><span itemprop="name">Markdown</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>Unix网络编程中提到了5种网络模型</p>
+<ul>
+<li>Blocking IO 阻塞式IO，一次只能处理一个请求。</li>
+<li>Noblocking IO 非阻塞式IO</li>
+<li>IO multiplexing IO多路复用（高并发框架使用）</li>
+<li>Signal Driven IO 信号驱动的IO</li>
+<li>Asynchronous IO 异步IO</li>
+</ul>
+<p>现在服务器基本使用 IO多路复用，实现单进程同时处理多个 socket 请求。</p>
+<h3 id="IO多路复用？"><a href="#IO多路复用？" class="headerlink" title="IO多路复用？"></a>IO多路复用？</h3><p>IO多路复用就是操作系统提供的同时监听多个 socket 的机制</p>
+<ul>
+<li>为了实现高并发需要一种机制并发处理多个 socket</li>
+<li>Linux 常见的是 select / poll / epoll 系统调用</li>
+<li>可以使用单线程单进程处理多个 socket<br>为什么 select 就能实现高并发呢？<br>select 可以同时处理多个 socket，有一个就绪应用程序代码就可以处理它<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 使用IO复用代码格式</span></span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    events = sel.select()    <span class="comment"># 系统阻塞在select，直到有一个socket就绪</span></span><br><span class="line">    <span class="keyword">for</span> key,mask <span class="keyword">in</span> events:   <span class="comment"># 当socket就绪之后就遍历事件</span></span><br><span class="line">        callback = key.data</span><br><span class="line">        callback(key.fileobj, mask)</span><br></pre></td></tr></tbody></table></figure>
+
+</li>
+</ul>
+<p>重点是索引就绪文件的时间复杂度，一般优先使用epoll,O(1)</p>
+<p>Python 封装了操作系统的IO多路复用<br>Python 的IO多路复用基于操作系统实现( select / poll / epoll )<br>Python2 select 模块<br>Python3 selectors 模块<br>selectors模块<br>事件类型: </p>
+<ul>
+<li>EVENT_READ 表示socket可读，</li>
+<li>EVENT_WRITE 表示socket可写</li>
+</ul>
+<p>Default selector:自动根据平台选取合适的o模型</p>
+<ul>
+<li>register(fileobj, events, data=None)</li>
+<li>unregister(fileobj)</li>
+<li>modify(fileobj, events, data=None)</li>
+<li>select(timeout=None): returns[(key, events)]</li>
+<li>close()</li>
+</ul>
+<p>下面是一个简单的echo服务器实现 ：异步的TCP回显,它能够并发的处理客户端请求，把客户端发的再发回去，这就是TCP回显服务器。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> selectors</span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"> </span><br><span class="line">sel = selectors.DefaultSelector()</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">accept</span>(<span class="params">sock, mask</span>):</span></span><br><span class="line">    conn, addr = sock.accept()  <span class="comment"># Should be ready</span></span><br><span class="line">    print(<span class="string">'accepted'</span>, conn, <span class="string">'from'</span>, addr)</span><br><span class="line">    conn.setblocking(<span class="literal">False</span>)</span><br><span class="line">    sel.register(conn, selectors.EVENT_READ, read)  <span class="comment"># 注册read回调</span></span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">read</span>(<span class="params">conn, mask</span>):</span></span><br><span class="line">    data = conn.recv(<span class="number">1000</span>)  <span class="comment"># Should be ready</span></span><br><span class="line">    <span class="keyword">if</span> data:</span><br><span class="line">        print(<span class="string">'echoing'</span>, repr(data), <span class="string">'to'</span>, conn)</span><br><span class="line">        conn.send(data)  <span class="comment"># Hope it won't block</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        print(<span class="string">'closing'</span>, conn)</span><br><span class="line">        sel.unregister(conn)</span><br><span class="line">        conn.close()</span><br><span class="line"> </span><br><span class="line"><span class="comment"># 服务端</span></span><br><span class="line">sock = socket.socket()</span><br><span class="line">sock.bind((<span class="string">'localhost'</span>, <span class="number">1234</span>))</span><br><span class="line">sock.listen(<span class="number">100</span>)</span><br><span class="line">sock.setblocking(<span class="literal">False</span>)</span><br><span class="line">sel.register(sock, selectors.EVENT_READ, accept) <span class="comment"># 注册accept回调</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:       <span class="comment"># 事件循环</span></span><br><span class="line">    events = sel.select()</span><br><span class="line">    <span class="keyword">for</span> key, mask <span class="keyword">in</span> events:</span><br><span class="line">        callback = key.data</span><br><span class="line">        callback(key.fileobj, mask)</span><br></pre></td></tr></tbody></table></figure><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -330,7 +586,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-02 12:24:46" itemprop="dateModified" datetime="2021-04-02T12:24:46Z">2021-04-02</time>
+        <time title="修改时间：2021-04-24 12:20:07" itemprop="dateModified" datetime="2021-04-24T12:20:07Z">2021-04-24</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -353,7 +609,8 @@
     
     <div class="post-body" itemprop="articleBody">
           <p>什么是 MVC模式？<br>mvc出现的意义就是解耦，比如：模型代表数据，视图代表展示层，控制器代表操作，<br>解耦数据、展示和操作。</p>
-<p>M=Mode 模型：负责业务对象和数据库的交互(ORM)。数据模型层，通常对数据加工和一些其它处理 ( 数据相关操作 )。<br>V=View 视图：负责与用户的交互展示，前端输出的内容,比如:颜色、文字、表单等等。视图层，跟用户交互的页面上东西。<br>一个视图的工作就是：从参数获取数据，装载一个模板，然后将根据获取的数据对模板进行渲染。<br>C= Controller控制器：起到粘合剂的作用，接收请求参数调用模型和视图完成请求，实现的功能,比如:加减乘除、增删改写。业务处理层，处理业务逻辑。</p>
+<p>M=Mode 模型：负责业务对象和数据库的交互(ORM)。数据模型层，通常对数据加工和一些其它处理 ( 数据相关操作 )。<br>V=View 视图：负责与用户的交互展示，前端输出的内容,比如:颜色、文字、表单等等。视图层，跟用户交互的页面上东西。<br>一个视图的工作就是：从参数获取数据，装载一个HTML页面模板，然后将根据获取的数据对模板进行渲染。<br>C= Controller控制器：起到粘合剂的作用，接收请求参数调用模型和视图完成请求，C进行处理，与M和V进行交互，返回应答，实现的功能,比如:加减乘除、增删改写。业务处理层，处理业务逻辑。</p>
+<p>M:model，模型，和MVC中M功能相同，和数据库进行交互<br>V：view，视图，和MVC中C功能相同，接受请求，进行处理，和M和T进行交互，返回应答<br>T：Template模板，和MVC中V功能相同，产生HTML页面</p>
 <p>&nbsp; &nbsp; &nbsp;图解：典型的一个web框架使用MVC模式怎么处理请求。首先用户在浏览器输入url之后，后端web框架通过url的routes，寻找url匹配之后调用那个controller，在controller通过model跟数据库一个交互，然后通过调用view层去展示逻辑这里一般指模板渲染。但随着现在这种前后分离比较流行之后，视图层只是做序列化的工作。</p>
 <h3 id="ORM-Object-Relational-Mapping，对象关系映射"><a href="#ORM-Object-Relational-Mapping，对象关系映射" class="headerlink" title="ORM Object Relational Mapping，对象关系映射"></a>ORM Object Relational Mapping，对象关系映射</h3><p>&nbsp; &nbsp;用于实现业务对象与数据表中的字段映射 ，比较流行 Sqlalchemy / Django自带的 Django ORM / 轻量级Peewee 。<br>优势：代码更加面向对象面向对象的编程思想，代码量更少，灵活性高，方便扩充，提升开发效率。<br>◆少写(几乎不写)SQL,提升开发效率<br>◆支持多种类型的数据库,方便切换<br>◆ORM技术成熟,能解决绝大部分问题</p>
 <p>缺点：拼接对象比较耗时，有一定性能影响<br>一般都是优先使用 ORM 框架提升开发效率和可维护性</p>
@@ -434,7 +691,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-23 07:33:34" itemprop="dateModified" datetime="2021-04-23T07:33:34Z">2021-04-23</time>
+        <time title="修改时间：2021-04-24 03:36:53" itemprop="dateModified" datetime="2021-04-24T03:36:53Z">2021-04-24</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -486,7 +743,7 @@
 <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> subprocess</span><br><span class="line">cmd = <span class="string">'ping www.baidu.com'</span></span><br><span class="line">screenData = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=<span class="literal">True</span>)</span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    line = screenData.stdout.readline()</span><br><span class="line">    print(line.decode(<span class="string">'gbk'</span>).strip(<span class="string">"b'"</span>))</span><br><span class="line">    <span class="keyword">if</span> line == <span class="string">b''</span> <span class="keyword">or</span> subprocess.Popen.poll(screenData) == <span class="number">0</span>:</span><br><span class="line">        screenData.stdout.close()</span><br><span class="line">        <span class="keyword">break</span></span><br></pre></td></tr></tbody></table></figure>
 
 <h2 id="非阻塞式调用其它程序"><a href="#非阻塞式调用其它程序" class="headerlink" title="非阻塞式调用其它程序"></a>非阻塞式调用其它程序</h2><p>调用 os.system 和 subprocess.check_output 时，都会等待该程序退出后，才会继续执行后续的代码。</p>
-<p>如果我们的Python程序本身并不需要等待外部程序结束。 比如，我们启动 wget下载命令， 下载1个文件。让它下载就可以了， 然后我们的程序还要继续去做其他的任务。 这时候， 我们就不能用os.system， 因为它会等待 外部程序结束。 我们可以用subprocess里面的Popen，</p>
+<p>如果我们的Python程序本身并不需要等待外部程序结束。 比如，我们启动 <code>wget</code> 下载命令， 下载1个文件。让它下载就可以了， 然后我们的程序还要继续去做其他的任务。 这时候， 我们就不能用<code>os.system</code>， 因为它会等待 外部程序结束。 我们可以用<code>subprocess</code>里面的<code>Popen</code>，</p>
 <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">print(dir(os))</span><br><span class="line"><span class="comment"># &lt;returns a list of all module functions&gt;</span></span><br><span class="line"></span><br><span class="line">print(help(os))</span><br><span class="line"><span class="comment"># &lt;returns an extensive manual page created from the module's docstrings&gt;</span></span><br></pre></td></tr></tbody></table></figure>
 
 <p><code>os.path</code> </p>
@@ -1164,224 +1421,8 @@
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/tcp-socket-bian-cheng/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/tcp-socket-bian-cheng/" class="post-title-link" itemprop="url">TCP socket 编程原理</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-02 12:24:45" itemprop="dateModified" datetime="2021-04-02T12:24:45Z">2021-04-02</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h3 id="了解TCP-socket-编程原理"><a href="#了解TCP-socket-编程原理" class="headerlink" title="了解TCP socket 编程原理"></a>了解TCP socket 编程原理</h3><p>如何使用 socket 模块<br>如何建立TCP socket 客户端和服务端<br>客户端和服务端之间的通信</p>
-<p>本质传输字节。所有网络通信都基于socket</p>
-<p>socket建立连接的过程？<br>服务器建立监听，socket，bind，listen<br>客户端发送请求，connect，send<br>连接确认，accept，response</p>
-<p>首先在服务器端建立监听；然后客户端发起连接，同时发送数据( request )；<br>服务器端收到连接请求之后accept接受建立连接，同时对发送过来的请求做出响应( response)。</p>
-<p>服务端要先启动，然后再启动客户端。<br>不要在ide里同时执行服务端和客户端，<br>如果你在同一个IDEL里开服务和客户端就会出那个问题，<br>因为开一个就要把另一个停了。<br>最好打开两个cmd窗口，以此执行服务端和客户端。<br>两个程序都执行才有结果，通信两个人都接受发送信息</p>
-<p>编写代码与网络交互的时候都需要把参数变成字节，处理的时候都需要转换成Unicode(py3为str)</p>
-<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 客户端 tcp_server.py</span></span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建socket对象，第一个参数协议族，第二个参数是类型，TCP还是UDP</span></span><br><span class="line"><span class="comment"># AF_INET是IPV4，SOCK_STREAM是TCP</span></span><br><span class="line">s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)</span><br><span class="line"><span class="comment"># 连接服务端</span></span><br><span class="line">s.connect((<span class="string">"127.0.0.1"</span>, <span class="number">6666</span>))  <span class="comment"># 参数是一个tuple对象,ip和端口</span></span><br><span class="line"><span class="comment"># 发送数据</span></span><br><span class="line">s.sendall(<span class="string">b'Hello World'</span>)</span><br><span class="line"><span class="comment"># 接收数据</span></span><br><span class="line">data = s.recv(<span class="number">1024</span>)  <span class="comment"># 1024字节数</span></span><br><span class="line">print(data.decode())</span><br><span class="line"><span class="comment"># 关闭客户端</span></span><br><span class="line">s.close()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 客户端输出结果：</span></span><br><span class="line"><span class="comment"># Tue Dec 15 11:54:43 2020</span></span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 服务端 tcp_client.py</span></span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建socket对象</span></span><br><span class="line">s = socket.socket()</span><br><span class="line"><span class="comment"># 绑定端口</span></span><br><span class="line">s.bind((<span class="string">"127.0.0.1"</span>, <span class="number">6666</span>))  <span class="comment"># 参数是一个tuple对象，hostname和port</span></span><br><span class="line"><span class="comment"># s.bind(("DESKTOP-3VCRA3T", 6666))  # 参数是一个tuple对象，hostname和port</span></span><br><span class="line"><span class="comment"># 监听</span></span><br><span class="line">s.listen()</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    <span class="comment"># 如果请求到来就接受</span></span><br><span class="line">    client, addr = s.accept()  <span class="comment"># return conn, addr</span></span><br><span class="line">    print(client)</span><br><span class="line">    timestr = time.ctime(time.time()) + <span class="string">'\r\n'</span>  <span class="comment"># 返回当前的时间戳</span></span><br><span class="line">    <span class="comment"># 发送数据</span></span><br><span class="line">    client.send(timestr.encode())  <span class="comment"># 把send 里面参数encode('utf8')成字节</span></span><br><span class="line">    <span class="comment"># 关闭socket</span></span><br><span class="line">    client.close()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 服务端输出结果：</span></span><br><span class="line"><span class="comment"># &lt;socket.socket fd=344, family=AddressFamily.AF_INET, </span></span><br><span class="line"><span class="comment"># type=SocketKind.SOCK_STREAM, proto=0, </span></span><br><span class="line"><span class="comment"># laddr=('127.0.0.1', 6666), raddr=('127.0.0.1', 51620)&gt;</span></span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> socket  <span class="comment"># 导入 socket 模块</span></span><br><span class="line"></span><br><span class="line">s = socket.socket()  <span class="comment"># 创建 socket 对象</span></span><br><span class="line">host = socket.gethostname()  <span class="comment"># 获取本地主机名</span></span><br><span class="line">print(<span class="string">'当前主机名称为: '</span> + host)</span><br><span class="line">port = <span class="number">42683</span>  <span class="comment"># 设置端口</span></span><br><span class="line">s.bind((host, port))  <span class="comment"># 绑定端口</span></span><br><span class="line"></span><br><span class="line">s.listen(<span class="number">5</span>)  <span class="comment"># 监听连接,传入连接请求的最大数5</span></span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    c, addr = s.accept()  <span class="comment"># 建立客户端连接。</span></span><br><span class="line">    print(<span class="string">'连接地址：'</span>, addr)</span><br><span class="line">    data = <span class="string">'hello word,你好，世界！'</span></span><br><span class="line">    c.send(data.encode())</span><br><span class="line">    c.close()  <span class="comment"># 关闭连接</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 当前主机名称为: DESKTOP-3VCRA3T</span></span><br><span class="line"><span class="comment"># 连接地址： ('192.168.110.248', 50733)</span></span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> socket  <span class="comment"># 导入 socket 模块</span></span><br><span class="line"></span><br><span class="line">s = socket.socket()  <span class="comment"># 创建 socket 对象</span></span><br><span class="line">host = socket.gethostname()  <span class="comment"># 获取本地主机名</span></span><br><span class="line">port = <span class="number">42683</span>  <span class="comment"># 设置端口号</span></span><br><span class="line"></span><br><span class="line">s.connect((host, port))</span><br><span class="line">print(s.recv(<span class="number">1024</span>).decode())</span><br><span class="line">s.close()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 输出</span></span><br><span class="line"><span class="comment"># hello word,你好，世界！</span></span><br></pre></td></tr></tbody></table></figure>
-
-<h3 id="如何使用-socket-发送HTTP请求"><a href="#如何使用-socket-发送HTTP请求" class="headerlink" title="如何使用 socket 发送HTTP请求"></a>如何使用 socket 发送HTTP请求</h3><p>使用 socket 接口发送 HTTP请求</p>
-<p>HTTP建立在TCP基础之上的一个应用层协议</p>
-<p>HTTP是基于文本的协议<br>发送GET请求的数据格式：</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socket.sendall(<span class="string">b'GET /index/?name=aa&amp;sex=bb http1.1\r\nAccept:text/html\r\nAccept-Encoding:gzip, deflate\r\n\r\n'</span>)</span><br></pre></td></tr></tbody></table></figure>
-<p>浏览器发送POST请求的数据格式：POST请求也可以在url上传参</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">​socket.sendall(<span class="string">b'GET /index/?name=aa&amp;sex=bb http1.1\r\nAccept:text/html\r\nAccept-Encoding:gzip, deflate\r\n\r\na1=1&amp;a2=2&amp;a3=3'</span>)</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># socket_send_http.py</span></span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"> </span><br><span class="line">s = socket.socket()</span><br><span class="line"><span class="comment"># 连接到百度的主机</span></span><br><span class="line">s.connect((<span class="string">'www.baidu.com'</span>, <span class="number">80</span>))</span><br><span class="line"><span class="comment"># 发送HTTP请求体</span></span><br><span class="line">http = <span class="string">b"GET / HTTP/1.1\r\nHost: www.baidu.com\r\n\r\n"</span></span><br><span class="line">s.sendall(http)</span><br><span class="line"><span class="comment"># 接收响应内容</span></span><br><span class="line">buf = s.recv(<span class="number">1024</span>)</span><br><span class="line">print(buf)</span><br><span class="line"><span class="comment"># 关闭socket</span></span><br><span class="line">s.close()</span><br></pre></td></tr></tbody></table></figure>
-<p>输出内容：</p>
-<figure class="highlight apache"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">b</span>'HTTP/<span class="number">1</span>.<span class="number">1</span> <span class="number">200</span> OK\r\nAccept-Ranges: bytes\r\nCache-Control: no-cache\r\nConnection: keep-alive\r\nContent-Length: <span class="number">14615</span>\r\nContent-Type: text/html\r\nDate: </span><br><span class="line"><span class="attribute">Tue</span>, <span class="number">15</span> Dec <span class="number">2020</span> <span class="number">14</span>:<span class="number">44</span>:<span class="number">38</span> GMT\r\nP<span class="number">3</span>p: CP=<span class="string">" OTI DSP COR IVA OUR IND COM "</span>\r\nP<span class="number">3</span>p: CP=<span class="string">" OTI DSP COR IVA OUR IND COM "</span>\r\nPragma: no-cache\r\nServer: BWS/<span class="number">1</span>.<span class="number">1</span>\r\nSet-Cookie: BAIDUID=DF<span class="number">34</span>EFEBEB<span class="number">41</span>F<span class="number">49</span>B<span class="number">4169</span>B<span class="number">86013</span>EDC<span class="number">8</span>FA:FG=<span class="number">1</span>; expires=Thu, <span class="number">31</span>-Dec-<span class="number">37</span> <span class="number">23</span>:<span class="number">55</span>:<span class="number">55</span> GMT; max-age=<span class="number">2147483647</span>; path=/; domain=.baidu.com\r\nSet-Cookie: BIDUPSID=DF<span class="number">34</span>EFEBEB<span class="number">41</span>F<span class="number">49</span>B<span class="number">4169</span>B<span class="number">86013</span>EDC<span class="number">8</span>FA; expires=Thu, <span class="number">31</span>-Dec-<span class="number">37</span> <span class="number">23</span>:<span class="number">55</span>:<span class="number">55</span> GMT; max-age=<span class="number">2147483647</span>; path=/; domain=.baidu.com\r\nSet-Cookie: PSTM=<span class="number">1608043478</span>; expires=Thu, <span class="number">31</span>-Dec-<span class="number">37</span> <span class="number">23</span>:<span class="number">55</span>:<span class="number">55</span> GMT; max-age=<span class="number">2147483647</span>; path=/; domain=.baidu.com\r\nSet-Cookie: BAIDUID=DF<span class="number">34</span>EFEBEB<span class="number">41</span>F<span class="number">49</span>B<span class="number">93</span>C<span class="number">5</span>DFE<span class="number">6</span>A<span class="number">700898</span>F:FG=<span class="number">1</span>; max-age=<span class="number">31536000</span>; expires=Wed, <span class="number">15</span>-Dec-<span class="number">21</span> <span class="number">14</span>:<span class="number">44</span>:<span class="number">38</span> GMT; domain=.baidu.com; path=/; version=<span class="number">1</span>; comment=bd\r\nTraceid: <span class="number">1608043478045537332210543503774960632313</span>\r\nVary: Accept-Encoding\r\nX-Ua-Compatible: IE=Edge,chrome=<span class="number">1</span>\r\n\r\n&lt;!DOCTYPE html&gt;&lt;!--STATUS OK--&gt;\r\n&lt;html&gt;\r\n&lt;head&gt;\r\n\t&lt;meta http-equ'</span><br></pre></td></tr></tbody></table></figure>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/url/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/url/" class="post-title-link" itemprop="url">URL Uniform Resource Locator</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-02 12:24:45" itemprop="dateModified" datetime="2021-04-02T12:24:45Z">2021-04-02</time>
-      </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>URL Uniform Resource Locator 统一资源定位符）是对可以从互联网上得到对资源位置和访问方法对一种简洁的表示，是互联网上标准资源的地址。<br>⼀般统⼀资源定位符的开始标志着⼀个计算机⽹络所使⽤的⽹络协议<br>互联网上的每个文件都有一个唯一的URL，且⼀个URL指向⼀个数据资源⽂件的路径</p>
-<p>URL是通过HTTP协议存取资源的Internet路径，</p>
-<p>URL是URI的子集，URI还包括URN，在互联网中，我们一般的网页链接、网址可以被称为URL或者URI，大多数人称为URL。</p>
-<p>基本URL包含模式（或称协议）、服务器名称（或IP地址）、文件所在路径和文件名<br><code>scheme://host[:port#]/path/.…/[;url-params][?query-string][#anchor]</code></p>
-<p>URL格式 <code>http://host[:port][path]</code></p>
-<p>host：合法的Internet主机域名或IP地址<br>port：端口号，缺省端口为80<br>path：请求资源的路径</p>
-<p>代理服务器位于客户端和真正的服务器之间，充当一个中间人的角色。当跟客户端交互的时候，是服务器。跟服务器交互的时候，又充当客户端，</p>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/5/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/page/7/">7</a><span class="space">&hellip;</span><a class="page-number" href="/page/20/">20</a><a class="extend next" rel="next" href="/page/7/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/5/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/page/7/">7</a><span class="space">&hellip;</span><a class="page-number" href="/page/21/">21</a><a class="extend next" rel="next" href="/page/7/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 <script src="/js/comments.js"></script>
 </div>

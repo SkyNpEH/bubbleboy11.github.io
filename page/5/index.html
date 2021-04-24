@@ -118,7 +118,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">200</span>
+          <span class="site-state-item-count">204</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -158,6 +158,214 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/04/02/lu-you-wang-qu-xiao-ding-dan-jie-kou-lian-diao/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/04/02/lu-you-wang-qu-xiao-ding-dan-jie-kou-lian-diao/" class="post-title-link" itemprop="url">旅游网取消订单接口联调</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-04-01 22:51:44" itemprop="dateCreated datePublished" datetime="2021-04-01T22:51:44Z">2021-04-01</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-04-02 12:24:45" itemprop="dateModified" datetime="2021-04-02T12:24:45Z">2021-04-02</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%97%85%E6%B8%B8%E7%BD%91%E9%A1%B9%E7%9B%AE/" itemprop="url" rel="index"><span itemprop="name">旅游网项目</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="取消订单接口联调"><a href="#取消订单接口联调" class="headerlink" title="取消订单接口联调"></a>取消订单接口联调</h1><h4 id="实现步骤"><a href="#实现步骤" class="headerlink" title="实现步骤"></a>实现步骤</h4><ul>
+<li>第一步，完成页面间的跳转<br>从我的订单列表页面跳转到待支付的页面，<br>在我的订单页面判断订单状态是否是待支付状态有去支付按钮，，点击后弹框跳转时候绑定事件，</li>
+</ul>
+<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;!-- 我的订单列表页面 --&gt;</span><br><span class="line">  &lt;div class="page-order-list"&gt;</span><br><span class="line">    &lt;!-- 订单记录 --&gt;</span><br><span class="line">    &lt;div class="order-list"&gt;</span><br><span class="line">      &lt;div class="order-item" v-for="item in dataList" :key="item.sn"&gt;</span><br><span class="line">        &lt;div class="order-footer"&gt;</span><br><span class="line">          &lt;van-button round size="small" type="warning"</span><br><span class="line">            v-if="item.status == constants.ORDER_STATUS_PAY"</span><br><span class="line">            @click="goPay(item)"&gt;去支付&lt;/van-button&gt;</span><br><span class="line">        &lt;/div&gt;</span><br><span class="line">      &lt;/div&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">export default {</span><br><span class="line">  data () {</span><br><span class="line">    return {</span><br><span class="line">      status: 0,</span><br><span class="line">      // 订单列表</span><br><span class="line">      dataList: [],</span><br><span class="line">      constants</span><br><span class="line">    }</span><br><span class="line">  },</span><br><span class="line">  methods: {</span><br><span class="line">    /**</span><br><span class="line">     * 跳转到支付页面</span><br><span class="line">     */</span><br><span class="line">    goPay (item) {</span><br><span class="line">      this.$router.push({name: 'OrderPay', params: {sn: item.sn}})</span><br><span class="line">    },</span><br><span class="line">    /**</span><br><span class="line">     * tab点击之后，重新去获取数据</span><br><span class="line">     */</span><br><span class="line">    tabChange (name, value) {</span><br><span class="line">      console.log(name, value)</span><br><span class="line">      this.$router.push({name: 'OrderList', params: { status: name }})</span><br><span class="line">    },</span><br><span class="line"></span><br><span class="line">}</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></tbody></table></figure>
+
+<ul>
+<li><p>第二步，配置接口地址及请求参数<br>右上角点击取消订单按钮，点击确认把订单在数据库中做，该订单不会再我的订单页面显示，</p>
+</li>
+<li><p>第三步，处理数据返回，给用户一个提示，取消订单成功<br>状态码是201则已经取消成功，是201则已经被取消一次了，不能重复取消且有弹框<br><code>src\views\order\Pay.vue</code></p>
+<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;!-- 订单确认及支付 --&gt;</span><br><span class="line">    &lt;!-- 顶部导航 --&gt;</span><br><span class="line">    &lt;van-nav-bar</span><br><span class="line">      right-text="取消订单"</span><br><span class="line">      @click-right="onCancelOrder"</span><br><span class="line">    /&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import { OrderApis } from '@/utils/apis'</span><br><span class="line">import { ajax } from '@/utils/ajax'</span><br><span class="line">import * as constants from '@/utils/constants'</span><br><span class="line">export default {</span><br><span class="line">  data () {</span><br><span class="line">    return {</span><br><span class="line">      // 订单的流水号</span><br><span class="line">      sn: '',</span><br><span class="line">      // 订单的信息</span><br><span class="line">      orderDetail: {}</span><br><span class="line">    }</span><br><span class="line">  },</span><br><span class="line">  methods: {</span><br><span class="line">    /**</span><br><span class="line">     * 取消订单</span><br><span class="line">     */</span><br><span class="line">    onCancelOrder () {</span><br><span class="line">      this.$dialog.confirm({</span><br><span class="line">        title: '温馨提示',</span><br><span class="line">        message: '确认取消该订单？'</span><br><span class="line">      }).then(() =&gt; {</span><br><span class="line">        const url = OrderApis.orderDetailUrl.replace('#{sn}', this.sn)</span><br><span class="line">        // put方式调用接口</span><br><span class="line">        ajax.put(url).then(res =&gt; {</span><br><span class="line">          console.log(res)</span><br><span class="line">          // 给用户提示</span><br><span class="line">          if (res.status === 201) {</span><br><span class="line">            this.$notify({</span><br><span class="line">              type: 'success',</span><br><span class="line">              message: '订单已成功取消'</span><br><span class="line">            })</span><br><span class="line">          } else if (res.status === 200) {</span><br><span class="line">            this.$notify({</span><br><span class="line">              type: 'warning',</span><br><span class="line">              message: '订单已被取消，请勿重复操作'</span><br><span class="line">            })</span><br><span class="line">          }</span><br><span class="line">          // 回到上一个我的订单页面</span><br><span class="line">          this.$router.go(-1)</span><br><span class="line">        })</span><br><span class="line">      })</span><br><span class="line">    }</span><br><span class="line">  }</span><br><span class="line">}</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></tbody></table></figure>
+</li>
+</ul>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/04/02/lu-you-wang-ding-dan-xiang-xi-xin-xi-ye-mian-de-zhan-shi/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/04/02/lu-you-wang-ding-dan-xiang-xi-xin-xi-ye-mian-de-zhan-shi/" class="post-title-link" itemprop="url">旅游网订单详细信息页面的展示</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-04-01 22:51:44" itemprop="dateCreated datePublished" datetime="2021-04-01T22:51:44Z">2021-04-01</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-04-02 12:24:45" itemprop="dateModified" datetime="2021-04-02T12:24:45Z">2021-04-02</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%97%85%E6%B8%B8%E7%BD%91%E9%A1%B9%E7%9B%AE/" itemprop="url" rel="index"><span itemprop="name">旅游网项目</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>我的订单中的订单详细信息页面的展示。<br>1、 点击全部订单可以跳转到我的订单页面，包括所有的订单，点击订单详情可以跳转到订单详情页，<br>该页面中包括导航条(包括返回按钮及当前订单的状态)、订单信息(包括订单号和下单时间)、订单明细(包括下单的商品快照，会显示商品图片、商品标题、数量、价格及备注信息)、订单总计(总共几件商品及价格合计)、对应的按钮</p>
+<p>实现订单详细信息接口<br> 实现订单详细信息页面<br> 完成订单详细信息页面展示<br> 实现页面间的跳转、订单删除功能</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1106,264 +1314,8 @@
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/http-fang-fa/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/http-fang-fa/" class="post-title-link" itemprop="url">HTTP 方法</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-02 12:24:45" itemprop="dateModified" datetime="2021-04-02T12:24:45Z">2021-04-02</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">计算机网络</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>常见的 HTTP 方法、接口的分类： </p>
-<p>GET 请求</p>
-<ul>
-<li>可以用浏览器直接访问</li>
-<li>请求参数直接放在URL后面，明文传递</li>
-</ul>
-<p>POST请求</p>
-<ul>
-<li>不能使用浏览器直接访问</li>
-<li>可以用来上传文件、登录注册等需求</li>
-<li>通过 request body传递参数，加密传递数据</li>
-</ul>
-<p>幂等性(Idempotent): 是一个数学上的概念，在这里表示发送一次和多次请求引起的边界效应是一致的，<br>幂等方法是无论调用多少次都得到相同请求结果的 HTTP 方法<br>幂等的方法客户端可以安全地重新请求，因为不会对服务器上的数据造成什么影响。<br>例如：a = 4 是幂等的，但是 a += 4 就是非幂等的</p>
-<p>GET 是幂等的，就是对服务器没有副作用；POST 非幂等，就是每一次创建一个新的东西会影响数据库的数据。<br>    • GET请求参数放到url(明文显示)，长度限制，没有请求体；POST放在Http报文实体的主体请求体，更安全。<br>    post请求携带的数据量比get请求大，多，常用于传输大文本的时候<br>    • get请求所包含的参数会被缓存(浏览器cache)，而post不会<br>    • get的url能被存为标签，post不会<br>    • get只能被url编码，而post可以被多种编码<br>    • get只接受ASCII字符，而post没有限制<br>    • get后退无害，而post后退会再次发送请求</p>
-<p>高级区别：<br>HTTP的底层是TCP/IP。所以GET和POST的底层也是TCP/IP，也就是说，GET/POST都是TCP链接。<br>GET和POST能做的事情是一样一样的。你要给GET加上request body，给POST带上url参数，技术上是完全行的通的。<br>    • get产生一个tcp数据包，post产生两个数据包。<br>对于GET方式的请求，浏览器会把http header和data一并发送出去，服务器响应200（返回数据）；<br>而对于POST，浏览器先发送header，服务器响应100 continue，浏览器再发送data，服务器响应200 ok（返回数据）。</p>
-<p>也就是说，GET只需要汽车跑一趟就把货送到了，而POST得跑两趟，第一趟，先去和服务器打个招呼“嗨，我等下要送一批货来，你们打开门迎接我”，然后再回头把货送过去。</p>
-<p>因为POST需要两步，时间上消耗的要多一点，看起来GET比POST更有效。因此Yahoo团队有推荐用GET替换POST来优化网站性能。但这是一个坑！跳入需谨慎。为什么？</p>
-<ol>
-<li>GET与POST都有自己的语义，不能随便混用。</li>
-<li>据研究，在网络环境好的情况下，发一次包的时间和发两次包的时间差别基本可以无视。而在网络环境差的情况下，两次包的TCP在验证数据包完整性上，有非常大的优点。</li>
-<li>并不是所有浏览器都会在POST中发送两次包，Firefox就只发送一次。</li>
-</ol>
-<p>（1）web开发中 Post 和 Get 有哪些区别，各适合用于什么情况 ？<br>    一般向服务器请求数据资源用Get；<br>    向服务器发送处理数据用Post。</p>
-<p>（2）http协议中get、post的区别详解？<br> ① 功能差异：<br>    get ：获取数据，客户端去服务器端取数据。</p>
-<pre><code>post：提交数据，从客户端向服务器上传数据。
-</code></pre>
-<p>② 数据传输：<br>   get：通过URL里面加上参数去把数据传输给服务器端，然后服务器端根据发送过来参数返回对应内容。<br>   get把请求的数据拼接在URL后面，在地址栏里提交(长度受地址栏限制<br>   浏览器的地址栏会显示出来当前URL，get会把所有的数据放到url部分，数据会以明文显示对于用户来说是可见的，并且浏览器会有历史记录的功能。</p>
-<p>  post：URL唯一标识，通过唯一标识向唯一标识路径下提交一些数据，数据在Body部分放着不在URL里面，<br>  Post把所有请求的数据放到WebForm里Body里面提交给服务器，以表单的形式提交,服务器会把Body(消息主题)里面的数据存储到服务器端数据库。<br>  post会把所有的数据放到Body部分，这一部分是浏览器无法记录，地址栏也是无法直接发送一个post请求，post请求一般在页面里面通过form表单或者Ajax等方式发送一个请求给服务器端。post把所有数据放到Body部分对于用户来说是不可见的</p>
-<p>③ 安全性：post相对于get更安全。安全指的是是否会修改数据。<br>安全性：GET,HEAD 和 OPTIONS 均被认为是安全的方法，因为它们旨在实现对数据的获取，并不具有’边界效应(side effect)’<br>无论是get还是post如果传输的数据未经过加密，通过第三方抓包工具依然是可以把数据抓取到的，一旦抓取到数据还是可以看到传输的数据内容都包含哪些。<br>为了保证传输的内容安全，一般对关键信息或者敏感信息都会采用这种加密的形式。<br>GET 方法是从指定的资源请求数据<br>GET 请求可被缓存<br>GET 请求保留在浏览器历史记录中<br>GET 请求可被收藏为书签<br>GET 请求不应在处理敏感数据时使用<br>GET 请求有长度限制GET 请求只应当用于取回数据</p>
-<p>POST 方法向指定资源提交要被处理的数据<br>POST 请求不会被缓存<br>POST 请求不会保留在浏览器历史记录中<br>POST 不能被收藏为书签</p>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/io-duo-lu-fu-yong/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/io-duo-lu-fu-yong/" class="post-title-link" itemprop="url">HTML</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-05 14:11:43" itemprop="dateModified" datetime="2021-04-05T14:11:43Z">2021-04-05</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Markdown/" itemprop="url" rel="index"><span itemprop="name">Markdown</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>Unix网络编程中提到了5种网络模型</p>
-<ul>
-<li>Blocking IO 阻塞式IO，一次只能处理一个请求。</li>
-<li>Noblocking IO 非阻塞式IO</li>
-<li>IO multiplexing IO多路复用（高并发框架使用）</li>
-<li>Signal Driven IO 信号驱动的IO</li>
-<li>Asynchronous IO 异步IO</li>
-</ul>
-<p>现在服务器基本使用 IO多路复用，实现单进程同时处理多个 socket 请求。</p>
-<h3 id="IO多路复用？"><a href="#IO多路复用？" class="headerlink" title="IO多路复用？"></a>IO多路复用？</h3><p>IO多路复用就是操作系统提供的同时监听多个 socket 的机制</p>
-<ul>
-<li>为了实现高并发需要一种机制并发处理多个 socket</li>
-<li>Linux 常见的是 select / poll / epoll 系统调用</li>
-<li>可以使用单线程单进程处理多个 socket<br>为什么 select 就能实现高并发呢？<br>select 可以同时处理多个 socket，有一个就绪应用程序代码就可以处理它<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 使用IO复用代码格式</span></span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    events = sel.select()    <span class="comment"># 系统阻塞在select，直到有一个socket就绪</span></span><br><span class="line">    <span class="keyword">for</span> key,mask <span class="keyword">in</span> events:   <span class="comment"># 当socket就绪之后就遍历事件</span></span><br><span class="line">        callback = key.data</span><br><span class="line">        callback(key.fileobj, mask)</span><br></pre></td></tr></tbody></table></figure>
-
-</li>
-</ul>
-<p>重点是索引就绪文件的时间复杂度，一般优先使用epoll,O(1)</p>
-<p>Python 封装了操作系统的IO多路复用<br>Python 的IO多路复用基于操作系统实现( select / poll / epoll )<br>Python2 select 模块<br>Python3 selectors 模块<br>selectors模块<br>事件类型: </p>
-<ul>
-<li>EVENT_READ 表示socket可读，</li>
-<li>EVENT_WRITE 表示socket可写</li>
-</ul>
-<p>Default selector:自动根据平台选取合适的o模型</p>
-<ul>
-<li>register(fileobj, events, data=None)</li>
-<li>unregister(fileobj)</li>
-<li>modify(fileobj, events, data=None)</li>
-<li>select(timeout=None): returns[(key, events)]</li>
-<li>close()</li>
-</ul>
-<p>下面是一个简单的echo服务器实现 ：异步的TCP回显,它能够并发的处理客户端请求，把客户端发的再发回去，这就是TCP回显服务器。</p>
-<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> selectors</span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"> </span><br><span class="line">sel = selectors.DefaultSelector()</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">accept</span>(<span class="params">sock, mask</span>):</span></span><br><span class="line">    conn, addr = sock.accept()  <span class="comment"># Should be ready</span></span><br><span class="line">    print(<span class="string">'accepted'</span>, conn, <span class="string">'from'</span>, addr)</span><br><span class="line">    conn.setblocking(<span class="literal">False</span>)</span><br><span class="line">    sel.register(conn, selectors.EVENT_READ, read)  <span class="comment"># 注册read回调</span></span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">read</span>(<span class="params">conn, mask</span>):</span></span><br><span class="line">    data = conn.recv(<span class="number">1000</span>)  <span class="comment"># Should be ready</span></span><br><span class="line">    <span class="keyword">if</span> data:</span><br><span class="line">        print(<span class="string">'echoing'</span>, repr(data), <span class="string">'to'</span>, conn)</span><br><span class="line">        conn.send(data)  <span class="comment"># Hope it won't block</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        print(<span class="string">'closing'</span>, conn)</span><br><span class="line">        sel.unregister(conn)</span><br><span class="line">        conn.close()</span><br><span class="line"> </span><br><span class="line"><span class="comment"># 服务端</span></span><br><span class="line">sock = socket.socket()</span><br><span class="line">sock.bind((<span class="string">'localhost'</span>, <span class="number">1234</span>))</span><br><span class="line">sock.listen(<span class="number">100</span>)</span><br><span class="line">sock.setblocking(<span class="literal">False</span>)</span><br><span class="line">sel.register(sock, selectors.EVENT_READ, accept) <span class="comment"># 注册accept回调</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:       <span class="comment"># 事件循环</span></span><br><span class="line">    events = sel.select()</span><br><span class="line">    <span class="keyword">for</span> key, mask <span class="keyword">in</span> events:</span><br><span class="line">        callback = key.data</span><br><span class="line">        callback(key.fileobj, mask)</span><br></pre></td></tr></tbody></table></figure><script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/20/">20</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/21/">21</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 <script src="/js/comments.js"></script>
 </div>

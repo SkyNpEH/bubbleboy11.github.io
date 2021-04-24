@@ -118,7 +118,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">200</span>
+          <span class="site-state-item-count">204</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -158,123 +158,6 @@
 
 
     <div class="main-inner index posts-expand">
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/04/19/django-sql-zhu-ru-xss/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/04/19/django-sql-zhu-ru-xss/" class="post-title-link" itemprop="url">django sql注入</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-04-18 17:46:44" itemprop="dateCreated datePublished" datetime="2021-04-18T17:46:44Z">2021-04-18</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-19 01:21:38" itemprop="dateModified" datetime="2021-04-19T01:21:38Z">2021-04-19</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p><code>system\urls.py</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">urlpatterns = [</span><br><span class="line">    <span class="comment"># 危险的SQL注入</span></span><br><span class="line">    path(<span class="string">'danger/sql/'</span>, views.danger_sql, name=<span class="string">"danger_sql"</span>),</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>system\views.py</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.db <span class="keyword">import</span> connection</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">danger_sql</span>(<span class="params">request</span>):</span></span><br><span class="line">    <span class="string">""" 危险的SQL注入</span></span><br><span class="line"><span class="string">    正常输入：</span></span><br><span class="line"><span class="string">    http://127.0.0.1:8000/system/danger/sql/?types=10</span></span><br><span class="line"><span class="string">    异常输入：</span></span><br><span class="line"><span class="string">    http://127.0.0.1:8000/system/danger/sql/?types=10' UNION select version(), database() -- ';</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    types = request.GET.get(<span class="string">'types'</span>, <span class="string">''</span>)</span><br><span class="line">    <span class="comment"># 1. 危险的写法</span></span><br><span class="line">    <span class="comment"># sql = "SELECT `name`, `img` FROM system_slider WHERE `types` ='{}';".format(types)</span></span><br><span class="line">    <span class="comment"># # sql = "SELECT `name`, `img` FROM system_slider WHERE `types` ='10' UNION select version(), database() -- ';';"</span></span><br><span class="line">    <span class="comment"># with connection.cursor() as c:</span></span><br><span class="line">    <span class="comment">#     c.execute(sql)</span></span><br><span class="line">    <span class="comment">#     data_list = c.fetchall()</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 2. 安全的写法</span></span><br><span class="line">    sql = <span class="string">"SELECT `name`, `img` FROM system_slider WHERE `types` =%s;"</span></span><br><span class="line">    <span class="keyword">with</span> connection.cursor() <span class="keyword">as</span> c:</span><br><span class="line">        c.execute(sql, (types, ))</span><br><span class="line">        data_list = c.fetchall()</span><br><span class="line">    <span class="keyword">return</span> render(request, <span class="string">'danger_sql.html'</span>, {<span class="string">'data_list'</span>: data_list})</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>system\templates\danger_sql.html</code></p>
-<figure class="highlight html"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">"en"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">title</span>&gt;</span>危险的SQL注入<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">h3</span>&gt;</span>查询的内容<span class="tag">&lt;/<span class="name">h3</span>&gt;</span></span><br><span class="line">  {% for item in data_list %}</span><br><span class="line">  <span class="tag">&lt;<span class="name">p</span>&gt;</span>{{ item }}<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">  {% endfor %}</span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure>
-
-
-
-<p><code>system\urls.py</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">urlpatterns = [</span><br><span class="line">    <span class="comment"># 跨站点脚本攻击</span></span><br><span class="line">    path(<span class="string">'danger/xss/'</span>, views.danger_xss, name=<span class="string">"danger_xss"</span>),</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>system\views.py</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">danger_xss</span>(<span class="params">request</span>):</span></span><br><span class="line">    <span class="string">""" 跨站点脚本攻击</span></span><br><span class="line"><span class="string">    输入测试：</span></span><br><span class="line"><span class="string">    &lt;script&gt;window.alert('你好');window.location.href='http://www.imooc.com';&lt;/script&gt;</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="keyword">if</span> request.method == <span class="string">'POST'</span>:</span><br><span class="line">        name = request.POST.get(<span class="string">'name'</span>, <span class="string">''</span>)</span><br><span class="line">        desc = request.POST.get(<span class="string">'desc'</span>, <span class="string">''</span>)</span><br><span class="line">        Slider.objects.create(name=name, desc=desc, img=<span class="string">'test.jpg'</span>)</span><br><span class="line">        <span class="keyword">return</span> redirect(<span class="string">'.'</span>)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        types = <span class="number">10</span></span><br><span class="line">        sql = <span class="string">"SELECT `name`, `img`, `desc` FROM system_slider WHERE `types` =%s;"</span></span><br><span class="line">        <span class="keyword">with</span> connection.cursor() <span class="keyword">as</span> c:</span><br><span class="line">            c.execute(sql, (types, ))</span><br><span class="line">            data_list = c.fetchall()</span><br><span class="line">    <span class="keyword">return</span> render(request, <span class="string">'danger_xss.html'</span>, {<span class="string">'data_list'</span>: data_list})</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>system\templates\danger_xss.html</code></p>
-<figure class="highlight html"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">"en"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">title</span>&gt;</span>危险的跨站点脚本攻击<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">h3</span>&gt;</span>内容输入<span class="tag">&lt;/<span class="name">h3</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">form</span> <span class="attr">action</span>=<span class="string">"."</span> <span class="attr">method</span>=<span class="string">"post"</span> <span class="attr">enctype</span>=<span class="string">"multipart/form-data"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span>&gt;</span>名称：<span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"name"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span>&gt;</span>描述：<span class="tag">&lt;<span class="name">textarea</span> <span class="attr">name</span>=<span class="string">"desc"</span> <span class="attr">cols</span>=<span class="string">"40"</span> <span class="attr">rows</span>=<span class="string">"10"</span>&gt;</span><span class="tag">&lt;/<span class="name">textarea</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span>&gt;</span><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"submit"</span> <span class="attr">value</span>=<span class="string">"提交"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">h3</span>&gt;</span>内容展示<span class="tag">&lt;/<span class="name">h3</span>&gt;</span></span><br><span class="line">{% for item in data_list %}</span><br><span class="line">  <span class="tag">&lt;<span class="name">p</span>&gt;</span>{{ item|safe|escape }}<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">  {% endfor %}</span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure>
-<p>  <code>&lt;p&gt;{{ item|safe|escape }}&lt;/p&gt;</code>改成  <code>&lt;p&gt;{{ item }}&lt;/p&gt;</code>才安全</p>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
 
     
 
@@ -368,6 +251,331 @@
 
 </li>
 </ol>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/04/19/linux-fang-huo-qiang-fu-wu-pei-zhi/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/04/19/linux-fang-huo-qiang-fu-wu-pei-zhi/" class="post-title-link" itemprop="url">linux 防火墙 服务配置</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-04-18 17:46:44" itemprop="dateCreated datePublished" datetime="2021-04-18T17:46:44Z">2021-04-18</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-04-24 13:04:37" itemprop="dateModified" datetime="2021-04-24T13:04:37Z">2021-04-24</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" itemprop="url" rel="index"><span itemprop="name">操作系统</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>防火墙选择让请求通过，从而保证网络安全性。</p>
+<p>在linux下配置</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">systemctl start firewalld.service</span><br><span class="line">systemctl stop firewalld.service</span><br><span class="line">systemctl restart firewalld.service</span><br><span class="line"></span><br><span class="line">firewall-cmd start 启动</span><br><span class="line">firewall-cmd stop 关闭</span><br><span class="line">firewall-cmd restart 重启</span><br><span class="line"></span><br><span class="line">firewall-cmd --version</span><br><span class="line">firewall-cmd --<span class="built_in">help</span></span><br><span class="line">firewall-cmd --state  查看</span><br></pre></td></tr></tbody></table></figure>
+
+<p>端口管理 </p>
+<p>开放端口 设置是一个范围，删除必须是一个范围  </p>
+<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">firewall-cmd --zone=public --add-port=3306/tcp --permanent</span><br><span class="line">firewall-cmd --zone=public --add-port=3306-3307/tcp --permanent </span><br><span class="line">firewall-cmd --add-port=3306/tcp --permanent  </span><br><span class="line">firewall-cmd --add-port=8080-8085/tcp --permanent </span><br></pre></td></tr></tbody></table></figure>
+
+<p>查询端口是否开放</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">firewall-cmd --query-port=3306/tcp</span><br></pre></td></tr></tbody></table></figure>
+
+<p>查看开发的端口</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">firewall-cmd --list-ports --permanent</span><br></pre></td></tr></tbody></table></figure>
+
+<p>移除3306端口</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">firewall-cmd --remove-port=3307/tcp --permanent</span><br><span class="line">firewall-cmd --remove-port=8080-8085/tcp --permanent</span><br></pre></td></tr></tbody></table></figure>
+
+<p>重启防火墙（修改配置后要重启加载设置）</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">firewall-cmd --reload</span><br></pre></td></tr></tbody></table></figure>
+
+<p>firewall-cmd –get-zones（查看所有区域）<br>firewall-cmd –get-default-zone（查看默认区域）<br>firewall-cmd –list-all-zone（查看所有区域配置信息）</p>
+<p>查询服务：firewall-cmd –zone=public（默认为此）–query-service=ssh<br>删除服务：firewall-cmd –zone=public（默认为此）–remove-service=ssh<br>添加服务：firewall-cmd –add-service=ssh<br>列出服务（service）：<br>firewall-cmd –list-services<br>firewall-cmd –list-services  –permanent 查看哪些程序使用互联网</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/04/19/web-xiang-mu-bu-shu/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/04/19/web-xiang-mu-bu-shu/" class="post-title-link" itemprop="url">web项目部署</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-04-18 17:46:44" itemprop="dateCreated datePublished" datetime="2021-04-18T17:46:44Z">2021-04-18</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-04-24 14:16:47" itemprop="dateModified" datetime="2021-04-24T14:16:47Z">2021-04-24</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>常见的部署方式</p>
+<ul>
+<li>nginx + gunicorn</li>
+<li>nginx + uwsgi</li>
+<li>docker</li>
+</ul>
+<h2 id="Web服务器nginx"><a href="#Web服务器nginx" class="headerlink" title="Web服务器nginx"></a>Web服务器nginx</h2><p>原理<br>静态文件(js/css/img) &lt;–&gt; nginx &lt;–&gt; 磁盘<br>动态请求  &lt;–&gt; nginx &lt;–&gt;  wsgi</p>
+<p>安装必备软件</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo yum install yum-utils</span><br><span class="line"><span class="built_in">cd</span> /etc/yum.repos.d/</span><br><span class="line">vim nginx.repo</span><br></pre></td></tr></tbody></table></figure>
+<p>进入交互模式 按i，复制下面内容</p>
+<figure class="highlight ini"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[nginx-stable]</span></span><br><span class="line"><span class="attr">name</span>=nginx stable repo</span><br><span class="line"><span class="attr">baseurl</span>=http://nginx.org/packages/centos/<span class="variable">$releasever</span>/<span class="variable">$basearch</span>/</span><br><span class="line"><span class="attr">gpgcheck</span>=<span class="number">1</span></span><br><span class="line"><span class="attr">enabled</span>=<span class="number">1</span></span><br><span class="line"><span class="attr">gpgkey</span>=https://nginx.org/keys/nginx_signing.key</span><br><span class="line"><span class="attr">module_hotfixes</span>=<span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="section">[nginx-mainline]</span></span><br><span class="line"><span class="attr">name</span>=nginx mainline repo</span><br><span class="line"><span class="attr">baseurl</span>=http://nginx.org/packages/mainline/centos/<span class="variable">$releasever</span>/<span class="variable">$basearch</span>/</span><br><span class="line"><span class="attr">gpgcheck</span>=<span class="number">1</span></span><br><span class="line"><span class="attr">enabled</span>=<span class="number">0</span></span><br><span class="line"><span class="attr">gpgkey</span>=https://nginx.org/keys/nginx_signing.key</span><br><span class="line"><span class="attr">module_hotfixes</span>=<span class="literal">true</span></span><br></pre></td></tr></tbody></table></figure>
+<p>Esc :wq</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">sudo yum-config-manager --<span class="built_in">enable</span> nginx-mainline</span><br><span class="line">sudo yum install nginx</span><br><span class="line"></span><br><span class="line">sudo yum install nginx</span><br><span class="line">nginx</span><br><span class="line">ps -ef | grep nginx</span><br></pre></td></tr></tbody></table></figure>
+<p>浏览器输入 <code>http:公网IP</code></p>
+<p><code>http://nginx.org/en/linux_packages.html</code></p>
+<figure class="highlight angelscript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[<span class="symbol">root@</span>VM<span class="number">-0</span><span class="number">-9</span>-centos ~]# cd /etc/nginx/</span><br><span class="line">[<span class="symbol">root@</span>VM<span class="number">-0</span><span class="number">-9</span>-centos nginx]# ls</span><br><span class="line">conf.d  fastcgi_params  mime.types  modules  nginx.conf  scgi_params  uwsgi_params</span><br><span class="line">[<span class="symbol">root@</span>VM<span class="number">-0</span><span class="number">-9</span>-centos nginx]# vim nginx.conf </span><br><span class="line">[<span class="symbol">root@</span>VM<span class="number">-0</span><span class="number">-9</span>-centos nginx]# cd conf.d/</span><br><span class="line">[<span class="symbol">root@</span>VM<span class="number">-0</span><span class="number">-9</span>-centos conf.d]# ls</span><br><span class="line"><span class="keyword">default</span>.conf</span><br><span class="line">[<span class="symbol">root@</span>VM<span class="number">-0</span><span class="number">-9</span>-centos conf.d]# vim <span class="keyword">default</span>.conf </span><br><span class="line">/usr/share/nginx/html</span><br></pre></td></tr></tbody></table></figure>
+
+<p>部署Vue.js</p>
+<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> apiHost = <span class="string">'/api'</span></span><br></pre></td></tr></tbody></table></figure>
+<p>当是<code>/api</code>开头，nginx把它转发给wsgi对应的内容进行处理，就会处理django的内容</p>
+<figure class="highlight plain"><figcaption><span>run build```把写好的代码组件、相关引用构建成一个生产使用的代码，里面的js进行压缩，css经过提取，</span></figcaption><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">生成dist文件夹，压缩成zip文件上传到这台服务器```/mnt/www/trip-mobile/dist```</span><br><span class="line">```bash</span><br><span class="line">[root@VM-0-9-centos ~]# cd /</span><br><span class="line">[root@VM-0-9-centos /]# cd /mnt/</span><br><span class="line">[root@VM-0-9-centos mnt]# mkdir www</span><br><span class="line">[root@VM-0-9-centos mnt]# cd www/</span><br><span class="line">[root@VM-0-9-centos www]# mkdir trip-mobile</span><br><span class="line">[root@VM-0-9-centos www]# cd trip-mobile</span><br><span class="line">[root@VM-0-9-centos www]# unzip dist.zip</span><br></pre></td></tr></tbody></table></figure>
+
+<p>配置ngix</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim default.conf</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight awk"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">location / {</span><br><span class="line">    root   <span class="regexp">/mnt/</span>www<span class="regexp">/trip-mobile/</span>dist;</span><br><span class="line">    index  index.html index.htm;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+<p>Esc + :wq</p>
+<p>测试语法和配置是否正常</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nginx -t </span><br></pre></td></tr></tbody></table></figure>
+
+<p>重启</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nginx -s reload</span><br></pre></td></tr></tbody></table></figure>
+<p>浏览器输入公网IP可以打开旅游网页面，但是只有前端页面没有后台数据，</p>
+<h2 id="安装mysql"><a href="#安装mysql" class="headerlink" title="安装mysql"></a>安装mysql</h2><p>官方文档<a target="_blank" rel="noopener" href="https://dev.mysql.com/doc/refman/8.0/en/linux-installation-yum-repo.html">https://dev.mysql.com/doc/refman/8.0/en/linux-installation-yum-repo.html</a></p>
+<ol>
+<li>下载 <a target="_blank" rel="noopener" href="https://dev.mysql.com/downloads/file/?id=484922%EF%BC%8C%E6%89%BE%E5%88%B0linux7">https://dev.mysql.com/downloads/file/?id=484922，找到linux7</a> 或 8 对应的版本右键<code>No thanks, just start my download.</code>复制链接<br>下载并安装MySQL官方的Yum Repository<br>目前用的是7下成8的，浪费2小时<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">wget https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-community-8.0.24-1.el7.src.rpm</span><br><span class="line">[root@VM-0-9-centos ~]<span class="comment"># ls</span></span><br><span class="line">authorized_keys  dev  file1  file2  file3  mysql-community-8.0.24-1.el7.src.rpm  test1</span><br></pre></td></tr></tbody></table></figure>
+
+</li>
+</ol>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install -y mysql80-community-release-el7-3.noarch.rpm</span><br></pre></td></tr></tbody></table></figure>
+<p>安装这个包后，会获得两个mysql的yum repo源：<code>/etc/yum.repos.d/mysql-community.repo</code>，<code>/etc/yum.repos.d/mysql-community-source.repo</code>。</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">yum install mysqlMySQL</span><br><span class="line">yum install mysql-server</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@VM-0-9-centos ~]<span class="comment"># yum repolist enabled | grep "mysql.*-community.*"</span></span><br><span class="line">mysql-connectors-community/x86_64    MySQL Connectors Community              194</span><br><span class="line">mysql-tools-community/x86_64         MySQL Tools Community                   126</span><br><span class="line">mysql80-community/x86_64             MySQL 8.0 Community Server              247</span><br></pre></td></tr></tbody></table></figure>
+
+<p>linux MySQL的启动控制 进入mysql的方式：</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">systemctl start/stop/restart mysqld</span><br><span class="line">ps -ef | grep mysql</span><br><span class="line">systemctl status mysqld</span><br><span class="line"></span><br><span class="line">[root@VM-0-9-centos ~]<span class="comment"># sudo grep 'temporary password' /var/log/mysqld.log</span></span><br><span class="line">2021-04-24T08:45:29.536875Z 6 [Note] [MY-010454] [Server] A temporary password is generated <span class="keyword">for</span> root@localhost: Q+s/T:;dS8r9</span><br></pre></td></tr></tbody></table></figure>
+<p>Q+s/T:;dS8r9 为mysql root用户密码</p>
+<p>查看端口号（默认端口号3306）</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@VM-0-9-centos ~]<span class="comment"># netstat -tnlp</span></span><br><span class="line">Active Internet connections (only servers)</span><br><span class="line">Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    </span><br><span class="line">tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      25528/nginx: master </span><br><span class="line">tcp        0      0 127.0.0.1:39602         0.0.0.0:*               LISTEN      14656/node          </span><br><span class="line">tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      1346/sshd           </span><br><span class="line">tcp6       0      0 :::33060                :::*                    LISTEN      25791/mysqld        </span><br><span class="line">tcp6       0      0 :::3306                 :::* </span><br></pre></td></tr></tbody></table></figure>
+
+
+<p>连接 远程登陆 </p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mysql -u用户名 -p</span><br><span class="line">mysql -h 服务器IP地址、主机 -P 端口号 -uroot -p</span><br></pre></td></tr></tbody></table></figure>
+<p>输入密码</p>
+<figure class="highlight sql"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// 法1</span><br><span class="line">mysql&gt; ALTER USER 'root'@'localhost' IDENTIFIED BY 'MyNewPass4!';</span><br><span class="line"></span><br><span class="line"><span class="comment"># 法二</span></span><br><span class="line"><span class="keyword">GRANT</span> <span class="keyword">ALL</span> <span class="keyword">PRIVILEGES</span> <span class="keyword">ON</span> *.* <span class="keyword">TO</span> <span class="string">'root'</span>@<span class="string">'%'</span> <span class="keyword">IDENTIFIED</span> <span class="keyword">BY</span> <span class="string">'MyNewPass4!'</span> <span class="keyword">WITH</span> <span class="keyword">GRANT</span> <span class="keyword">OPTION</span>;</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight sql"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">USER</span> <span class="string">'root'</span>@<span class="string">'%'</span> <span class="keyword">IDENTIFIED</span> <span class="keyword">WITH</span> mysql_native_password <span class="keyword">BY</span> <span class="string">'MyNewPass4!'</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<p>在实际运维工作中，远程连接账号尽量不要使用root。<br>应该手工创建 一个普通账号，然后按需分配权限</p>
+<p>退出MySQL到linux命令行：</p>
+<figure class="highlight"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql &gt; exit</span><br></pre></td></tr></tbody></table></figure>
+
+<p>默认root只能在本地连接</p>
+<figure class="highlight sql"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; select user,host from mysql.user;</span><br><span class="line">+<span class="comment">------------------+-----------+</span></span><br><span class="line">| user             | host      |</span><br><span class="line">+<span class="comment">------------------+-----------+</span></span><br><span class="line">| mysql.infoschema | localhost |</span><br><span class="line">| mysql.session    | localhost |</span><br><span class="line">| mysql.sys        | localhost |</span><br><span class="line">| root             | localhost |</span><br><span class="line">+<span class="comment">------------------+-----------+</span></span><br><span class="line">4 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>Linux配置MySQL远程连接访问权限</p>
+<figure class="highlight sql"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; update mysql.user set host = '%' where user = 'root' ;</span><br><span class="line">mysql&gt; select user,host from mysql.user;</span><br><span class="line">+<span class="comment">------------------+-----------+</span></span><br><span class="line">| user             | host      |</span><br><span class="line">+<span class="comment">------------------+-----------+</span></span><br><span class="line">| root             | %         |</span><br><span class="line">| mysql.infoschema | localhost |</span><br><span class="line">| mysql.session    | localhost |</span><br><span class="line">| mysql.sys        | localhost |</span><br><span class="line">+<span class="comment">------------------+-----------+</span></span><br><span class="line">4 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; <span class="keyword">select</span> <span class="keyword">user</span>,host <span class="keyword">from</span> mysql.user <span class="keyword">where</span> <span class="keyword">user</span>=<span class="string">'root'</span>;</span><br><span class="line">+<span class="comment">------+------+</span></span><br><span class="line">| user | host |</span><br><span class="line">+<span class="comment">------+------+</span></span><br><span class="line">| root | %    |</span><br><span class="line">+<span class="comment">------+------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></tbody></table></figure>
+<p>看到有一条 host值为<code>%</code>，说明授权了</p>
+<h2 id="安装redis"><a href="#安装redis" class="headerlink" title="安装redis"></a>安装redis</h2><p><a target="_blank" rel="noopener" href="https://redis.io/download">https://redis.io/download</a> 右键download复制连接</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@VM-0-9-centos ~]<span class="comment"># wget https://download.redis.io/releases/redis-6.0.12.tar.gz</span></span><br></pre></td></tr></tbody></table></figure>
+<p>解压</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@VM-0-9-centos ~]<span class="comment"># tar -zxvf redis-6.0.12.tar.gz </span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>开始进行配置、编译<br>redis用c语言编写</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@VM-0-9-centos ~]<span class="comment"># yum install gcc gcc-c++</span></span><br></pre></td></tr></tbody></table></figure>
+<p>yum安装的gcc是4.8.5的，升级gcc</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">yum -y install centos-release-scl</span><br><span class="line"> </span><br><span class="line">yum -y install devtoolset-9-gcc devtoolset-9-gcc-c++ devtoolset-9-binutils</span><br><span class="line"> </span><br><span class="line">scl <span class="built_in">enable</span> devtoolset-9 bash</span><br><span class="line"> </span><br><span class="line"><span class="built_in">echo</span> <span class="string">"source /opt/rh/devtoolset-9/enable"</span> &gt;&gt; /etc/profile</span><br><span class="line"> </span><br><span class="line">gcc -v</span><br><span class="line"></span><br><span class="line">[root@VM-0-9-centos redis-6.0.12]<span class="comment"># make</span></span><br><span class="line">[root@VM-0-9-centos redis-6.0.12]<span class="comment"># make install</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>配置后台进程</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@VM-0-9-centos redis-6.0.12]<span class="comment"># vim redis.conf</span></span><br></pre></td></tr></tbody></table></figure>
+<p>yy复制一行，p粘贴，</p>
+<figure class="highlight nginx"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># daemonize no</span></span><br><span class="line"><span class="attribute">daemonize</span> <span class="literal">yes</span></span><br></pre></td></tr></tbody></table></figure>
+<p>Esc + :wq</p>
+<p>启动redis</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@VM-0-9-centos redis-6.0.12]<span class="comment"># cd src</span></span><br><span class="line">[root@VM-0-9-centos redis-6.0.12]<span class="comment"># ./src/redis-server redis.conf</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="安装python"><a href="#安装python" class="headerlink" title="安装python"></a>安装python</h2><p>python在linux环境下面没有安装包，只支持从源码安装，</p>
+<p>gcc：C语言的编译（四个过程）</p>
+<ol>
+<li>预处理（Preprocessing）（文件格式变化：.c—.i）</li>
+<li>编译 (Compilation)（文件格式变化：.i—.s）</li>
+<li>汇编(Assemble)（文件格式变化：.s—.o）</li>
+<li>链接(Linking)（文件格式变化：.o—.out，windows平台下生成可执行文件.exe）</li>
+</ol>
+<p>如果我们只写了一个<code>.cc</code>/<code>.cpp</code>文件，我们可以使用gcc。<br>比如我们写了一个<code>hello.cpp</code><br>那我们可以使用gcc这样编译<code>gcc hello.c -o hello</code>，<code>-o</code>是指输出名为hello的可执行文件。</p>
+<p>但是，如果我们写的是一系列的代码我们总不能挨个对他们进行gcc编译吧？这时候轮到make登场了。</p>
+<p>（2）make<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 在 Linux环境下使用 GNU 的 make工具能够比较容易的构建一个属于你自己的工程，整个工程的编译只需要一个命令就可以完成编译、连接以至于最后的执行。不过这需要我们投入一些时间去完成一个或者多个称之为 Makefile 文件的编写。此文件正是 make 正常工作的基础。make 是一个命令工具，它解释 Makefile 中的指令（应该说是规则）。在 Makefile文件中描述了整个工程所有文件的编译顺序、编译规则。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 所以，首先我们要将所有要编译的文件信息写到makefile中，然后执行make，make就会按照makefile进行编译，这避免了程序在调试过程中频繁输入命令进行编译。但是makefile写起来比较复杂，规则很多。</p>
+<p>这就要提到另一个工具cmake了。</p>
+<p>（3）cmake<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 前面说了，对于一个大工程，编写makefile实在是件复杂的事，于是人们又想，为什么不设计一个工具，读入所有源文件之后，自动生成makefile呢，于是就出现了cmake工具，它能够输出各种各样的makefile或者project文件,从而帮助程序员减轻负担。但是随之而来也就是编写cmakelist文件，它是cmake所依据的规则。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cmake的作用就是生成makefile给make用。cmake生成makefile的根据正是CMakeLists.txt。我们主要就是学习CMakeLists.txt的写法。</p>
+<p>一个大的工程，按照下面的步骤进行，gcc make cmake三个工具配合使用</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@VM-0-9-centos ~]<span class="comment"># yum -y install zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel gdbm-devel db4-devel libpcap-devel xz-devel libffi-devel cmake bzip2 readline-devel sqlite xz </span></span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@VM-0-9-centos ~]<span class="comment"># wget https://www.python.org/ftp/python/3.8.9/Python-3.8.9.tgz</span></span><br></pre></td></tr></tbody></table></figure>
+<p>解压</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@VM-0-9-centos ~]<span class="comment"># tar -zxvf Python-3.8.9.tgz</span></span><br><span class="line">[root@VM-0-9-centos ~]<span class="comment"># cd Python-3.8.9</span></span><br><span class="line">[root@VM-0-9-centos Python-3.8.9]<span class="comment"># sh configure</span></span><br><span class="line">[root@VM-0-9-centos Python-3.8.9]<span class="comment"># make </span></span><br><span class="line">[root@VM-0-9-centos Python-3.8.9]<span class="comment"># make install</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>configure的作用是利用这个configure可执行的脚本文件来查看你的linux的运行环境。<br>然后生成一个Makefile文件，你就可以通过makefile文件编译你的项目了。<br>所以下面几种方式都是可以的<br><code>sh configure</code><br><code>source configure</code></p>
+<figure class="highlight plain"><figcaption><span>configure``` (中间有一个空格)</span></figcaption><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">```./configure```</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">···实际就是编译源代码，按照上一步生成makefile文件进行编译，并生成执行文件。</span><br><span class="line"></span><br><span class="line">python添加到了整个系统的全局环境变量里面，</span><br><span class="line">```bash</span><br><span class="line">python3 --version</span><br></pre></td></tr></tbody></table></figure>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -1509,106 +1717,8 @@
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/04/13/sui-ji-shu/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/04/13/sui-ji-shu/" class="post-title-link" itemprop="url">python 随机数</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-04-12 16:21:41" itemprop="dateCreated datePublished" datetime="2021-04-12T16:21:41Z">2021-04-12</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-14 08:53:24" itemprop="dateModified" datetime="2021-04-14T08:53:24Z">2021-04-14</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>python中生成随机整数、随机小数、0–1之间小数方法<br>随机整数：<code>random.randint(a,b)</code>，生成区间内的整数<br>随机小数：<code>numpy.random.randn(5)</code>生成5个随机小数<br>0-1随机小数：```random.random()``，括号中不传参</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> random</span><br><span class="line"><span class="keyword">import</span> numpy</span><br><span class="line"></span><br><span class="line">res = random.randint(<span class="number">0</span>, <span class="number">10</span>)</span><br><span class="line">print(<span class="string">'生成区间内的随机整数'</span>, res)</span><br><span class="line"><span class="comment"># 生成区间内的随机整数 1</span></span><br><span class="line"></span><br><span class="line">res = random.random()</span><br><span class="line">print(<span class="string">'0-1随机小数'</span>, res)</span><br><span class="line"><span class="comment"># 0-1随机小数 0.7409183329758731</span></span><br><span class="line"></span><br><span class="line">print(numpy.random.randn(<span class="number">5</span>))</span><br><span class="line"><span class="comment"># [ 1.0366976  -0.00223677  0.35166583 -0.08984272  1.1260413 ]</span></span><br></pre></td></tr></tbody></table></figure><script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/20/">20</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/21/">21</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 <script src="/js/comments.js"></script>
 </div>
