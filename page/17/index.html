@@ -118,13 +118,13 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">204</span>
+          <span class="site-state-item-count">214</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
-        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-count">20</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -158,6 +158,507 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/duan-wang-zhi-xi-tong-she-ji-yu-shi-xian/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/duan-wang-zhi-xi-tong-she-ji-yu-shi-xian/" class="post-title-link" itemprop="url">短网址系统设计与实现</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-04-14 07:32:08" itemprop="dateModified" datetime="2021-04-14T07:32:08Z">2021-04-14</time>
+      </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="短网址系统-TinyUrl-Service"><a href="#短网址系统-TinyUrl-Service" class="headerlink" title="短网址系统 TinyUrl Service"></a>短网址系统 TinyUrl Service</h2><ul>
+<li><p>把一个长网址转成短网址的服务</p>
+</li>
+<li><p>比如比较出名 <a target="_blank" rel="noopener" href="https://bitly.com/">https://bitly.com/</a> ,缩短网址的网站。比如把一个长链接粘贴进去它会自动帮你生成一个较短网址。</p>
+</li>
+<li><p>转换之后网址后缀不超过7位（字符或者数字）</p>
+</li>
+<li><p>粘贴进去长网址<a target="_blank" rel="noopener" href="http://mirrors.163.com/.help/CentOS7-Base-163.repo">http://mirrors.163.com/.help/CentOS7-Base-163.repo</a> 点击Shorten按钮 生成 一个短网址 <a target="_blank" rel="noopener" href="https://bit.ly/304LlY9%E3%80%82">https://bit.ly/304LlY9。</a> 可以看到短网址后面一共有7位数 304LlY9，7位里面既包含大写字母也包含小写字母同时也包含数字。比如：像国外的Twitter网站默认使用 bitly 作为短网址服务，实际上短网址服务的兴起就是因为Twitter一开始只允许发140个字，比较长的网址就特别占用空间，所以才出现短网址这种服务。</p>
+</li>
+</ul>
+<h2 id="场景和限制"><a href="#场景和限制" class="headerlink" title="场景和限制"></a>场景和限制</h2><p>  使用场景：提供短网址服务为公司其他各业务服务</p>
+<ul>
+<li>功能：一个长网址转成短网址并存储；根据短网址还原长 url</li>
+<li>要求短网址的后缀不超过7位(大小写字母和数字)</li>
+<li>估计峰值假设插入请求数量级：数百；查询请求数量级：数千</li>
+</ul>
+<h2 id="数据存储设计"><a href="#数据存储设计" class="headerlink" title="数据存储设计"></a>数据存储设计</h2><p>   根据需求设计数据存储方式</p>
+<ul>
+<li>使用Mysql即可满足</li>
+<li>需要的字段有哪些？根据需求来看实际上只需要 ID、存储生成之后的短网址、原网址、创建时间这四个字段就可以满足需求。</li>
+</ul>
+<p>Mysql 数据表</p>
+<figure class="highlight isbl"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">id</span>     <span class="function"><span class="title">token</span>(索引)    <span class="title">url</span>(原网址)    <span class="variable">created_at</span></span></span><br></pre></td></tr></tbody></table></figure>
+<p>token:不存储整个短网址，希望前边的主机名可以随意的去替换</p>
+<p>如何根据查询设计索引？只有一个需求就是根据短网址还原原网址，直接给token加上索引就可以。</p>
+<h2 id="算法实现设计"><a href="#算法实现设计" class="headerlink" title="算法实现设计"></a>算法实现设计</h2><pre><code>  短网址生成算法有哪些？对比优缺点选择适合业务的方法
+</code></pre>
+<ul>
+<li>两个 API：long2short_url 把长的url转换成短网址，short2long_url 根据短网址查询出长网址</li>
+</ul>
+<p>常用算法：hash 算法截取； 自增序列算法</p>
+<p>对比多钟算法，采取自增序列算法实现</p>
+<p>短网址生成算法：<br>CHARS=“abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789”<br>对每个长网址从```里面生成一个不超过7位长度的一个短网址token</p>
+<p>① md5摘要算法：接收任意长度的字节然后生成一个定长的字符，经常用在下载文件的时候会与md5校验值用来检查文件是不是修改了。</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> hashlib</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>url = <span class="string">'http://mirrors.163.com/.help/CentOS7-Base-163.repo'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>hashlib.md5(url.encode())    <span class="comment"># 对url使用摘要算法得到的值</span></span><br><span class="line">&lt;md5 HASH object @ <span class="number">0x000002BE328342D8</span>&gt;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>hashlib.md5(url.encode()).hexdigest()  <span class="comment"># 转化成一个16进制串</span></span><br><span class="line"><span class="string">'60dc55352afeb63b4d91a75c9c4ff287'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>len(hashlib.md5(url.encode()).hexdigest())</span><br><span class="line"><span class="number">32</span>                                    <span class="comment"># 是一个定长的32位字符串</span></span><br></pre></td></tr></tbody></table></figure>
+<p>因为我们需要一个不超过7位的字符串而md5摘要算法是32位的。可能会想到截断只取前7个字符。但是有个问题可能会有一定概率的冲突。<br>一旦有冲突就需要在插入时候去数据库检查一下是不是有冲突。实际上这样在高并发的插入场景下是特别不友好的。</p>
+<p>② 把对应的每个ID给它生成一个不重复的短网址token。</p>
+<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">一共七个位置每个位置有62种选项，62**7是一个非常大的数字，万亿规模的数字，对短网址token来说有万亿规模肯定就够用了</span><br><span class="line"></span><br><span class="line">字符集类似于62进制的数字。对于二进制数字来说它的可选项是0,1；十六进制 0-9 a-f 。</span><br><span class="line"></span><br><span class="line">可以把自增ID十进制把它转换成字符集这种62进制的，十进制 -&gt; 62进制，这样就实现十进制的ID跟六十二进制数字的一个映射。这里并不是严格的62进制的数字，不过从0到61每个位置上都有一个字符与之对应。</span><br><span class="line"></span><br><span class="line">  现在就知道如何来解决这个问题了，就是根据自增的ID来去给每个长网址生成一个62进制的短网址。</span><br><span class="line"></span><br><span class="line">        如何把十进制的ID转换成62进制的短网址？</span><br><span class="line"></span><br><span class="line">进制转换</span><br><span class="line">10进制 -&gt;2进制 ，不断取余，倒序输出</span><br><span class="line">```py</span><br><span class="line">&gt;&gt;&gt; bin(10)    # 将10进制转换成2进制</span><br><span class="line">  '0b1010' </span><br><span class="line"> </span><br><span class="line">&gt;&gt;&gt; help(divmod)   # 查看divmod函数使用</span><br><span class="line">Help on built-in function divmod in module builtins:</span><br><span class="line">divmod(x, y, /)</span><br><span class="line">    Return the tuple (x//y, x%y).  Invariant: div*y + mod == x.</span><br><span class="line">&gt;&gt;&gt; divmod(10, 2)   # 返回一个tuple，一个是整除的商，x对y取模求余数</span><br><span class="line">(5, 0)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>1). 10进制转换成2进制函数实现</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">mybin</span>(<span class="params">num</span>):</span>  <span class="comment"># 10进制 -&gt; 2进制</span></span><br><span class="line">    <span class="keyword">if</span> num == <span class="number">0</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">    res = []  <span class="comment"># 保存2进制串的列表</span></span><br><span class="line">    <span class="keyword">while</span> num:</span><br><span class="line">        num, rem = divmod(num, <span class="number">2</span>)</span><br><span class="line">        res.append(str(rem))</span><br><span class="line">    <span class="keyword">return</span> <span class="string">''</span>.join(reversed(res))  <span class="comment"># 倒序输出转换成字符串</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">print(mybin(<span class="number">10</span>))  <span class="comment"># 1010</span></span><br><span class="line"><span class="comment"># num = 10</span></span><br><span class="line"><span class="comment"># res = []</span></span><br><span class="line"><span class="comment"># num = num // 2 = 10 // 2 = 5</span></span><br><span class="line"><span class="comment"># rem = num % 2 = 10 % 2 = 0</span></span><br><span class="line"><span class="comment"># res= ['0']</span></span><br><span class="line"><span class="comment"># num = num // 2 = 5 // 2 = 2</span></span><br><span class="line"><span class="comment"># rem = num % 2 = 5 % 2 = 1</span></span><br><span class="line"><span class="comment"># res= ['0', '1']</span></span><br><span class="line"><span class="comment"># num = num // 2 = 2 // 2 = 1</span></span><br><span class="line"><span class="comment"># rem = num % 2 = 2 % 2 = 0</span></span><br><span class="line"><span class="comment"># res = ['0', '1', '0']</span></span><br><span class="line"><span class="comment"># num = num // 2 = 1 // 2 = 0</span></span><br><span class="line"><span class="comment"># rem = num % 2 = 1 % 2 = 1</span></span><br><span class="line"><span class="comment"># res = ['0', '1', '0', '1']</span></span><br><span class="line"><span class="comment"># ''.join(reversed(res) = '1010'</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>2). 10进制到62进制串的转化（递增序列算法）</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">CHARS = <span class="string">"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">encode</span>(<span class="params">num</span>):</span></span><br><span class="line">    <span class="keyword">if</span> num == <span class="number">0</span>:</span><br><span class="line">        <span class="keyword">return</span> CHARS[<span class="number">0</span>]</span><br><span class="line">    res = []</span><br><span class="line">    <span class="keyword">while</span> num:</span><br><span class="line">        num, rem = divmod(num, len(CHARS))  <span class="comment"># len(CHARS) = 62</span></span><br><span class="line">        res.append(CHARS[rem])</span><br><span class="line">    <span class="keyword">return</span> <span class="string">''</span>.join(reversed(res))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">print(encode(<span class="number">0</span>))  <span class="comment"># a</span></span><br><span class="line">print(encode(<span class="number">61</span>))  <span class="comment"># 9</span></span><br><span class="line">print(encode(<span class="number">62</span>))  <span class="comment"># ba</span></span><br><span class="line"><span class="comment"># num = 62</span></span><br><span class="line"><span class="comment"># len(CHARS) = 62</span></span><br><span class="line"><span class="comment"># num = num // len(CHARS) = 62 // 62 = 1</span></span><br><span class="line"><span class="comment"># rem = num % len(CHARS) = 62 % 62 = 0</span></span><br><span class="line"><span class="comment"># res= res.append(CHARS[rem]) </span></span><br><span class="line"><span class="comment"># rews = res.append(CHARS[0]) = ['a']</span></span><br><span class="line"><span class="comment"># num = num // len(CHARS) = 1 // 62 = 0</span></span><br><span class="line"><span class="comment"># rem = num % len(CHARS) = 1 % 62 = 1</span></span><br><span class="line"><span class="comment"># rews = res.append(CHARS[1]) = ['a', 'b']</span></span><br><span class="line"><span class="comment"># ''.join(reversed(res) = ['b', 'a']</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>自增 id 问题？数据库只有在插入时候才会有自增ID，所以这里还需要一个全局计数器，用来生成自增ID，这样就可以根据ID生成62进制串。使用 Redis incr可以非常容易实现一个计数器。</p>
+<p>5.生成短网址的过程<br>request -&gt; redis incr的值 index -&gt; encode(index) -&gt; save mysql<br>如果一个请求(request)过来时候，先去Redis 拿到 incr 值比如叫index, 然后把index转换成index串。最后把得到的值存储到数据库里面。</p>
+<p>.短网址服务的编码实现<br>首先需要你安装MySQL数据库，只安装服务器端就行，安装的时候可以选择。<br>安装Redis 非关系型数据库<br>接下来是一些需要的Python插件安装： </p>
+<figure class="highlight sh"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 安装flask</span></span><br><span class="line">(python3) C:\Users\allar\system_design&gt;pip  install  -i  https://pypi.doubanio.com/simple/  --trusted-host pypi.doubanio.com  flask</span><br><span class="line"> </span><br><span class="line"><span class="comment"># 安装flask_mysqldb</span></span><br><span class="line">(python3) C:\Users\allar\system_design&gt;pip install flask_mysqldb</span><br><span class="line"> </span><br><span class="line"><span class="comment"># 安装flask_redis</span></span><br><span class="line">(python3) C:\Users\allar\system_design&gt;pip install flask-redis</span><br><span class="line"> </span><br><span class="line"><span class="comment"># 安装requests</span></span><br><span class="line">(python3) C:\Users\allar\system_design&gt;pip install requests</span><br><span class="line">``` </span><br><span class="line"></span><br><span class="line">（1） 在数据库里面创建一个 short_url 表</span><br><span class="line">```sql</span><br><span class="line">CREATE TABLE short_url (</span><br><span class="line">    id bigint unsigned NOT NULL AUTO_INCREMENT,</span><br><span class="line">    token varchar(10),</span><br><span class="line">    url varchar(2048),</span><br><span class="line">    created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,</span><br><span class="line">    PRIMARY KEY (`id`),</span><br><span class="line">    KEY `idx_token` (`token`)</span><br><span class="line">);</span><br></pre></td></tr></tbody></table></figure>
+<p>（2）使用 Flask 框架演示本系统实现</p>
+<p>代码里实现了短网址生成算法</p>
+<p>数据库使用 Mysql</p>
+<p>计数器使用 Redis</p>
+<p>代码实现：</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask, jsonify, render_template, request</span><br><span class="line"><span class="keyword">from</span> flask_mysqldb <span class="keyword">import</span> MySQL</span><br><span class="line"><span class="comment"># from flask.ext.redis import FlaskRedis</span></span><br><span class="line"><span class="keyword">from</span> flask_redis <span class="keyword">import</span> FlaskRedis</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line">app.config[<span class="string">'MYSQL_USER'</span>] = <span class="string">'root'</span></span><br><span class="line">app.config[<span class="string">'MYSQL_PASSWORD'</span>] = <span class="string">'123456'</span></span><br><span class="line">app.config[<span class="string">'MYSQL_DB'</span>] = <span class="string">'test'</span></span><br><span class="line">app.config[<span class="string">'MYSQL_CUESORCLASS'</span>] = <span class="string">'DictCursor'</span></span><br><span class="line"></span><br><span class="line">mysql = MySQL(app)</span><br><span class="line">redis_store = FlaskRedis(app)</span><br><span class="line"></span><br><span class="line">CHARS = <span class="string">"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">encode</span>(<span class="params">num</span>):</span></span><br><span class="line">    <span class="string">'''10进制转化成62进制串'''</span></span><br><span class="line">    <span class="keyword">if</span> num == <span class="number">0</span>:</span><br><span class="line">        <span class="keyword">return</span> CHARS[<span class="number">0</span>]</span><br><span class="line">    res = []</span><br><span class="line">    <span class="keyword">while</span> num:</span><br><span class="line">        num, rem = divmod(num, len(CHARS))</span><br><span class="line">        res.append(CHARS[rem])</span><br><span class="line">    <span class="keyword">return</span> <span class="string">''</span>.join(reversed(res))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route('/shorten', methods=['POST'])</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">shorten_url</span>():</span></span><br><span class="line">    <span class="string">'''视图函数'''</span></span><br><span class="line">    <span class="comment"># 获取页面长的url</span></span><br><span class="line">    long_url = request.json[<span class="string">'url'</span>]</span><br><span class="line">    <span class="comment"># 从Redis获取自增的index</span></span><br><span class="line">    index = int(redis_store.incr(<span class="string">'SHORT_CNT'</span>))</span><br><span class="line">    <span class="comment"># 生成一个token，把一个index10进制数转化成62进制串</span></span><br><span class="line">    token = encode(index)</span><br><span class="line">    sql = <span class="string">"INSERT INTO short_url(token, url) VALUES(%s, %s)"</span></span><br><span class="line">    <span class="comment"># 获取mysql连接</span></span><br><span class="line">    cur = mysql.connection.cursor()</span><br><span class="line">    cur.execute(sql, (token, long_url))</span><br><span class="line">    mysql.connection.commit()</span><br><span class="line">    <span class="comment"># 构造短网址</span></span><br><span class="line">    short_url = <span class="string">'https://short.com/'</span> + token</span><br><span class="line">    <span class="keyword">return</span> jsonify(url=short_url)  <span class="comment"># 返回短网址的json数据</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route('/')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span>():</span></span><br><span class="line">    <span class="keyword">return</span> render_template(<span class="string">'index.html'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    app.run(debug=<span class="number">1</span>)</span><br></pre></td></tr></tbody></table></figure><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/kong-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/kong-1/" class="post-title-link" itemprop="url">HTML</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-04-13 13:04:17" itemprop="dateModified" datetime="2021-04-13T13:04:17Z">2021-04-13</time>
+      </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>只有当破解所需的预期成本远远超出破解之后所获得的预期的时候，你的加密才是真正安全的。</p>
+<p> GPL 协议 公共授权条款 要求所有衍生作品以相同协议继续开源，否则可以上法院告你。如果有人写了一个库，用了GPL。你用了这个库，那么你的整个软件都必须以GPL开源。这样这个库的使用人数会减少，所以Stallman又搞了一个LGPL。如果你的软件动态链接一个LGPL库，那么你的软件不需要开源。</p>
+<p>开源和自由软件都是承认产权的，只是产权上放弃了作者拥有权，但同时这种放弃也是基于一定的规则，这个东西并不是不承认产权，恰恰是承认产权，叫做知识产权（著作权），因此，你如果不同意这个GPL协议，那么这时候著作权法就成了紧接着的法律上的选项。</p>
+<p>无论共享还是分享，你都要先拥有你的东西，你有了对自己东西的产权，然后才能有怎么处置的自由，于是才有分享或共享。（如果你都没有自己的东西，你要分享也谈不上，难道还能拿别人的东西来说成是分享？）</p>
+<p> MIT 协议则允许任意形式的使用，但是原作者不承担任何责任。同时，公开的源代码使得任何人都可以参与项目并作出贡献，为项目添砖加瓦。</p>
+<p>开源跟开源还不一样。要看用的什么协议。</p>
+<p>但基本上都不等同于放弃版权。</p>
+<p>开源阵营里类似共产主义的是类似BSD协议的协议。这类协议基本不管你怎么用，可以用了之后不开源。</p>
+<p>在我参与开源项目的过程中，我觉得我学到的最主要的内容就是团队协作的技巧。例如，版本管理工具 Git 的使用、统一的代码风格和良好的文档注释的意义、持续整合 (Continuous Integration, CI) 的意义与使用，以及与人交流沟通的技巧等。</p>
+<ol start="3">
+<li>参与开源项目的方法与技巧Permalink<br>在参与开源项目之前，首先要理解一点，开源项目是一个【项目】，所以参与方式是多种多样的。</li>
+</ol>
+<p>对于开源软件来说，最容易想到的方式自然是提交代码，比如 bug 修复、功能改进，或者代码中的测试项目；<br>另一个，为项目完善文档和教程等也是一种非常有价值的贡献；<br>同时，将项目资料翻译成其他语言可以帮助更多人参与进来。Transifex 是一个有名的开放协作翻译的平台，很多软件和网站都在利用它给用户提供参与翻译的机会；<br>最后，如果你对前面几项都不感兴趣，你也可以为项目贡献一些周边资料，例如为其他用户解答问题，为项目反馈问题或提出建议等。<br>这些都是开源项目常见的参与方式。</p>
+<p>那么，在参与开源项目的过程中，我们能为自己收获什么？</p>
+<p>最直接的，你获得了参与真实项目的实践经验；<br>其次，你在项目中可以锻炼技能，也可以学到新的技能；<br>参与开源项目的过程中，你可以学习到各种各样的宝贵知识；<br>你可以很容易地向别人展示你的成果，就像我前面展示的一样；<br>由于上面那个原因，参与开源项目的经历可以使你在人群中脱颖而出。很显然，如果你面对的 HR 或导师能够真真实实地看到你的作品或劳动成果，那么你就更容易获得他们给的机会。</p>
+<p>例如，我能得到今天在这里演讲的机会，就是因为我参与各种开源项目的经历，主办方可以真实看到并做出评价。</p>
+<p>参与开源项目能得到的收获看起来很诱人对不对？那么下面我就介绍一下具体的参与方式。</p>
+<p>发现自己的长处Permalink<br>在准备参与之前，第一件事是看看自己擅长哪方面的事，有哪方面的技能。比如说，你很擅长将你的想法转化成代码；或者你擅长折腾软件，找出意想不到的 bug；或者你擅长把复杂的东西解释清楚；或者你对艺术和设计有自己独到的见解；或者你去过西方的很多国家，精通八国语言；或者你对于某些东西有不错的了解，能够帮助别人答疑解惑……</p>
+<p>找到自己的兴趣Permalink<br>其次，你要找到一个你感兴趣的项目来参与。寻找的方向也有几种，比如</p>
+<p>你日常使用的软件；<br>某天你意外看到的一个有趣的项目，比如 GitHub 首页右边栏随机推送的三个项目；<br>网络上还会时不时的有一些号召大家参与开源项目的活动，比如 Hacktoberfest，以及另一个长期举行的 Up For Grabs；<br>如果你有一个好点子，你也可以自己开始一个新项目。<br>如果你决定加入一个现有项目的话，我建议先对这个项目做一些背景调查。</p>
+<p>首先最重要的一点，开源软件一定要有协议。同时由于开源项目的开放特性，如果有一份行为准则，那就更好了；<br>其次你要判断项目的活跃程度，比如最近一次提交时间，以及项目维护者的提交频率；<br>如果项目有一个活跃的社区，那绝对是一个加分项。活跃的社区通常会产生大量的 Issues 和 Pull Requests，所以这些活动你可以考虑也检查一下；<br>最后，一个友好的社区和交流环境会让人在参与的过程中感到舒适。<br>高效沟通Permalink<br>在你参与项目的过程中，发生的最频繁的事件就是与其他人交流。为了提升交流效率，有几点值得注意：</p>
+<p>你应该自己做足够的研究，例如提问时不要问 “怎么写 1+1 的代码”，而 “1+1 为什么出来 3” 甚至都可能是个好点的问题；<br>如果你真的要问 “1+1 为什么出来 3” 这样的问题，那么你最好能提供足够的信息让别人可以判断你的问题出在哪。同样对于其他讨论，也要确保别人有足够信息来复现你说的内容；<br>在保证信息完整的时候尽可能保持简练，比如 “这个 1+1 等于 3 的代码是我下午在码头搬完砖后去星巴克喝咖啡的时候写的” 这样的信息最好就别提供了 :)<br>对于公开的项目，最好能够保证讨论也是在公开的环境下进行的，除非有特别的保密需求，例如反馈安全方面的漏洞；<br>如果你的观点和其他人不一致，请尊重他们。<br>提交你的贡献之后Permalink<br>当你提交了你的贡献之后，就是等待项目的维护者来检查和进行下一步处理了。这里也有几种情况</p>
+<p>没人理你，你的 Issue 或 PR 就那么挂在那里。这时候要么多等一会，要么再检查一下这个项目，是不是还在活跃维护的状态；<br>如果有人对你的贡献提出了改进意见，说明你的提交有人来花时间看过了。你应该尊重别人，尽早响应别人提出的意见；<br>也许有时候，项目维护者或者社区不认可你的提交，这时候也不要气馁，看看别人给出的评价和理由，作为自己的经验；<br>如果你的贡献被采纳了，那么祝贺你。</p>
+<p>系统输入两个数字M、N，M为1-9的数字，N为系数。<br>eg:<br>输入 1 3，则需计算 1 11 111 的总和，即 123<br>分析 1 = 1 * 10^0<br>分析 11 = 1 + 1 * 10^1<br>分析 111 = 1 + 1 * 10^1 + 1 * 10^2<br>分析 2 = 2 * 10^0<br>分析 22 = 2 + 2 * 10^1<br>分析 222 = 2 + 22 + 2 * 10^2</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func</span>():</span></span><br><span class="line">    M, N = map(int, input().split())</span><br><span class="line">    <span class="comment"># input 1 3</span></span><br><span class="line">    sum_number = number = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(N):</span><br><span class="line">        number += M * <span class="number">10</span> ** i</span><br><span class="line">        sum_number += number</span><br><span class="line"></span><br><span class="line">    print(sum_number)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># M是1--9之间的数字，所以先入为主的将M定义为了数字，</span></span><br><span class="line"><span class="comment"># 但其实如果将M认为是字符串。</span></span><br><span class="line"><span class="comment"># 那么2 --&gt; 222 可以理解为int('2'*3)！这样思考后，题目是否变得更为简单了。</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func2</span>():</span></span><br><span class="line">    M, N = input().split()</span><br><span class="line">    print(sum([int(M * i) <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, int(N) + <span class="number">1</span>)]))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    func()</span><br><span class="line">    <span class="comment"># input: 1 3</span></span><br><span class="line">    <span class="comment"># output: 123</span></span><br><span class="line">    <span class="comment"># func2()</span></span><br></pre></td></tr></tbody></table></figure>
+
+
+<figure class="highlight angelscript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">M = <span class="number">1</span></span><br><span class="line">N = <span class="number">3</span></span><br><span class="line">number = <span class="number">0</span></span><br><span class="line"></span><br><span class="line">i = <span class="number">0</span></span><br><span class="line">number = number + M * <span class="number">10</span> ** i</span><br><span class="line">number = <span class="number">0</span> + <span class="number">1</span> * <span class="number">10</span> ** <span class="number">0</span> = <span class="number">1</span></span><br><span class="line">sum_number = sum_number + number </span><br><span class="line">sum_number = <span class="number">0</span> + <span class="number">1</span> = <span class="number">1</span></span><br><span class="line"></span><br><span class="line">i = <span class="number">1</span></span><br><span class="line">number = <span class="number">1</span> + <span class="number">1</span> * <span class="number">10</span> ** <span class="number">1</span> = <span class="number">11</span></span><br><span class="line">sum_number = <span class="number">1</span> + <span class="number">11</span> = <span class="number">12</span></span><br><span class="line"></span><br><span class="line">i = <span class="number">2</span></span><br><span class="line">number = <span class="number">11</span> + <span class="number">1</span> * <span class="number">10</span> ** <span class="number">2</span> = <span class="number">111</span></span><br><span class="line">sum_number = <span class="number">12</span> + <span class="number">111</span> = <span class="number">123</span></span><br></pre></td></tr></tbody></table></figure><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/bi-ji-ben-lu-da-shi/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/bi-ji-ben-lu-da-shi/" class="post-title-link" itemprop="url">笔记本鲁大师</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-04-17 13:01:18" itemprop="dateModified" datetime="2021-04-17T13:01:18Z">2021-04-17</time>
+      </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/xi-tong-she-ji/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/xi-tong-she-ji/" class="post-title-link" itemprop="url">系统设计</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-04-02 12:24:45" itemprop="dateModified" datetime="2021-04-02T12:24:45Z">2021-04-02</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Markdown/" itemprop="url" rel="index"><span itemprop="name">Markdown</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h3 id="系统设计-System-Design"><a href="#系统设计-System-Design" class="headerlink" title="系统设计(System Design)"></a>系统设计(System Design)</h3><ul>
+<li>系统设计是一个定义系统架构、模块、接口和数据满足特定需求的过程。</li>
+<li>比如设计一个短网址服务、评论服务、Feed流系统、抢红包系统。</li>
+<li>微服务架构很多系统被按照业务拆分，需要单独设计一个系统服务。比如短网址服务一开始由于推特只能发140个字，然后很多时候贴一个很长网址就直接快把字符给沾满了，所以因为这个需求才诞生短网址服务，就是根据一个长度来生成一个短地址。现在很多网站如: 头条、微博、知乎都能见到类似形式的短网址。   </li>
+</ul>
+<p>在一个公司可能有很多不同部门不同的业务，不可能每个业务需要短网址服务就开发一套。这个时候就需要公司里提供一个供其它所有业务使用的一个短网址服务。</p>
+<h3 id="系统设计的难点"><a href="#系统设计的难点" class="headerlink" title="系统设计的难点"></a>系统设计的难点</h3><ul>
+<li>中高级工程师必经之路</li>
+<li>需要具有相关领域、算法的经验，有一定的架构设计能力。(Feed流推拉模型)</li>
+<li>熟悉后端技术组件，比如消息队列、缓存、数据库、各种Web框架等，需要熟悉这些组件使用场景甚至底层原理。</li>
+<li>具备文档撰写、流程图绘制、架构设计、编码实现等综合能力</li>
+</ul>
+<h3 id="系统设计怎么答？"><a href="#系统设计怎么答？" class="headerlink" title="系统设计怎么答？"></a>系统设计怎么答？</h3><ul>
+<li>完全没有思路的（很多毕业生对这种问题完全手足无措）</li>
+<li>有一定思路，但是回答没有重点</li>
+<li>能回答上来重点，但是思路不够清楚</li>
+</ul>
+<h3 id="系统设计的要素"><a href="#系统设计的要素" class="headerlink" title="系统设计的要素"></a>系统设计的要素</h3><ul>
+<li>使用场景和限制条件</li>
+<li>数据存储设计</li>
+<li>算法模块设计</li>
+</ul>
+<p>③ 如何回答系统设计题目？</p>
+<ul>
+<li>按照三个要素来回答</li>
+<li>问面试官：什么场景和条件下使用？（经常会遇到面试官上来就抛一句：如何设计一个短网址系统。问题虽然经典但其实他问的比较宽泛，就是你根本不知道在什么场景下什么条件下去使用，所以第一个要素就是需要搞清场景和使用条件）</li>
+<li>设计数据存储系统</li>
+<li>设计算法相关模块</li>
+</ul>
+<ol>
+<li>要素之一：场景和限制</li>
+</ol>
+<ul>
+<li>这个系统是在什么地方使用的？比如短网址系统提供给站内各种服务生成短网址</li>
+<li>限制条件：用户估计有多少？至少要能支撑多少用户（服务）</li>
+<li>估算并发 qps：峰值 qps 是多少？平均 qps 是多少？（qps就是每秒的查询请求量）</li>
+</ul>
+<ol start="2">
+<li>要素二：数据存储设计<br>数据库的选型，选型数据库以及怎么来去设计存储</li>
+</ol>
+<ul>
+<li>按照需求设计数据表，需要哪些字段，使用什么类型？数据增长规模</li>
+<li>数据库选型：是否需要持久化？使用关系型还是 NoSQL？</li>
+<li>如何优化？如何设计索引？是否可以使用缓存？</li>
+</ul>
+<ol start="3">
+<li>要素之三：算法模块设计 算法解决问题的核心。</li>
+</ol>
+<ul>
+<li>需要哪些接口？接口如何设计</li>
+<li>使用什么算法或者模型？</li>
+<li>不同实现方式之间的优劣对比，如何取舍？比如有些方式是牺牲时间去换空间，有些可能牺牲空间换时间，这个时候就需要根据系统本身做权衡。</li>
+</ul>
+<p>4.针对中高级工程师，可能会问一些深入的问题（如何扩展、容错）</p>
+<ul>
+<li>用户多了，qps 高了如何处理？</li>
+<li>数据存储多了不够存了如何处理？</li>
+<li>故障如何处理？单点失败、多点失败、雪崩问题</li>
+</ul>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -784,7 +1285,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/wang-luo/" class="post-title-link" itemprop="url">HTML</a>
+          <a href="/2020/08/21/wang-luo/" class="post-title-link" itemprop="url">网络</a>
         </h2>
 
         <div class="post-meta-container">
@@ -802,7 +1303,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-02 12:24:45" itemprop="dateModified" datetime="2021-04-02T12:24:45Z">2021-04-02</time>
+        <time title="修改时间：2021-04-25 02:42:04" itemprop="dateModified" datetime="2021-04-25T02:42:04Z">2021-04-25</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -810,7 +1311,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Markdown/" itemprop="url" rel="index"><span itemprop="name">Markdown</span></a>
+          <a href="/categories/%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">网络</span></a>
         </span>
     </span>
 
@@ -824,441 +1325,18 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <p>如何准确的定位到网络上的一台或者多台主机<br>找到主机之后如何进行通信
- </p>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/xu-ni-nei-cun-he-nei-cun-dou-dong/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/xu-ni-nei-cun-he-nei-cun-dou-dong/" class="post-title-link" itemprop="url">HTML</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-02 12:24:46" itemprop="dateModified" datetime="2021-04-02T12:24:46Z">2021-04-02</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Markdown/" itemprop="url" rel="index"><span itemprop="name">Markdown</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>虚拟内存<br>通过把一部分暂时不用的内存信息放到硬盘上</p>
-<p>局部性原理，程序运行时候只有部分必要的信息装入内存<br>（1）局部性分为时间局部性和空间局部性</p>
-<ul>
-<li>时间局部性就是如果一块内存被访问的时候，很有可能在不远的将来还会被访问</li>
-<li>空间局部性就是如果一块内存被访问，那么周围的内存也很有可能被访问</li>
-</ul>
-<p>内存中暂时不需要的内容放到硬盘上，当需要的时候从新交换回来</p>
-<p>系统似乎提供了比实际内存大得多的容量，称之为虚拟内存</p>
-<p>内存抖动（颠簸）<br>本质是频繁的页调度行为</p>
-<ul>
-<li>频繁的页调度，进程不断产生缺页中断</li>
-<li>置换一个页，又不断再次需要这个页</li>
-<li>运行程序太多；页面替换策略不好。通过杀掉一些无关的进程(终止进程)或者增加物理内存解决</li>
-</ul>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/xing-wei-xing-mo-shi-zhi-ce-lue-mo-shi/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/xing-wei-xing-mo-shi-zhi-ce-lue-mo-shi/" class="post-title-link" itemprop="url">行为型模式之策略模式</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-02 12:24:45" itemprop="dateModified" datetime="2021-04-02T12:24:45Z">2021-04-02</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Markdown/" itemprop="url" rel="index"><span itemprop="name">Markdown</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h3 id="策略模式-Strategy"><a href="#策略模式-Strategy" class="headerlink" title="策略模式(Strategy)"></a>策略模式(Strategy)</h3><ul>
-<li>根据不同的输入规模采用不同的策略</li>
-<li>比如: 买东西超过10个打八折，超过20个打七折</li>
-<li>对外暴露统一的接口，内部采用不同的策略计算<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Order</span>:</span>  <span class="comment"># 订单类，根据订单的个数，来去决定哪种折购策略</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, price, discount_strategy=None</span>):</span></span><br><span class="line">        self.price = price</span><br><span class="line">        self.discount_strategy = discount_strategy</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">price_after_discount</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">if</span> self.discount_strategy:</span><br><span class="line">            <span class="comment"># 括号里self表示给order参数传入price的值</span></span><br><span class="line">            discount = self.discount_strategy(self)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            discount = <span class="number">0</span></span><br><span class="line">        <span class="keyword">return</span> self.price - discount</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span>(<span class="params">self</span>):</span></span><br><span class="line">        fmt = <span class="string">"&lt;Price: {}, price after discount: {}&gt;"</span></span><br><span class="line">        <span class="keyword">return</span> fmt.format(self.price, self.price_after_discount())</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">ten_percent_discount</span>(<span class="params">order</span>):</span>  <span class="comment"># 打九折</span></span><br><span class="line">    <span class="keyword">return</span> order.price * <span class="number">0.1</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">on_sale_discount</span>(<span class="params">order</span>):</span>  <span class="comment"># 打七三折</span></span><br><span class="line">    <span class="keyword">return</span> order.price * <span class="number">0.25</span> + <span class="number">20</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span>():</span></span><br><span class="line">    order0 = Order(<span class="number">100</span>)</span><br><span class="line">    order1 = Order(<span class="number">100</span>, discount_strategy=ten_percent_discount)</span><br><span class="line">    order2 = Order(<span class="number">1000</span>, discount_strategy=on_sale_discount)</span><br><span class="line">    print(order0)</span><br><span class="line">    print(order1)</span><br><span class="line">    print(order2)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">main()</span><br><span class="line"><span class="comment"># 输出结果：</span></span><br><span class="line"><span class="comment"># &lt;Price: 100, price after discount: 100&gt;</span></span><br><span class="line"><span class="comment"># &lt;Price: 100, price after discount: 90.0&gt;</span></span><br><span class="line"><span class="comment"># &lt;Price: 1000, price after discount: 730.0&gt;</span></span><br></pre></td></tr></tbody></table></figure></li>
-</ul>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/xing-wei-xing-mo-shi-zhi-guan-cha-zhe-mo-shi/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/xing-wei-xing-mo-shi-zhi-guan-cha-zhe-mo-shi/" class="post-title-link" itemprop="url">行为型模式之观察者模式</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-02 12:24:46" itemprop="dateModified" datetime="2021-04-02T12:24:46Z">2021-04-02</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Markdown/" itemprop="url" rel="index"><span itemprop="name">Markdown</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h3 id="观察者模式"><a href="#观察者模式" class="headerlink" title="观察者模式"></a>观察者模式</h3><ul>
-<li>发布订阅是一种最常见的实现方式</li>
-<li>发布订阅用于解耦逻辑</li>
-<li>可以通过回调等方式实现，当发生事件时，调用相应的回调函数<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 发布订阅模式，通过在发布者里面加入订阅者，并通过订阅者的回调实现</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Publisher</span>:</span>  <span class="comment"># 发布者</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>):</span></span><br><span class="line">        self.observers = []  <span class="comment"># 初始化观察者为空列表</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">add</span>(<span class="params">self, observer</span>):</span>  <span class="comment"># 加入观察者到观察者列表</span></span><br><span class="line">        <span class="keyword">if</span> observer <span class="keyword">not</span> <span class="keyword">in</span> self.observers:</span><br><span class="line">            self.observers.append(observer)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            print(<span class="string">'Failed to add : {}'</span>.format(observer))</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">remove</span>(<span class="params">self, observer</span>):</span>  <span class="comment"># 从观察者列表移除观察者</span></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            self.observers.remove(observer)</span><br><span class="line">        <span class="keyword">except</span> ValueError:</span><br><span class="line">            print(<span class="string">'Failed to remove : {}'</span>.format(observer))</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">notify</span>(<span class="params">self</span>):</span>  <span class="comment"># 调用观察者的回调</span></span><br><span class="line">        [o.notify_by(self) <span class="keyword">for</span> o <span class="keyword">in</span> self.observers]</span><br><span class="line">        <span class="comment"># 当发生相应事件时候，通知所有观察者去调用回调函数</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Formatter</span>(<span class="params">Publisher</span>):</span>  <span class="comment"># 继承自发布者</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, name</span>):</span></span><br><span class="line">        super().__init__()</span><br><span class="line">        self.name = name</span><br><span class="line">        self._data = <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="meta">    @property</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">data</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> self._data</span><br><span class="line"></span><br><span class="line"><span class="meta">    @data.setter</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">data</span>(<span class="params">self, new_value</span>):</span></span><br><span class="line">        self._data = int(new_value)</span><br><span class="line">        self.notify()  <span class="comment"># data 在被合法赋值以后会执行notify</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BinaryFormatter</span>:</span></span><br><span class="line">    <span class="string">''' 订阅者 '''</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">notify_by</span>(<span class="params">self, publisher</span>):</span>  <span class="comment"># 接收一个Publisher类的实例作为参数</span></span><br><span class="line">        print(<span class="string">"{}: '{}' has now bin data = {}"</span>.format(</span><br><span class="line">            type(self).__name__, </span><br><span class="line">            publisher.name, </span><br><span class="line">            bin(publisher.data))</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">df = Formatter(<span class="string">'formatter'</span>)  <span class="comment"># 发布者</span></span><br><span class="line">bf = BinaryFormatter()  <span class="comment"># 订阅者</span></span><br><span class="line">df.add(bf)  <span class="comment"># 添加订阅者</span></span><br><span class="line">df.data = <span class="number">3</span>  <span class="comment"># 设置的时候调用订阅者的notify_by函数</span></span><br><span class="line"><span class="comment"># 输出结果：</span></span><br><span class="line"><span class="comment"># BinaryFormatter: 'formatter' has now bin data = 0b11</span></span><br></pre></td></tr></tbody></table></figure></li>
-</ul>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/xing-wei-xing-mo-shi-zhi-die-dai-qi-mo-shi/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/xing-wei-xing-mo-shi-zhi-die-dai-qi-mo-shi/" class="post-title-link" itemprop="url">行为型模式之策略模式</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-02 12:24:45" itemprop="dateModified" datetime="2021-04-02T12:24:45Z">2021-04-02</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Markdown/" itemprop="url" rel="index"><span itemprop="name">Markdown</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h3 id="迭代器-Iterator-模式"><a href="#迭代器-Iterator-模式" class="headerlink" title="迭代器(Iterator)模式"></a>迭代器(Iterator)模式</h3><ul>
-<li>Python内置对迭代器模式支持</li>
-<li>可作用于for循环的，具备了__iter__或iter()方法的对象，就是可迭代对象 Iterable</li>
-<li>调用对象名.<strong>next</strong>()时（或next(对象名)）和 <strong>iter</strong> 对象称为迭代器Iterator<br>每次调用next(g)，就计算出g的下一个元素的值，<br>返回它所记录位置的下一个位置的数据。<br>直到没有数据时抛出StopIteration错误，表示无法继续返回下一个值了。<br>直到计算到最后一个元素，没有可供返回的值</li>
-</ul>
-<p>Iterator对象表示的是一个数据流、一个有序序列，<br>但我们却不能提前知道序列的长度，<br>只能不断通过next()函数实现按需计算下一个数据，<br>所以Iterator的计算是惰性的，<br>只有在需要返回下一个数据时它才会计算。</p>
-<p>Python的for循环本质上就是通过不断调用next()函数实现的</p>
-<p>Iterator甚至可以表示一个无限大的数据流，例如全体自然数。<br>而使用list是永远不可能存储全体自然数的。</p>
-<p>给定一个list或tuple或字符串，通过for循环来遍历这个list或tuple，称为迭代（Iteration）。<br>dict迭代的是key。<br>如果要迭代value，可以用for value in d.values()，<br>如果要同时迭代key和value，可以用for k, v in d.items()。</p>
-<p>可以使用isinstance()判断一个对象是否是Iterable对象<br>可以使用isinstance()判断一个对象是否是Iterator对象：</p>
-<p>迭代Iteration 是访问集合元素的一种方式。<br>迭代器是一个可以记住遍历的位置的对象，记录每次迭代访问到的位置，<br>迭代器对象从集合的第一个元素开始访问，<br>直到所有的元素被访问完结束。<br>迭代器只能往前不会后退。</p>
-<p>重复多次，像循环那样，针对对象</p>
-<p>数据类型有以下几种：<br>一类是集合数据类型，<br>int整型不是iterable，即int整型不是可以迭代的<br>如list、tuple、dict、set、str等是Iterable但不是Iterator，<br>把list、dict、str等Iterable变成Iterator可以使用iter()函数</p>
-<p>法二：<br>    定义一个以 yield 关键字标识返回值的函数；<br>    调用刚刚创建的函数，即可创建一个生成器（generator）。<br>生成器函数就是一个迭代器，返回迭代器Iterator的函数，<br>创建了一个generator后，基本上永远不会调用next()，太麻烦<br>而是通过for循环来迭代它，并且不需要关心StopIteration的错误。</p>
-<p>#普通函数是顺序执行，遇到return语句或者最后一行函数语句就返回。<br>#在调用生成器运行的过程中，遇到yield时函数会返回一个generator对象<br>#并保存当前所有的运行信息，函数冻结<br>#在下一次执行next()方法时从上次返回的yield语句处继续执行。<br>比如<code>[i for i in range(10) if i % 2 == 0]</code><br>生成器的创建方式也比迭代器简单很多<br>只要把一个列表生成式的方括号[]改成圆括号()就会返回生成器，只保存算法不保存数据，使用生成器推导大大节省内存<br>一边循环一边计算的机制 只能用于迭代操作</p>
-<figure class="highlight plain"><figcaption><span>for i in range(10) if i % 2 </span></figcaption><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">一类是generator，包括生成器和带yield的generator function。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">为啥会用到生成器？&nbsp; &nbsp;&nbsp;</span><br><span class="line">&nbsp;简单举个例子：</span><br><span class="line">&nbsp; &nbsp; 列表所有数据都在内存中，如果有海量数据的话将会非常耗内存。</span><br><span class="line">如果仅仅需要访问前面几个元素，</span><br><span class="line">那后面绝大多数元素占用的空间都白白浪费了。</span><br><span class="line">&nbsp;&nbsp; &nbsp;如果列表元素能按照某种算法推算出来，</span><br><span class="line">那我们就可以在循环的过程中不断推算出后续的元素，</span><br><span class="line">这样就不必创建完整的list，从而节省大量的空间。</span><br><span class="line"></span><br><span class="line">实现了延迟求值和惰性求值，也是后面协程实现的基础</span><br><span class="line">```python</span><br><span class="line">import hello</span><br><span class="line">hello.test() # test是hello模块的一个函数</span><br><span class="line">变量和函数并没有本质区别，函数名就是变量</span><br><span class="line">import hello</span><br><span class="line">hello.new_var # new_var是hello模块的一个变量</span><br></pre></td></tr></tbody></table></figure>
-
-<p>_是一个合法的标识符，也可以作为一个有效的变量使用，除非明确的知道这个数据需要使用<br>但是定义成下划线就是希望不要被使用<br>无需关注其实际含义的变量可以用_代替，起到的是循环此数的作用,也可以用i，j 等其他字母代替，</p>
-<p>如何让一个对象可迭代</p>
-<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> deque</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Stack</span>(<span class="params">object</span>):</span>  <span class="comment"># 使用组合的例子</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>):</span></span><br><span class="line">        self._deque = deque()  <span class="comment"># has a deque()</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">push</span>(<span class="params">self, value</span>):</span></span><br><span class="line">        <span class="keyword">return</span> self._deque.append(value)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">pop</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> self._deque.pop()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">empty</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> len(self._deque) == <span class="number">0</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__iter__</span>(<span class="params">self</span>):</span>  <span class="comment"># 定义__iter__方法让它支持迭代</span></span><br><span class="line">        <span class="comment"># 因为栈是后进先出希望让它从上往下去迭代</span></span><br><span class="line">        res = []</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> self._deque:  <span class="comment"># deque从左往右去遍历的</span></span><br><span class="line">            res.append(i)</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> reversed(res):  <span class="comment"># 需要让res反转，才能实现从上往下迭代</span></span><br><span class="line">            <span class="keyword">yield</span> i</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">s = Stack()</span><br><span class="line">s.push(<span class="number">1</span>)</span><br><span class="line">s.push(<span class="number">2</span>)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> s:  <span class="comment"># 让自定义Stack实现迭代，通过添加__iter__方法实现迭代</span></span><br><span class="line">    print(i)</span><br><span class="line"><span class="comment"># 输出结果：</span></span><br><span class="line"><span class="comment"># 2</span></span><br><span class="line"><span class="comment"># 1</span></span><br></pre></td></tr></tbody></table></figure>
-<p>注意：Stack并不是一个迭代器，它是个可迭代对象Iterable。要区分迭代器(Iterator)。</p>
+          <p>如何准确的定位到网络上的一台或者多台主机<br>找到主机之后如何进行通信</p>
+<p>（一） 问题解析<br>问： IP地址,子网掩码,默认网关,DNS服务器,有什么区别呀？我知道没有IP地址就不能上网，我也知道没设DNS就不能上外网，可它们都有什么功能，有什么区别呢？还有真奇怪,我的计算机没设DNS,竟然能上QQ,却不能打开网页,这是为什么呢？</p>
+<p>答： IP是32位二进制数据，通常以点分十进制表示。IP地址是一种逻辑地地址，用来标识网络中一个个主机，IP有唯一性，即每台机器的IP在全世界是唯一的。 DNS是域名服务器，用来解析域名的（域名与IP之间的解析），如果没有这东西，你必须输入网站的IP地址，有了DNS，你就可以直接输入网址。 因为上QQ不需要有DNS(QQ只是一个客户端程序，用不到DNS)，只有浏览网页(需输入网址时)才用到DNS。</p>
+<p>（二）DNS服务器<br>DNS是指：域名服务器(Domain Name Server)。在Internet上域名与IP地址之间是一一对应的，域名虽然便于人们记忆，但机器之间只能互相认识IP地址，它们之间的转换工作称为域名解析，域名解析需要由专门的域名解析服务器来完成，DNS就是进行域名解析的服务器 。(详见文化基础P242)<br>（三）IP地址<br>电脑之间要实现网络通信，就必须要有一个合法的ip地址。IP地址=网络地址+主机地址，（又称：主机号和网络号组成）ip地址的结构使我们可以在Internet上很方便的寻址。ip地址通常用更直观的，以圆点分隔号的四个十进制数字表示，每个数字从0到255，如某一台主机的ip地址为：128.20.4.1在局域网里，同样也需要ip地址，一般内网的ip地址是以192.168开头的，这样很容易区分公网和内网的ip地址。<br>（四）子网掩码<br>子网掩码是用来判断任意两台计算机的ip地址是否属于同一子网络的根据。最为简单的理解就是两台计算机各自的ip地址与子网掩码进行and运算后，得出的结果是相同的，则说明这两台计算机是处于同一个子网络上的，可以进行直接的通讯。（具体子网掩码各位的含义待补充。）<br>（五）默认网关<br>什么是默认网关 ？</p>
+<p>如果搞清了什么是网关，默认网关也就好理解了。就好像一个房间可以有多扇门一样，一台主机可以有多个网关。默认网关的意思是一台主机如果找不到可用的网关，就把数据包发给默认指定的网关，由这个网关来处理数据包。现在主机使用的网关，一般指的是默认网关。（文化基础P222 网关的概念）</p>
+<p>如何设置默认网关</p>
+<p>一台电脑的默认网关是不可以随随便便指定的，必须正确地指定，否则一台电脑就会将数据包发给不是网关的电脑，从而无法与其他网络的电脑通信。默认网关的设定有手动设置和自动设置两种方式。</p>
+<p>手动设置<br>手动设置适用于电脑数量比较少、TCP/IP参数基本不变的情况，比如只有几台到十几台电脑。因为这种方法需要在联入网络的每台电脑上设置“默认网关”，非常费劲，一旦因为迁移等原因导致必须修改默认网关的IP地址，就会给网管带来很大的麻烦，所以不推荐使用。</p>
+<p>在Windows 9x中，设置默认网关的方法是在“网上邻居”上右击，在弹出的菜单中点击“属性”，在网络属性对话框中选择“TCP/IP协议”，点击“属性”，在“默认网关”选项卡中填写新的默认网关的IP地址就可以了。</p>
+<p>需要特别注意的是：默认网关必须是电脑自己所在的网段中的IP地址，而不能填写其他网段中的IP地址。</p>
+<p>自动设置</p>
+<p>自动设置就是利用DHCP（Dynamic Host Configuration Protocol, 动态主机配置协议）服务器来自动给网络中的电脑分配IP地址、子网掩码和默认网关 。这样做的好处是一旦网络的默认网关发生了变化时，只要更改了DHCP服务器中默认网关的设置，那么网络中所有的电脑均获得了新的默认网关的IP地址。这种方法适用于网络规模较大、TCP/IP参数有可能变动的网络。另外一种自动获得网关的办法是通过安装代理服务器软件（如MS Proxy）的客户端程序来自动获得，其原理和方法和DHCP有相似之处。由于篇幅所限，就不再详述了</p>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -1296,7 +1374,7 @@
 
 
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/16/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/16/">16</a><span class="page-number current">17</span><a class="page-number" href="/page/18/">18</a><span class="space">&hellip;</span><a class="page-number" href="/page/21/">21</a><a class="extend next" rel="next" href="/page/18/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/16/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/16/">16</a><span class="page-number current">17</span><a class="page-number" href="/page/18/">18</a><span class="space">&hellip;</span><a class="page-number" href="/page/22/">22</a><a class="extend next" rel="next" href="/page/18/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 <script src="/js/comments.js"></script>
 </div>

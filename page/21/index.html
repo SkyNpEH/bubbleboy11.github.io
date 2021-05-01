@@ -118,13 +118,13 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">204</span>
+          <span class="site-state-item-count">214</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
-        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-count">20</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -158,6 +158,602 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/xie-cheng/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/xie-cheng/" class="post-title-link" itemprop="url">协程</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-04-13 14:17:38" itemprop="dateModified" datetime="2021-04-13T14:17:38Z">2021-04-13</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h3 id="协程：协同多任务"><a href="#协程：协同多任务" class="headerlink" title="协程：协同多任务"></a>协程：协同多任务</h3><ul>
+<li>协程是轻量级线程，单线程，分解一个线程成为多个 “微线程”。</li>
+<li>可以执行并发任务，原因是协程把切换的权利交给程序员调度而不是操作系统，与程序员决定在哪些环节进行切换。协程可以处理上万的并发，多线程即不可以，因为切换成本太大，会耗尽计算机资源</li>
+<li>不需要锁机制，因为是单线程</li>
+<li>对多核CPU的利用——多进程+协程<br>协程是为非抢占式多任务产生子程序的计算机程序组件，协程允许不同入口点在不同位置暂停或开始执行程序。从技术的角度来说，“协程就是你可以暂停执行的函数”</li>
+</ul>
+<h3 id="协程的实现"><a href="#协程的实现" class="headerlink" title="协程的实现"></a>协程的实现</h3><h4 id="协程在Python3-5里引入"><a href="#协程在Python3-5里引入" class="headerlink" title="协程在Python3.5里引入"></a>协程在Python3.5里引入</h4><figure class="highlight plain"><figcaption><span>支持原生协程（native coroutine）</span></figcaption><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">##### 非阻塞（异步）与多线程多进程</span><br><span class="line">- 可以获取异步函数的返回值</span><br><span class="line">- 主进程需要异步才行，web服务是异步，执行的过程中所有的程序都需要是异步加上```await```</span><br><span class="line">- 更适合文件读写使用</span><br><span class="line"></span><br><span class="line">协程通常表示两种不同的概念。</span><br><span class="line">1. ```async```定义修饰的协程函数</span><br><span class="line">- 当被调用时，**不执行里面的代码，而是返回一个协程对象**</span><br><span class="line">- 在事件循环中调度其执行前，协程对象不执行任何操作</span><br><span class="line">```py</span><br><span class="line">async def async_():</span><br><span class="line">    pass</span><br><span class="line">    return "a"</span><br></pre></td></tr></tbody></table></figure>
+
+<ol start="2">
+<li><code>await</code></li>
+</ol>
+<ul>
+<li>等待协程执行异步完成 </li>
+<li>当遇到阻塞调用的函数的时候，使用<code>await</code>方法将协程的控制权让出，以便<code>loop</code>调用其他的异步协程，loop指事件循环的队列<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">handle</span>():</span></span><br><span class="line">    result = <span class="keyword">await</span> test()</span><br></pre></td></tr></tbody></table></figure>
+
+</li>
+</ul>
+<figure class="highlight plain"><figcaption><span>Python3 协程标准库只有一个，支持多线程，</span></figcaption><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">- 基于协程实现的内置并发网络库，协程+事件循环</span><br><span class="line">- 事件循环框架可以进行异步编程</span><br><span class="line">调用一个异步函数</span><br><span class="line">- ```asyncio.get_event_loop()```获得事件循环队列</span><br><span class="line">- ```run_until_complete()``` 注册任务到队列</span><br><span class="line">- ```asyncio.gather(asyncfunc)``` 将异步函数批量执行，返回值```List```类型的函数的返回结果，参数是声明了```async```的函数名</span><br><span class="line">- ````asyncio.run(task)```` 执行主异步函数， 返回执行函数的结果</span><br><span class="line">- ```asyncio.iscoroutinefunction(func)``` 判断是否为协程函数</span><br><span class="line"></span><br><span class="line">- ```time.sleep()```是cpu级别的阻塞，无论是同步还是异步都停下来</span><br><span class="line">- ```gevent.sleep()```是当前函数的阻塞，业务执行等待的时间</span><br><span class="line">- ```await asyncio.sleep()```当前函数的阻塞，业务执行等待的时间</span><br><span class="line"></span><br><span class="line">```py</span><br><span class="line">import os</span><br><span class="line">import asyncio</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">async def a():</span><br><span class="line">    print("我是异步代码a", os.getpid())</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">async def b():</span><br><span class="line">    print("我是异步代码b", os.getpid())</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">async def handle():</span><br><span class="line">    await b()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">async def main():</span><br><span class="line">    await asyncio.gather(a(), handle())  # 将异步函数批量执行</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">if __name__ == '__main__':</span><br><span class="line">    asyncio.run(main())</span><br><span class="line">    print('parent is %s' % os.getpid())</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight angelscript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">我是异步代码a <span class="number">12088</span></span><br><span class="line">我是异步代码b <span class="number">12088</span></span><br><span class="line">parent <span class="keyword">is</span> <span class="number">12088</span></span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">import</span> random</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">a</span>():</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">5</span>):</span><br><span class="line">        print(i, <span class="string">'a'</span>, os.getpid())</span><br><span class="line">        time.sleep(random.random() * <span class="number">2</span>)</span><br><span class="line">    <span class="keyword">return</span> <span class="string">'a function'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">b</span>():</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">5</span>):</span><br><span class="line">        print(i, <span class="string">'b'</span>, os.getpid())</span><br><span class="line">        time.sleep(random.random() * <span class="number">2</span>)</span><br><span class="line">    <span class="keyword">return</span> <span class="string">'b function'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    start = time.time()</span><br><span class="line">    a()</span><br><span class="line">    b()</span><br><span class="line">    print(time.time() - start)</span><br><span class="line">    print(<span class="string">'parent is %s'</span> % os.getpid())</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight angelscript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">0</span> a <span class="number">11876</span></span><br><span class="line"><span class="number">1</span> a <span class="number">11876</span></span><br><span class="line"><span class="number">2</span> a <span class="number">11876</span></span><br><span class="line"><span class="number">3</span> a <span class="number">11876</span></span><br><span class="line"><span class="number">4</span> a <span class="number">11876</span></span><br><span class="line"><span class="number">0</span> b <span class="number">11876</span></span><br><span class="line"><span class="number">1</span> b <span class="number">11876</span></span><br><span class="line"><span class="number">2</span> b <span class="number">11876</span></span><br><span class="line"><span class="number">3</span> b <span class="number">11876</span></span><br><span class="line"><span class="number">4</span> b <span class="number">11876</span></span><br><span class="line"><span class="number">11.118042469024658</span></span><br><span class="line">parent <span class="keyword">is</span> <span class="number">11876</span></span><br></pre></td></tr></tbody></table></figure>
+<p>同步从上到下，线执行完a函数在执行b函数</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">import</span> random</span><br><span class="line"><span class="keyword">import</span> asyncio</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">a</span>():</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">5</span>):</span><br><span class="line">        print(i, <span class="string">'a'</span>, os.getpid())</span><br><span class="line">        <span class="keyword">await</span> asyncio.sleep(random.random() * <span class="number">2</span>)  <span class="comment"># 不再是time.sleep</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">'a function'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">b</span>():</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">5</span>):</span><br><span class="line">        print(i, <span class="string">'b'</span>, os.getpid())</span><br><span class="line">        <span class="keyword">await</span> asyncio.sleep(random.random() * <span class="number">2</span>)  <span class="comment"># 不再是time.sleep</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">'b function'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">main</span>():</span></span><br><span class="line">    result = <span class="keyword">await</span> asyncio.gather(a(), b())</span><br><span class="line">    print(result[<span class="number">0</span>], result[<span class="number">1</span>])</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    start = time.time()</span><br><span class="line">    asyncio.run(main())</span><br><span class="line">    <span class="comment"># print(result[0].value)</span></span><br><span class="line">    <span class="comment"># print(result[1].value)</span></span><br><span class="line">    print(time.time() - start)</span><br><span class="line">    print(<span class="string">'parent is %s'</span> % os.getpid())</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight lsl"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">0</span> a <span class="number">7880</span></span><br><span class="line"><span class="number">0</span> b <span class="number">7880</span></span><br><span class="line"><span class="number">1</span> b <span class="number">7880</span></span><br><span class="line"><span class="number">2</span> b <span class="number">7880</span></span><br><span class="line"><span class="number">1</span> a <span class="number">7880</span></span><br><span class="line"><span class="number">2</span> a <span class="number">7880</span></span><br><span class="line"><span class="number">3</span> a <span class="number">7880</span></span><br><span class="line"><span class="number">3</span> b <span class="number">7880</span></span><br><span class="line"><span class="number">4</span> a <span class="number">7880</span></span><br><span class="line"><span class="number">4</span> b <span class="number">7880</span></span><br><span class="line">a function b function</span><br><span class="line"><span class="number">3.2919344902038574</span></span><br><span class="line">parent is <span class="number">7880</span></span><br></pre></td></tr></tbody></table></figure>
+<p>ab同时执行</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> asyncio</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 在事件循环中调度其执行前，协程对象不执行任何操作</span></span><br><span class="line"><span class="comment"># asyncio模块用于事件循环</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">do_sth</span>(<span class="params">x</span>):</span></span><br><span class="line">    <span class="string">""" 定义协程函数 """</span></span><br><span class="line">    print(<span class="string">'等待中: {0}'</span>.format(x))</span><br><span class="line">    <span class="keyword">await</span> asyncio.sleep(x)</span><br><span class="line">    <span class="comment"># 等待协程执行完成</span></span><br><span class="line">    <span class="comment"># 当遇到阻塞调用的函数的时候，使用await方法将协程的控制权让出，</span></span><br><span class="line">    <span class="comment"># 以便loop调用其他的协程</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 判断是否为协程函数</span></span><br><span class="line">print(asyncio.iscoroutinefunction(do_sth))</span><br><span class="line"></span><br><span class="line">coroutine = do_sth(<span class="number">5</span>)</span><br><span class="line">loop = asyncio.get_event_loop()  <span class="comment"># 获得事件的循环队列</span></span><br><span class="line"><span class="comment"># 注册任务到队列</span></span><br><span class="line">task = loop.create_task(coroutine)</span><br><span class="line">print(task)</span><br><span class="line"><span class="comment"># 等待协程任务执行结束</span></span><br><span class="line">loop.run_until_complete(task)</span><br><span class="line">print(task)</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight routeros"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="literal">True</span></span><br><span class="line">&lt;Task pending <span class="attribute">name</span>=<span class="string">'Task-1'</span> <span class="attribute">coro</span>=&lt;do_sth() running at c:/use_async.py:7&gt;&gt;</span><br><span class="line">等待中: 5</span><br><span class="line">&lt;Task finished <span class="attribute">name</span>=<span class="string">'Task-1'</span> <span class="attribute">coro</span>=&lt;do_sth() done, defined at c:/chapter01/use_async.py:7&gt; <span class="attribute">result</span>=None&gt;</span><br></pre></td></tr></tbody></table></figure>
+<p>如果没有<code>await</code>不会等待5秒</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> asyncio</span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"><span class="keyword">import</span> random</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">display_date</span>(<span class="params">num, loop</span>):</span></span><br><span class="line">    end_time = loop.time() + <span class="number">50.0</span></span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        print(<span class="string">"Loop: {} Time: {}"</span>.format(num, datetime.datetime.now()))</span><br><span class="line">        <span class="keyword">if</span> (loop.time() + <span class="number">1.0</span>) &gt;= end_time:</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        <span class="keyword">await</span> asyncio.sleep(random.randint(<span class="number">0</span>, <span class="number">5</span>))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    loop = asyncio.get_event_loop()</span><br><span class="line">    asyncio.ensure_future(display_date(<span class="number">1</span>, loop))</span><br><span class="line">    asyncio.ensure_future(display_date(<span class="number">2</span>, loop))</span><br><span class="line">    loop.run_forever()</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> asyncio</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">main</span>():</span></span><br><span class="line">    print(<span class="string">'hello'</span>)</span><br><span class="line">    <span class="keyword">await</span> asyncio.sleep(<span class="number">1</span>)</span><br><span class="line">    print(<span class="string">'world'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># loop是事件循环</span></span><br><span class="line">loop = asyncio.get_event_loop()</span><br><span class="line">loop.run_until_complete(main())</span><br><span class="line">loop.close()</span><br><span class="line"></span><br><span class="line"><span class="comment"># hello</span></span><br><span class="line"><span class="comment"># world 隔1秒</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>示例：基于asyncio实现的异步http客户端 aiohttp</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 基于 aiohttp 并发请求</span></span><br><span class="line"><span class="keyword">import</span> asyncio</span><br><span class="line"><span class="keyword">from</span> aiohttp <span class="keyword">import</span> ClientSession</span><br><span class="line"> </span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">fetch</span>(<span class="params">url, session</span>):</span></span><br><span class="line">    <span class="keyword">async</span> <span class="keyword">with</span> session.get(url) <span class="keyword">as</span> response:</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">await</span> response.read()</span><br><span class="line">        </span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">run</span>(<span class="params">r=<span class="number">10</span></span>):</span></span><br><span class="line">    url = <span class="string">"http://httpbin.org/get"</span></span><br><span class="line">    tasks = []</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">async</span> <span class="keyword">with</span> ClientSession() <span class="keyword">as</span> session:</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(r):</span><br><span class="line">            task = asyncio.ensure_future(fetch(url, session))</span><br><span class="line">            tasks.append(task)</span><br><span class="line">        responses = <span class="keyword">await</span> asyncio.gather(*tasks)</span><br><span class="line">        <span class="keyword">for</span> resp_body <span class="keyword">in</span> responses:</span><br><span class="line">            print(len(resp_body))</span><br><span class="line">            </span><br><span class="line">loop = asyncio.get_event_loop()  <span class="comment"># 获取事件循环</span></span><br><span class="line">future = asyncio.ensure_future(run())</span><br><span class="line">loop.run_until_complete(future)  <span class="comment"># 在事件循环里执行任务</span></span><br><span class="line"><span class="comment"># 输出结果：</span></span><br><span class="line"><span class="comment"># 254</span></span><br><span class="line"><span class="comment"># 254</span></span><br><span class="line"><span class="comment"># 254</span></span><br><span class="line"><span class="comment"># 254</span></span><br><span class="line"><span class="comment"># 254</span></span><br><span class="line"><span class="comment"># 254</span></span><br><span class="line"><span class="comment"># 254</span></span><br><span class="line"><span class="comment"># 254</span></span><br><span class="line"><span class="comment"># 254</span></span><br><span class="line"><span class="comment"># 254</span></span><br></pre></td></tr></tbody></table></figure>
+
+<hr>
+<h4 id="基于生成器的协程-Generator-Based-Coroutine"><a href="#基于生成器的协程-Generator-Based-Coroutine" class="headerlink" title="基于生成器的协程 Generator Based Coroutine"></a>基于生成器的协程 Generator Based Coroutine</h4><p>python3.5之前没有原生协程，是基于生成器（yield）来实现的协程。</p>
+<ul>
+<li>pep 342(Coroutines via Enhanced Generator)增强生成器功能</li>
+<li>生成器可以通过yield暂停执行和产出数据</li>
+<li>同时支持<code>send()</code>向生成器发送数据和<code>throw()</code>向生成器抛异常 </li>
+<li>协程需要使用<code> send(None)</code> 或者 <code>next(coroutine)</code> 来预激 <code>(prime)</code>才能启动</li>
+<li>在 <code>yield</code>处协程会暂定执行</li>
+<li>单独<code>yield value</code> 会产出值给调用方</li>
+<li>可以单独<code>coroutine.send(value)</code> 来给协程发送值，发送的值会赋值给&nbsp;<code>yield</code>表达式左边的变量</li>
+<li>协程执行完后（没有遇到下一个<code>yield</code>语句）会抛出<code>StopIteratio</code>异常</li>
+</ul>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">count_down</span>(<span class="params">n</span>):</span></span><br><span class="line">    <span class="string">""" 倒计时效果 """</span></span><br><span class="line">    <span class="keyword">while</span> n &gt; <span class="number">0</span>:</span><br><span class="line">        <span class="keyword">yield</span> n  <span class="comment"># generator</span></span><br><span class="line">        n -= <span class="number">1</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    rest = count_down(<span class="number">5</span>)</span><br><span class="line">    print(next(rest))</span><br><span class="line">    print(next(rest))</span><br><span class="line">    print(next(rest))</span><br><span class="line">    print(next(rest))</span><br><span class="line">    print(next(rest))</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight angelscript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">5</span></span><br><span class="line"><span class="number">4</span></span><br><span class="line"><span class="number">3</span></span><br><span class="line"><span class="number">2</span></span><br><span class="line"><span class="number">1</span></span><br></pre></td></tr></tbody></table></figure>
+<p>调用<code>next()</code>，函数将不断的执行语句直到遇到下一个yield的位置，yield在函数语句执行暂停，直到下一次遇到又会暂停 </p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">yield_test</span>():</span></span><br><span class="line">    <span class="string">""" 实现协程函数 """</span></span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        n = (<span class="keyword">yield</span>)  <span class="comment"># yield当成赋值语句</span></span><br><span class="line">        print(n)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    rest = yield_test()</span><br><span class="line">    next(rest)</span><br><span class="line">    rest.send(<span class="string">'6666'</span>)</span><br><span class="line">    rest.send(<span class="string">'6666'</span>)</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight angelscript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">6666</span></span><br><span class="line"><span class="number">6666</span></span><br></pre></td></tr></tbody></table></figure>
+
+
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">coro</span>():</span></span><br><span class="line">    a1 = <span class="keyword">yield</span> <span class="string">'hello'</span>  <span class="comment"># yield关键字在=右边作为表达式，可以被send值</span></span><br><span class="line">    <span class="keyword">yield</span> a1</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">c = coro()  <span class="comment"># 生成一个协程</span></span><br><span class="line">print(type(c))  <span class="comment"># &lt;class 'generator'&gt;</span></span><br><span class="line"><span class="comment"># 输出 'hello'，这里调用next产出第一个值’hello',之后函数暂停 </span></span><br><span class="line">print(next(c))  <span class="comment"># hello</span></span><br><span class="line">print(c.send(<span class="string">'world'</span>))  <span class="comment"># world</span></span><br><span class="line"><span class="comment"># 如果yield在表达式=的右边，就可以向该函数调用 send() 发送一个值，此时a1被赋值为'world'，然后yield产出a1变量的值'world',然后函数又暂停</span></span><br><span class="line"><span class="comment"># 之后协程结束，后续再send值会抛出异常 StopIteration</span></span><br><span class="line"><span class="comment"># print(c.send('None'))  # StopIteration  </span></span><br></pre></td></tr></tbody></table></figure>
+
+
+<h2 id="协程之间的数据通信"><a href="#协程之间的数据通信" class="headerlink" title="协程之间的数据通信"></a>协程之间的数据通信</h2><h4 id="嵌套调用："><a href="#嵌套调用：" class="headerlink" title="嵌套调用："></a>嵌套调用：</h4><p>在一个协程函数中，有一些业务逻辑代码依赖于另外的协程函数的返回</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> asyncio</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">compute</span>(<span class="params">x, y</span>):</span></span><br><span class="line">    print(<span class="string">'计算x +y =&gt; {0}+{1}'</span>.format(x, y))</span><br><span class="line">    <span class="keyword">await</span> asyncio.sleep(<span class="number">3</span>)</span><br><span class="line">    <span class="keyword">return</span> x + y</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">get_sum</span>(<span class="params">x, y</span>):</span></span><br><span class="line">    rest = compute(x, y) <span class="comment"># 当被调用不加上await时，不执行里面的代码，而是返回一个协程对象，</span></span><br><span class="line">    <span class="comment"># rest = await compute(x, y) # 调用比较耗时的函数，加上await才能得到函数的返回值</span></span><br><span class="line">    print(<span class="string">'{0} + {1} = {2}'</span>.format(x, y, rest))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 拿到事件循环</span></span><br><span class="line">loop = asyncio.get_event_loop()</span><br><span class="line">loop.run_until_complete(get_sum(<span class="number">1</span>, <span class="number">2</span>))</span><br><span class="line">loop.close()</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight crystal"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span> + <span class="number">2</span> = &lt;coroutine object compute at <span class="number">0x000002B6B85F5140</span>&gt;</span><br><span class="line"><span class="symbol">C:</span>\Users\rose\AppData\Local\Programs\Python\Python38\<span class="class"><span class="keyword">lib</span>\<span class="title">asyncio</span>\<span class="title">events</span>.<span class="title">py</span>:81: <span class="title">RuntimeWarning</span>: <span class="title">coroutine</span> '<span class="title">compute</span>' <span class="title">was</span> <span class="title">never</span> <span class="title">awaited</span></span></span><br><span class="line">  <span class="keyword">self</span>._context.run(<span class="keyword">self</span>._callback, *<span class="keyword">self</span>._args)</span><br><span class="line"><span class="symbol">RuntimeWarning:</span> Enable tracemalloc to get the object allocation traceback</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> asyncio</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">compute</span>(<span class="params">x, y</span>):</span></span><br><span class="line">    print(<span class="string">'计算x +y =&gt; {0}+{1}'</span>.format(x, y))</span><br><span class="line">    <span class="keyword">await</span> asyncio.sleep(<span class="number">3</span>)</span><br><span class="line">    <span class="keyword">return</span> x + y</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">get_sum</span>(<span class="params">x, y</span>):</span></span><br><span class="line">    <span class="comment"># rest = compute(x, y) # 调用比较耗时的函数，加上await</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 当遇到阻塞调用的函数的时候，使用```await```方法将协程的控制权让出，</span></span><br><span class="line">    <span class="comment"># 以便```loop```调用其他的异步协程，loop指事件循环</span></span><br><span class="line">    rest = <span class="keyword">await</span> compute(x, y) <span class="comment"># 加上await 等待协程执行异步完成 </span></span><br><span class="line">    print(<span class="string">'{0} + {1} = {2}'</span>.format(x, y, rest))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 拿到事件循环</span></span><br><span class="line">loop = asyncio.get_event_loop()</span><br><span class="line">loop.run_until_complete(get_sum(<span class="number">1</span>, <span class="number">2</span>))</span><br><span class="line">loop.close()</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight angelscript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">计算x +y =&gt; <span class="number">1</span>+<span class="number">2</span></span><br><span class="line">等待<span class="number">3</span>秒</span><br><span class="line"><span class="number">1</span> + <span class="number">2</span> = <span class="number">3</span></span><br></pre></td></tr></tbody></table></figure>
+
+
+<h3 id="队列"><a href="#队列" class="headerlink" title="队列"></a>队列</h3><ol>
+<li>定义一个队列</li>
+<li>让两个协程来进行通信</li>
+<li>让其中一个协程往队列中写入数据</li>
+<li>让另一个协程从队列中删除数据<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> asyncio</span><br><span class="line"><span class="keyword">import</span> random</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">add</span>(<span class="params">store, name</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    写入数据到队列</span></span><br><span class="line"><span class="string">    :param store: 队列的对象</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">5</span>):</span><br><span class="line">        <span class="comment"># 往队列中添加数字</span></span><br><span class="line">        num = <span class="string">'{0} - {1}'</span>.format(name, i)</span><br><span class="line">        <span class="keyword">await</span> asyncio.sleep(random.randint(<span class="number">1</span>, <span class="number">5</span>))</span><br><span class="line">        <span class="keyword">await</span> store.put(i)</span><br><span class="line">        print(<span class="string">'{2} add one ... {0}, size: {1}'</span>.format(num, store.qsize(),</span><br><span class="line">                                                      name))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    <span class="comment"># 准备一个队列</span></span><br><span class="line">    store = asyncio.Queue(maxsize=<span class="number">5</span>)</span><br><span class="line">    a1 = add(store, <span class="string">'a1'</span>)</span><br><span class="line">    a2 = add(store, <span class="string">'a2'</span>)</span><br><span class="line">    r1 = reduce(store)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 添加到事件队列</span></span><br><span class="line">    loop = asyncio.get_event_loop()</span><br><span class="line">    loop.run_until_complete(a1)</span><br><span class="line">    <span class="comment"># loop.run_until_complete(asyncio.gather(a1, a2, r1))</span></span><br><span class="line">    loop.close()</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight apache"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">a1</span> add one ... a<span class="number">1</span> - <span class="number">0</span>, size: <span class="number">1</span></span><br><span class="line"><span class="attribute">a1</span> add one ... a<span class="number">1</span> - <span class="number">1</span>, size: <span class="number">2</span></span><br><span class="line"><span class="attribute">a1</span> add one ... a<span class="number">1</span> - <span class="number">2</span>, size: <span class="number">3</span></span><br><span class="line"><span class="attribute">a1</span> add one ... a<span class="number">1</span> - <span class="number">3</span>, size: <span class="number">4</span></span><br><span class="line"><span class="attribute">a1</span> add one ... a<span class="number">1</span> - <span class="number">4</span>, size: <span class="number">5</span></span><br><span class="line"><span class="attribute">sys</span>:<span class="number">1</span>: RuntimeWarning: coroutine 'add' was never awaited   </span><br><span class="line"><span class="attribute">sys</span>:<span class="number">1</span>: RuntimeWarning: coroutine 'reduce' was never awaited</span><br></pre></td></tr></tbody></table></figure>
+
+</li>
+</ol>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> asyncio</span><br><span class="line"><span class="keyword">import</span> random</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">add</span>(<span class="params">store, name</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    写入数据到队列</span></span><br><span class="line"><span class="string">    :param store: 队列的对象</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">5</span>):</span><br><span class="line">        <span class="comment"># 往队列中添加数字</span></span><br><span class="line">        num = <span class="string">'{0} - {1}'</span>.format(name, i)</span><br><span class="line">        <span class="keyword">await</span> asyncio.sleep(random.randint(<span class="number">1</span>, <span class="number">5</span>))</span><br><span class="line">        <span class="keyword">await</span> store.put(i)</span><br><span class="line">        print(<span class="string">'{2} add one ... {0}, size: {1}'</span>.format(num, store.qsize(),</span><br><span class="line">                                                      name))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">reduce</span>(<span class="params">store</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    从队列中删除数据</span></span><br><span class="line"><span class="string">    :param store:</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10</span>):</span><br><span class="line">        rest = <span class="keyword">await</span> store.get()</span><br><span class="line">        print(<span class="string">' reduce one.. {0}, size: {1}'</span>.format(rest, store.qsize()))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    <span class="comment"># 准备一个队列</span></span><br><span class="line">    store = asyncio.Queue(maxsize=<span class="number">5</span>)</span><br><span class="line">    a1 = add(store, <span class="string">'a1'</span>)</span><br><span class="line">    a2 = add(store, <span class="string">'a2'</span>)</span><br><span class="line">    r1 = reduce(store)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 添加到事件队列</span></span><br><span class="line">    loop = asyncio.get_event_loop()</span><br><span class="line">    loop.run_until_complete(asyncio.gather(a1, a2, r1))</span><br><span class="line">    loop.close()</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight yaml"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">a1</span> <span class="string">add</span> <span class="string">one</span> <span class="string">...</span> <span class="string">a1</span> <span class="bullet">-</span> <span class="number">0</span><span class="string">,</span> <span class="attr">size:</span> <span class="number">1</span></span><br><span class="line"> <span class="string">reduce</span> <span class="string">one..</span> <span class="number">0</span><span class="string">,</span> <span class="attr">size:</span> <span class="number">0</span></span><br><span class="line"><span class="string">a2</span> <span class="string">add</span> <span class="string">one</span> <span class="string">...</span> <span class="string">a2</span> <span class="bullet">-</span> <span class="number">0</span><span class="string">,</span> <span class="attr">size:</span> <span class="number">1</span></span><br><span class="line"> <span class="string">reduce</span> <span class="string">one..</span> <span class="number">0</span><span class="string">,</span> <span class="attr">size:</span> <span class="number">0</span></span><br><span class="line"><span class="string">a1</span> <span class="string">add</span> <span class="string">one</span> <span class="string">...</span> <span class="string">a1</span> <span class="bullet">-</span> <span class="number">1</span><span class="string">,</span> <span class="attr">size:</span> <span class="number">1</span></span><br><span class="line"> <span class="string">reduce</span> <span class="string">one..</span> <span class="number">1</span><span class="string">,</span> <span class="attr">size:</span> <span class="number">0</span></span><br><span class="line"><span class="string">a1</span> <span class="string">add</span> <span class="string">one</span> <span class="string">...</span> <span class="string">a1</span> <span class="bullet">-</span> <span class="number">2</span><span class="string">,</span> <span class="attr">size:</span> <span class="number">1</span></span><br><span class="line"> <span class="string">reduce</span> <span class="string">one..</span> <span class="number">2</span><span class="string">,</span> <span class="attr">size:</span> <span class="number">0</span></span><br><span class="line"><span class="string">a2</span> <span class="string">add</span> <span class="string">one</span> <span class="string">...</span> <span class="string">a2</span> <span class="bullet">-</span> <span class="number">1</span><span class="string">,</span> <span class="attr">size:</span> <span class="number">1</span></span><br><span class="line"> <span class="string">reduce</span> <span class="string">one..</span> <span class="number">1</span><span class="string">,</span> <span class="attr">size:</span> <span class="number">0</span></span><br><span class="line"><span class="string">a2</span> <span class="string">add</span> <span class="string">one</span> <span class="string">...</span> <span class="string">a2</span> <span class="bullet">-</span> <span class="number">2</span><span class="string">,</span> <span class="attr">size:</span> <span class="number">1</span></span><br><span class="line"> <span class="string">reduce</span> <span class="string">one..</span> <span class="number">2</span><span class="string">,</span> <span class="attr">size:</span> <span class="number">0</span></span><br><span class="line"><span class="string">a1</span> <span class="string">add</span> <span class="string">one</span> <span class="string">...</span> <span class="string">a1</span> <span class="bullet">-</span> <span class="number">3</span><span class="string">,</span> <span class="attr">size:</span> <span class="number">1</span></span><br><span class="line"> <span class="string">reduce</span> <span class="string">one..</span> <span class="number">3</span><span class="string">,</span> <span class="attr">size:</span> <span class="number">0</span></span><br><span class="line"><span class="string">a2</span> <span class="string">add</span> <span class="string">one</span> <span class="string">...</span> <span class="string">a2</span> <span class="bullet">-</span> <span class="number">3</span><span class="string">,</span> <span class="attr">size:</span> <span class="number">1</span></span><br><span class="line"> <span class="string">reduce</span> <span class="string">one..</span> <span class="number">3</span><span class="string">,</span> <span class="attr">size:</span> <span class="number">0</span></span><br><span class="line"><span class="string">a1</span> <span class="string">add</span> <span class="string">one</span> <span class="string">...</span> <span class="string">a1</span> <span class="bullet">-</span> <span class="number">4</span><span class="string">,</span> <span class="attr">size:</span> <span class="number">1</span></span><br><span class="line"> <span class="string">reduce</span> <span class="string">one..</span> <span class="number">4</span><span class="string">,</span> <span class="attr">size:</span> <span class="number">0</span></span><br><span class="line"><span class="string">a2</span> <span class="string">add</span> <span class="string">one</span> <span class="string">...</span> <span class="string">a2</span> <span class="bullet">-</span> <span class="number">4</span><span class="string">,</span> <span class="attr">size:</span> <span class="number">1</span></span><br><span class="line"> <span class="string">reduce</span> <span class="string">one..</span> <span class="number">4</span><span class="string">,</span> <span class="attr">size:</span> <span class="number">0</span></span><br></pre></td></tr></tbody></table></figure>
+
+
+<h3 id="协程装饰器"><a href="#协程装饰器" class="headerlink" title="协程装饰器"></a>协程装饰器</h3><p>避免每次都要用 send 预激它</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 协程</span></span><br><span class="line"><span class="keyword">import</span> gevent</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">foo</span>():</span></span><br><span class="line">    print(<span class="string">"start_foo"</span>)</span><br><span class="line">    gevent.sleep(<span class="number">2</span>)</span><br><span class="line">    print(<span class="string">"end_foo"</span>)</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">bar</span>():</span></span><br><span class="line">    print(<span class="string">"start_bar"</span>)</span><br><span class="line">    gevent.sleep(<span class="number">0</span>)</span><br><span class="line">    print(<span class="string">"end_bar"</span>)</span><br><span class="line"> </span><br><span class="line">gevent.joinall([</span><br><span class="line">    gevent.spawn(foo),</span><br><span class="line">    gevent.spawn(bar)</span><br><span class="line">])</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight ebnf"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">start_foo</span></span><br><span class="line"><span class="attribute">       start_bar</span></span><br><span class="line"><span class="attribute">       end_bar</span></span><br><span class="line"><span class="attribute">       end_foo</span></span><br></pre></td></tr></tbody></table></figure>
+
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/sheng-cheng-mu-lu-jie-gou/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/sheng-cheng-mu-lu-jie-gou/" class="post-title-link" itemprop="url">生成目录结构</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-04-12 09:49:51" itemprop="dateModified" datetime="2021-04-12T09:49:51Z">2021-04-12</time>
+      </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h3 id="生成目录结构"><a href="#生成目录结构" class="headerlink" title="生成目录结构"></a>生成目录结构</h3><p>weixin-spider<br>│ manage.py （web服务启动文件）<br>│ README.md （项目说明文档）<br>│ requirements.txt （项目安装包）<br>│ wx_monitor.py （任务调度中心）<br>│<br>├─api<br>│ │ crawlerapi.py （爬虫文件）<br>│ │ init.py<br>│ │<br>├─exceptions (异常捕获目录)<br>│<br>├─tools<br>│ │ addons.py （mitm配置）<br>│ │ handle.py （自动化操作）<br>│ │ keys.py （redis-keys管理）<br>│ │ proxy.py （本地代理）<br>│<br>├─webapp<br>│ │ models.py （数据库表模型）<br>│ │ <em>init</em>.py<br>│ ├─static （静态资源目录）<br>│ ├─templates（html文件目录）<br>│ │<br>│ ├─wxapp<br>│ │ │ selffilter.py (过滤器)<br>│ │ │ views.py (视图文件、接口)</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/python-logging/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/python-logging/" class="post-title-link" itemprop="url">python logging</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-04-20 08:38:30" itemprop="dateModified" datetime="2021-04-20T08:38:30Z">2021-04-20</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>日志记录配置<br>logging是一个python标准库<br>logging的四个部分（配置logging中很重要）：<br>    • logger——日志记录入口<br>logger的级别：<br>        ○ DEBUG：用于调试目的的底层系统信息<br>        ○ INFO: 普通的系统信息<br>        ○ WARNING： 警告，较小的问题，不影响执行顺序<br>        ○ ERROR: 错误，较大的问题<br>        ○ CRITICAL: 严重，致命的问题<br>logger记录内容：<br>        ○ django 记录所有内容<br>        ○ django.request 记录？（官方文档说是记录请求，但是使用后发现没有写入任何内容。。。<br>        ○ django.server 记录请求<br>        ○ django.template 记录与渲染模板相关的内容<br>        ○ django.db.backends 记录数据库操作<br>        ○ django.security.* 记录与安全相关的内容<br>    • Handler——决定处理logger中消息的方式<br>比如写入文件‘log_file’，控制台输出’console‘，发送邮件’mail_admins’等等<br>    • Filters——对日志进行条件控制<br>    • Formatters——日志记录的文本顺序（格式）<br>在view视图中写入logging的方法<br>确保切换到了debug模式，否则本地运行无法读取静态文件，服务器端运行则需要部署nginx。</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># import the logging library</span></span><br><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"><span class="comment"># Get an instance of a logger</span></span><br><span class="line"><span class="comment"># __name__对应django的记录模式，比如'django'等，也可以自定义，但是需要到设置中配置handler</span></span><br><span class="line">logger = logging.getLogger(__name__)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">my_view</span>(<span class="params">request, arg1, arg</span>):</span></span><br><span class="line">...</span><br><span class="line"><span class="keyword">if</span> bad_mojo:</span><br><span class="line">    <span class="comment"># Log an error message</span></span><br><span class="line">   logger.error(<span class="string">'Something went wrong!'</span>)</span><br></pre></td></tr></tbody></table></figure><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/flask/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/flask/" class="post-title-link" itemprop="url">flask</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-05-01 02:03:06" itemprop="dateModified" datetime="2021-05-01T02:03:06Z">2021-05-01</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>flask</p>
+<ul>
+<li>参数<code>__name__</code>解释<br>表示Fask应用的主模块或包的名称。<br>Fask使用该参数确定应用的位置，<br>然后找到应用中其他文件的位置,如网页中的图片目录,模板目录</li>
+</ul>
+<p>模型（Model）<br>    • Flask-PyMongo/Flask-MongoKit<br>    • Flask-SQLAlchemy<br>视图（View）<br>    • Flask-WTF/bootstrap-flask/Flask-Uploads<br>模板（Template）<br>    • Jinja2</p>
+<p>启动服务器<br>-步骤1:设置环境变量<br>Windows: <code>set FLASK_APP=模块名.py</code><br>linux: <code>export FLASK APP=模块名.py</code><br>-步骤2: flask run启动内置web服务器<br>指定IP及端口:</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">flask run --host=0.0.0.0 --port=8001 </span><br><span class="line">flask run -h 0.0.0.0 -p 8001</span><br></pre></td></tr></tbody></table></figure>
+
+<p>开启调试模式<br>-代码修改后服务器自动重启<br>-步骤1:设置环境变量<br>Windows: <code>set FLASK_ENV=development</code><br>linux: <code>export FLASK_ENV=development</code><br>-步骤2: flask run启动内置web服务器</p>
+<p>使⽤app.run()⽅式可以启动flask应⽤，但是每次修改代码 之后，需要重新启动，这样对于调试就很不太⽅便。<br>启⽤调试模式，服务器会在代码修改后⾃动重新载⼊，并在发⽣错误时提供⼀个能获得 错误上下⽂及可执⾏代码的调试⻚⾯<br> 开启调试模式会成为⼀个巨⼤的安全隐患，因此绝不能在⽣产环境中开启调试。<br>启⽤flask的调试模式有两种⽅法： </p>
+<ol>
+<li>直接设置app的debug为true: app.debug=true</li>
+<li>把debug=true作为参数，传⼊到run⽅法：app.run(debug=true) </li>
+</ol>
+<p>url配置及路由 ：用户在浏览器输入∪RL,使用对应的函数处理其中的业务逻辑</p>
+<p>表示一个路由配置，即：<br>-方式一:使用装饰器<br>@app.route(url, methods)<br>-参数解释<br>url:匹配的URL地址<br>methods:所支持的请求方式([‘GET’,’POST’])<br>-匹配整个字符<br>@app.route(‘/login’, methods=[‘GET’, ‘POST’])<br>-传递参数 URL中的值<br>@app.route(‘/user/<username>‘)<br>def list user(username)</username></p>
+<p>URL中的值为可选，需要加入两个装饰器</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@app.route('/page')</span></span><br><span class="line"><span class="meta">@app.route('/page/&lt;page&gt;')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">page</span>(<span class="params">page=None</span>):</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">'this is page {}'</span>.format(page)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>指定参数类型<br>@app.route(‘/post/&lt;int: post_id&gt;’)</p>
+<p>-方式二:使用API配置</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">app.add_url_rule(url, url_name, view_name)</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span>():</span></span><br><span class="line">    print(<span class="string">'当前应用的实例，即flask中f1.py'</span>, current_app)</span><br><span class="line">    <span class="comment"># 当前应用的实例，即flask中f1.py &lt; Flask 'f1' &gt;</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">'index.html'</span></span><br><span class="line"></span><br><span class="line">app.add_url_rule(<span class="string">'/index'</span>, <span class="string">'index'</span>, index)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>url参数类型<br>类型     描述<br>string  接受任何不包含斜杠的文本,默认<br>int     接受正整数<br>float   接受正浮点数<br>path    类似 string,但可以包含斜杠<br>uuid    接收符合uuid的字符串，uuid是⼀个唯⼀的字符串,⼀般可⽤来作为表的主键</p>
+<p>-查看现有URL规则列表<br>app.url_map<br>-URL逆向解析(根据名称解析成URL字符串)<br>url_for(url_name, **kwargs)<br>静态文件(js/css/图片)引用<br>url_for(‘static’, filename=’style. css’)</p>
+<p>上下文对象<br>上下文就是工作的环境<br>    每一段程序都有很多外部变量。只有像Add这种简单的函数才是没有外部变量的。一旦你的一段程序有了外部变量，这段程序就不完整，不能独立运行。你为了使他们运行，就要给所有的外部变量一个一个写一些值进去。这些值的集合就叫上下文。</p>
+<p>-应用上下文<br>-请求上下文<br>-在分派请求之前激活应用上下文和请求上下文<br>请求分派：就是分派 url对应视图</p>
+<p>-在请求处理完成后将其删除<br>整个请求的处理过程，都会在这个上下⽂对象中进⾏ </p>
+<p>应用上下文 是⼀个上下⽂对象，⽽不是应⽤，<br>应用指的是flask 的app是确定请求所在的应⽤<br>current app当前应用的实例<br>g处理请求时的临时存储对象,每次请求都会重设这个变量</p>
+<p>请求上下文对象<br>request 请求对象,封装了客户端发出的HTTP请求中的内容<br>session 用户会话(dict),各请求之间的数据共享</p>
+<p>请求报文指的是请求上下文对象中的request<br>请求报文常用参数</p>
+<ul>
+<li>method:请求的类型(GET/POST/OPTIONS等)</li>
+<li>form:POST请求数据dict</li>
+<li>args:GET请求数据dict</li>
+<li>values:POST请求和GET请求数据集合dict</li>
+<li>files:上传的文件数据dict</li>
+<li>cookies:请求中的 cookie dict</li>
+<li>headers:HTTP请求头</li>
+</ul>
+<p>Flask请求报⽂的理解，Flask⽀持四种请求钩⼦，<br>思考:如下场景如何实现?<br>-每个请求中都要验证用户信息(是否已登录、是否有权限访问）<br>限制某些IP的恶意请求<br>使用钩子函数可以减少重复代码的编写,便于维护<br>request就是flask中代表当前请求的request对象<br>当我们需要对请求进⾏预处理和后处理时，就可以⽤Flask提供的钩⼦函数，⽤他们来注 册在请求处理的不同阶段执⾏的处理函数</p>
+<ul>
+<li>before_first_request 服务器初始化后在处理第一个请求到达前执行</li>
+<li>before_request 每一个请求到达前执行</li>
+<li>after_request 如果没有未处理的异常抛出，在每次请求处理完成后执行,如果请求过程中产生了异常,则不执行</li>
+<li>teardown_request 每次请求处理完成之后执行,如果请求过程中产生了异常也执行</li>
+</ul>
+<p>响应<br>-可以是字符串<br>-可以是元组(tupe)<br>(response, status, headers)或(response, headers)</p>
+<p>响应报文<br>-响应元组</p>
+<ul>
+<li>response-响应内容 响应报⽂中的内容由服务器处理</li>
+<li>status-响应状态码</li>
+<li>headers-响应头信息</li>
+<li>make_response 来获取响应对象然后对它进行修改<br>render_template可以渲染html页面</li>
+</ul>
+<p>在客户端发送请求地址后，URL的路由地址找到具体的视图函数， 在视图函数中会对客户端的请求进⾏处理<br>请求的地址在视图函数中找不到，就会返回404</p>
+<p>重定向等内部视图</p>
+<ul>
+<li>redirect()实现重定向 return redirect(‘/url’)</li>
+<li>abort()处理错误 abort(404)</li>
+</ul>
+<p>模板引擎<br>默认配置</p>
+<ul>
+<li>template_folder=’templates’—模板的默认目录<br>render_template()—(X)htm动转义</li>
+<li>render_template_string()—字符串自动转义</li>
+<li><figure class="highlight html"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">{% autoescape %}</span><br></pre></td></tr></tbody></table></figure>
+手动设置是否转义<br>全局函数和辅助对象——增强模板的功能</li>
+</ul>
+<p>全局对象<br>config–Flask的配置信息</p>
+<ul>
+<li>request—请求对象</li>
+<li>session会话对象</li>
+<li>g—请求相关的全局变量(如g.user)</li>
+</ul>
+<p>全局函数<br>url_for() URL解析函数(如:静态文件地址解析、链接跳转地址解析)<br>print(url_for(‘index’, _external=True))<br>print(url_for(‘mine’, _external=True))<br>get_flashed_messages() 会话消息</p>
+<p>上下文处理器<br>-在模板的上下文中添加新的内容<br>-内容可以是变量，也可以是函数<br>@app.context_processor<br>def inject_user():<br>    return dict(user=g user</p>
+<p>渲染机制<br>模板引擎怎样在浏览器展示HTML<br>-从磁盘读取html字符串<br>-将满足特定规则的内容进行替换<br>-发送给浏览器展示</p>
+<p>模板引擎的作用<br>一是使用户界面（HTML）与业务数据（后端逻辑代码）分离。<br>二是可以将写好的HTML模板代码渲染成纯HTML页面，就可以实现动态数据展示了。<br>    模板引擎的实现方式有很多，最简单的是“置换型”模板引擎，这类模板引擎只是将指定模板内容（字符串）中的特定标记（子字符串）替换一下便生成了最终需要的业务数据（比如网页）。置换型模板引擎实现简单，但其会多消耗服务器一些性能，而且效率低下，无法满足高负载的应用需求（比如有海量访问的网站），因此还出现了“解释型”模板引擎和“编译型”模板引擎等。</p>
+<p>模板其实是⼀个包含响应⽂本的⽂件，其中⽤变量表示动态部分，<br>告诉模板引擎其具体的值需要从使⽤的数据中获取。<br>模板中变量的使用<br>-语法</p>
+<figure class="highlight html"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">{{ object.attribute }}或{{ object['attribute'] }}</span><br></pre></td></tr></tbody></table></figure>
+<p>-dict类型数据的渲染<br>-list/ tuple类型数据的渲染<br>-list/ tuple嵌套dict复杂类型数据的渲染</p>
+<p>模板标签</p>
+<figure class="highlight html"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">{% tag %}</span><br><span class="line">内容</span><br><span class="line">{% endtag %}</span><br></pre></td></tr></tbody></table></figure>
+<p>模板变量传参<br>render_template 函数的第⼀个参数是模板的⽂件名，<br>后⾯的参数都是键值对，表示模板中变量对应的真实值。<br>将 Jinja2 模板引擎集成到程序中<br>1.单个变量可直接放在render_templates（）参数中<br>2.多个变量，可将参数变量值放在一个字典中，<br>前端使用：<code>{{ 变量 }}</code></p>
+<p>条件控制</p>
+<figure class="highlight html"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">{% if condition_a %}</span><br><span class="line">    满足a条件</span><br><span class="line">{{% elif condition_b }}</span><br><span class="line">    满足条件b</span><br><span class="line">{% else %}</span><br><span class="line">    都不满足</span><br><span class="line">{% endif %}</span><br></pre></td></tr></tbody></table></figure>
+<p>if标签中的is判断</p>
+<figure class="highlight html"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">{% if value is defined %}</span><br><span class="line">  …</span><br><span class="line">{{% endif }}</span><br></pre></td></tr></tbody></table></figure>
+<p>内置的判断条件<br>defined/ undefined变量是否已经定义<br>none变量是否为None<br>number/ string—数字/字符串判断<br>even/odd奇偶判断<br>upper/lower大小写判断</p>
+<p>for 循环对象</p>
+<figure class="highlight html"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">{% for key,value in user_info.items() %}</span><br><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>{{ key }}:{{ value }}<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">{% endfor %}</span><br><span class="line"></span><br><span class="line">{# 去除HTML中多余的空白 #}</span><br><span class="line">{# 在块的开始或结束放置一个减号(-),不能有空格 #}</span><br></pre></td></tr></tbody></table></figure>
+<p>如果要在for循环中使用 continue/ break<br>#为模板引擎添加扩展，支持break\continue语法<br><code>app.jinja_env.add_extension('jinja2.ext.loopcontrols')</code></p>
+<figure class="highlight html"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">{% for item in list_obj -%}</span><br><span class="line">{#    <span class="tag">&lt;<span class="name">p</span>&gt;</span>{{ item.user }}<span class="tag">&lt;/<span class="name">p</span>&gt;</span>#}</span><br><span class="line">    {% for key,value in item.items() -%}</span><br><span class="line">{# loop.index当前循环迭代的次数(从1开始) #}</span><br><span class="line">        {% if loop.index &gt; 2 -%}</span><br><span class="line">            {% break -%}</span><br><span class="line">        {% endif -%}</span><br><span class="line">        <span class="tag">&lt;<span class="name">p</span>&gt;</span>{{ loop.index }}{{ key }} : {{ value }}<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">    {% endfor -%}</span><br><span class="line">{% endfor -%}</span><br><span class="line"></span><br><span class="line">{# 使用with代码块，实现块级作用域，只在代码块中有效 #}</span><br><span class="line">{% with %}</span><br><span class="line">{# 设置变量，赋值操作 #}</span><br><span class="line">{# 先设置,后使用,可以通过 Import导入 #}</span><br><span class="line">    {% set value=100 %}</span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span>{{ value }}<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">{% endwith %}</span><br><span class="line">{{ value }} --with代码块外值无效</span><br></pre></td></tr></tbody></table></figure>
+
+<p>过滤器：模板中使用的变量可以通过使用过滤器改变变量的值，本质是函数<br>(如:格式化显示)<br>通过管道符号 <code>{{变量名|过滤器名 }}</code></p>
+<p>-可以链式调用<code>{{ name|striptags|title }}</code><br>-可以用圆括号传递可选参数<code>{{ list|join(,") }}</code></p>
+<figure class="highlight html"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">h3</span>&gt;</span>管道符|使用过滤器<span class="tag">&lt;/<span class="name">h3</span>&gt;</span></span><br><span class="line">{{ hello|upper }}</span><br><span class="line"><span class="tag">&lt;<span class="name">h3</span>&gt;</span>标签使用过滤器<span class="tag">&lt;/<span class="name">h3</span>&gt;</span></span><br><span class="line">{% filter upper %}</span><br><span class="line">{{ hello }}</span><br><span class="line">{% endfilter %}</span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">h3</span>&gt;</span>默认值显示过滤器<span class="tag">&lt;/<span class="name">h3</span>&gt;</span></span><br><span class="line">1.{{ 变量名|default(value,default_value='',boolean=False)}} </span><br><span class="line"><span class="tag">&lt;<span class="name">h3</span>&gt;</span>默认值显示过滤器<span class="tag">&lt;/<span class="name">h3</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">h3</span>&gt;</span>default(value, default_value='',boolean=False)<span class="tag">&lt;/<span class="name">h3</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">h3</span>&gt;</span>默认值:指没有定义的变量value的默认值<span class="tag">&lt;/<span class="name">h3</span>&gt;</span></span><br><span class="line">{# 已经在视图定义var=None var1=1#}</span><br><span class="line">{{ var|default('我没有') }}</span><br><span class="line">{{ var|d('我没有', False) }}</span><br><span class="line">{{ var|d('我没有', True) }}</span><br><span class="line"><span class="tag">&lt;<span class="name">h5</span>&gt;</span>--------<span class="tag">&lt;/<span class="name">h5</span>&gt;</span></span><br><span class="line">{# 已经在视图定义var1=1#}</span><br><span class="line">{{ var1|default('我没有') }}</span><br><span class="line"><span class="tag">&lt;<span class="name">h5</span>&gt;</span>--------<span class="tag">&lt;/<span class="name">h5</span>&gt;</span></span><br><span class="line">{# 没有在视图定义var2 #}</span><br><span class="line">{{ var2|default('我没有') }}</span><br></pre></td></tr></tbody></table></figure>
+<p>2.可以使用or来替代default </p>
+<figure class="highlight html"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">{{ 变量名 or "" }}</span><br><span class="line">{{ var2 or '我没有' }}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>转义过滤器：防止转义<br>块区域防止转义：jinja2自动转义默认成字符串，而不是html标签 </p>
+<figure class="highlight html"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">{% autoescape off %} {% endautoescape%}</span><br><span class="line">``` </span><br><span class="line">单变量防止转义： ```{{ 变量名|safe }} ```</span><br><span class="line">```{{ valuelsafe }}```  富文本内容转义显示</span><br><span class="line"></span><br><span class="line">某个字符串进行进行转义： ```{{ 变量名|escape }}```</span><br><span class="line"></span><br><span class="line">视图</span><br><span class="line">```py</span><br><span class="line">html_code='<span class="tag">&lt;<span class="name">h2</span>&gt;</span>hello<span class="tag">&lt;/<span class="name">h2</span>&gt;</span>'</span><br></pre></td></tr></tbody></table></figure>
+<p>模板</p>
+<figure class="highlight html"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">h3</span>&gt;</span>html自动转义 true false <span class="tag">&lt;/<span class="name">h3</span>&gt;</span></span><br><span class="line">{% autoescape false %}</span><br><span class="line">{{ html }}</span><br><span class="line">{#块区域防止转义：jinja2自动转义默认成字符串，而不是html标签#}</span><br><span class="line">{{ html_code|escape }}</span><br><span class="line">{% endautoescape %}</span><br><span class="line"></span><br><span class="line">{#format过滤器：#}</span><br><span class="line">{{"我的名字是%s"|format("Jason")}}</span><br></pre></td></tr></tbody></table></figure>
+<p>自定义过滤器<br>后端视图<br>方法一 使用装饰器注册到jinja2模板当中</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@app.template_filter('phone_format')   </span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">phone_format</span>(<span class="params">phone_num</span>):</span></span><br><span class="line">    <span class="string">""" 手机号格式化 """</span></span><br><span class="line">    <span class="keyword">return</span> phone_num[<span class="number">0</span>:<span class="number">3</span>] + <span class="string">'***'</span> + phone_num[<span class="number">-4</span>:]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 方法二：调用函数注册,对象的 add_template_filter </span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">tel_format</span>(<span class="params">tel_num</span>):</span></span><br><span class="line">    <span class="string">""" 手机号格式化 """</span></span><br><span class="line">    <span class="keyword">return</span> tel_num[<span class="number">0</span>:<span class="number">3</span>] + <span class="string">'***'</span> + tel_num[<span class="number">-4</span>:]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">app.jinja_env.filters[<span class="string">'tel_format'</span>] = tel_format</span><br></pre></td></tr></tbody></table></figure>
+<p>前端模板html中可直接使用，变量则会自动传入func函数的value参数，<br>然后返回新的值。</p>
+<figure class="highlight html"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">{{ phone|phone_format }}</span><br><span class="line">{{ phone|tel_format }}</span><br><span class="line"></span><br><span class="line">{{ value|reverse }}  -倒序显示</span><br><span class="line"></span><br><span class="line">@app.route('/global_func')</span><br><span class="line">def g_func():</span><br><span class="line">    """ 全局函数在模板中使用 """</span><br><span class="line">    for i in range(10):</span><br><span class="line">        print(i)</span><br><span class="line">    return render_template('global_func.html')</span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">style</span> <span class="attr">type</span>=<span class="string">"text/css"</span>&gt;</span></span><br><span class="line"><span class="css">    <span class="selector-class">.row1</span> {</span></span><br><span class="line"><span class="css">        <span class="selector-tag">color</span>: <span class="selector-id">#f00</span>;</span></span><br><span class="line">    }</span><br><span class="line"><span class="css">    <span class="selector-class">.row2</span> {</span></span><br><span class="line"><span class="css">        <span class="selector-tag">color</span>: <span class="selector-id">#00f</span>;</span></span><br><span class="line">    }</span><br><span class="line"><span class="css">    <span class="selector-class">.row3</span> {</span></span><br><span class="line">        background: aquamarine;</span><br><span class="line"><span class="css">        <span class="selector-tag">color</span>: <span class="selector-id">#fff</span>;</span></span><br><span class="line">    }</span><br><span class="line"><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">h3</span>&gt;</span>cycler(*items)—可用于css类名的循环<span class="tag">&lt;/<span class="name">h3</span>&gt;</span></span><br><span class="line">    {% set class_name = cycler('row1', 'row2', 'row3') %}</span><br><span class="line">    {% for i in range(100) %}</span><br><span class="line">        <span class="tag">&lt;<span class="name">p</span> <span class="attr">class</span>=<span class="string">"{{ class_name.next() }}"</span>&gt;</span>{{ i }}<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">    {% endfor %}</span><br></pre></td></tr></tbody></table></figure>
+<p>模板中的宏<br>-把常用功能抽取出来,实现可重用<br>-简单理解:宏≈函数，可以定义不带参数的宏也可定义带参数的宏，但不能有返回值，<br>在多处重复使用的模板代码片段可以写入单独的文件放到宏中，<br>再包含在所有模板中，把不固定的值抽取出来当成一个变量参数</p>
+<p>-宏可以写在单独的html文件中</p>
+<figure class="highlight html"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">{# 像书写函数一样定义宏 #}</span><br><span class="line">{% macro input(type_name, name, value='') %}</span><br><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"{{ type_name }}"</span> <span class="attr">name</span>=<span class="string">"{{ name }}"</span> <span class="attr">value</span>=<span class="string">"{{ value }}"</span>&gt;</span></span><br><span class="line">{% endmacro %}</span><br><span class="line"></span><br><span class="line">{# 像调用函数一样调用宏 #}</span><br><span class="line"><span class="comment">&lt;!-- &lt;input type="text" name="username" value="admin"&gt; --&gt;</span></span><br><span class="line">{{ input('text', 'username', 'admin') }}</span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">h3</span>&gt;</span>number输入<span class="tag">&lt;/<span class="name">h3</span>&gt;</span></span><br><span class="line">{{ input('number', 'age') }}</span><br><span class="line"></span><br><span class="line">{# 文件中宏的使用 #}</span><br><span class="line">{# 1.把宏单独抽取出来，封装成html文件,文件名可以自定义macro.html #}</span><br><span class="line">{# 2.1导入方法一 #}</span><br><span class="line">{% import 'forms.html' as forms %}</span><br><span class="line"><span class="tag">&lt;<span class="name">h3</span>&gt;</span>邮件地址输入<span class="tag">&lt;/<span class="name">h3</span>&gt;</span></span><br><span class="line">{{ forms.input('email', 'email', '123456@qq.com') }}</span><br><span class="line"></span><br><span class="line">{# 2.2导入方法二 #}</span><br><span class="line">{% from 'forms.html' import input as my_input %}</span><br><span class="line">{# 3.使用 #}</span><br><span class="line">{{ my_input('password', 'password') }}</span><br></pre></td></tr></tbody></table></figure>
+<p>-思考:为什么要对模板进行抽象和继承?<br>-思考:如下场景怎样设计(易维护、可扩展)?<br>每个页面都引用了公共的头部,js,CSS<br>有几个页面结构和内容及其相似<br>一般Web开发中，继承主要使用在网站的顶部菜单、底部。</p>
+<p>步骤一:将可变的部分圈出来(base.html)</p>
+<figure class="highlight html"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">{% block sidebar %}</span><br><span class="line">{# 菜单栏的内容 #}</span><br><span class="line">{% endblock %}</span><br></pre></td></tr></tbody></table></figure>
+<p>步骤二：子模板使用标签 extends 继承父模板</p>
+<figure class="highlight html"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">{% extends "父模板路径"%} </span><br><span class="line">{% extends 'base.html' %}</span><br></pre></td></tr></tbody></table></figure>
+<p>步骤三:填充新的内容(index htm)</p>
+<figure class="highlight html"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">{% extends 'base.html' %}</span><br><span class="line">{% block sidebar %}</span><br><span class="line">{# 新的菜单栏的内容 #}</span><br><span class="line">{% endblock %}</span><br></pre></td></tr></tbody></table></figure>
+<p>步骤四:复用父模板的內容(可选)</p>
+<figure class="highlight html"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">{% extends 'base.html' %}</span><br><span class="line">{% block sidebar %}</span><br></pre></td></tr></tbody></table></figure>
+<p>父模板中定义的块在子模板中被重新定义，<br>在子模板中调用父模板的内容可以使用super()</p>
+<figure class="highlight html"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">{{ super() }}</span><br><span class="line">{# 新的菜单栏的内容 #}</span><br><span class="line">{% endblock %}</span><br><span class="line"></span><br><span class="line">{# 包含实现 将另一个模板整个加载到当前模板中，并直接渲染。#}</span><br><span class="line">{# 步骤一:将可变的部分拆出来 (footer. html) #}</span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">footer</span>&gt;</span></span><br><span class="line">    我是公共部分的页脚</span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span></span><br><span class="line">        {{ user }}</span><br><span class="line">    <span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">footer</span>&gt;</span></span><br><span class="line"> </span><br><span class="line">{# 包含实现 #}</span><br><span class="line">{# 步骤二:将拆出来的部分包进来(index.html) #}</span><br><span class="line">{# include标签 直接将模板中的代码复制粘贴到当前位置 #}</span><br><span class="line">{# include标签如果想要使用父模板的变量，直接用就可以了，不需要context #}</span><br><span class="line">{# "include"的路径，直接从templates根目录下查找 #}</span><br><span class="line"></span><br><span class="line">{# ignore missing如果模板不存在,jnja2会忽略这条include语句 #}</span><br><span class="line">{% include 'footer.html' ignore missing %}</span><br><span class="line"></span><br><span class="line">{#with/without context是否想把被导入的html文件的变量值自动传递到模板中，携带当前页面的上下文 #}</span><br><span class="line">{% include 'footer.html' with context %}</span><br><span class="line">{% include 'footer.html' without context %}</span><br><span class="line"></span><br><span class="line">{% endblock %}</span><br><span class="line"></span><br><span class="line">{% block title %}</span><br><span class="line">{# 当前页面的代码复用 #}</span><br><span class="line">{{ self.sub_title() }}</span><br><span class="line">{% endblock %}</span><br><span class="line"></span><br><span class="line">{% block content %}</span><br><span class="line">{# 没用super()调用父模板的content #}</span><br><span class="line">我是个人中心的代码</span><br><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span></span><br><span class="line">    {# 当前页面的代码复用 #}</span><br><span class="line">    {{ self.sub_title() }}</span><br><span class="line"><span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>消息闪现<br>第一步:在视图中产生消息(提示/警告/错误)<br>flash(msg content, msg type)<br>参数 msg content:消息内容<br>参数msg_type:消息类型</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@app.route('/flash')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">flash_func</span>():</span></span><br><span class="line">    <span class="string">""" 消息闪现的展示，</span></span><br><span class="line"><span class="string">    flash(msg_content,msg_type)产生消息 """</span></span><br><span class="line">    flash(<span class="string">'welcome back'</span>, <span class="string">'success'</span>)</span><br><span class="line">    flash(<span class="string">'warning'</span>, <span class="string">'error'</span>)</span><br><span class="line">    <span class="keyword">return</span> redirect(<span class="string">'/notice'</span>)</span><br><span class="line">    <span class="comment"># return render_template('flash.html')</span></span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight html"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">{# 在模板中展示消息 #}</span><br><span class="line">    {% for msg in get_flashed_messages() %}</span><br><span class="line">        <span class="tag">&lt;<span class="name">p</span>&gt;</span>{{ msg }}<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">    {% endfor %}</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">h3</span>&gt;</span>消息展示区域<span class="tag">&lt;/<span class="name">h3</span>&gt;</span></span><br><span class="line">{# 参数 category filter:对产生的消息按类别查询 #}</span><br><span class="line">{% for cat, msg in get_flashed_messages(with_categories=true, category_filter=['error']) %}</span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span> <span class="attr">class</span>=<span class="string">"{{ cat }}"</span>&gt;</span>{{ msg }}<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">{% endfor %}</span><br></pre></td></tr></tbody></table></figure>
+
+
+
+
+
+
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -221,6 +817,104 @@
     
     <div class="post-body" itemprop="articleBody">
           <p>setting.通用的配置</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/kong-3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/kong-3/" class="post-title-link" itemprop="url">Gunicorn</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-04-27 14:20:24" itemprop="dateModified" datetime="2021-04-27T14:20:24Z">2021-04-27</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>Powered by <a target="_blank" rel="noopener" href="https://github.com/yanzai/goindex/">yanzai/goindex</a>, Hosted on <a target="_blank" rel="noopener" href="https://workers.cloudflare.com/">Cloudflare Workers</a>.</p>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -418,7 +1112,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-24 15:22:58" itemprop="dateModified" datetime="2021-04-24T15:22:58Z">2021-04-24</time>
+        <time title="修改时间：2021-04-24 16:38:13" itemprop="dateModified" datetime="2021-04-24T16:38:13Z">2021-04-24</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -449,11 +1143,7 @@
 <p>队列的删除       pop()                    pop(0)</p>
 <p>push(1);push(2);pop(3);push(4); # 尾部插入<br>1234<br>pop(1),pop(2), 头部删除<br>34</p>
 <p>一个Node对象如下示意图：<br>![]C:\python代码\牛客网剑指offer66题思路分析\图解说明\node对象.jpg</p>
-<p>Queue() 创建一个空队列，无参数，返回值是空队列<br>如果是一个空的队列，那head和tail都指向None。<br><img src="/2020/08/21/dui-lie-he-zhan/python代码\牛客网剑指offer66题思路分析\图解说明\空队列.jpg"></p>
-<p>当队列里有一个元素时，head和tail两个指针都指向这个元素，next指向None<br>示意图是这样的：<br><img src="/2020/08/21/dui-lie-he-zhan/python代码\牛客网剑指offer66题思路分析\图解说明\队列.jpg"></p>
-<p>enqueue(item) 在队列尾部加入一个数据项，参数是数据项，无返回值<br>当队列再增加一个元素时，而head指针不会发生改变，<br>tail指针会移动到新增加的这个元素，<br>前一个元素的next指针也会指向新元素，<br>如下图：<br><img src="/2020/08/21/dui-lie-he-zhan/python代码\牛客网剑指offer66题思路分析\图解说明\对列增加元素.jpg"></p>
-<hr>
-<figure class="highlight plain"><figcaption><span>检测队列是否为空。无参数，返回布尔值。</span></figcaption><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line">```size()``` 返回队列数据项的数量。无参数，返回一个整数。</span><br><span class="line"></span><br><span class="line">同栈一样，队列也可以用顺序表或者链表实现。</span><br><span class="line">我们假设队列里的元素有一个指针，最先加进元素的指针指向它下一个元素，依次类推，</span><br><span class="line">最后一个元素的指针是指向None。</span><br><span class="line">所以队列里的元素可以抽象出一个Queue类，会创建两个指针，</span><br><span class="line">一个head，指向队头的元素，</span><br><span class="line">一个tail，指向队尾的元素。</span><br><span class="line">同样像链表时的Node类一样有自己的数据和一个指向None的指针。</span><br><span class="line">```python</span><br><span class="line">class Node:</span><br><span class="line">    def __init__(self, value):</span><br><span class="line">        self.value = value</span><br><span class="line">        self.next = None</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class Queue:</span><br><span class="line">    def __init__(self):</span><br><span class="line">        self.head = None</span><br><span class="line">        self.tail = None</span><br><span class="line"></span><br><span class="line">    def enqueue(self, value):</span><br><span class="line">        node = Node(value)  # 实列化节点</span><br><span class="line">        if self.head is None:</span><br><span class="line">            self.head = node</span><br><span class="line">            self.tail = node</span><br><span class="line">        else:</span><br><span class="line">            self.tail.next = node</span><br><span class="line">            self.tail = node</span><br><span class="line"></span><br><span class="line">    def dequeue(self):</span><br><span class="line">        if self.head is None:</span><br><span class="line">            raise Exception('This is a empty queue')</span><br><span class="line">        cur = self.head</span><br><span class="line">        self.head = cur.next</span><br><span class="line">        return cur.value</span><br><span class="line"></span><br><span class="line">    def is_empty(self):</span><br><span class="line">        return self.head is None</span><br><span class="line"></span><br><span class="line">    def size(self):</span><br><span class="line">        cur = self.head</span><br><span class="line">        count = 0</span><br><span class="line">        if cur is None:</span><br><span class="line">            return count</span><br><span class="line">        while cur.next is not None:</span><br><span class="line">            count += 1</span><br><span class="line">            cur = cur.next</span><br><span class="line">        return count + 1</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">if __name__ == '__main__':</span><br><span class="line">    q = Queue()  # 实列化队列</span><br><span class="line">    for i in range(5):</span><br><span class="line">        q.enqueue(i)</span><br><span class="line">    for _ in range(5):</span><br><span class="line">        print(q.dequeue())</span><br><span class="line">    print(q.is_empty())</span><br><span class="line">    print(q.dequeue())</span><br><span class="line">        # 0</span><br><span class="line">        # 1</span><br><span class="line">        # 2</span><br><span class="line">        # 3</span><br><span class="line">        # 4</span><br><span class="line">    print(q.is_empty())  # True</span><br><span class="line">    print(q.size())  # 0</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plain"><figcaption><span>创建一个空队列，无参数，返回值是空队列</span></figcaption><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line">如果是一个空的队列，那head和tail都指向None。</span><br><span class="line">![](C:\python代码\牛客网剑指offer66题思路分析\图解说明\空队列.jpg)</span><br><span class="line"></span><br><span class="line">当队列里有一个元素时，head和tail两个指针都指向这个元素，next指向None</span><br><span class="line">示意图是这样的：</span><br><span class="line">![](C:\python代码\牛客网剑指offer66题思路分析\图解说明\队列.jpg)</span><br><span class="line"></span><br><span class="line">enqueue(item) 在队列尾部加入一个数据项，参数是数据项，无返回值</span><br><span class="line">当队列再增加一个元素时，而head指针不会发生改变，</span><br><span class="line">tail指针会移动到新增加的这个元素，</span><br><span class="line">前一个元素的next指针也会指向新元素，</span><br><span class="line">如下图：</span><br><span class="line">![](C:\python代码\牛客网剑指offer66题思路分析\图解说明\对列增加元素.jpg)</span><br><span class="line">___</span><br><span class="line"></span><br><span class="line">```isEmpty()``` 检测队列是否为空。无参数，返回布尔值。</span><br><span class="line">```size()``` 返回队列数据项的数量。无参数，返回一个整数。</span><br><span class="line"></span><br><span class="line">同栈一样，队列也可以用顺序表或者链表实现。</span><br><span class="line">我们假设队列里的元素有一个指针，最先加进元素的指针指向它下一个元素，依次类推，</span><br><span class="line">最后一个元素的指针是指向None。</span><br><span class="line">所以队列里的元素可以抽象出一个Queue类，会创建两个指针，</span><br><span class="line">一个head，指向队头的元素，</span><br><span class="line">一个tail，指向队尾的元素。</span><br><span class="line">同样像链表时的Node类一样有自己的数据和一个指向None的指针。</span><br><span class="line">```python</span><br><span class="line">class Node:</span><br><span class="line">    def __init__(self, value):</span><br><span class="line">        self.value = value</span><br><span class="line">        self.next = None</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class Queue:</span><br><span class="line">    def __init__(self):</span><br><span class="line">        self.head = None</span><br><span class="line">        self.tail = None</span><br><span class="line"></span><br><span class="line">    def enqueue(self, value):</span><br><span class="line">        node = Node(value)  # 实列化节点</span><br><span class="line">        if self.head is None:</span><br><span class="line">            self.head = node</span><br><span class="line">            self.tail = node</span><br><span class="line">        else:</span><br><span class="line">            self.tail.next = node</span><br><span class="line">            self.tail = node</span><br><span class="line"></span><br><span class="line">    def dequeue(self):</span><br><span class="line">        if self.head is None:</span><br><span class="line">            raise Exception('This is a empty queue')</span><br><span class="line">        cur = self.head</span><br><span class="line">        self.head = cur.next</span><br><span class="line">        return cur.value</span><br><span class="line"></span><br><span class="line">    def is_empty(self):</span><br><span class="line">        return self.head is None</span><br><span class="line"></span><br><span class="line">    def size(self):</span><br><span class="line">        cur = self.head</span><br><span class="line">        count = 0</span><br><span class="line">        if cur is None:</span><br><span class="line">            return count</span><br><span class="line">        while cur.next is not None:</span><br><span class="line">            count += 1</span><br><span class="line">            cur = cur.next</span><br><span class="line">        return count + 1</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">if __name__ == '__main__':</span><br><span class="line">    q = Queue()  # 实列化队列</span><br><span class="line">    for i in range(5):</span><br><span class="line">        q.enqueue(i)</span><br><span class="line">    for _ in range(5):</span><br><span class="line">        print(q.dequeue())</span><br><span class="line">    print(q.is_empty())</span><br><span class="line">    print(q.dequeue())</span><br><span class="line">        # 0</span><br><span class="line">        # 1</span><br><span class="line">        # 2</span><br><span class="line">        # 3</span><br><span class="line">        # 4</span><br><span class="line">    print(q.is_empty())  # True</span><br><span class="line">    print(q.size())  # 0</span><br></pre></td></tr></tbody></table></figure>
 
 
 <figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Queue</span>(<span class="params">object</span>):</span></span><br><span class="line">    <span class="string">""" 使用列表[]实现队列 """</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>):</span></span><br><span class="line">        self.items = []  <span class="comment"># 初始化一个[]对象</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">is_empty</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> self.items == []</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">enqueue</span>(<span class="params">self, item</span>):</span></span><br><span class="line">        <span class="string">"""队列一端添加元素"""</span></span><br><span class="line">        self.items.insert(<span class="number">0</span>, item)</span><br><span class="line">        <span class="comment"># self.items.append(item)</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">dequeue</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="string">"""队列另一端删除一个元素"""</span></span><br><span class="line">        <span class="keyword">return</span> self.items.pop()</span><br><span class="line">        <span class="comment"># return self.items.pop(0)</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">size</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="string">"""返回队列大小"""</span></span><br><span class="line">        <span class="keyword">return</span> len(self.items)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    q = Queue()</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">5</span>):</span><br><span class="line">        q.enqueue(i)</span><br><span class="line">    print(q.size())  <span class="comment"># 5</span></span><br><span class="line">    print(q.is_empty())  <span class="comment"># False</span></span><br><span class="line">    print(q.dequeue())  <span class="comment"># 0</span></span><br><span class="line">    print(q.dequeue())  <span class="comment"># 1</span></span><br><span class="line">    print(q.dequeue())  <span class="comment"># 2</span></span><br></pre></td></tr></tbody></table></figure>
@@ -528,7 +1218,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/04/08/python-cheng-xu-ru-kou-name-main/">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/sdk-api/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -541,7 +1231,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/04/08/python-cheng-xu-ru-kou-name-main/" class="post-title-link" itemprop="url">Python程序入口 __name__ == '__main__'</a>
+          <a href="/2020/08/21/sdk-api/" class="post-title-link" itemprop="url">SDK API</a>
         </h2>
 
         <div class="post-meta-container">
@@ -552,14 +1242,151 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2020-04-07 16:21:41" itemprop="dateCreated datePublished" datetime="2020-04-07T16:21:41Z">2020-04-07</time>
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
     </span>
       <span class="post-meta-item">
         <span class="post-meta-item-icon">
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-15 01:46:30" itemprop="dateModified" datetime="2021-04-15T01:46:30Z">2021-04-15</time>
+        <time title="修改时间：2021-04-27 01:25:43" itemprop="dateModified" datetime="2021-04-27T01:25:43Z">2021-04-27</time>
+      </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h3 id="软件开发工具包-SDK-Software-Development-Kit"><a href="#软件开发工具包-SDK-Software-Development-Kit" class="headerlink" title="软件开发工具包 SDK Software Development Kit"></a>软件开发工具包 SDK Software Development Kit</h3><p>辅助开发某一类软件的相关文档说明书、范例和工具的集合都可以叫做SDK。</p>
+<p>SDK被开发出来是为了减少程序员工作量，越容易开发越好</p>
+<p>比如——</p>
+<p>有公司开发出某种软件的某一功能，把它封装成SDK（比如数据分析SDK就是能够实现数据分析功能的SDK），出售给其他公司做开发用，其他公司如果想要给软件开发出某种功能，但又不想从头开始搞开发，直接付钱省事。</p>
+<p>SDK想象成一个虚拟的程序包，在这个程序包中有一份做好的软件功能，这份程序包几乎是全封闭的，只有一个小小接口可以联通外界，这个接口就是API。</p>
+<p>这个SDK提供了这么多API<br>SDK 是可以下载的。API 是写在文档里的</p>
+<p>你是个男的<br>你要开发一个BABY<br>SDK<br>就是房间、床、你老婆等一系列相关的工具、文档<br>API<br>就是你老婆开放的接口</p>
+<p>有一杯密封饮料，它的名字叫做“SDK”。<br>饮料上插着吸管，吸管的名字叫“API”。</p>
+<p>把你叫做“XX系统”。<br>如果你想喝到SDK里的饮料（让系统拥有SDK中的功能），你必须通过API这根吸管来实现（通过API连接你的系统和SDK工具包），否则你就喝不到饮料。</p>
+<h3 id="API-Application-Programming-Interface-应用程序编程接口"><a href="#API-Application-Programming-Interface-应用程序编程接口" class="headerlink" title="API Application Programming Interface  应用程序编程接口"></a>API Application Programming Interface  应用程序编程接口</h3><p>是一些预先定义的函数，<br>目的是提供应用程序与开发人员基于某软件或硬件得以访问一组例程的能力，<br>而又无需访问源码，或理解内部工作机制的细节。</p>
+<ul>
+<li><p>预先定义好的程序代码</p>
+</li>
+<li><p>屏蔽实现的细节</p>
+</li>
+<li><p>被调用来获取信息或实现某些功能</p>
+</li>
+<li><p>我有一些功能</p>
+</li>
+<li><p>你们呢不用关心我是怎么实现的</p>
+</li>
+<li><p>我给你一个访问地址</p>
+</li>
+<li><p>你通过地址来找我，按照我规定的格式提供我需要的信息</p>
+</li>
+<li><p>我会给你你需要的信息反馈</p>
+</li>
+</ul>
+<p>连接前端后端及移动端，系统与系统、模块与模块、服务与服务直接相互调用的入口，<br>开发者分工协作封装成接口，其他开发者只要按照对应格式，发送一些必要参数，就能使用功能</p>
+<p>![description](./SDK API/接口.png)</p>
+<p>常见接口类型</p>
+<ul>
+<li>HTTP接口 传输文本表单数据、json类型的对象、xml类似的数据</li>
+<li>RPC 远程方法调用，使用分布式系统，调用部署到其他服务器，远程调用希望像本地调用一样方便，让调用者感知不到远程调用的逻辑，不需要搞一串发起http请求的代码</li>
+<li>SOAP - Simple Object Access Protocol 简单面向对象访问协议，一种协议规范，是一种轻量的，简单的，基于HTTP协议，使用XML作为默认的存储格式。</li>
+</ul>
+<p>SOAP与REST区别：</p>
+<ul>
+<li><p>安全性：SOAP会好于REST</p>
+</li>
+<li><p>效率和易用性：REST更胜一筹</p>
+</li>
+<li><p>成熟度：总的来说SOAP在成熟度上优于REST</p>
+</li>
+<li><p>Web Servicez 是一种跨编程语言 和 跨操作系统平台的远程调用技术。基于SOAP协议的PRC实践方案，可以拿到远程对象并调用其属性和方法，</p>
+</li>
+<li><p>REST API</p>
+</li>
+</ul>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/python-datetime-mo-kuai/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/python-datetime-mo-kuai/" class="post-title-link" itemprop="url">python datetime模块</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-05-01 01:56:46" itemprop="dateModified" datetime="2021-05-01T01:56:46Z">2021-05-01</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -581,38 +1408,10 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <p>Python的文件头：</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/bin/bash/python3  # 在代码被执行时，主动说明该选哪个路径下的编译器</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p>Python程序入口 <strong>name</strong> == ‘<strong>main</strong>‘</p>
-<p>既没有写一个被调用的库和多进程的容易错误地认为「程序的入口」没什么用、是编码习惯。<br>事实上程序的入口非常有用，绝非可有可无，例如在Python自带的多线程库要求必须把主进程写在 if入口内部才能正常运行</p>
-<p>直接写在Python最左端没有缩进的代码，在这个 <code>*.py</code> 文件被直接运行、或者被调用时会被执行</p>
-<p>Python用这个方法来判断当前的模块是<strong>被直接运行</strong>还是<strong>被调用</strong><br>一个模块中有<code>__name__</code> 是当前模块名，</p>
-<ul>
-<li>当 <code>*.py</code> 文件模块被直接运行时，<code>模块名</code>为 <code>__main__</code>，即<code>__name__</code>置为 <code>__main__</code>，<code>if __name__ == '__main__'</code>之下的代码块将被运行。</li>
-<li>当 <code>*.py</code> 文件模块以模块形式被导入调用时，在终端命令行运行时， <code>__name__</code> 为被调用模块的 模块名，<code>if __name__ == '__main__'</code>之下的代码块不被运行。</li>
-</ul>
-<p>这种if测试可以让一个模块通过命令行运行时执行一些额外的代码，最常见的就是运行测试。</p>
-<p>假如你叫小明.py，在朋友眼中，你是小明(<strong>name</strong> == ‘小明’)；<br>在你自己眼中，你是你自己(<strong>name</strong> == ‘<strong>main</strong>‘)。</p>
-<p>main文件不能直接用相对路径导入，加个-m</p>
-<ul>
-<li>把不想在被调用时执行的代码放在程序入口的if内部，比如自检程序。</li>
-<li>把多线程的主线程写在程序入口的if内部。只能这么做，避免自己调用自己时重复执行主进程，下面会详细解释。</li>
-</ul>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Python的程序入口</span></span><br><span class="line"><span class="keyword">if</span> __name__ ==<span class="string">'__main__'</span>: <span class="comment"># 它对多进程非常重要</span></span><br><span class="line">    <span class="comment"># 这里是主程序</span></span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># C语言的程序入口</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">main</span><span class="params">()</span></span>{</span><br><span class="line">    <span class="comment">/* 这里是主程序 */</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># Java的程序入口</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span></span>{</span><br><span class="line">    <span class="comment">// 这里是主程序</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 新建一个名为【run1.py】的文件，填入下方代码</span></span><br><span class="line"><span class="comment"># 然后在终端输入【python3 run1.py】并运行</span></span><br><span class="line"></span><br><span class="line">print(__name__, <span class="string">'run1-outside'</span>)  <span class="comment"># __main__ run1-outside</span></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    print(__name__, <span class="string">'run1-inside'</span>)  <span class="comment"># __main__ run1-inside</span></span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 新建另一个名为【run2.py】的文件，填入下方代码，并放在与【run1.py】的相同目录下，</span></span><br><span class="line"><span class="comment"># 然后在终端命令行输入【python3 run2.py】并运行。用run2 调用run1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> run1  <span class="comment"># 这一行代码调用了外部的代码 run1，它只会print出：</span></span><br><span class="line"><span class="comment"># run1 run1-outside # 它只print出这一行东西，并且run1.py的【__main__】变成了【run1】</span></span><br><span class="line"><span class="comment"># run1 run1-inside  # 写在run1【if】缩进里的东西都没有被执行</span></span><br><span class="line"></span><br><span class="line">print(__name__, <span class="string">'run2-outside'</span>)  <span class="comment"># __main__ run2-outside</span></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    print(__name__, <span class="string">'run2-inside'</span>)  <span class="comment"># __main__ run2-inside</span></span><br></pre></td></tr></tbody></table></figure>
-
-
-<p>程序入口与自检程序<br>当一个开发者编写一个库时（例如把它命名为 utils.py），如</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 这个库（模块）被命名为 utils.py</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">C1</span>:</span></span><br><span class="line">   ...</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func1</span>():</span></span><br><span class="line">   ...</span><br><span class="line"></span><br><span class="line">c1 = C1()  <span class="comment"># 这是错误的做法，应该挪到 程序入口if内部</span></span><br><span class="line">func1()    <span class="comment"># 这是错误的做法，应该挪到 程序入口if内部</span></span><br><span class="line"><span class="keyword">if</span> __name__ ==<span class="string">'__main__'</span>:</span><br><span class="line">    c = C1()</span><br><span class="line">    func1()</span><br></pre></td></tr></tbody></table></figure>
-<p>当其他人只想调用 <code>C1</code> 或者 <code>func1</code> 时，他在另一个Python文件中，用 <code>import utils</code> 导入 <code>utils</code> 这个库时就不会运行程序入口if内部的任何代码了。</p>
+          <p>支持日期和时间算法的同时，实现的重点放在更有效的处理和格式化输出。</p>
+<p>该模块还支持时区处理:</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> datetime <span class="keyword">import</span> datetime, date</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"><span class="comment"># dates are easily constructed and formatted</span></span><br><span class="line">now_time = datetime.now()</span><br><span class="line"></span><br><span class="line">print(<span class="string">"now: {0}"</span>.format(now_time))</span><br><span class="line"><span class="comment"># now: 2021-02-15 17:11:14.226178</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 当前的日期</span></span><br><span class="line">print(<span class="string">'now day: {0}'</span>.format(now_time.date()))</span><br><span class="line"><span class="comment"># now day: 2021-02-15</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 当前的时间</span></span><br><span class="line">print(<span class="string">'now time: {0}'</span>.format(now_time.time()))</span><br><span class="line"><span class="comment"># now time: 17:11:14.226178</span></span><br><span class="line">print(<span class="string">'now day2: {0}'</span>.format(datetime.today()))</span><br><span class="line"><span class="comment"># now day2: 2021-02-15 17:11:14.226178</span></span><br><span class="line">print(<span class="string">'year: {0}'</span>.format(now_time.year))</span><br><span class="line"><span class="comment"># year: 2021</span></span><br><span class="line">print(<span class="string">'month: {0}'</span>.format(now_time.month))</span><br><span class="line"><span class="comment"># month: 2</span></span><br><span class="line">print(<span class="string">'day: {0}'</span>.format(now_time.day))</span><br><span class="line"><span class="comment"># day: 15</span></span><br><span class="line">print(<span class="string">'microsecond: {0}'</span>.format(now_time.microsecond))</span><br><span class="line"><span class="comment"># microsecond: 226178</span></span><br><span class="line">print(dir(now_time))</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">['__add__', '__class__', '__delattr__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__ne__', '__new__', '__radd__', '__reduce__', '__reduce_ex__', </span></span><br><span class="line"><span class="string">'__repr__', '__rsub__', '__setattr__', '__sizeof__', '__str__', '__sub__', '__subclasshook__', 'astimezone', 'combine', 'ctime', 'date', 'day', 'dst', 'fold', 'fromisocalendar', 'fromisoformat', 'fromordinal', 'fromtimestamp', 'hour', 'isocalendar', 'isoformat', 'isoweekday', 'max', 'microsecond', 'min', 'minute', 'month', 'now', 'replace', 'resolution', 'second', 'strftime', 'strptime', 'time', 'timestamp', 'timetuple', </span></span><br><span class="line"><span class="string">'timetz', 'today', 'toordinal', 'tzinfo', 'tzname', 'utcfromtimestamp', 'utcnow', 'utcoffset', 'utctimetuple', 'weekday', 'year']</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># date</span></span><br><span class="line">now = date.today()</span><br><span class="line">print(now)</span><br><span class="line"><span class="comment"># 2021-02-15</span></span><br><span class="line">print(now.strftime(<span class="string">"%m-%d-%y. %d %b %Y is a %A on the %d day of %B."</span>))</span><br><span class="line"><span class="comment"># 02-15-21. 15 Feb 2021 is a Monday on the 15 day of February.</span></span><br><span class="line"><span class="comment"># dates support calendar arithmetic</span></span><br><span class="line">birthday = date(<span class="number">1997</span>, <span class="number">1</span>, <span class="number">1</span>)</span><br><span class="line">age = now - birthday</span><br><span class="line">print(age.days)</span><br><span class="line"><span class="comment"># 8811</span></span><br><span class="line"></span><br><span class="line">d1 = datetime(<span class="number">2020</span>, <span class="number">6</span>, <span class="number">20</span>)  <span class="comment"># 第一个日期</span></span><br><span class="line">d2 = datetime(<span class="number">2020</span>, <span class="number">6</span>, <span class="number">21</span>)  <span class="comment"># 第二个日期</span></span><br><span class="line">interval = d2 - d1  <span class="comment"># 1 两日期差距</span></span><br><span class="line">print(interval.days)  <span class="comment"># 0 具体的天数</span></span><br><span class="line">print(interval.seconds)  <span class="comment"># 0 具体的秒数</span></span><br><span class="line"></span><br><span class="line">print(<span class="string">'------------------'</span>)</span><br><span class="line"><span class="comment"># 获取到毫秒数</span></span><br><span class="line">print(time.time())  <span class="comment"># 1613380274.227134</span></span><br><span class="line">time.sleep(<span class="number">2</span>)</span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> datetime <span class="keyword">import</span> datetime, date, time, timedelta</span><br><span class="line"></span><br><span class="line">str_ = <span class="string">'2019-9-10 8:10:56'</span></span><br><span class="line">str_date = datetime.strptime(str_, <span class="string">'%Y-%m-%d %H:%M:%S'</span>)</span><br><span class="line">print(str_date)</span><br><span class="line"><span class="comment"># 2019-09-10 08:10:56</span></span><br><span class="line"></span><br><span class="line">now = datetime.now()</span><br><span class="line">date_str = now.strftime(<span class="string">'%Y/%m/%d %H:%M:%S'</span>)</span><br><span class="line">print(date_str)</span><br><span class="line"><span class="comment"># 2021/02/15 17:28:16</span></span><br></pre></td></tr></tbody></table></figure>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -650,7 +1449,7 @@
 
 
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/20/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/20/">20</a><span class="page-number current">21</span>
+    <a class="extend prev" rel="prev" href="/page/20/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/20/">20</a><span class="page-number current">21</span><a class="page-number" href="/page/22/">22</a><a class="extend next" rel="next" href="/page/22/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 <script src="/js/comments.js"></script>
 </div>
