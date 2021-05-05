@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<meta name="hexo-config" content="{&quot;hostname&quot;:&quot;bubbleboy11.github.io&quot;,&quot;root&quot;:&quot;/&quot;,&quot;images&quot;:&quot;/images&quot;,&quot;scheme&quot;:&quot;Muse&quot;,&quot;version&quot;:&quot;8.3.0&quot;,&quot;exturl&quot;:false,&quot;sidebar&quot;:{&quot;position&quot;:&quot;left&quot;,&quot;display&quot;:&quot;post&quot;,&quot;padding&quot;:18,&quot;offset&quot;:12},&quot;copycode&quot;:true,&quot;bookmark&quot;:{&quot;enable&quot;:false,&quot;color&quot;:&quot;#222&quot;,&quot;save&quot;:&quot;auto&quot;},&quot;fancybox&quot;:false,&quot;mediumzoom&quot;:false,&quot;lazyload&quot;:false,&quot;pangu&quot;:false,&quot;comments&quot;:{&quot;style&quot;:&quot;tabs&quot;,&quot;active&quot;:null,&quot;storage&quot;:true,&quot;lazyload&quot;:false,&quot;nav&quot;:null},&quot;motion&quot;:{&quot;enable&quot;:true,&quot;async&quot;:false,&quot;transition&quot;:{&quot;post_block&quot;:&quot;fadeIn&quot;,&quot;post_header&quot;:&quot;fadeInDown&quot;,&quot;post_body&quot;:&quot;fadeInDown&quot;,&quot;coll_header&quot;:&quot;fadeInLeft&quot;,&quot;sidebar&quot;:&quot;fadeInUp&quot;}},&quot;prism&quot;:false,&quot;i18n&quot;:{&quot;placeholder&quot;:&quot;搜索...&quot;,&quot;empty&quot;:&quot;没有找到任何搜索结果：${query}&quot;,&quot;hits_time&quot;:&quot;找到 ${hits} 个搜索结果（用时 ${time} 毫秒）&quot;,&quot;hits&quot;:&quot;找到 ${hits} 个搜索结果&quot;}}">
+<meta name="description" content="把查询集归为queryset或者模型类生成实例instance的django数据类型转换成json&#x2F; xml &#x2F; yaml，再传给前端js进行渲染反序列化，前端post请求的body里面带有json数据，使用django的orm让它保存到数据库里面， django自带序列化功能，但是不完善 Python Console是针对当前项目环境的console 12345678910from course">
+<meta property="og:type" content="article">
+<meta property="og:title" content="序列化">
+<meta property="og:url" content="https://bubbleboy11.github.io/2021/05/05/xu-lie-hua/index.html">
+<meta property="og:site_name" content="外心人D的博客">
+<meta property="og:description" content="把查询集归为queryset或者模型类生成实例instance的django数据类型转换成json&#x2F; xml &#x2F; yaml，再传给前端js进行渲染反序列化，前端post请求的body里面带有json数据，使用django的orm让它保存到数据库里面， django自带序列化功能，但是不完善 Python Console是针对当前项目环境的console 12345678910from course">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://bubbleboy11.github.io/2021/05/05/xu-lie-hua/drf-app.png">
+<meta property="article:published_time" content="2021-05-04T16:21:41.000Z">
+<meta property="article:modified_time" content="2021-05-05T07:43:03.065Z">
+<meta property="article:author" content="外心人D">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://bubbleboy11.github.io/2021/05/05/xu-lie-hua/drf-app.png">
+
+
+<link rel="canonical" href="https://bubbleboy11.github.io/2021/05/05/xu-lie-hua/">
+
+
+
+<meta name="hexo-config-page" content="{&quot;sidebar&quot;:&quot;&quot;,&quot;isHome&quot;:false,&quot;isPost&quot;:true,&quot;lang&quot;:&quot;zh-CN&quot;}">
+<meta name="hexo-config-calendar" content="">
+<script data-pjax src="/js/load-config.js"></script>
+  <title>序列化 | 外心人D的博客</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="外心人D的博客" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">外心人D的博客</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#drf%E7%9A%84%E5%BA%8F%E5%88%97%E5%8C%96%E4%BD%9C%E7%94%A8"><span class="nav-text">drf的序列化作用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%96%E5%86%99%E8%A7%86%E5%9B%BE%E5%87%BD%E6%95%B0"><span class="nav-text">编写视图函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E8%80%81%E5%B8%88%E4%BF%A1%E6%81%AF%E6%95%B0%E6%8D%AE%E6%8E%A5%E5%8F%A3"><span class="nav-text">实现老师信息数据接口</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">外心人D</p>
+  <div class="site-description" itemprop="description">本博客大多内容为慕课和网上博客，并非原创</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">228</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/05/05/xu-lie-hua/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          序列化
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-05-04 16:21:41" itemprop="dateCreated datePublished" datetime="2021-05-04T16:21:41Z">2021-05-04</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-05-05 07:43:03" itemprop="dateModified" datetime="2021-05-05T07:43:03Z">2021-05-05</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>把查询集归为queryset或者模型类生成实例instance的django数据类型转换成json/ xml / yaml，再传给前端js进行渲染<br>反序列化，前端post请求的body里面带有json数据，使用django的orm让它保存到数据库里面，</p>
+<p>django自带序列化功能，但是不完善</p>
+<p><code>Python Console</code>是针对当前项目环境的console</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> course.models <span class="keyword">import</span> Course  <span class="comment"># 引入课程</span></span><br><span class="line"><span class="keyword">from</span> django.core <span class="keyword">import</span> serializers</span><br><span class="line"></span><br><span class="line"><span class="comment"># 序列化模型类已有的所有字段</span></span><br><span class="line">serializers.serialize(<span class="string">'json'</span>, Course.objects.all())</span><br><span class="line"><span class="string">'[{"model": "course.course", "pk": 1, "fields": {"name": "django rest framework快速入门", "introduction": "API接口开发无需费时费力，本课程将从零开始引导同学们快速开发自己的RESTful API接口，从Django项目环境搭建、API接口生成数据、Postman接口测试到DRF认证方式的讲解，通过一个典型的课程信息接口（含增删改查），给同学们讲解完DRF中的序列化（serializers）、视图集（viewsets）、路由（routers）、认证（authentication）、权限（permission），为将来前后端分离项目的开发打下基础。", "teacher": 1, "price": "9.99", "created_at": "2021-05-04T22:35:31.439", "updated_at": "2021-05-04T22:35:31.439"}}]'</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 序列号特定字段</span></span><br><span class="line">serializers.serialize(<span class="string">'json'</span>, Course.objects.all(), fields=(<span class="string">"name"</span>))</span><br><span class="line"><span class="string">'[{"model": "course.course", "pk": 1, "fields": {"name": "django rest framework快速入门"}}]'</span></span><br></pre></td></tr></tbody></table></figure>
+<p><code>teacher</code>不是外键所关联的用户名称而是用户id</p>
+<p>如何序列化模型类<br>在各个应用下面建一个<code>serializers.py</code>，写法和form表单类的类似 </p>
+<h3 id="drf的序列化作用"><a href="#drf的序列化作用" class="headerlink" title="drf的序列化作用"></a>drf的序列化作用</h3><ul>
+<li>验证处理：反序列化中，当前端传递过来的数据放在request.data的时候，要把他转换成模型类实例进行保存到数据表，对前端提交的数据进行验证</li>
+<li>验证器的参数</li>
+<li>同时序列化多个对象</li>
+<li>序列化的过程添加上下文</li>
+<li>无限的数据异常处理</li>
+</ul>
+<p>DRF中封装了<code>Serializer</code>类和<code>ModelSerializer</code>类用于实现序列化操作，通过继承<code>Serializer</code>类或<code>ModelSerializer</code>类，<br>我们可以自定义序列化器，用于将对象处理成字典，</p>
+<p>关系字段的外键字段序列化可以指定遍历的序列化深度<code>depth</code>，如果表结构有子表关联到父表，父表又关联到另外的父表，可以设置深度</p>
+<p><code>course/serializers.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django <span class="keyword">import</span> forms</span><br><span class="line"><span class="keyword">from</span> django.contrib.auth.models <span class="keyword">import</span> User</span><br><span class="line"><span class="keyword">from</span> rest_framework <span class="keyword">import</span> serializers</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> .models <span class="keyword">import</span> Course</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># form类这里用不到，只是对比类似的样子</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CourseForm</span>(<span class="params">forms.ModelForm</span>):</span></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        model = Course</span><br><span class="line">        fields = (<span class="string">'name'</span>, <span class="string">'introduction'</span>, <span class="string">'teacher'</span>, <span class="string">'price'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserSerializer</span>(<span class="params">serializers.ModelSerializer</span>):</span></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        model = User  <span class="comment"># 序列化用户模型类</span></span><br><span class="line">        fields = <span class="string">'__all__'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CourseSerializer</span>(<span class="params">serializers.ModelSerializer</span>):</span></span><br><span class="line">    <span class="comment"># teacher是外键关联到用户表，并不是新建过程中新建的一个用户，想得到对应的名字，可以把用户的名称序列化，和使用ORM查询外键关联查询一样</span></span><br><span class="line">    teacher = serializers.ReadOnlyField(source=<span class="string">'teacher.username'</span>)  <span class="comment"># 序列化模型类中指定字段，外键字段，指定只读字段</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        model = Course  <span class="comment"># 序列化课程模型类</span></span><br><span class="line">        <span class="comment"># exclude = ('id', )  # 排除字段</span></span><br><span class="line">        <span class="comment"># fields = ('id', 'name', 'introduction', 'teacher', 'price', 'created_at', 'updated_at')</span></span><br><span class="line">        fields = <span class="string">'__all__'</span>  <span class="comment"># 包含模型类所有字段</span></span><br><span class="line">        depth = <span class="number">2</span>  <span class="comment"># 深度</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>实现序列化结果带绝对和相对URL超链接的<code>HyperlinkedModelSerializer</code>的api，在<code>fields</code> 加上 <code>url</code>，不用用于FBV</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework <span class="keyword">import</span> serializers</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> .models <span class="keyword">import</span> Course</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CourseSerializer</span>(<span class="params">serializers.HyperlinkedModelSerializer</span>):</span></span><br><span class="line">    teacher = serializers.ReadOnlyField(source=<span class="string">'teacher.username'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        model = Course</span><br><span class="line">        <span class="comment"># url是默认值，可在settings.py中设置URL_FIELD_NAME使全局生效</span></span><br><span class="line">        fields = (<span class="string">'id'</span>, <span class="string">'url'</span>, <span class="string">'name'</span>, <span class="string">'introduction'</span>, <span class="string">'teacher'</span>, <span class="string">'price'</span>, <span class="string">'created_at'</span>, <span class="string">'updated_at'</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<hr>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework <span class="keyword">import</span> serializers </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SubjectSerializer</span>(<span class="params">serializers.ModelSerializer</span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        model = Subject</span><br><span class="line">        fields = <span class="string">'__all__'</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>上面的代码直接继承了<code>ModelSerializer</code>，通过<code>Meta</code>类的<code>model</code>属性指定要序列化的模型以及<code>fields</code>属性指定需要序列化的模型字段，稍后我们就可以在视图函数中使用该类来实现对<code>Subject</code>模型的序列化。</p>
+<h4 id="编写视图函数"><a href="#编写视图函数" class="headerlink" title="编写视图函数"></a>编写视图函数</h4><p>DRF框架支持两种实现数据接口的方式，一种是FBV（基于函数的视图），另一种是CBV（基于类的视图）。<br>我们先看看FBV的方式如何实现数据接口，代码如下所示。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework.decorators <span class="keyword">import</span> api_view</span><br><span class="line"><span class="keyword">from</span> rest_framework.response <span class="keyword">import</span> Response</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@api_view(('GET', ))</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">show_subjects</span>(<span class="params">request: HttpRequest</span>) -&gt; HttpResponse:</span></span><br><span class="line">    subjects = Subject.objects.all().order_by(<span class="string">'no'</span>)</span><br><span class="line">    <span class="comment"># 创建序列化器对象并指定要序列化的模型</span></span><br><span class="line">    serializer = SubjectSerializer(subjects, many=<span class="literal">True</span>)</span><br><span class="line">    <span class="comment"># 通过序列化器的data属性获得模型对应的字典并通过创建Response对象返回JSON格式的数据</span></span><br><span class="line">    <span class="keyword">return</span> Response(serializer.data)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>对比上一个章节的使用<code>bpmapper</code>实现模型序列化的代码，使用DRF的代码更加简单明了，而且DRF本身自带了一套页面，可以方便我们查看我们使用DRF定制的数据接口，如下图所示。</p>
+<p><img src="/2021/05/05/xu-lie-hua/drf-app.png"></p>
+<p>直接使用上一节写好的页面，就可以通过Vue.js把上面接口提供的学科数据渲染并展示出来，此处不再进行赘述。</p>
+<h4 id="实现老师信息数据接口"><a href="#实现老师信息数据接口" class="headerlink" title="实现老师信息数据接口"></a>实现老师信息数据接口</h4><p>编写序列化器。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SubjectSimpleSerializer</span>(<span class="params">serializers.ModelSerializer</span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        model = Subject</span><br><span class="line">        fields = (<span class="string">'no'</span>, <span class="string">'name'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TeacherSerializer</span>(<span class="params">serializers.ModelSerializer</span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        model = Teacher</span><br><span class="line">        exclude = (<span class="string">'subject'</span>, )</span><br></pre></td></tr></tbody></table></figure>
+
+<p>编写视图函数。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@api_view(('GET', ))</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">show_teachers</span>(<span class="params">request: HttpRequest</span>) -&gt; HttpResponse:</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        sno = int(request.GET.get(<span class="string">'sno'</span>))</span><br><span class="line">        subject = Subject.objects.only(<span class="string">'name'</span>).get(no=sno)</span><br><span class="line">        teachers = Teacher.objects.filter(subject=subject).defer(<span class="string">'subject'</span>).order_by(<span class="string">'no'</span>)</span><br><span class="line">        subject_seri = SubjectSimpleSerializer(subject)</span><br><span class="line">        teacher_seri = TeacherSerializer(teachers, many=<span class="literal">True</span>)</span><br><span class="line">        <span class="keyword">return</span> Response({<span class="string">'subject'</span>: subject_seri.data, <span class="string">'teachers'</span>: teacher_seri.data})</span><br><span class="line">    <span class="keyword">except</span> (TypeError, ValueError, Subject.DoesNotExist):</span><br><span class="line">        <span class="keyword">return</span> Response(status=<span class="number">404</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>配置URL映射。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">urlpatterns = [</span><br><span class="line">    </span><br><span class="line">    path(<span class="string">'api/teachers/'</span>, show_teachers),</span><br><span class="line">    </span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>通过Vue.js渲染页面。</p>
+<figure class="highlight html"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">"en"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>老师信息<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="css">        <span class="comment">/* 此处省略掉层叠样式表 */</span></span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"container"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">h1</span>&gt;</span>{{ subject.name }}学科的老师信息<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">hr</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">h2</span> <span class="attr">v-if</span>=<span class="string">"loaded &amp;&amp; teachers.length == 0"</span>&gt;</span>暂无该学科老师信息<span class="tag">&lt;/<span class="name">h2</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"teacher"</span> <span class="attr">v-for</span>=<span class="string">"teacher in teachers"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"photo"</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">img</span> <span class="attr">:src</span>=<span class="string">"'/static/images/' + teacher.photo"</span> <span class="attr">height</span>=<span class="string">"140"</span> <span class="attr">alt</span>=<span class="string">""</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"info"</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">span</span>&gt;</span><span class="tag">&lt;<span class="name">strong</span>&gt;</span>姓名：{{ teacher.name }}<span class="tag">&lt;/<span class="name">strong</span>&gt;</span><span class="tag">&lt;/<span class="name">span</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">span</span>&gt;</span>性别：{{ teacher.sex | maleOrFemale }}<span class="tag">&lt;/<span class="name">span</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">span</span>&gt;</span>出生日期：{{ teacher.birth }}<span class="tag">&lt;/<span class="name">span</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"intro"</span>&gt;</span>{{ teacher.intro }}<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"comment"</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">""</span> @<span class="attr">click.prevent</span>=<span class="string">"vote(teacher, true)"</span>&gt;</span>好评<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="symbol">&amp;nbsp;</span><span class="symbol">&amp;nbsp;</span></span><br><span class="line">                    (<span class="tag">&lt;<span class="name">strong</span>&gt;</span>{{ teacher.good_count }}<span class="tag">&lt;/<span class="name">strong</span>&gt;</span>)</span><br><span class="line">                    <span class="symbol">&amp;nbsp;</span><span class="symbol">&amp;nbsp;</span><span class="symbol">&amp;nbsp;</span><span class="symbol">&amp;nbsp;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">""</span> @<span class="attr">click.prevent</span>=<span class="string">"vote(teacher, false)"</span>&gt;</span>差评<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="symbol">&amp;nbsp;</span><span class="symbol">&amp;nbsp;</span></span><br><span class="line">                    (<span class="tag">&lt;<span class="name">strong</span>&gt;</span>{{ teacher.bad_count }}<span class="tag">&lt;/<span class="name">strong</span>&gt;</span>)</span><br><span class="line">                <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"/static/html/subjects.html"</span>&gt;</span>返回首页<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"https://cdn.bootcdn.net/ajax/libs/vue/2.6.11/vue.min.js"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript">        <span class="keyword">let</span> app = <span class="keyword">new</span> Vue({</span></span><br><span class="line"><span class="javascript">            el: <span class="string">'#container'</span>,</span></span><br><span class="line">            data: {</span><br><span class="line">                subject: {},</span><br><span class="line">                teachers: [],</span><br><span class="line"><span class="javascript">                loaded: <span class="literal">false</span></span></span><br><span class="line">            },</span><br><span class="line">            created() {</span><br><span class="line"><span class="javascript">                fetch(<span class="string">'/api/teachers/'</span> + location.search)</span></span><br><span class="line"><span class="javascript">                    .then(<span class="function"><span class="params">resp</span> =&gt;</span> resp.json())</span></span><br><span class="line"><span class="javascript">                    .then(<span class="function"><span class="params">json</span> =&gt;</span> {</span></span><br><span class="line"><span class="javascript">                        <span class="built_in">this</span>.subject = json.subject</span></span><br><span class="line"><span class="javascript">                        <span class="built_in">this</span>.teachers = json.teachers</span></span><br><span class="line">                    })</span><br><span class="line">            },</span><br><span class="line">            filters: {</span><br><span class="line">                maleOrFemale(sex) {</span><br><span class="line"><span class="javascript">                    <span class="keyword">return</span> sex? <span class="string">'男'</span>: <span class="string">'女'</span></span></span><br><span class="line">                }</span><br><span class="line">            },</span><br><span class="line">            methods: {</span><br><span class="line">               vote(teacher, flag) {</span><br><span class="line"><span class="javascript">                    <span class="keyword">let</span> url = flag? <span class="string">'/praise/'</span> : <span class="string">'/criticize/'</span></span></span><br><span class="line"><span class="javascript">                    url += <span class="string">'?tno='</span> + teacher.no</span></span><br><span class="line"><span class="javascript">                    fetch(url).then(<span class="function"><span class="params">resp</span> =&gt;</span> resp.json()).then(<span class="function"><span class="params">json</span> =&gt;</span> {</span></span><br><span class="line">                        if (json.code === 10000) {</span><br><span class="line">                            if (flag) {</span><br><span class="line">                                teacher.good_count = json.count</span><br><span class="line"><span class="javascript">                            } <span class="keyword">else</span> {</span></span><br><span class="line">                                teacher.bad_count = json.count</span><br><span class="line">                            }</span><br><span class="line">                        }</span><br><span class="line">                    })</span><br><span class="line">                }</span><br><span class="line">            }</span><br><span class="line">        })</span><br><span class="line">    <span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/05/03/ce-shi-bao-gao-shi-zhan/" rel="prev" title="测试报告实战">
+                  <i class="fa fa-chevron-left"></i> 测试报告实战
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/05/06/django-shi-tu-kai-fa-restful-api-jie-kou/" rel="next" title="django视图开发RESTful API接口">
+                  django视图开发RESTful API接口 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+<script src="/js/comments.js"></script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">外心人D</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

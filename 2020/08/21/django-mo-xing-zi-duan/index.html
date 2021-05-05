@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<meta name="hexo-config" content="{&quot;hostname&quot;:&quot;bubbleboy11.github.io&quot;,&quot;root&quot;:&quot;/&quot;,&quot;images&quot;:&quot;/images&quot;,&quot;scheme&quot;:&quot;Muse&quot;,&quot;version&quot;:&quot;8.3.0&quot;,&quot;exturl&quot;:false,&quot;sidebar&quot;:{&quot;position&quot;:&quot;left&quot;,&quot;display&quot;:&quot;post&quot;,&quot;padding&quot;:18,&quot;offset&quot;:12},&quot;copycode&quot;:true,&quot;bookmark&quot;:{&quot;enable&quot;:false,&quot;color&quot;:&quot;#222&quot;,&quot;save&quot;:&quot;auto&quot;},&quot;fancybox&quot;:false,&quot;mediumzoom&quot;:false,&quot;lazyload&quot;:false,&quot;pangu&quot;:false,&quot;comments&quot;:{&quot;style&quot;:&quot;tabs&quot;,&quot;active&quot;:null,&quot;storage&quot;:true,&quot;lazyload&quot;:false,&quot;nav&quot;:null},&quot;motion&quot;:{&quot;enable&quot;:true,&quot;async&quot;:false,&quot;transition&quot;:{&quot;post_block&quot;:&quot;fadeIn&quot;,&quot;post_header&quot;:&quot;fadeInDown&quot;,&quot;post_body&quot;:&quot;fadeInDown&quot;,&quot;coll_header&quot;:&quot;fadeInLeft&quot;,&quot;sidebar&quot;:&quot;fadeInUp&quot;}},&quot;prism&quot;:false,&quot;i18n&quot;:{&quot;placeholder&quot;:&quot;搜索...&quot;,&quot;empty&quot;:&quot;没有找到任何搜索结果：${query}&quot;,&quot;hits_time&quot;:&quot;找到 ${hits} 个搜索结果（用时 ${time} 毫秒）&quot;,&quot;hits&quot;:&quot;找到 ${hits} 个搜索结果&quot;}}">
+<meta name="description" content="Django模型最佳实践 正确的为模型和关系字段命名。 设置适当的related_name属性。 用OneToOneField代替ForeignKeyField(unique&#x3D;True)。 通过“迁移操作”（migrate）来添加模型。 用NoSQL来应对需要降低范式级别的场景。 如果布尔类型可以为空要使用NullBooleanField。 在模型中放置业务逻辑。 用&lt;ModelName&amp;g">
+<meta property="og:type" content="article">
+<meta property="og:title" content="django">
+<meta property="og:url" content="https://bubbleboy11.github.io/2020/08/21/django-mo-xing-zi-duan/index.html">
+<meta property="og:site_name" content="外心人D的博客">
+<meta property="og:description" content="Django模型最佳实践 正确的为模型和关系字段命名。 设置适当的related_name属性。 用OneToOneField代替ForeignKeyField(unique&#x3D;True)。 通过“迁移操作”（migrate）来添加模型。 用NoSQL来应对需要降低范式级别的场景。 如果布尔类型可以为空要使用NullBooleanField。 在模型中放置业务逻辑。 用&lt;ModelName&amp;g">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-08-20T16:21:41.000Z">
+<meta property="article:modified_time" content="2021-05-05T04:13:35.518Z">
+<meta property="article:author" content="外心人D">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://bubbleboy11.github.io/2020/08/21/django-mo-xing-zi-duan/">
+
+
+
+<meta name="hexo-config-page" content="{&quot;sidebar&quot;:&quot;&quot;,&quot;isHome&quot;:false,&quot;isPost&quot;:true,&quot;lang&quot;:&quot;zh-CN&quot;}">
+<meta name="hexo-config-calendar" content="">
+<script data-pjax src="/js/load-config.js"></script>
+  <title>django | 外心人D的博客</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="外心人D的博客" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">外心人D的博客</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#Django%E6%A8%A1%E5%9E%8B%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5"><span class="nav-text">Django模型最佳实践</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A8%A1%E5%9E%8B%E5%AE%9A%E4%B9%89%E5%8F%82%E8%80%83"><span class="nav-text">模型定义参考</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%AD%97%E6%AE%B5"><span class="nav-text">字段</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%AD%97%E6%AE%B5%E5%B1%9E%E6%80%A7"><span class="nav-text">字段属性</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%A8%A1%E5%9E%8B%E5%85%83%E6%95%B0%E6%8D%AE%E9%80%89%E9%A1%B9%E5%92%8C%E6%8F%8F%E8%BF%B0"><span class="nav-text">模型元数据选项和描述</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">外心人D</p>
+  <div class="site-description" itemprop="description">本博客大多内容为慕课和网上博客，并非原创</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">228</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/django-mo-xing-zi-duan/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          django
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-05-05 04:13:35" itemprop="dateModified" datetime="2021-05-05T04:13:35Z">2021-05-05</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h4 id="Django模型最佳实践"><a href="#Django模型最佳实践" class="headerlink" title="Django模型最佳实践"></a>Django模型最佳实践</h4><ol>
+<li>正确的为模型和关系字段命名。</li>
+<li>设置适当的<code>related_name</code>属性。</li>
+<li>用<code>OneToOneField</code>代替<code>ForeignKeyField(unique=True)</code>。</li>
+<li>通过“迁移操作”（migrate）来添加模型。</li>
+<li>用NoSQL来应对需要降低范式级别的场景。</li>
+<li>如果布尔类型可以为空要使用<code>NullBooleanField</code>。</li>
+<li>在模型中放置业务逻辑。</li>
+<li>用<code>&lt;ModelName&gt;.DoesNotExists</code>取代<code>ObjectDoesNotExists</code>。</li>
+<li>在数据库中不要出现无效数据。</li>
+<li>不要对<code>QuerySet</code>调用<code>len()</code>函数。</li>
+<li>将<code>QuerySet</code>的<code>exists()</code>方法的返回值用于<code>if</code>条件。</li>
+<li>用<code>DecimalField</code>来存储货币相关数据而不是<code>FloatField</code>。</li>
+<li>定义<code>__str__</code>方法。</li>
+<li>不要将数据文件放在同一个目录中。</li>
+</ol>
+<blockquote>
+<p><strong>说明</strong>：以上内容来自于STEELKIWI网站的<a target="_blank" rel="noopener" href="https://steelkiwi.com/blog/best-practices-working-django-models-python/"><em>Best Practice working with Django models in Python</em></a>，有兴趣的小伙伴可以阅读原文。</p>
+</blockquote>
+<h4 id="模型定义参考"><a href="#模型定义参考" class="headerlink" title="模型定义参考"></a>模型定义参考</h4><h5 id="字段"><a href="#字段" class="headerlink" title="字段"></a>字段</h5><p>对字段名称的限制</p>
+<ul>
+<li>字段名不能是Python的保留字，否则会导致语法错误</li>
+<li>字段名不能有多个连续下划线，否则影响ORM查询操作</li>
+</ul>
+<p>Django模型字段类</p>
+<table>
+<thead>
+<tr>
+<th>字段类</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>AutoField</code></td>
+<td>自增ID字段</td>
+</tr>
+<tr>
+<td><code>BigIntegerField</code></td>
+<td>64位有符号整数</td>
+</tr>
+<tr>
+<td><code>BinaryField</code></td>
+<td>存储二进制数据的字段，对应Python的<code>bytes</code>类型</td>
+</tr>
+<tr>
+<td><code>BooleanField</code></td>
+<td>存储<code>True</code>或<code>False</code></td>
+</tr>
+<tr>
+<td><code>CharField</code></td>
+<td>长度较小的字符串，属性max_length——最大长度</td>
+</tr>
+<tr>
+<td><code>DateField</code></td>
+<td>存储日期，属性有<code>auto_now</code> 更新时间为记录更改时的时间和<code>auto_now_add</code>  记录创建的时间</td>
+</tr>
+<tr>
+<td><code>DateTimeField</code></td>
+<td>存储日期和日期 时间，两个附加属性同上</td>
+</tr>
+<tr>
+<td><code>DecimalField</code></td>
+<td>存储固定精度小数，有<code>max_digits</code>（有效位数）和<code>decimal_places</code>（小数点后面）两个必要的参数</td>
+</tr>
+<tr>
+<td><code>DurationField</code></td>
+<td>存储时间跨度</td>
+</tr>
+<tr>
+<td><code>EmailField</code></td>
+<td>邮件输入，与<code>CharField</code>相同，可以用<code>EmailValidator</code>验证</td>
+</tr>
+<tr>
+<td><code>FileField</code></td>
+<td>文件上传字段，验证上传的对象是不是有效</td>
+</tr>
+<tr>
+<td><code>FielPathField</code></td>
+<td>文件文件路径，验证上传的对象是不是有效</td>
+</tr>
+<tr>
+<td><code>FloatField</code></td>
+<td>存储浮点数</td>
+</tr>
+<tr>
+<td><code>ImageField</code></td>
+<td>其他同<code>FileFiled</code>，要验证上传的对象是不是有效图像</td>
+</tr>
+<tr>
+<td><code>IntegerField</code></td>
+<td>存储32位有符号整数。</td>
+</tr>
+<tr>
+<td><code>GenericIPAddressField</code></td>
+<td>存储IPv4或IPv6地址</td>
+</tr>
+<tr>
+<td><code>NullBooleanField</code></td>
+<td>存储<code>True</code>、<code>False</code>或<code>null</code>值</td>
+</tr>
+<tr>
+<td><code>PositiveIntegerField</code></td>
+<td>存储无符号整数（只能存储正数）</td>
+</tr>
+<tr>
+<td><code>SlugField</code></td>
+<td>存储slug（简短标注）</td>
+</tr>
+<tr>
+<td><code>SmallIntegerField</code></td>
+<td>存储16位有符号整数</td>
+</tr>
+<tr>
+<td><code>TextField</code></td>
+<td>存储数据量较大的文本</td>
+</tr>
+<tr>
+<td><code>TimeField</code></td>
+<td>存储时间</td>
+</tr>
+<tr>
+<td><code>URLField</code></td>
+<td>存储URL的<code>CharField</code></td>
+</tr>
+<tr>
+<td><code>UUIDField</code></td>
+<td>存储全局唯一标识符</td>
+</tr>
+</tbody></table>
+<h5 id="字段属性"><a href="#字段属性" class="headerlink" title="字段属性"></a>字段属性</h5><p>数据库字段和ORM模型对应，是用field对应，field是一个基础的类，有很多很多子类<br>通用字段属性</p>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>null</code></td>
+<td>数据库中对应的字段是否允许为<code>NULL</code>，默认为<code>False</code>，如果为True，表示允许为空，null是什么都没填</td>
+</tr>
+<tr>
+<td><code>blank</code></td>
+<td>后台模型管理验证数据时，是否允许为<code>NULL</code>，默认为<code>False</code> 如果为True，则该字段允许为空⽩空字符串</td>
+</tr>
+<tr>
+<td><code>choices</code></td>
+<td>设定字段的选项，各元组中的第一个值是设置在模型上的值，第二值是人类可读的值，可供选择的选项，如：性别的选项（男，女）</td>
+</tr>
+<tr>
+<td><code>db_column</code></td>
+<td>字段对应到数据库表中的列名，未指定时直接使用字段的名称</td>
+</tr>
+<tr>
+<td><code>db_index</code></td>
+<td>设置为<code>True</code>时将在该字段创建索引</td>
+</tr>
+<tr>
+<td><code>db_tablespace</code></td>
+<td>为有索引的字段设置使用的表空间，默认为<code>DEFAULT_INDEX_TABLESPACE</code></td>
+</tr>
+<tr>
+<td><code>default</code></td>
+<td>字段的默认值</td>
+</tr>
+<tr>
+<td><code>editable</code></td>
+<td>字段在后台模型管理或<code>ModelForm</code>中是否显示，默认为<code>True</code></td>
+</tr>
+<tr>
+<td><code>error_messages</code></td>
+<td>设定字段抛出异常时的默认消息的字典，其中的键包括<code>null</code>、<code>blank</code>、<code>invalid</code>、<code>invalid_choice</code>、<code>unique</code>和<code>unique_for_date</code></td>
+</tr>
+<tr>
+<td><code>help_text</code></td>
+<td>表单小组件旁边显示的额外的帮助文本。api文档对应字段的注释</td>
+</tr>
+<tr>
+<td><code>primary_key</code></td>
+<td>将字段指定为模型的主键，未指定时会自动添加<code>AutoField</code>用于主键，只读。若为True，则该字段会成为模型的主键字段，默认值是False</td>
+</tr>
+<tr>
+<td><code>unique</code></td>
+<td>设置为<code>True</code>时，表中字段的值必须是唯一的</td>
+</tr>
+<tr>
+<td><code>verbose_name</code></td>
+<td>字段在后台模型管理显示的名称，未指定时使用字段的名称</td>
+</tr>
+</tbody></table>
+<p>unique——唯一索引<br><code>get_FOO_display()</code>——展示choices对应的值</p>
+<p>数据关系的几种类型<br>OneToOneField = ForeignKey(…，unique=True)设置一对一关系 </p>
+<p>SQL FOREIGN KEY 一个表中的 FOREIGN KEY 指向另一个表中的 UNIQUE KEY(唯一约束的键)。<br>若有模型类存在外键，创建数据时，要先创建外键关联的模型类的数据，<br>不然创建包含外键的模型类的数据时，外键的关联模型类的数据会找不到。</p>
+<p><code>ForeignKey</code>属性</p>
+<ol>
+<li><code>limit_choices_to</code>：值是一个Q对象或返回一个Q对象，用于限制后台显示哪些对象。</li>
+<li><code>related_name</code>：用于获取关联对象的关联管理器对象（反向查询），如果不允许反向，该属性应该被设置为<code>'+'</code>，或者以<code>'+'</code>结尾。</li>
+<li><code>to_field</code>：指定关联的字段，默认关联对象的主键字段。</li>
+<li><code>db_constraint</code>：是否为外键创建约束，默认值为<code>True</code>。</li>
+<li><code>on_delete</code>：外键关联的对象被删除时对应的动作，可取的值包括<code>django.db.models</code>中定义的：<ul>
+<li><code>CASCADE</code>：级联删除。</li>
+<li><code>PROTECT</code>：抛出<code>ProtectedError</code>异常，阻止删除引用的对象。</li>
+<li><code>SET_NULL</code>：把外键设置为<code>null</code>，当<code>null</code>属性被设置为<code>True</code>时才能这么做。</li>
+<li><code>SET_DEFAULT</code>：把外键设置为默认值，提供了默认值才能这么做。</li>
+</ul>
+</li>
+</ol>
+<p><code>ManyToManyField</code>属性 </p>
+<ol>
+<li><code>symmetrical</code>：是否建立对称的多对多关系。</li>
+<li><code>through</code>：指定维持多对多关系的中间表的Django模型。</li>
+<li><code>throughfields</code>：定义了中间模型时可以指定建立多对多关系的字段。</li>
+<li><code>db_table</code>：指定维持多对多关系的中间表的表名。</li>
+</ol>
+<h5 id="模型元数据选项和描述"><a href="#模型元数据选项和描述" class="headerlink" title="模型元数据选项和描述"></a>模型元数据选项和描述</h5><p>使用Meta类来表示，对模型的补充说明，在定义好的模型类里面定义一个内部类<br>| 选项                    | 说明                                                         |<br>| ———————– | ———————————————————— |<br>| <code>abstract</code>              | 设置为True时模型是抽象父类 (抽象类不会生成数据表)，其他类需要继承自这个公共类的字段部分    |<br>| <code>app_label</code>             | 如果定义模型的应用不在INSTALLED_APPS中可以用该属性指定       |<br>| <code>db_table</code>              | 模型使用映射的数据表名称                                      |<br>| <code>db_tablespace</code>         | 模型使用的数据表空间                                         |<br>| <code>default_related_name</code>  | 关联对象回指这个模型时默认使用的名称，默认为<model_name>_set |<br>| <code>get_latest_by</code>         | 模型中可排序字段的名称。                                     |<br>| <code>managed</code>               | 设置为True时，Django在迁移中创建数据表并在执行flush管理命令时把表移除 |<br>| <code>order_with_respect_to</code> | 标记对象为可排序的                                           |<br>| <code>ordering</code>              | 对象的默认排序，指定数据表的默认排序规则                                               |<br>| <code>permissions</code>           | 创建对象时写入权限表的额外权限                               |<br>| <code>default_permissions</code>   | 默认为<code>('add', 'change', 'delete')</code>                          |<br>| <code>unique_together</code>       | 设定组合在一起时必须独一无二的字段名                         |<br>| <code>index_together</code>        | 设定一起建立索引的多个字段名                                 |<br>| <code>verbose_name</code>          | 为对象设定人类可读的名称                           |<br>| <code>verbose_name_plural</code>   | 设定对象的复数名称                                           |<br>| <code>proxy</code>   | 代理模型(对父模型的功能进行扩充) |</model_name></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">    verbose_name = <span class="string">'用户基础信息'</span></span><br><span class="line">    verbose_name_plural = <span class="string">'用户基础信息'</span></span><br><span class="line">    db_table = <span class="string">'oauth_user'</span></span><br></pre></td></tr></tbody></table></figure><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/08/21/pycharm-kuai-jie-jian-keymap/" rel="prev" title="pycharm 快捷键 keymap">
+                  <i class="fa fa-chevron-left"></i> pycharm 快捷键 keymap
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/08/21/ajax/" rel="next" title="Ajax">
+                  Ajax <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+<script src="/js/comments.js"></script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">外心人D</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

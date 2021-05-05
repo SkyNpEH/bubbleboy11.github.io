@@ -118,7 +118,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">214</span>
+          <span class="site-state-item-count">228</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -158,6 +158,813 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/05/06/drf-shi-tu-kai-fa-restful-api-jie-kou-de-fang-shi/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/05/06/drf-shi-tu-kai-fa-restful-api-jie-kou-de-fang-shi/" class="post-title-link" itemprop="url">DRF视图开发RESTful API接口的方式</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2021-05-05 16:21:41 / 修改时间：09:54:41" itemprop="dateCreated datePublished" datetime="2021-05-05T16:21:41Z">2021-05-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>总路由<br><code>drf_tutorial\urls.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.urls <span class="keyword">import</span> path, include</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    path(<span class="string">"course/"</span>, include(<span class="string">"course.urls"</span>)),</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
+
+<h1 id="DRF视图开发RESTful-API接口的方式"><a href="#DRF视图开发RESTful-API接口的方式" class="headerlink" title="DRF视图开发RESTful API接口的方式"></a>DRF视图开发RESTful API接口的方式</h1><blockquote>
+<p>优点：集成了分页、排序、认证、权限、限流</p>
+</blockquote>
+<h2 id="基于函数的视图-Function-Based-View"><a href="#基于函数的视图-Function-Based-View" class="headerlink" title="基于函数的视图 Function Based View"></a>基于函数的视图 Function Based View</h2><h3 id="获取所有课程信息或新增一个课程"><a href="#获取所有课程信息或新增一个课程" class="headerlink" title="获取所有课程信息或新增一个课程"></a>获取所有课程信息或新增一个课程</h3><p><code>course\views.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework <span class="keyword">import</span> status</span><br><span class="line"><span class="keyword">from</span> rest_framework.authentication <span class="keyword">import</span> BasicAuthentication, SessionAuthentication, TokenAuthentication</span><br><span class="line"><span class="keyword">from</span> rest_framework.decorators <span class="keyword">import</span> api_view, authentication_classes, permission_classes</span><br><span class="line"><span class="keyword">from</span> rest_framework.permissions <span class="keyword">import</span> IsAuthenticated</span><br><span class="line"><span class="keyword">from</span> rest_framework.response <span class="keyword">import</span> Response</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> .models <span class="keyword">import</span> Course</span><br><span class="line"><span class="keyword">from</span> .serializers <span class="keyword">import</span> CourseSerializer</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="string">"""一、 函数式编程 Function Based View"""</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@api_view(["GET", "POST"])</span></span><br><span class="line"><span class="meta">@authentication_classes(</span></span><br><span class="line">    (BasicAuthentication, SessionAuthentication, TokenAuthentication))</span><br><span class="line"><span class="meta">@permission_classes((IsAuthenticated, ))</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">course_list</span>(<span class="params">request</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    获取所有课程信息或新增一个课程</span></span><br><span class="line"><span class="string">    :param request:</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="keyword">if</span> request.method == <span class="string">"GET"</span>:</span><br><span class="line">        <span class="comment"># 序列化课程的所有字段</span></span><br><span class="line">        s = CourseSerializer(instance=Course.objects.all(), many=<span class="literal">True</span>)</span><br><span class="line">        <span class="comment"># Response指定返回的数据data是序列化从模型类里面拿到数据s.data</span></span><br><span class="line">        <span class="keyword">return</span> Response(data=s.data, status=status.HTTP_200_OK)  <span class="comment"># 获取当然有返回对应的数据给前端</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">elif</span> request.method == <span class="string">"POST"</span>:</span><br><span class="line">        <span class="comment"># 反序列化：前端POST过来的数据request.data转换成django能够识别的queryset或模型类实例instance</span></span><br><span class="line">        s = CourseSerializer(data=request.data)</span><br><span class="line">        <span class="comment"># partial=True属性适用于非必填的字段部分更新用，前端传递的数据比django ORM的模型类的字段要少</span></span><br><span class="line">        <span class="comment"># 如果把这个字段设置为主键或必填的字段（没有设置null=True，blank=True），那前端必须传过来，否则is_valid()为False</span></span><br><span class="line">        <span class="comment"># 对数据进行校验是否符合定义的字段属性</span></span><br><span class="line">        <span class="keyword">if</span> s.is_valid():</span><br><span class="line">            <span class="comment"># 模型类.save()方法保存对象实例，相当于执行了创建数据的sql语句，序列化时只可读属性前端不能传过来</span></span><br><span class="line">            <span class="comment"># quest可以获取当前登录的用户，是哪一个用户post过来的就把它设为讲师，</span></span><br><span class="line">            <span class="comment"># 因为前端用户已经登录了，POST创建的course实例数据时没有teacher这个外键字段的，但又是模型类必填的，把课程信息的讲师设为自己登录的这个用户</span></span><br><span class="line">            s.save(teacher=request.user)</span><br><span class="line">            <span class="keyword">return</span> Response(data=s.data,</span><br><span class="line">                            status=status.HTTP_201_CREATED)  <span class="comment"># 反序列化后的数据返回给前端</span></span><br><span class="line">        <span class="keyword">return</span> Response(s.errors, status=status.HTTP_400_BAD_REQUEST)  <span class="comment"># 新增当然有返回对应的数据给前端</span></span><br></pre></td></tr></tbody></table></figure>
+
+
+<p><code>course\urls.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.urls <span class="keyword">import</span> path, include</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> course <span class="keyword">import</span> views</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    <span class="comment"># Function Based View</span></span><br><span class="line">    <span class="comment"># 获取所有课程信息或新增一个课程</span></span><br><span class="line">    path(<span class="string">"fbv/list/"</span>, views.course_list, name=<span class="string">"fbv-list"</span>),</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>![<a target="_blank" rel="noopener" href="http://127.0.0.1:8000/course/fbv/list/]">http://127.0.0.1:8000/course/fbv/list/]</a>(./DRF视图开发RESTful API接口的方式/0.png)</p>
+<p>POST请求添加数据</p>
+<figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">{</span><br><span class="line">    <span class="attr">"name"</span>: <span class="string">"Python体验课"</span>,</span><br><span class="line">    <span class="attr">"introduction"</span>: <span class="string">"9元包邮"</span>,</span><br><span class="line">    <span class="attr">"price"</span>: <span class="string">"9.00"</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+<p><code>id</code> 不需要，<code>teacher</code> 是当前已登录的用户，<code>created_at</code> 和 <code>updated_at</code> django ORM 会自动加上</p>
+<p>![description](./DRF视图开发RESTful API接口的方式/2.png)</p>
+<h3 id="获取一个课程的详细信息、更新、删除一个课程"><a href="#获取一个课程的详细信息、更新、删除一个课程" class="headerlink" title="获取一个课程的详细信息、更新、删除一个课程"></a>获取一个课程的详细信息、更新、删除一个课程</h3><ul>
+<li><code>CourseSerializer(instance=course, data=request.data)</code> 把<code>data</code>的数据序列化后保存或跟新到 <code>course</code> 这个对象里面 <ul>
+<li><code>instance</code> 要序列化的实例，要序列化的 <code>course</code> 是查询出来的实例</li>
+<li><code>data</code> 数据哪里来的，<code>request.data</code> 是前端传递过来的数据  </li>
+</ul>
+</li>
+</ul>
+<p><code>course\views.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework <span class="keyword">import</span> status</span><br><span class="line"><span class="keyword">from</span> rest_framework.authentication <span class="keyword">import</span> BasicAuthentication, SessionAuthentication, TokenAuthentication</span><br><span class="line"><span class="keyword">from</span> rest_framework.decorators <span class="keyword">import</span> api_view, authentication_classes, permission_classes</span><br><span class="line"><span class="keyword">from</span> rest_framework.permissions <span class="keyword">import</span> IsAuthenticated</span><br><span class="line"><span class="keyword">from</span> rest_framework.response <span class="keyword">import</span> Response</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> .models <span class="keyword">import</span> Course</span><br><span class="line"><span class="keyword">from</span> .serializers <span class="keyword">import</span> CourseSerializer</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="string">"""一、 函数式编程 Function Based View"""</span></span><br><span class="line"><span class="meta">@api_view(["GET", "PUT", "DELETE"])</span></span><br><span class="line"><span class="meta">@authentication_classes(</span></span><br><span class="line">    (BasicAuthentication, SessionAuthentication, TokenAuthentication))</span><br><span class="line"><span class="meta">@permission_classes((IsAuthenticated, ))</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">course_detail</span>(<span class="params">request, pk</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    获取一个课程的详细信息、更新、删除一个课程</span></span><br><span class="line"><span class="string">    :param request:</span></span><br><span class="line"><span class="string">    :param pk: url传递过来的主键</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        <span class="comment"># 通过pk获取课程的queryset</span></span><br><span class="line">        course = Course.objects.get(pk=pk)</span><br><span class="line">    <span class="keyword">except</span> Course.DoesNotExist:  <span class="comment"># 前端传递过来的pk在数据表查不到，不存在</span></span><br><span class="line">        <span class="keyword">return</span> Response(data={<span class="string">"msg"</span>: <span class="string">"没有此课程信息"</span>},</span><br><span class="line">                        status=status.HTTP_404_NOT_FOUND)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">if</span> request.method == <span class="string">"GET"</span>:</span><br><span class="line">            s = CourseSerializer(instance=course)</span><br><span class="line">            <span class="keyword">return</span> Response(data=s.data, status=status.HTTP_200_OK)  <span class="comment"># 获取当然有返回对应的数据给前端</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">elif</span> request.method == <span class="string">"PUT"</span>:</span><br><span class="line">            s = CourseSerializer(instance=course, data=request.data)</span><br><span class="line">            <span class="comment"># `instance` 要序列化的实例，要序列化的 `course` 是查询出来的实例</span></span><br><span class="line">            <span class="comment"># `data` 数据哪里来的，`request.data` 是前端传递过来的数据，</span></span><br><span class="line">            <span class="comment"># 把`data`的数据序列化后保存或跟新到 `course` 这个对象里面 </span></span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> s.is_valid():</span><br><span class="line">                s.save()  <span class="comment"># 不用像POST请求一样设置teacher字段为当前登录的用户，</span></span><br><span class="line">                <span class="comment"># PUT为更新操作，这条数据teacher字段已经有了并且是登录用户，是当前登录用户更改自己的数据，不能把别人的课程改成自己是讲师</span></span><br><span class="line">                <span class="keyword">return</span> Response(data=s.data, status=status.HTTP_200_OK)  <span class="comment"># 更新当然有返回数据</span></span><br><span class="line">            <span class="keyword">return</span> Response(data=s.errors, status=status.HTTP_400_BAD_REQUEST)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">elif</span> request.method == <span class="string">"DELETE"</span>:</span><br><span class="line">            course.delete()</span><br><span class="line">            <span class="keyword">return</span> Response(status=status.HTTP_204_NO_CONTENT)  <span class="comment"># 删除不返回数据，只返回状态码</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>course\urls.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.urls <span class="keyword">import</span> path, include</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> course <span class="keyword">import</span> views</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    <span class="comment"># Function Based View</span></span><br><span class="line">    <span class="comment"># 获取一个课程的详细信息、更新、删除一个课程，类型是int，名称是pk</span></span><br><span class="line">    path(<span class="string">"fbv/detail/&lt;int:pk&gt;/"</span>, views.course_detail, name=<span class="string">"fbv-detail"</span>),</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>![‘<a target="_blank" rel="noopener" href="http://127.0.0.1:8000/course/fbv/detail/1/']">http://127.0.0.1:8000/course/fbv/detail/1/']</a>(./DRF视图开发RESTful API接口的方式/3.png)</p>
+<h2 id="基于类的视图-Classed-Based-View"><a href="#基于类的视图-Classed-Based-View" class="headerlink" title="基于类的视图 Classed Based View"></a>基于类的视图 Classed Based View</h2><h2 id="通用类视图-Generic-Classed-Based-View"><a href="#通用类视图-Generic-Classed-Based-View" class="headerlink" title="通用类视图 Generic Classed Based View"></a>通用类视图 Generic Classed Based View</h2><h2 id="DRF的视图集viewsets"><a href="#DRF的视图集viewsets" class="headerlink" title="DRF的视图集viewsets"></a>DRF的视图集viewsets</h2><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/05/06/django-shi-tu-kai-fa-restful-api-jie-kou/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/05/06/django-shi-tu-kai-fa-restful-api-jie-kou/" class="post-title-link" itemprop="url">django视图开发RESTful API接口</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2021-05-05 16:21:41 / 修改时间：03:34:02" itemprop="dateCreated datePublished" datetime="2021-05-05T16:21:41Z">2021-05-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="django视图开发RESTful-API接口"><a href="#django视图开发RESTful-API接口" class="headerlink" title="django视图开发RESTful API接口"></a>django视图开发RESTful API接口</h1><blockquote>
+<p>缺点：分页、排序、认证、权限、限流都需要自己实现</p>
+</blockquote>
+<h2 id="原生django-实现数据接口的方式"><a href="#原生django-实现数据接口的方式" class="headerlink" title="原生django 实现数据接口的方式"></a>原生django 实现数据接口的方式</h2><h3 id="FBV-Function-Based-View-基于函数的视图"><a href="#FBV-Function-Based-View-基于函数的视图" class="headerlink" title="FBV Function Based View 基于函数的视图"></a>FBV Function Based View 基于函数的视图</h3><ul>
+<li><code>JsonResponse</code>直接返回json数据</li>
+<li>对于POST请求，用装饰器，取消csrf的限制，就不用setting里面去注释掉了</li>
+</ul>
+<p><code>course\views.py</code><br>下面两种方法等价</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.http <span class="keyword">import</span> JsonResponse</span><br><span class="line"><span class="comment"># 对于POST请求，用装饰器，取消csrf的限制，就不用setting里面去注释掉了</span></span><br><span class="line"><span class="keyword">from</span> django.views.decorators.csrf <span class="keyword">import</span> csrf_exempt</span><br><span class="line"></span><br><span class="line">course_dict = {<span class="string">'name'</span>: <span class="string">"课程"</span>, <span class="string">'introduction'</span>: <span class="string">"课程简介"</span>, <span class="string">'price'</span>: <span class="string">"课程价格"</span>}</span><br><span class="line"></span><br><span class="line"><span class="meta">@csrf_exempt</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">course_list</span>(<span class="params">request</span>):</span></span><br><span class="line">    <span class="keyword">if</span> request.method == <span class="string">'GET'</span>:</span><br><span class="line">        <span class="keyword">return</span> JsonResponse(course_dict)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> request.method == <span class="string">'POST'</span>:</span><br><span class="line">        course = json.loads(request.body.decode(<span class="string">'utf-8'</span>))  <span class="comment"># 解析数据不是字典而是字符串类型，要safe=False</span></span><br><span class="line">        <span class="keyword">return</span> JsonResponse(course, safe=<span class="literal">False</span>)  <span class="comment"># safe默认True</span></span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> json</span><br><span class="line"><span class="keyword">from</span> django.http <span class="keyword">import</span> HttpResponse</span><br><span class="line"><span class="comment"># 对于POST请求，用装饰器，取消csrf的限制，就不用setting里面去注释掉了。</span></span><br><span class="line"><span class="keyword">from</span> django.views.decorators.csrf <span class="keyword">import</span> csrf_exempt</span><br><span class="line"></span><br><span class="line">course_dict = {<span class="string">'name'</span>: <span class="string">"课程"</span>, <span class="string">'introduction'</span>: <span class="string">"课程简介"</span>, <span class="string">'price'</span>: <span class="string">"课程价格"</span>}</span><br><span class="line"></span><br><span class="line"><span class="meta">@csrf_exempt</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">course_list</span>(<span class="params">request</span>):</span></span><br><span class="line">    <span class="keyword">if</span> request.method == <span class="string">'GET'</span>:</span><br><span class="line">        <span class="keyword">return</span> HttpResponse(json.dumps(course_dict), content_type=<span class="string">'application/json'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> request.method == <span class="string">'POST'</span>:</span><br><span class="line">        course = json.loads(request.body.decode(<span class="string">'utf-8'</span>))</span><br><span class="line">        <span class="keyword">return</span> HttpResponse(json.dumps(course), content_type=<span class="string">'application/json'</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="CBV-Classed-Based-View-基于类的视图"><a href="#CBV-Classed-Based-View-基于类的视图" class="headerlink" title="CBV Classed Based View 基于类的视图"></a>CBV Classed Based View 基于类的视图</h3><figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.http <span class="keyword">import</span> JsonResponse</span><br><span class="line"><span class="keyword">from</span> django.views <span class="keyword">import</span> View</span><br><span class="line"><span class="keyword">from</span> django.views.decorators.csrf <span class="keyword">import</span> csrf_exempt</span><br><span class="line"></span><br><span class="line">course_dict = {<span class="string">'name'</span>: <span class="string">"课程"</span>, <span class="string">'introduction'</span>: <span class="string">"课程简介"</span>, <span class="string">'price'</span>: <span class="string">"课程价格"</span>}</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CourseList</span>(<span class="params">View</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span>(<span class="params">self, request</span>):</span></span><br><span class="line">        <span class="keyword">return</span> JsonResponse(course_dict)</span><br><span class="line"></span><br><span class="line"><span class="meta">    @csrf_exempt</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">post</span>(<span class="params">self, request</span>):</span></span><br><span class="line">        course = json.loads(request.body.decode(<span class="string">'utf-8'</span>))  <span class="comment"># 解析数据不是字典而是字符串类型，要safe=False</span></span><br><span class="line">        <span class="keyword">return</span> JsonResponse(course, safe=<span class="literal">False</span>)  <span class="comment"># safe默认True</span></span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> Json</span><br><span class="line"><span class="keyword">from</span> django.http <span class="keyword">import</span> HttpResponse</span><br><span class="line"><span class="keyword">from</span> django.views <span class="keyword">import</span> View</span><br><span class="line"><span class="keyword">from</span> django.views.decorators.csrf <span class="keyword">import</span> csrf_exempt</span><br><span class="line"></span><br><span class="line">course_dict = {<span class="string">'name'</span>: <span class="string">"课程"</span>, <span class="string">'introduction'</span>: <span class="string">"课程简介"</span>, <span class="string">'price'</span>: <span class="string">"课程价格"</span>}</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CourseList</span>(<span class="params">View</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span>(<span class="params">self, request</span>):</span></span><br><span class="line">        <span class="keyword">return</span> HttpResponse(json.dumps(course_dict), content_type=<span class="string">'application/json'</span>)</span><br><span class="line"></span><br><span class="line"><span class="meta">    @csrf_exempt</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">post</span>(<span class="params">self, request</span>):</span></span><br><span class="line">        course = json.loads(request.body.decode(<span class="string">'utf-8'</span>))</span><br><span class="line">        <span class="keyword">return</span> HttpResponse(json.dumps(course), content_type=<span class="string">'application/json'</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.views <span class="keyword">import</span> View</span><br><span class="line"><span class="keyword">from</span> django.utils.decorators <span class="keyword">import</span> method_decorator</span><br><span class="line">course_dict = {<span class="string">'name'</span>: <span class="string">"课程"</span>, <span class="string">'introduction'</span>: <span class="string">"课程简介"</span>, <span class="string">'price'</span>: <span class="string">"课程价格"</span>}</span><br><span class="line"></span><br><span class="line"><span class="meta">@method_decorator(csrf_exempt, name='dispatch')  # 不是post，是由django的请求响应原理决定的，</span></span><br><span class="line"><span class="comment"># 当http request拿到的时候，首先到达dispatch方法，通过dispatch方法处理后再找到post方法</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CourseList</span>(<span class="params">View</span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span>(<span class="params">self, request</span>):</span></span><br><span class="line">        <span class="keyword">return</span> JsonResponse(course_dict)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">post</span>(<span class="params">self, request</span>):</span></span><br><span class="line">        course = json.loads(request.body.decode(<span class="string">'utf-8'</span>))  <span class="comment"># 解析数据不是字典而是字符串类型，要safe=False</span></span><br><span class="line">        <span class="keyword">return</span> JsonResponse(course, safe=<span class="literal">False</span>)  <span class="comment"># safe默认True</span></span><br></pre></td></tr></tbody></table></figure><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/05/05/xu-lie-hua/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/05/05/xu-lie-hua/" class="post-title-link" itemprop="url">序列化</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-05-04 16:21:41" itemprop="dateCreated datePublished" datetime="2021-05-04T16:21:41Z">2021-05-04</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-05-05 07:43:03" itemprop="dateModified" datetime="2021-05-05T07:43:03Z">2021-05-05</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>把查询集归为queryset或者模型类生成实例instance的django数据类型转换成json/ xml / yaml，再传给前端js进行渲染<br>反序列化，前端post请求的body里面带有json数据，使用django的orm让它保存到数据库里面，</p>
+<p>django自带序列化功能，但是不完善</p>
+<p><code>Python Console</code>是针对当前项目环境的console</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> course.models <span class="keyword">import</span> Course  <span class="comment"># 引入课程</span></span><br><span class="line"><span class="keyword">from</span> django.core <span class="keyword">import</span> serializers</span><br><span class="line"></span><br><span class="line"><span class="comment"># 序列化模型类已有的所有字段</span></span><br><span class="line">serializers.serialize(<span class="string">'json'</span>, Course.objects.all())</span><br><span class="line"><span class="string">'[{"model": "course.course", "pk": 1, "fields": {"name": "django rest framework快速入门", "introduction": "API接口开发无需费时费力，本课程将从零开始引导同学们快速开发自己的RESTful API接口，从Django项目环境搭建、API接口生成数据、Postman接口测试到DRF认证方式的讲解，通过一个典型的课程信息接口（含增删改查），给同学们讲解完DRF中的序列化（serializers）、视图集（viewsets）、路由（routers）、认证（authentication）、权限（permission），为将来前后端分离项目的开发打下基础。", "teacher": 1, "price": "9.99", "created_at": "2021-05-04T22:35:31.439", "updated_at": "2021-05-04T22:35:31.439"}}]'</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 序列号特定字段</span></span><br><span class="line">serializers.serialize(<span class="string">'json'</span>, Course.objects.all(), fields=(<span class="string">"name"</span>))</span><br><span class="line"><span class="string">'[{"model": "course.course", "pk": 1, "fields": {"name": "django rest framework快速入门"}}]'</span></span><br></pre></td></tr></tbody></table></figure>
+<p><code>teacher</code>不是外键所关联的用户名称而是用户id</p>
+<p>如何序列化模型类<br>在各个应用下面建一个<code>serializers.py</code>，写法和form表单类的类似 </p>
+<h3 id="drf的序列化作用"><a href="#drf的序列化作用" class="headerlink" title="drf的序列化作用"></a>drf的序列化作用</h3><ul>
+<li>验证处理：反序列化中，当前端传递过来的数据放在request.data的时候，要把他转换成模型类实例进行保存到数据表，对前端提交的数据进行验证</li>
+<li>验证器的参数</li>
+<li>同时序列化多个对象</li>
+<li>序列化的过程添加上下文</li>
+<li>无限的数据异常处理</li>
+</ul>
+<p>DRF中封装了<code>Serializer</code>类和<code>ModelSerializer</code>类用于实现序列化操作，通过继承<code>Serializer</code>类或<code>ModelSerializer</code>类，<br>我们可以自定义序列化器，用于将对象处理成字典，</p>
+<p>关系字段的外键字段序列化可以指定遍历的序列化深度<code>depth</code>，如果表结构有子表关联到父表，父表又关联到另外的父表，可以设置深度</p>
+<p><code>course/serializers.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django <span class="keyword">import</span> forms</span><br><span class="line"><span class="keyword">from</span> django.contrib.auth.models <span class="keyword">import</span> User</span><br><span class="line"><span class="keyword">from</span> rest_framework <span class="keyword">import</span> serializers</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> .models <span class="keyword">import</span> Course</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># form类这里用不到，只是对比类似的样子</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CourseForm</span>(<span class="params">forms.ModelForm</span>):</span></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        model = Course</span><br><span class="line">        fields = (<span class="string">'name'</span>, <span class="string">'introduction'</span>, <span class="string">'teacher'</span>, <span class="string">'price'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserSerializer</span>(<span class="params">serializers.ModelSerializer</span>):</span></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        model = User  <span class="comment"># 序列化用户模型类</span></span><br><span class="line">        fields = <span class="string">'__all__'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CourseSerializer</span>(<span class="params">serializers.ModelSerializer</span>):</span></span><br><span class="line">    <span class="comment"># teacher是外键关联到用户表，并不是新建过程中新建的一个用户，想得到对应的名字，可以把用户的名称序列化，和使用ORM查询外键关联查询一样</span></span><br><span class="line">    teacher = serializers.ReadOnlyField(source=<span class="string">'teacher.username'</span>)  <span class="comment"># 序列化模型类中指定字段，外键字段，指定只读字段</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        model = Course  <span class="comment"># 序列化课程模型类</span></span><br><span class="line">        <span class="comment"># exclude = ('id', )  # 排除字段</span></span><br><span class="line">        <span class="comment"># fields = ('id', 'name', 'introduction', 'teacher', 'price', 'created_at', 'updated_at')</span></span><br><span class="line">        fields = <span class="string">'__all__'</span>  <span class="comment"># 包含模型类所有字段</span></span><br><span class="line">        depth = <span class="number">2</span>  <span class="comment"># 深度</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>实现序列化结果带绝对和相对URL超链接的<code>HyperlinkedModelSerializer</code>的api，在<code>fields</code> 加上 <code>url</code>，不用用于FBV</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework <span class="keyword">import</span> serializers</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> .models <span class="keyword">import</span> Course</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CourseSerializer</span>(<span class="params">serializers.HyperlinkedModelSerializer</span>):</span></span><br><span class="line">    teacher = serializers.ReadOnlyField(source=<span class="string">'teacher.username'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        model = Course</span><br><span class="line">        <span class="comment"># url是默认值，可在settings.py中设置URL_FIELD_NAME使全局生效</span></span><br><span class="line">        fields = (<span class="string">'id'</span>, <span class="string">'url'</span>, <span class="string">'name'</span>, <span class="string">'introduction'</span>, <span class="string">'teacher'</span>, <span class="string">'price'</span>, <span class="string">'created_at'</span>, <span class="string">'updated_at'</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<hr>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework <span class="keyword">import</span> serializers </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SubjectSerializer</span>(<span class="params">serializers.ModelSerializer</span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        model = Subject</span><br><span class="line">        fields = <span class="string">'__all__'</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>上面的代码直接继承了<code>ModelSerializer</code>，通过<code>Meta</code>类的<code>model</code>属性指定要序列化的模型以及<code>fields</code>属性指定需要序列化的模型字段，稍后我们就可以在视图函数中使用该类来实现对<code>Subject</code>模型的序列化。</p>
+<h4 id="编写视图函数"><a href="#编写视图函数" class="headerlink" title="编写视图函数"></a>编写视图函数</h4><p>DRF框架支持两种实现数据接口的方式，一种是FBV（基于函数的视图），另一种是CBV（基于类的视图）。<br>我们先看看FBV的方式如何实现数据接口，代码如下所示。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework.decorators <span class="keyword">import</span> api_view</span><br><span class="line"><span class="keyword">from</span> rest_framework.response <span class="keyword">import</span> Response</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@api_view(('GET', ))</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">show_subjects</span>(<span class="params">request: HttpRequest</span>) -&gt; HttpResponse:</span></span><br><span class="line">    subjects = Subject.objects.all().order_by(<span class="string">'no'</span>)</span><br><span class="line">    <span class="comment"># 创建序列化器对象并指定要序列化的模型</span></span><br><span class="line">    serializer = SubjectSerializer(subjects, many=<span class="literal">True</span>)</span><br><span class="line">    <span class="comment"># 通过序列化器的data属性获得模型对应的字典并通过创建Response对象返回JSON格式的数据</span></span><br><span class="line">    <span class="keyword">return</span> Response(serializer.data)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>对比上一个章节的使用<code>bpmapper</code>实现模型序列化的代码，使用DRF的代码更加简单明了，而且DRF本身自带了一套页面，可以方便我们查看我们使用DRF定制的数据接口，如下图所示。</p>
+<p><img src="/2021/05/05/xu-lie-hua/drf-app.png"></p>
+<p>直接使用上一节写好的页面，就可以通过Vue.js把上面接口提供的学科数据渲染并展示出来，此处不再进行赘述。</p>
+<h4 id="实现老师信息数据接口"><a href="#实现老师信息数据接口" class="headerlink" title="实现老师信息数据接口"></a>实现老师信息数据接口</h4><p>编写序列化器。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SubjectSimpleSerializer</span>(<span class="params">serializers.ModelSerializer</span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        model = Subject</span><br><span class="line">        fields = (<span class="string">'no'</span>, <span class="string">'name'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TeacherSerializer</span>(<span class="params">serializers.ModelSerializer</span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        model = Teacher</span><br><span class="line">        exclude = (<span class="string">'subject'</span>, )</span><br></pre></td></tr></tbody></table></figure>
+
+<p>编写视图函数。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@api_view(('GET', ))</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">show_teachers</span>(<span class="params">request: HttpRequest</span>) -&gt; HttpResponse:</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        sno = int(request.GET.get(<span class="string">'sno'</span>))</span><br><span class="line">        subject = Subject.objects.only(<span class="string">'name'</span>).get(no=sno)</span><br><span class="line">        teachers = Teacher.objects.filter(subject=subject).defer(<span class="string">'subject'</span>).order_by(<span class="string">'no'</span>)</span><br><span class="line">        subject_seri = SubjectSimpleSerializer(subject)</span><br><span class="line">        teacher_seri = TeacherSerializer(teachers, many=<span class="literal">True</span>)</span><br><span class="line">        <span class="keyword">return</span> Response({<span class="string">'subject'</span>: subject_seri.data, <span class="string">'teachers'</span>: teacher_seri.data})</span><br><span class="line">    <span class="keyword">except</span> (TypeError, ValueError, Subject.DoesNotExist):</span><br><span class="line">        <span class="keyword">return</span> Response(status=<span class="number">404</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>配置URL映射。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">urlpatterns = [</span><br><span class="line">    </span><br><span class="line">    path(<span class="string">'api/teachers/'</span>, show_teachers),</span><br><span class="line">    </span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>通过Vue.js渲染页面。</p>
+<figure class="highlight html"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">"en"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>老师信息<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="css">        <span class="comment">/* 此处省略掉层叠样式表 */</span></span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"container"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">h1</span>&gt;</span>{{ subject.name }}学科的老师信息<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">hr</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">h2</span> <span class="attr">v-if</span>=<span class="string">"loaded &amp;&amp; teachers.length == 0"</span>&gt;</span>暂无该学科老师信息<span class="tag">&lt;/<span class="name">h2</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"teacher"</span> <span class="attr">v-for</span>=<span class="string">"teacher in teachers"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"photo"</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">img</span> <span class="attr">:src</span>=<span class="string">"'/static/images/' + teacher.photo"</span> <span class="attr">height</span>=<span class="string">"140"</span> <span class="attr">alt</span>=<span class="string">""</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"info"</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">span</span>&gt;</span><span class="tag">&lt;<span class="name">strong</span>&gt;</span>姓名：{{ teacher.name }}<span class="tag">&lt;/<span class="name">strong</span>&gt;</span><span class="tag">&lt;/<span class="name">span</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">span</span>&gt;</span>性别：{{ teacher.sex | maleOrFemale }}<span class="tag">&lt;/<span class="name">span</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">span</span>&gt;</span>出生日期：{{ teacher.birth }}<span class="tag">&lt;/<span class="name">span</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"intro"</span>&gt;</span>{{ teacher.intro }}<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"comment"</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">""</span> @<span class="attr">click.prevent</span>=<span class="string">"vote(teacher, true)"</span>&gt;</span>好评<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="symbol">&amp;nbsp;</span><span class="symbol">&amp;nbsp;</span></span><br><span class="line">                    (<span class="tag">&lt;<span class="name">strong</span>&gt;</span>{{ teacher.good_count }}<span class="tag">&lt;/<span class="name">strong</span>&gt;</span>)</span><br><span class="line">                    <span class="symbol">&amp;nbsp;</span><span class="symbol">&amp;nbsp;</span><span class="symbol">&amp;nbsp;</span><span class="symbol">&amp;nbsp;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">""</span> @<span class="attr">click.prevent</span>=<span class="string">"vote(teacher, false)"</span>&gt;</span>差评<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="symbol">&amp;nbsp;</span><span class="symbol">&amp;nbsp;</span></span><br><span class="line">                    (<span class="tag">&lt;<span class="name">strong</span>&gt;</span>{{ teacher.bad_count }}<span class="tag">&lt;/<span class="name">strong</span>&gt;</span>)</span><br><span class="line">                <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"/static/html/subjects.html"</span>&gt;</span>返回首页<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"https://cdn.bootcdn.net/ajax/libs/vue/2.6.11/vue.min.js"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript">        <span class="keyword">let</span> app = <span class="keyword">new</span> Vue({</span></span><br><span class="line"><span class="javascript">            el: <span class="string">'#container'</span>,</span></span><br><span class="line">            data: {</span><br><span class="line">                subject: {},</span><br><span class="line">                teachers: [],</span><br><span class="line"><span class="javascript">                loaded: <span class="literal">false</span></span></span><br><span class="line">            },</span><br><span class="line">            created() {</span><br><span class="line"><span class="javascript">                fetch(<span class="string">'/api/teachers/'</span> + location.search)</span></span><br><span class="line"><span class="javascript">                    .then(<span class="function"><span class="params">resp</span> =&gt;</span> resp.json())</span></span><br><span class="line"><span class="javascript">                    .then(<span class="function"><span class="params">json</span> =&gt;</span> {</span></span><br><span class="line"><span class="javascript">                        <span class="built_in">this</span>.subject = json.subject</span></span><br><span class="line"><span class="javascript">                        <span class="built_in">this</span>.teachers = json.teachers</span></span><br><span class="line">                    })</span><br><span class="line">            },</span><br><span class="line">            filters: {</span><br><span class="line">                maleOrFemale(sex) {</span><br><span class="line"><span class="javascript">                    <span class="keyword">return</span> sex? <span class="string">'男'</span>: <span class="string">'女'</span></span></span><br><span class="line">                }</span><br><span class="line">            },</span><br><span class="line">            methods: {</span><br><span class="line">               vote(teacher, flag) {</span><br><span class="line"><span class="javascript">                    <span class="keyword">let</span> url = flag? <span class="string">'/praise/'</span> : <span class="string">'/criticize/'</span></span></span><br><span class="line"><span class="javascript">                    url += <span class="string">'?tno='</span> + teacher.no</span></span><br><span class="line"><span class="javascript">                    fetch(url).then(<span class="function"><span class="params">resp</span> =&gt;</span> resp.json()).then(<span class="function"><span class="params">json</span> =&gt;</span> {</span></span><br><span class="line">                        if (json.code === 10000) {</span><br><span class="line">                            if (flag) {</span><br><span class="line">                                teacher.good_count = json.count</span><br><span class="line"><span class="javascript">                            } <span class="keyword">else</span> {</span></span><br><span class="line">                                teacher.bad_count = json.count</span><br><span class="line">                            }</span><br><span class="line">                        }</span><br><span class="line">                    })</span><br><span class="line">                }</span><br><span class="line">            }</span><br><span class="line">        })</span><br><span class="line">    <span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/05/03/ce-shi-bao-gao-shi-zhan/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/05/03/ce-shi-bao-gao-shi-zhan/" class="post-title-link" itemprop="url">测试报告实战</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2021-05-02 17:46:44 / 修改时间：08:15:19" itemprop="dateCreated datePublished" datetime="2021-05-02T17:46:44Z">2021-05-02</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%97%85%E6%B8%B8%E7%BD%91%E9%A1%B9%E7%9B%AE/" itemprop="url" rel="index"><span itemprop="name">旅游网项目</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <ul>
+<li>通过<code>HTMLTESTRUNNER</code>生成测试报告</li>
+</ul>
+<p><code>traveltest（实战项目第七节后）\test_login_suite.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> unittest</span><br><span class="line"><span class="keyword">from</span> test_login_ddt <span class="keyword">import</span> TestTravel</span><br><span class="line"><span class="keyword">from</span> HTMLTestReportCN <span class="keyword">import</span> HTMLTestRunner</span><br><span class="line"><span class="keyword">from</span> xmlrunner <span class="keyword">import</span> xmlrunner</span><br><span class="line"></span><br><span class="line">suite = unittest.TestSuite()</span><br><span class="line">suite = unittest.TestLoader().loadTestsFromTestCase(TestTravel)</span><br><span class="line"></span><br><span class="line">f = open(<span class="string">"result.html"</span>, <span class="string">"wb"</span>)</span><br><span class="line">HTMLTestRunner(stream=f, title=<span class="string">"UI自动化测试报告"</span>, description=<span class="string">"风落测试"</span>).run(suite)</span><br><span class="line">xmlrunner.XMLTestRunner(verbosity=<span class="number">2</span>, output=<span class="string">'测试报告'</span>).run(suite)</span><br></pre></td></tr></tbody></table></figure><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/05/03/shu-ju-qu-dong-zai-zi-dong-hua-ce-shi-zhong-de-ying-yong/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/05/03/shu-ju-qu-dong-zai-zi-dong-hua-ce-shi-zhong-de-ying-yong/" class="post-title-link" itemprop="url">数据驱动在自动化测试中的应用</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2021-05-02 17:46:44 / 修改时间：06:09:20" itemprop="dateCreated datePublished" datetime="2021-05-02T17:46:44Z">2021-05-02</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%97%85%E6%B8%B8%E7%BD%91%E9%A1%B9%E7%9B%AE/" itemprop="url" rel="index"><span itemprop="name">旅游网项目</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="数据驱动在自动化测试中的应用"><a href="#数据驱动在自动化测试中的应用" class="headerlink" title="数据驱动在自动化测试中的应用"></a>数据驱动在自动化测试中的应用</h1><h2 id="自动化测试模型介绍"><a href="#自动化测试模型介绍" class="headerlink" title="自动化测试模型介绍"></a>自动化测试模型介绍</h2><ul>
+<li><p><code>线性</code>测试：每个测试脚本相对独立，一个脚本文件都是独立编写测试内容等，任何一个脚本都可以拿出来单独执行。开发和维护的成本很高</p>
+</li>
+<li><p><code>模块化驱动</code>测试：把重复的操作单独成立公关模块。如登陆模块，写好之后后续用例只需要调用对应模块即可。较好的解决了脚本重复问题。分为PageObject和分层模式。分层模式，设计思维从页面模式中抽离，做成业务化的思维，业务流程横跨多个界面只要是固化流程就好</p>
+</li>
+<li><p><code>数据驱动</code>测试：针对测试数据改变而影响数据驱动测试而提出的。就是将测试数据做成参数化。<br>不仅解决脚本重复的问题，还增加了可重用性和可维护性。<br>测试数据改的时不需要修改测试代码</p>
+</li>
+<li><p><code>关键字驱动</code>测试：市面的很多工具、平台等都是关键字模式。<br>将底层代码封装，给用户提供独立的图形界面。<br>减少编写代码，从而降低脚本的编写难度</p>
+</li>
+<li><p>数据驱动的应用</p>
+</li>
+</ul>
+<p><code>traveltest（实战项目第七节后）\test_login_ddt.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> unittest</span><br><span class="line"><span class="keyword">from</span> selenium <span class="keyword">import</span> webdriver</span><br><span class="line"><span class="keyword">from</span> time <span class="keyword">import</span> sleep</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> pages.first_page <span class="keyword">import</span> FirstPage</span><br><span class="line"><span class="keyword">from</span> pages.login_page <span class="keyword">import</span> LoginPage</span><br><span class="line"><span class="keyword">from</span> pages.order_page <span class="keyword">import</span> OrderPage</span><br><span class="line"><span class="keyword">from</span> ddt <span class="keyword">import</span> ddt, data</span><br><span class="line"><span class="keyword">from</span> xlrd <span class="keyword">import</span> open_workbook</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">getExcelData</span>():</span></span><br><span class="line">    excelFile = open_workbook(<span class="string">"d:/data.xlsx"</span>)</span><br><span class="line">    <span class="comment"># 获取excel的工作簿</span></span><br><span class="line">    sheet = excelFile.sheet_by_index(<span class="number">0</span>)</span><br><span class="line">    <span class="comment"># 获取行数</span></span><br><span class="line">    rowNumber = sheet.nrows</span><br><span class="line">    dataList = []</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, rowNumber):  <span class="comment"># 第一行是表头，从第二行开始</span></span><br><span class="line">        dataList.append(sheet.row_values(i))</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> dataList</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@ddt</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TestTravel</span>(<span class="params">unittest.TestCase</span>):</span></span><br><span class="line">    <span class="comment"># 初始化操作 打开浏览器&amp;浏览器设置</span></span><br><span class="line">    <span class="comment"># 最终结束操作 关闭浏览器</span></span><br><span class="line">    <span class="comment"># 用例分为 登录、下单两个部分</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">setUp</span>(<span class="params">self</span>):</span>  <span class="comment"># self 每次重新打开浏览器</span></span><br><span class="line">        driver_path = <span class="string">'C:\\Users\\rose\\Downloads\\chromedriver.exe'</span></span><br><span class="line">        cls.dr = webdriver.Chrome(driver_path)</span><br><span class="line">        self.dr.maximize_window()</span><br><span class="line"></span><br><span class="line"><span class="meta">    @data(*getExcelData())</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">test_login_ddt</span>(<span class="params">self, data</span>):</span></span><br><span class="line">        <span class="comment"># 初始化参数</span></span><br><span class="line">        username, password = tuple(data)</span><br><span class="line">        <span class="comment"># 初始化界面</span></span><br><span class="line">        first_page = FirstPage(driver=self.dr,</span><br><span class="line">                               path=<span class="string">"http://django.t.mukewang.com/#/"</span>)</span><br><span class="line">        login_page = LoginPage(driver=self.dr)</span><br><span class="line">        order_page = OrderPage(driver=self.dr)</span><br><span class="line">        <span class="comment"># 跳转登录</span></span><br><span class="line">        first_page.cross_to_login()</span><br><span class="line">        <span class="comment"># 登录</span></span><br><span class="line">        login_page.login(username, password)</span><br><span class="line">        sleep(<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">tearDown</span>(<span class="params">self</span>):</span>  <span class="comment"># self 每次重新打开浏览器并关闭</span></span><br><span class="line">        self.dr.quit()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    unittest.main()</span><br></pre></td></tr></tbody></table></figure><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/05/02/pageobject-kuang-jia-she-ji/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/05/02/pageobject-kuang-jia-she-ji/" class="post-title-link" itemprop="url">PageObject框架设计</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-05-01 17:46:44" itemprop="dateCreated datePublished" datetime="2021-05-01T17:46:44Z">2021-05-01</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-05-02 03:52:22" itemprop="dateModified" datetime="2021-05-02T03:52:22Z">2021-05-02</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%97%85%E6%B8%B8%E7%BD%91%E9%A1%B9%E7%9B%AE/" itemprop="url" rel="index"><span itemprop="name">旅游网项目</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>了解并实现PageObeject自动化设计模式</p>
+<ul>
+<li>一种在测试自动化中变得流行的设计模式，使得自动化测试脚本的减少代码重复、更易读、减少维护成本<br>页面、操作、脚本、case 分开</li>
+</ul>
+<p>PO三层模式</p>
+<h4 id="第一层"><a href="#第一层" class="headerlink" title="第一层"></a>第一层</h4><ul>
+<li>对 Selenium进行二次封装，定义一个所有页面都继承的<code>BasePage</code></li>
+<li>封装 Selenium基本方法例如:元素定位，元素等待，导航页面。</li>
+<li>不需要全部封装，用到多少方法就封装多少方法。</li>
+</ul>
+<h4 id="第二层"><a href="#第二层" class="headerlink" title="第二层"></a>第二层</h4><ul>
+<li>页面元素迸行分离，每个元素只定位一次，隔离定位，如果页面改变，只需要改变相应的元素定位。</li>
+<li>业务逻辑分离或操作元素动作分离。</li>
+</ul>
+<h4 id="第三层"><a href="#第三层" class="headerlink" title="第三层"></a>第三层</h4><ul>
+<li>使用单元测试unittest框架对业务逻辑进行测试</li>
+</ul>
+<p>PO设计模式的优点</p>
+<ul>
+<li>页面频繁变化，导致页面U元素频繁变动，元素定位改变。</li>
+<li>传统线性自动化，多个用例脚本中需要反复的定位同一个元素。</li>
+<li>修改元素定位时容易维护</li>
+</ul>
+<p><code>traveltest\pages\base_page.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> selenium <span class="keyword">import</span> webdriver</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BasePage</span>():</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    第一层 basepage层 定义一个所有页面都继承的page层</span></span><br><span class="line"><span class="string">    对selenium我们要使用的底层方法进行一次封装</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, driver, path=None</span>):</span></span><br><span class="line">        <span class="comment"># 为了方便编写，把driver初始化，后续改回来</span></span><br><span class="line">        driver_path = <span class="string">'C:\\Users\\rose\\Downloads\\msedgedriver.exe'</span></span><br><span class="line">        <span class="comment"># self.driver = webdriver.Edge(driver_path)</span></span><br><span class="line">        self.driver = driver</span><br><span class="line">        self.driver.implicitly_wait(<span class="number">10</span>)  <span class="comment"># 隐式等待10秒</span></span><br><span class="line">        self.load_page(path)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">load_page</span>(<span class="params">self, path=None</span>):</span></span><br><span class="line">        <span class="keyword">if</span> path:</span><br><span class="line">            self.driver.get(path)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">by_xpath</span>(<span class="params">self, xpath</span>):</span></span><br><span class="line">        <span class="keyword">return</span> self.driver.find_element_by_xpath(xpath)</span><br></pre></td></tr></tbody></table></figure>
+
+
+<p><code>traveltest（实战项目第七节后）\pages\first_page.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> selenium <span class="keyword">import</span> webdriver</span><br><span class="line"><span class="keyword">from</span> pages.base_page <span class="keyword">import</span> BasePage</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FirstPage</span>(<span class="params">BasePage</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    第二层</span></span><br><span class="line"><span class="string">    各个页面单独封装成层，页面的元素、操作、流程</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">direct_to_login</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="comment"># 跳转至登录页：点击 我的</span></span><br><span class="line">        <span class="keyword">return</span> self.by_xpath(<span class="string">"//*[@id='app']/div[1]/div[5]/div[3]"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">direct_to_product</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="comment"># 点击 首页</span></span><br><span class="line">        <span class="keyword">return</span> self.by_xpath(<span class="string">"//*[@id='app']/div[1]/div[5]/div[1]"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 方法流程</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">cross_to_login</span>(<span class="params">self</span>):</span></span><br><span class="line">        self.direct_to_login().click()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">cross_to_product</span>(<span class="params">self</span>):</span></span><br><span class="line">        self.direct_to_product().click()</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>traveltest（实战项目第七节后）\pages\login_page.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> selenium <span class="keyword">import</span> webdriver</span><br><span class="line"><span class="keyword">from</span> pages.base_page <span class="keyword">import</span> BasePage</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LoginPage</span>(<span class="params">BasePage</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    第二层</span></span><br><span class="line"><span class="string">    各个页面单独封装成层，页面的元素、操作、流程</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">login_username</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="comment"># 登录，输入用户名</span></span><br><span class="line">        <span class="keyword">return</span> self.by_xpath(</span><br><span class="line">            <span class="string">"//*[@id='app']/div[1]/form/div[1]/div[2]/div/input"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">login_pass</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="comment"># 登录，输入密码</span></span><br><span class="line">        <span class="keyword">return</span> self.by_xpath(</span><br><span class="line">            <span class="string">"//*[@id='app']/div[1]/form/div[2]/div[2]/div/input"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">login_button</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="comment"># 点击登录</span></span><br><span class="line">        <span class="keyword">return</span> self.by_xpath(<span class="string">"//*[@id='app']/div[1]/form/div[3]/button"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 登录</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">login</span>(<span class="params">self, username, password</span>):</span></span><br><span class="line">        self.login_username().send_keys(username)</span><br><span class="line">        self.login_pass().send_keys(password)</span><br><span class="line">        self.login_button().click()</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>traveltest（实战项目第七节后）\pages\order_page.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> selenium <span class="keyword">import</span> webdriver</span><br><span class="line"><span class="keyword">from</span> pages.base_page <span class="keyword">import</span> BasePage</span><br><span class="line"><span class="keyword">from</span> time <span class="keyword">import</span> sleep</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">OrderPage</span>(<span class="params">BasePage</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    第二层</span></span><br><span class="line"><span class="string">    各个页面单独封装成层，页面的元素、操作、流程</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">product</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> self.by_xpath(<span class="string">"//*[@id='app']/div[1]/div[4]/div[2]/a[1]"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">ticket_book</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> self.by_xpath(<span class="string">"//*[@id='app']/div[1]/div[5]/div[2]/div[2]/a"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">book_date</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> self.by_xpath(</span><br><span class="line">            <span class="string">"//*[@id='app']/div[1]/form/div[1]/div[1]/div[2]/div/input"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">to_order</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> self.by_xpath(<span class="string">"//*[@id='app']/div[1]/form/div[4]/div/button"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">pay_off</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> self.by_xpath(<span class="string">"//*[@id='app']/div[1]/form/div/div/button"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">confirm</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> self.by_xpath(<span class="string">"/html/body/div[5]/div[3]/button[2]"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 下单成功</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">place_order</span>(<span class="params">self</span>):</span></span><br><span class="line">        self.product().click()</span><br><span class="line">        self.ticket_book().click()</span><br><span class="line">        self.book_date().send_keys(<span class="string">"2021-05-01"</span>)</span><br><span class="line">        self.to_order().click()</span><br><span class="line">        sleep(<span class="number">2</span>)</span><br><span class="line">        el = self.pay_off()</span><br><span class="line">        self.driver.execute_script(<span class="string">'arguments[0].click()'</span>, el)</span><br><span class="line">        sleep(<span class="number">2</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>traveltest（实战项目第七节后）\test_travel_po.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> unittest</span><br><span class="line"><span class="keyword">from</span> selenium <span class="keyword">import</span> webdriver</span><br><span class="line"><span class="keyword">from</span> time <span class="keyword">import</span> sleep</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> pages.first_page <span class="keyword">import</span> FirstPage</span><br><span class="line"><span class="keyword">from</span> pages.login_page <span class="keyword">import</span> LoginPage</span><br><span class="line"><span class="keyword">from</span> pages.order_page <span class="keyword">import</span> OrderPage</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TestTravel</span>(<span class="params">unittest.TestCase</span>):</span></span><br><span class="line">    <span class="comment"># 初始化操作 打开浏览器&amp;浏览器设置</span></span><br><span class="line">    <span class="comment"># 最终结束操作 关闭浏览器</span></span><br><span class="line">    <span class="comment"># 第三层</span></span><br><span class="line">    <span class="comment"># 用例分为 登录、下单两个部分</span></span><br><span class="line"><span class="meta">    @classmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">setUpClass</span>(<span class="params">cls</span>):</span></span><br><span class="line">        <span class="comment"># driver_path = 'C:\\Users\\rose\\Downloads\\msedgedriver.exe'</span></span><br><span class="line">        driver_path = <span class="string">'C:\\Users\\rose\\Downloads\\chromedriver.exe'</span></span><br><span class="line">        <span class="comment"># cls.dr = webdriver.Edge(driver_path)</span></span><br><span class="line">        cls.dr = webdriver.Chrome(driver_path)</span><br><span class="line">        cls.dr.maximize_window()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">test_a_order</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="comment"># 初始化参数</span></span><br><span class="line">        username = <span class="string">'13500000001'</span></span><br><span class="line">        password = <span class="string">'Success@2020'</span></span><br><span class="line">        <span class="comment"># 初始化界面</span></span><br><span class="line">        first_page = FirstPage(driver=self.dr,</span><br><span class="line">                               path=<span class="string">"http://django.t.mukewang.com/#/"</span>)</span><br><span class="line">        login_page = LoginPage(driver=self.dr)</span><br><span class="line">        order_page = OrderPage(driver=self.dr)</span><br><span class="line">        <span class="comment"># 跳转登录</span></span><br><span class="line">        first_page.cross_to_login()</span><br><span class="line">        <span class="comment"># 登录</span></span><br><span class="line">        login_page.login(username, password)</span><br><span class="line">        <span class="comment"># 跳转至首页</span></span><br><span class="line">        first_page.cross_to_product()</span><br><span class="line">        <span class="comment"># 下单</span></span><br><span class="line">        order_page.place_order()</span><br><span class="line"></span><br><span class="line"><span class="meta">    @classmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">tearDownClass</span>(<span class="params">cls</span>):</span></span><br><span class="line">        cls.dr.quit()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    unittest.main()</span><br></pre></td></tr></tbody></table></figure>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/05/01/django-web-ui-ce-shi/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/05/01/django-web-ui-ce-shi/" class="post-title-link" itemprop="url">django web ui测试</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-04-30 17:46:44" itemprop="dateCreated datePublished" datetime="2021-04-30T17:46:44Z">2021-04-30</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-05-01 12:59:22" itemprop="dateModified" datetime="2021-05-01T12:59:22Z">2021-05-01</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%97%85%E6%B8%B8%E7%BD%91%E9%A1%B9%E7%9B%AE/" itemprop="url" rel="index"><span itemprop="name">旅游网项目</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>在我们的页面不太标准化，没有标准的属性功能使用，元素定位方式想用byname不一定有name属性，只有xpath和css_selector能保证一定定位到一个元素，<br>页面与页面直接跳转可能有时间差，如果没有定位完整的、全局的响应等待时间，<code>time.sleep()</code> 减少由于页面跳转所带来的元素还没有加载出来就去<code>find</code><br>它。<br>一旦页面出现了一些元素，不可或不易点击，比如广告弹层刚好把按钮挡住，可以通过js的<code>.execute_script('arguments[0].click()', el)</code>方式来处理，可以忽视前端的页面呈现</p>
+<h2 id="结合旅游网设计自动化测试脚本"><a href="#结合旅游网设计自动化测试脚本" class="headerlink" title="结合旅游网设计自动化测试脚本"></a>结合旅游网设计自动化测试脚本</h2><p>旅游网核心主线流程<br>进入首页-跳转到登录页-进行登录-跳转首页-选择想要购买的产品-在产品下执行某一个门票或其他类型的预定-完成支付-跳转订单页</p>
+<p><code>travelTest.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> selenium <span class="keyword">import</span> webdriver</span><br><span class="line"><span class="keyword">from</span> time <span class="keyword">import</span> sleep</span><br><span class="line"></span><br><span class="line">driver_path = <span class="string">'C:\\Users\\rose\\Downloads\\msedgedriver.exe'</span></span><br><span class="line">driver = webdriver.Edge(driver_path)</span><br><span class="line">driver.maximize_window()</span><br><span class="line">driver.get(<span class="string">"http://django.t.mukewang.com/#/"</span>)</span><br><span class="line"><span class="comment"># 跳转至登录页：点击 我的</span></span><br><span class="line">el_mine = driver.find_element_by_xpath(<span class="string">"//*[@id='app']/div[1]/div[5]/div[3]"</span>)</span><br><span class="line">el_mine.click()</span><br><span class="line">sleep(<span class="number">1</span>)</span><br><span class="line"><span class="comment"># 登录</span></span><br><span class="line">driver.find_element_by_xpath(</span><br><span class="line">    <span class="string">"//*[@id='app']/div[1]/form/div[1]/div[2]/div/input"</span>).send_keys(</span><br><span class="line">        <span class="string">"13500000001"</span>)</span><br><span class="line">driver.find_element_by_xpath(</span><br><span class="line">    <span class="string">"//*[@id='app']/div[1]/form/div[2]/div[2]/div/input"</span>).send_keys(</span><br><span class="line">        <span class="string">"Success@2020"</span>)</span><br><span class="line">driver.find_element_by_xpath(</span><br><span class="line">    <span class="string">"//*[@id='app']/div[1]/form/div[3]/button"</span>).click()</span><br><span class="line">sleep(<span class="number">1</span>)</span><br><span class="line"><span class="comment"># 点击 首页</span></span><br><span class="line">driver.find_element_by_xpath(<span class="string">"//*[@id='app']/div[1]/div[5]/div[1]"</span>).click()</span><br><span class="line">sleep(<span class="number">2</span>)</span><br><span class="line"><span class="comment"># 下单操作</span></span><br><span class="line"><span class="comment"># 点击 一个商品</span></span><br><span class="line">driver.find_element_by_xpath(</span><br><span class="line">    <span class="string">"//*[@id='app']/div[1]/div[4]/div[2]/a[1]"</span>).click()</span><br><span class="line">sleep(<span class="number">1</span>)</span><br><span class="line"><span class="comment"># 点击 预定</span></span><br><span class="line">driver.find_element_by_xpath(</span><br><span class="line">    <span class="string">"//*[@id='app']/div[1]/div[5]/div[2]/div[2]/a"</span>).click()</span><br><span class="line"><span class="comment"># 不点击 出行日期而是设置input属性的日期</span></span><br><span class="line">driver.find_element_by_xpath(</span><br><span class="line">    <span class="string">"//*[@id='app']/div[1]/form/div[1]/div[1]/div[2]/div/input"</span>).send_keys(</span><br><span class="line">        <span class="string">"2021-05-01"</span>)</span><br><span class="line"><span class="comment"># 提交订单</span></span><br><span class="line">driver.find_element_by_xpath(</span><br><span class="line">    <span class="string">"//*[@id='app']/div[1]/form/div[4]/div/button"</span>).click()</span><br><span class="line">sleep(<span class="number">1</span>)</span><br><span class="line"><span class="comment"># 点击 立即支付</span></span><br><span class="line"><span class="comment"># driver.find_element_by_xpath("//*[@id='app']/div[1]/form/div/div/button").click() # not clickable</span></span><br><span class="line"><span class="comment"># 若元素不能点击，先定位元素，再执行js脚本</span></span><br><span class="line">el = driver.find_element_by_xpath(<span class="string">"//*[@id='app']/div[1]/form/div/div/button"</span>)</span><br><span class="line">driver.execute_script(<span class="string">'arguments[0].click()'</span>, el)</span><br><span class="line"><span class="comment"># 确认</span></span><br><span class="line">driver.find_element_by_xpath(<span class="string">"/html/body/div[5]/div[3]/button[2]"</span>).click()</span><br><span class="line">sleep(<span class="number">2</span>)</span><br><span class="line">driver.quit()</span><br></pre></td></tr></tbody></table></figure>
+
+<p>unittest框架设计应用</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> unittest</span><br><span class="line"><span class="keyword">from</span> selenium <span class="keyword">import</span> webdriver</span><br><span class="line"><span class="keyword">from</span> time <span class="keyword">import</span> sleep</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TestTravel</span>(<span class="params">unittest.TestCase</span>):</span></span><br><span class="line">    <span class="comment"># 初始化操作 打开浏览器&amp;浏览器设置</span></span><br><span class="line">    <span class="comment"># 最终结束操作 关闭浏览器</span></span><br><span class="line">    <span class="comment"># 用例分为 登录、下单两个部分</span></span><br><span class="line"><span class="meta">    @classmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">setUpClass</span>(<span class="params">cls</span>):</span></span><br><span class="line">        driver_path = <span class="string">'C:\\Users\\rose\\Downloads\\msedgedriver.exe'</span></span><br><span class="line">        cls.dr = webdriver.Edge(driver_path)</span><br><span class="line">        cls.dr.maximize_window()</span><br><span class="line">        cls.dr.implicitly_wait(<span class="number">10</span>)</span><br><span class="line">        cls.dr.get(<span class="string">"http://django.t.mukewang.com/#/"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">test_a_login</span>(<span class="params">self</span>):</span>  <span class="comment"># unittest中的方法不是按书写顺序而是方法名的ASCII</span></span><br><span class="line">        <span class="comment"># 跳转至登录页 点击 我的</span></span><br><span class="line">        el_mine = self.dr.find_element_by_xpath(</span><br><span class="line">            <span class="string">"//*[@id='app']/div[1]/div[5]/div[3]"</span>)</span><br><span class="line">        el_mine.click()</span><br><span class="line">        sleep(<span class="number">1</span>)</span><br><span class="line">        <span class="comment"># 登录</span></span><br><span class="line">        self.dr.find_element_by_xpath(</span><br><span class="line">            <span class="string">"//*[@id='app']/div[1]/form/div[1]/div[2]/div/input"</span>).send_keys(</span><br><span class="line">                <span class="string">"13500000001"</span>)</span><br><span class="line">        self.dr.find_element_by_xpath(</span><br><span class="line">            <span class="string">"//*[@id='app']/div[1]/form/div[2]/div[2]/div/input"</span>).send_keys(</span><br><span class="line">                <span class="string">"Success@2020"</span>)</span><br><span class="line">        self.dr.find_element_by_xpath(</span><br><span class="line">            <span class="string">"//*[@id='app']/div[1]/form/div[3]/button"</span>).click()</span><br><span class="line">        sleep(<span class="number">1</span>)</span><br><span class="line">        self.dr.find_element_by_xpath(</span><br><span class="line">            <span class="string">"//*[@id='app']/div[1]/div[5]/div[1]"</span>).click()</span><br><span class="line">        sleep(<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">test_b_order</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="comment"># 下单操作</span></span><br><span class="line">        self.dr.find_element_by_xpath(</span><br><span class="line">            <span class="string">"//*[@id='app']/div[1]/div[4]/div[2]/a[1]"</span>).click()</span><br><span class="line">        sleep(<span class="number">1</span>)</span><br><span class="line">        self.dr.find_element_by_xpath(</span><br><span class="line">            <span class="string">"//*[@id='app']/div[1]/div[5]/div[2]/div[2]/a"</span>).click()</span><br><span class="line">        self.dr.find_element_by_xpath(</span><br><span class="line">            <span class="string">"//*[@id='app']/div[1]/form/div[1]/div[1]/div[2]/div/input"</span></span><br><span class="line">        ).send_keys(<span class="string">"2020-12-01"</span>)</span><br><span class="line">        self.dr.find_element_by_xpath(</span><br><span class="line">            <span class="string">"//*[@id='app']/div[1]/form/div[4]/div/button"</span>).click()</span><br><span class="line">        sleep(<span class="number">1</span>)</span><br><span class="line">        el = self.dr.find_element_by_xpath(</span><br><span class="line">            <span class="string">"//*[@id='app']/div[1]/form/div/div/button"</span>)</span><br><span class="line">        self.dr.execute_script(<span class="string">'arguments[0].click()'</span>, el)</span><br><span class="line">        self.dr.find_element_by_xpath(</span><br><span class="line">            <span class="string">"/html/body/div[5]/div[3]/button[2]"</span>).click()</span><br><span class="line">        sleep(<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line"><span class="meta">    @classmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">tearDownClass</span>(<span class="params">cls</span>):</span></span><br><span class="line">        cls.dr.quit()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    unittest.main()</span><br></pre></td></tr></tbody></table></figure><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -729,882 +1536,8 @@
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/04/26/linux-an-zhuang-python/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/04/26/linux-an-zhuang-python/" class="post-title-link" itemprop="url">linux安装python</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-04-25 16:21:41" itemprop="dateCreated datePublished" datetime="2021-04-25T16:21:41Z">2021-04-25</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-30 01:37:31" itemprop="dateModified" datetime="2021-04-30T01:37:31Z">2021-04-30</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" itemprop="url" rel="index"><span itemprop="name">操作系统</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>win10</p>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">C:\Users\rose&gt;whereis python</span><br><span class="line">C:\Users\rose\AppData\Local\Programs\Python\Python38\python.exe</span><br><span class="line"></span><br><span class="line">C:\Users\rose&gt;<span class="built_in">where</span> python</span><br><span class="line">C:\Users\rose\AppData\Local\Programs\Python\Python38\python.exe</span><br><span class="line">C:\Users\rose\AppData\Local\Microsoft\WindowsApps\python.exe</span><br></pre></td></tr></tbody></table></figure>
-
-<p>python在linux环境下面没有安装包，只支持从源码安装，</p>
-<p>Linux系统下查看python解释器安装路径</p>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">whereis python</span><br><span class="line">[root@centos ~]<span class="comment"># cd /usr/bin/</span></span><br><span class="line">[root@centos bin]<span class="comment"># ll python*</span></span><br><span class="line">lrwxrwxrwx. 1 root root    7 2月   7 09:30 python -&gt; python2</span><br><span class="line">lrwxrwxrwx. 1 root root    9 2月   7 09:30 python2 -&gt; python2.7</span><br><span class="line">-rwxr-xr-x. 1 root root 7136 8月   4 2017 python2.7</span><br></pre></td></tr></tbody></table></figure>
-<p>python指向的是python2，python2指向的是python2.7，<br>我们可以装个python3，然后将python指向python3，然后python2指向python2.7，那么两个版本的python就能共存了。</p>
-<p>gcc：C语言的编译（四个过程）</p>
-<ol>
-<li>预处理（Preprocessing）（文件格式变化：.c—.i）</li>
-<li>编译 (Compilation)（文件格式变化：.i—.s）</li>
-<li>汇编(Assemble)（文件格式变化：.s—.o）</li>
-<li>链接(Linking)（文件格式变化：.o—.out，windows平台下生成可执行文件.exe）</li>
-</ol>
-<p>如果我们只写了一个<code>.cc</code>/<code>.cpp</code>文件，我们可以使用gcc。<br>比如我们写了一个<code>hello.cpp</code><br>那我们可以使用gcc这样编译<code>gcc hello.c -o hello</code>，<code>-o</code>是指输出名为hello的可执行文件。</p>
-<p>但是，如果我们写的是一系列的代码我们总不能挨个对他们进行gcc编译吧？这时候轮到make登场了。</p>
-<p>（2）make<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 在 Linux环境下使用 GNU 的 make工具能够比较容易的构建一个属于你自己的工程，整个工程的编译只需要一个命令就可以完成编译、连接以至于最后的执行。不过这需要我们投入一些时间去完成一个或者多个称之为 Makefile 文件的编写。此文件正是 make 正常工作的基础。make 是一个命令工具，它解释 Makefile 中的指令（应该说是规则）。在 Makefile文件中描述了整个工程所有文件的编译顺序、编译规则。</p>
-<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 所以，首先我们要将所有要编译的文件信息写到makefile中，然后执行make，make就会按照makefile进行编译，这避免了程序在调试过程中频繁输入命令进行编译。但是makefile写起来比较复杂，规则很多。</p>
-<p>这就要提到另一个工具cmake了。</p>
-<p>（3）cmake<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 前面说了，对于一个大工程，编写makefile实在是件复杂的事，于是人们又想，为什么不设计一个工具，读入所有源文件之后，自动生成makefile呢，于是就出现了cmake工具，它能够输出各种各样的makefile或者project文件,从而帮助程序员减轻负担。但是随之而来也就是编写cmakelist文件，它是cmake所依据的规则。</p>
-<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cmake的作用就是生成makefile给make用。cmake生成makefile的根据正是CMakeLists.txt。我们主要就是学习CMakeLists.txt的写法。</p>
-<p>一个大的工程，按照下面的步骤进行，gcc make cmake三个工具配合使用</p>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@VM-0-9-centos ~]<span class="comment"># yum -y install zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel gdbm-devel db4-devel libpcap-devel xz-devel libffi-devel cmake bzip2 readline-devel sqlite xz mysql-devel python-devel make</span></span><br><span class="line"></span><br><span class="line">gcc -v</span><br><span class="line">g++ -v</span><br></pre></td></tr></tbody></table></figure>
-
-<p>下载python3的tar.xz的源码包</p>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@VM-0-9-centos ~]<span class="comment"># wget https://www.python.org/ftp/python/3.8.9/Python-3.8.9.tgz</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p>解压</p>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@VM-0-9-centos ~]<span class="comment"># tar -zxvf Python-3.8.9.tgz</span></span><br></pre></td></tr></tbody></table></figure>
-<p>编译</p>
-<figure class="highlight angelscript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[<span class="symbol">root@</span>VM<span class="number">-0</span><span class="number">-9</span>-centos ~]# cd Python<span class="number">-3.8</span><span class="number">.9</span></span><br><span class="line">[<span class="symbol">root@</span>VM<span class="number">-0</span><span class="number">-9</span>-centos Python<span class="number">-3.8</span><span class="number">.9</span>]# ./configure --prefix=/usr/local/Python<span class="number">-3.6</span><span class="number">.1</span></span><br><span class="line">[<span class="symbol">root@</span>VM<span class="number">-0</span><span class="number">-9</span>-centos Python<span class="number">-3.8</span><span class="number">.9</span>]# make #&lt;=====编译初始化</span><br><span class="line">[<span class="symbol">root@</span>VM<span class="number">-0</span><span class="number">-9</span>-centos Python<span class="number">-3.8</span><span class="number">.9</span>]# make install #&lt;====安装</span><br></pre></td></tr></tbody></table></figure>
-
-<p>configure的作用是利用这个configure可执行的脚本文件来查看你的linux的运行环境。<br>然后生成一个Makefile文件，你就可以通过makefile文件编译你的项目了。<br>所以下面几种方式都是可以的<br><code>sh configure</code><br><code>source configure</code></p>
-<figure class="highlight plain"><figcaption><span>configure``` (中间有一个空格)</span></figcaption><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">```./configure```</span><br><span class="line"></span><br><span class="line">···实际就是编译源代码，按照上一步生成makefile文件进行编译，并生成执行文件。</span><br><span class="line"></span><br><span class="line">python添加到了整个系统的全局环境变量里面，</span><br><span class="line">把Python3安装到/usr/local/python35 文件夹目录内，在/usr/local/目录下就会有python3目录</span><br><span class="line"></span><br><span class="line">系统自带2或者3，修改的链接代码不一样，</span><br><span class="line">系统自带2</span><br><span class="line">```bash</span><br><span class="line">python</span><br></pre></td></tr></tbody></table></figure>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line">sys.executable</span><br><span class="line">/usr/bin/python</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python2</span><br></pre></td></tr></tbody></table></figure>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line">sys.executable</span><br><span class="line">/usr/bin/python</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python3</span><br></pre></td></tr></tbody></table></figure>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line">sys.executable</span><br><span class="line">/usr/local/bin/python3</span><br></pre></td></tr></tbody></table></figure>
-
-
-<p>ln -s /usr/local/bin/python3 /usr/bin/python（把软链接放在环境变量的目录内）<br>ln -s /usr/local/bin/pip3 /usr/bin/pip</p>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@VM-0-9-centos ~]<span class="comment"># find / -name python3</span></span><br><span class="line">/usr/<span class="built_in">local</span>/python3</span><br><span class="line">/usr/<span class="built_in">local</span>/python3/bin/python3</span><br><span class="line">/usr/<span class="built_in">local</span>/bin/python3</span><br><span class="line">/usr/bin/python3</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@centos ~]<span class="comment"># ll /usr/bin/python*</span></span><br><span class="line">lrwxrwxrwx 1 root root   22 Apr 25 12:42 python -&gt; /usr/<span class="built_in">local</span>/bin/python3</span><br><span class="line">lrwxrwxrwx 1 root root    9 Apr 25 11:37 python2 -&gt; python2.7</span><br><span class="line">-rwxr-xr-x 1 root root 7144 Nov 17 06:23 python2.7</span><br><span class="line">-rwxr-xr-x 1 root root 1835 Nov 17 06:23 python2.7-config</span><br><span class="line">lrwxrwxrwx 1 root root   16 Apr 25 11:37 python2-config -&gt; python2.7-config</span><br><span class="line">lrwxrwxrwx 1 root root   30 Apr 25 09:36 python3 -&gt; /usr/<span class="built_in">local</span>/python3/bin/python3</span><br><span class="line">lrwxrwxrwx 1 root root    7 Apr 25 11:37 python.bak -&gt; python2</span><br><span class="line">lrwxrwxrwx 1 root root   14 Apr 25 11:37 python-config -&gt; python2-config</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">vim /usr/bin/yum</span><br><span class="line"></span><br><span class="line">把<span class="comment">#! /usr/bin/python修改为#! /usr/bin/python2</span></span><br><span class="line"></span><br><span class="line">vim /usr/libexec/urlgrabber-ext-down</span><br><span class="line">把<span class="comment">#! /usr/bin/python 修改为#! /usr/bin/python2</span></span><br></pre></td></tr></tbody></table></figure>
-
-
-<figure class="highlight awk"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[root@centos ~]<span class="comment"># python2</span></span><br><span class="line">Python <span class="number">2.7</span>.<span class="number">5</span> (default, Jun <span class="number">20</span> <span class="number">2019</span>, <span class="number">20</span>:<span class="number">27</span>:<span class="number">34</span>) </span><br><span class="line">[GCC <span class="number">4.8</span>.<span class="number">5</span> <span class="number">20150623</span> (Red Hat <span class="number">4.8</span>.<span class="number">5</span>-<span class="number">36</span>)] on linux2</span><br><span class="line">Type <span class="string">"help"</span>, <span class="string">"copyright"</span>, <span class="string">"credits"</span> or <span class="string">"license"</span> <span class="keyword">for</span> more information.</span><br><span class="line">&gt;&gt;&gt; <span class="keyword">exit</span>()</span><br><span class="line">[root@centos ~]<span class="comment"># python</span></span><br><span class="line">Python <span class="number">3.6</span>.<span class="number">4</span> (default, Sep <span class="number">27</span> <span class="number">2019</span>, <span class="number">16</span>:<span class="number">54</span>:<span class="number">08</span>) </span><br><span class="line">[GCC <span class="number">4.8</span>.<span class="number">5</span> <span class="number">20150623</span> (Red Hat <span class="number">4.8</span>.<span class="number">5</span>-<span class="number">39</span>)] on linux</span><br><span class="line">Type <span class="string">"help"</span>, <span class="string">"copyright"</span>, <span class="string">"credits"</span> or <span class="string">"license"</span> <span class="keyword">for</span> more information.</span><br><span class="line">&gt;&gt;&gt; <span class="keyword">exit</span>()</span><br></pre></td></tr></tbody></table></figure>
-
-
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python --version</span><br><span class="line">python2 --version</span><br><span class="line">python3 --version</span><br></pre></td></tr></tbody></table></figure>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip3 install django</span><br></pre></td></tr></tbody></table></figure>
-
-<p>如果系统自带的是python3<br>ln -s /usr/Python-3.6.1/bin/python3 /usr/bin/python3<br>ln -s /usr/Python-3.6.1/bin/pip3 /usr/bin/pip3</p>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/04/24/bi-te-zi-jie/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/04/24/bi-te-zi-jie/" class="post-title-link" itemprop="url">比特字节</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-      
-
-      <time title="创建时间：2021-04-23 16:21:41 / 修改时间：08:19:06" itemprop="dateCreated datePublished" datetime="2021-04-23T16:21:41Z">2021-04-23</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" itemprop="url" rel="index"><span itemprop="name">操作系统</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>M是兆，也就是 10 的 6 次方<br>位（比特）b = bit ，二进制范畴<br>字节 B = Byte ，计算机文件大小的基本计算单位<br>1B = 8b  12.5MB/s = 100Mb/s<br>千字节Ko = 1KB = 1024B<br>兆字节Mo = 1MB = 1024KB<br>千兆字节Go = 1GB = 1024MB<br>1TB = 1024GB<br>PB<br>EB</p>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/04/23/linux-ruan-jian-bao/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/04/23/linux-ruan-jian-bao/" class="post-title-link" itemprop="url">linux 软件包</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-04-22 16:21:41" itemprop="dateCreated datePublished" datetime="2021-04-22T16:21:41Z">2021-04-22</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-24 13:08:12" itemprop="dateModified" datetime="2021-04-24T13:08:12Z">2021-04-24</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" itemprop="url" rel="index"><span itemprop="name">操作系统</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>在 Windows 下，要安装软件，一般使用“安装程序”<br>一般是 .exe 结尾的可执行程序，双击即可运行，一般会把64位软件安装到 Program Files 这个文件夹下</p>
-<p>CentOS 下也有类似的程序，但不称之为“安装程序，而称之为“软件包”，英语是 Package<br>一个软件包其实是软件的所有文件的压缩包<br>二进制形式的，包含了安装软件的所有指令<br>◆ 在 Red Hat 一族里，软件包的后缀是 .rpm<br>rpm 是 Red Hat Package Manager 红帽软件包管理器<br>RedHat系列：Redhat、Centos、Fedora用 .rpm 的软件包<br>Debian 一族（Ubuntu，Debian，等）的软件包是 .deb 为后缀</p>
-<p>Linux的软件包相较于windows的exe安装包文件，包含了依赖关系的管理，对于依赖的软件会自动下载。<br>软件包不需要我们通过搜索引擎来找到并下载<br>Linux几乎所有.rpm软件包存放在相同地方，称为软件仓库（repository）<br>软件仓库绝不只是存放在一台服务器上，在全世界各地分布有软件仓库。（也就是有很多服务器）<br>大部分软件仓库里的软件都是一样的，只不过是拷贝而已<br>有一些特别的软件仓库，会存放其他软件仓库没有的软件<br>是用户选择软件仓库，因为基本上各个软件仓库中的软件都是一样的<br>一般建议用户选择离自己所在地较近的软件仓库的服务器</p>
-<h3 id="dependency依赖关系：一个软件依赖其他程序，还有下层依赖关系，环环相扣"><a href="#dependency依赖关系：一个软件依赖其他程序，还有下层依赖关系，环环相扣" class="headerlink" title="dependency依赖关系：一个软件依赖其他程序，还有下层依赖关系，环环相扣"></a>dependency依赖关系：一个软件依赖其他程序，还有下层依赖关系，环环相扣</h3><ul>
-<li>很少有一个软件可以单独在 Linux 上运行，它不依赖于其他程序</li>
-<li>一个软件经常需要使用其他程序或者其他程序的片段（称之为 库<br>Linux 下类似 Photoshop 的软件 GIMP，GIMP 的正常运作需要调用图片读取的库（例如读取一个JPG图片）</li>
-</ul>
-<p>管理软件仓库</p>
-<p>如果我们要切换软件仓库，可以通过编辑软件仓库列表文件，是系统文件，只能被 root 用户修改<br>CentOS是<code>/etc/yum.repos.d/CentOS-Base.repo</code></p>
-<p>配置yum源<br>1、安装wget下载工具</p>
-<p>yum install wget -y</p>
-<p>2、进入yum源配置文件</p>
-<p>//进入yum配置文件夹</p>
-<p>cd /etc/yum.repos.d</p>
-<p>//备份之前的配置文件<br>备份系统旧配置文件<br>mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup<br>mv CentOS-Base.repo CentOS-Base.repo.bak</p>
-<p>//阿里源<br>wget <a target="_blank" rel="noopener" href="http://mirrors.aliyun.com/repo/Centos-7.repo">http://mirrors.aliyun.com/repo/Centos-7.repo</a></p>
-<p>wget -O /etc/yum.repos.d/CentOS-Base.repo <a target="_blank" rel="noopener" href="http://mirrors.cloud.tencent.com/repo/centos7_base.repo">http://mirrors.cloud.tencent.com/repo/centos7_base.repo</a></p>
-<p>4、设置需要的镜像源为默认源<br>//修改指定的yum源为默认yum源<br>mv /etc/yum.repos.d/Centos-7.repo /etc/yum.repos.d/CentOS-Base.repo</p>
-<p>5、清空之前缓存生成新的缓存<br>//清空缓存<br>yum clean all<br>//生成新的缓存<br>yum makecache</p>
-<p>debian是<code>/etc/apt/sources.list</code><br>一般来说，这个文件中有作用的行是由以下两个指令开头：<br>deb: 用于下载软件的二进制版本，大多数情况下我们用的是这个<br>deb-src: 用于下载软件的源代码</p>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 举例其中一行</span></span><br><span class="line">deb http://cn.archive.ubuntu.com/ubuntu/ bionic universe</span><br></pre></td></tr></tbody></table></figure>
-<p>第二个是仓库地址，第三个bionic是Ubuntu版本代号，第三个universe是软件仓库的区域，也就是要查看的代码仓库的不同分区。</p>
-<p>Ubuntu图形界面中software&amp;update中可以直接切换软件仓库，更加方便</p>
-<p>终端包管理工具<br>apt-get/apt管理包命令<br>aptitude：这个命令再卸载软件时可以卸载不用的依赖<br><code>sudo apt update</code>更新软件包缓存；<br><code>sudo apt-cache search</code>搜索软件包；<br><code>sudo apt install</code>安装软件包；<br><code>sudo apt upgrade</code>升级所有已安装软件包；<br><code>sudo apt autoremove</code></p>
-<p>dpkg命令时apt-get和aptitude两个命令的后端（backend）命令</p>
-<p>依赖链：dpkg–&gt;apt-get,aptitude–&gt;Ubuntu Software</p>
-<p>使用dpkg可以安装本地的软件包：<code>sudo dpkg -i *.deb</code>，<br>卸载：<code>sudo dpkg -r 包名</code></p>
-<p>yum等傻瓜式安装  终端的软件包管理器 企业级不会用<br>yum 是 CentOS 中的默认包管理器工具，也用于 Red Hat 一族<br>    优点: 安装简单，快捷<br>    缺点: 完全丧失了自定义性<br>    注意：如果不更改软件来源的情况下，是需要联网才能使用yum的。<br>  <code>ls /etc/yum.repos.d/</code> 查看源下载<br>常用的yum指令：</p>
-<ul>
-<li><code>yum list [installed]</code> 列出当前已经装的和可以装的软件（全部）</li>
-<li><code>yum search 名</code>  搜索指定的关键词的包</li>
-<li><code>yum [-y] install 包名 </code> 安装指定的包（-y表示允许不再确认）</li>
-<li><code>yum [-y] update [包名]</code> 更新指定的包，不指定包则更新全部软件，删除旧包</li>
-<li><code>yum [-y] upgrade [包名]</code> 更新指定的包，不指定包则更新全部软件，不删除旧包</li>
-<li><code>yum [-y] remove 包名</code> 删除卸载指定的包</li>
-<li><code>sudo yum autoremove xxx</code></li>
-<li><code>yum clean packages</code> 清理缓存 </li>
-<li><code>yum info xx</code>  软件包信息</li>
-</ul>
-<p><code>yum remove firefox</code>指令卸载火狐浏览器<br><code>yum install firefox</code>指令安装火狐浏览器</p>
-<p>本地的 *.rpm 软件包安装的命令</p>
-<ol>
-<li><code>sudo yum localinstall *.rpm</code> 用于安装<br><code>sudo yum remove *.rpm</code> 用于卸载</li>
-<li><code>rpm -ivh 软件包完整名称</code><br>选项：</li>
-</ol>
-<ul>
-<li>   <code>-i</code>：install，安装</li>
-<li>   ````-v```：显示进度条</li>
-<li>   <code>-h</code>：表示以“#”形式显示进度条</li>
-</ul>
-<p><code>rpm -e 软件的名称</code> 卸载某个软件<br>火狐卸载的时候是没有依赖关系的，所以可以直接卸载。<br>但是在卸载Apache的时候提示无法卸载：<br>当存在依赖关系的时候又不想去解决这个问题的时候可以：<br><code>rpm -e 软件包名 --nodeps</code><br><code>rpm -qa|grep 关键词 </code>    查询某个软件的安装情况<br>Red-Hat Package Manager</p>
-<p>选项：<br>    -q：查询，query<br>-a：全部，all</p>
-<p>文件下载</p>
-<ul>
-<li>wget</li>
-<li>scp进行文件上传和下载</li>
-</ul>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/04/22/linux-nano/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/04/22/linux-nano/" class="post-title-link" itemprop="url">linux Nano</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-04-21 16:21:41" itemprop="dateCreated datePublished" datetime="2021-04-21T16:21:41Z">2021-04-21</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-22 09:27:22" itemprop="dateModified" datetime="2021-04-22T09:27:22Z">2021-04-22</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" itemprop="url" rel="index"><span itemprop="name">操作系统</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h2 id="文本编辑器Text-Editor，"><a href="#文本编辑器Text-Editor，" class="headerlink" title="文本编辑器Text Editor，"></a>文本编辑器Text Editor，</h2><ul>
-<li><p>一种程序，编辑和查看纯文本文件，没有任何文本修饰</p>
-</li>
-<li><p>不能对文字做格式处理：没有任何粗体，下划线、斜体，图形，符号或特殊字符及特殊打印格式的文本</p>
-</li>
-<li><p>只保存文本，不保存其格式设置</p>
-</li>
-<li><p>Windows 下的记事本 纯文本文件就是 .txt 结尾的文本文档；<br>macOS 下的文本编辑<br>Linux 终端的文本编辑器中，有：Nano，Vim，Emacs, Gedit，Sublime，Atom; DOS 下的 edit<br>在 Linux 和 macOS 下，后缀名没那么重要，不少纯文本文件是没有后缀名的</p>
-</li>
-</ul>
-<h2 id="文本处理器（文档编辑器）Text-Processor，"><a href="#文本处理器（文档编辑器）Text-Processor，" class="headerlink" title="文本处理器（文档编辑器）Text Processor，"></a>文本处理器（文档编辑器）Text Processor，</h2><p>能以编辑和查看文档，对文字做格式处理，例如：加粗，斜体，改变颜色，改变字体大小，添加超链接，加下划线，设为标题，插入图片</p>
-<p>这些软件只能在图形界面下使用<br>Windows 下的 Word；macOS 下的 Pages<br>◆ Linux 下的 OpenOffice Writer，等等</p>
-<p>文本编辑器处理的文件格式和文本处理器的文件格式一般也不同</p>
-<h2 id="Nano-文本编辑器，不是文本处理器-GNU-Nano"><a href="#Nano-文本编辑器，不是文本处理器-GNU-Nano" class="headerlink" title="Nano 文本编辑器，不是文本处理器 GNU Nano"></a>Nano 文本编辑器，不是文本处理器 GNU Nano</h2><p>Nano is ANOther editor “nano 是另一种编辑器”<br>nano 是“毫微”的意思，也就是 10 的 -9 次方</p>
-<h3 id="Nano-中的键盘快捷键"><a href="#Nano-中的键盘快捷键" class="headerlink" title="Nano 中的键盘快捷键"></a>Nano 中的键盘快捷键</h3><p>终端下部，我们可以看到有两行帮助文档<br>这些快捷键组合中虽然字母是大写，但就是键盘上对应的字母键，并不需要用 Shift 键来将其变为大写</p>
-<p>^ 这个符号表示键盘的 Ctrl 键<br>Nano 的快捷键组合<br>^X 标明的是 Exit，按Ctrl+X 退出Nano<br>Ctrl+Y：上一个屏幕<br>Ctrl+V：下一个屏幕<br>PaUp 和 PaDn 也分别与 Ctrl+Y 和 Ctrl+V 功能一样<br>复制一整行：Alt+6<br>Ctrl+K 剪切当前一整行<br>Ctrl+U 粘贴刚剪切的内容</p>
-<p>如果需要复制／剪贴多行或者一行中的一部分，先将光标移动到需要复制／剪贴的文本的开头，按Ctrl+6（或者Alt+A）做标记，然后移动光标到 待复制／剪贴的文本末尾。这时选定的文本会反白，用Alt+6来复制，Ctrl+K来剪贴。若在选择文本过程中要取消，只需要再按一次Ctrl+6。</p>
-<p>Ctrl+W，然后输入你要搜索的关键字，回车确定。这将会定位到第一个匹配的文本，接着可以用Alt+W来定位到下一个匹配的文本。<br>Ctrl+G：显示帮助文档<br>Ctrl+O 保存所做的修改<br>Ctrl+R：打开其他文件<br>Ctrl+\：替换<br>Ctrl+F：向前移动一格光标<br>Ctrl+B：向后移动一格光标<br>Ctrl+P：向上移动一行<br>Ctrl+N：向下移动一行<br>用键盘上的方向键（上，下，左，右）也可以控制光标移动</p>
-<p>先按 Esc 键，再按 X 键，帮助文档就没了</p>
-<figure class="highlight plain"><figcaption><span>file_path```直接打开，如果你对 file.txt 有写的权限，那你就可以用 nano 来修改这个文件了，没有该文件的话，就会创建一个空文件</span></figcaption><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">```-m```：激活鼠标，鼠标可以通过点击来控制光标的位置。如果没有 -m 参数，那么鼠标在 nano 里是不起作用的</span><br><span class="line">```-i```：激活自动缩进</span><br><span class="line">```-A```：激活智能 Home 键的功能。通常状况下按下键盘的 Home 键，光标会立即跳到一行的最开始。用了 -A 这个参数</span><br><span class="line">◆ 按下 Home 键它会智能地判断，根据一行的开始处有无缩进来跳转，如果有缩进会跳转到缩进之后而不是最开始</span><br><span class="line">```nano -miA file.txt```</span><br><span class="line"></span><br><span class="line">### 配置nano编辑器</span><br><span class="line">#### 单个用户配置：</span><br><span class="line">每个 Linux 的用户都可以在自己的家目录```/home/username```路径下创建 ```.nanorc``` 这个文件，在每次 nano 启动前，它会读取此配置文件</span><br><span class="line"></span><br><span class="line"> 最前面有一个点```.```，表明这是一个隐藏文件</span><br><span class="line"> ◆ Linux 中的配置文件大多以点开头，</span><br><span class="line"> 而且多以 rc 结尾，“rc”是“runcomm”的缩写，即“run command”(运行命令)，"具有从档案中取出一系列命令来执行的功能</span><br><span class="line">比如 Vim 的配置文件 ```.vimrc```；</span><br><span class="line">Linux 或 Unix 的许多程序在启动时，都需要“rc”后缀的初始文件或配置文件，</span><br><span class="line">" rc”是很多脚本类文件的后缀，常在程序的启动阶段被调用，通常是 Linux 系统启动时</span><br><span class="line"></span><br><span class="line">而 ```.bashrc``` 是当 Linux 的 Bash shell 启动后所运行的脚本配置文件</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">```bash</span><br><span class="line">touch .nanorc</span><br><span class="line">nano .nanorc</span><br></pre></td></tr></tbody></table></figure>
-<p>配置语言以<code>set</code>和<code>unset</code>开头：</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 相当于命令后面加 -m 参数 鼠标生效</span><br><span class="line">set mouse</span><br><span class="line"># 相当于 -i 参数 自动缩进</span><br><span class="line">set autoindent</span><br><span class="line"># 激活职能home键 -A参数</span><br><span class="line">set smarthome</span><br></pre></td></tr></tbody></table></figure>
-<p>要保存文件，只要按下 Ctrl+O，它会提示你文件名是 .nanorc<br> 已经指定了文件名，直接按下回车，这三行就写入到了.nanorc中<br>可以看到终端提示：[Wrote 3 lines]，表示“写入了 3 行<br>按下 Ctrl+X 来退出 nano<br>下次你再启动 nano 的时候，你会发现：鼠标、自动缩进、智能 Home 键也激活了</p>
-<p>全局配置：<br>每个用户的家目录中的 .nanorc 这个文件非常实用，可以帮助你设置自己的 nano 选项<br>nano 有一个全局的配置文件，是为系统上所有用户所公共调用的，也叫 nanor</p>
-<figure class="highlight plain"><figcaption><span>nanorc 前面没有点```.```了</span></figcaption><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">（只能被 root 用户修改）</span><br><span class="line"></span><br><span class="line">```/etc``` 这个目录，它里面存放系统的配置文件。一般为所有用户共用</span><br><span class="line">如果我们要修改这个文件，建议用命令```sudo nano /etc/nanorc```</span><br><span class="line">在这个配置文件里，有所有可以放置在你自己的 .nanorc 中的语句</span><br><span class="line">在/etc/nanorc中把那些配置语句前面的#去掉，会对全局用户生效</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">### 配置终端</span><br><span class="line"></span><br><span class="line">#### 单个用户的终端配置文件```/home/username/.bashrc```</span><br><span class="line">一般来说是默认存在的，不像 .nanorc 可能还要自己创建</span><br><span class="line">```nano ~/.bashrc```打开家目录下的终端配置文件看看</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">bash其实是一种shell， CentOS 和大部分常见的 Linux 发行版默认的 shell 程序就是Bash</span><br><span class="line">shell是外壳程序（shell 是英语“外壳”的意思），用于解释我们输入终端的各种命令的，是用户和操作系统之间的一个命令解释器，是用户与 Linux 操作系统之间沟通的桥梁</span><br><span class="line"></span><br><span class="line">bashrc应用于不用用户登录的图形化终端，也就是我们一直在使用的终端形式，图形化的终端的情况</span><br><span class="line">这种终端是读取 .bashrc 为配置文件的</span><br><span class="line">.bashrc 就是 Bash 这个 shell 程序的配置文件</span><br><span class="line">.bashrc 本身的语法也是 Bash 的语法，是一种脚本语言</span><br><span class="line">配置.bashrc文件可以修改终端的各种配置，如命令提示符样式，创建命令别名</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">```Code</span><br><span class="line"># 创建别名 alias xx='command'</span><br><span class="line">alias ll='ls -alF'</span><br><span class="line">alias la='ls -A'</span><br><span class="line">alias l='ls -CF'</span><br></pre></td></tr></tbody></table></figure>
-
-<p>终端的 bash的全局配置的路径：<code>/etc/bashrc</code>，<br>家目录下的 <code>.bashrc</code> 和优先级高于系统的<code>/etc/bashrc</code>文件高<br><code>nano ~/etc/bashrc</code><br>把 bashrc 文件向下拉，看到有 PS1 开头的行，设置命令行提示符的样式的，<br><code>PROMPT_COMMAND='printf "\033]0;%s@%s:%s\007" "${USER}" "${HOSTNAME%%.*}" "${PWD/#$HOME/~}"'</code></p>
-<figure class="highlight plain"><figcaption><span>表示用户名（例如我的用户名是 oscar</span></figcaption><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">```${HOSTNAME}``` 是电脑的名称（我的情况是 oscar-laptop）</span><br><span class="line">```@``` 分割用户名和电脑名的那个 @</span><br><span class="line"></span><br><span class="line">### profile配置文件</span><br><span class="line">单个用户：```~/.profile```，全局 ```/etc/profile```</span><br><span class="line">```nano ~/etc/profile```</span><br><span class="line">```vi /etc/profile```</span><br><span class="line">```export CLASSPATH=./JAVA_HOME/lib;$JAVA_HOME/jre/lib```</span><br><span class="line">profile应用TTY1-TTY6这种需要用户登录的，非图形界面的终端的配置文件。</span><br><span class="line">profile文件会调用```.bashrc```，修改了 .bashrc，也就是间接修改了 profile 文件，</span><br><span class="line">profile 文件会用 profile 本身的配置再加上 .bashrc 的配置</span><br><span class="line"></span><br><span class="line">```bashrc``` 和``` profile```文件二者修改后都是默认是在用户下次登陆生效，需要立即生效使用source命令：</span><br><span class="line">```Code</span><br><span class="line">source .bashrc</span><br><span class="line">source .profile</span><br><span class="line">source /etc/profile</span><br></pre></td></tr></tbody></table></figure>
-
-<p>2.1 在/etc/profile文件中添加变量【对所有用户生效(永久的)】<br>用VI在文件/etc/profile文件中增加变量，该变量将会对Linux下所有用户有效，并且是“永久的”。</p>
-<p>例如：编辑/etc/profile文件，添加CLASSPATH变量</p>
-<p>2.2 在用户目录下的.bash_profile文件中增加变量【对单一用户生效(永久的)】</p>
-<p>用VI在用户目录下的.bash_profile文件中增加变量，改变量仅会对当前用户有效，并且是“永久的”。</p>
-<p>例如：编辑guok用户目录(/home/guok)下的.bash_profile</p>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ vi /home/guok/.bash.profile</span><br></pre></td></tr></tbody></table></figure>
-
-<p>添加如下内容：</p>
-<figure class="highlight crystal"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">export CLASSPATH=./JAVA_HOME/<span class="class"><span class="keyword">lib</span>;</span>$JAVA_HOME/jre/<span class="class"><span class="keyword">lib</span></span></span><br></pre></td></tr></tbody></table></figure>
-<p>注：修改文件后要想马上生效还要运行<code>source /home/guok/.bash_profile</code>不然只能在下次重进此用户时生效</p>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/04/22/vim/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/04/22/vim/" class="post-title-link" itemprop="url">linux Vim</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-04-21 16:21:41" itemprop="dateCreated datePublished" datetime="2021-04-21T16:21:41Z">2021-04-21</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-23 15:24:14" itemprop="dateModified" datetime="2021-04-23T15:24:14Z">2021-04-23</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" itemprop="url" rel="index"><span itemprop="name">操作系统</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>Vim Vi iMproved<br>vi文本编辑器的进阶版</p>
-<p><code>vi</code>进入<br><code>vim</code>进入<br><code>vim 文件路径1 文件路径2 文件路径3</code> 同时打开多个指定文件，如果文件不存在会创建<br><code>vim 数字 文件的路径</code> 打开指定的文件，并且将光标移动到指定行<br><code>vim /关键词 文件路径</code> 打开指定的文件，并且高亮显示关键词</p>
-<p><code>:q</code>退出</p>
-<p>单词：以空格隔开的连续字符串<br>Vim编辑的文件中,每一行都有一个行号<br>行号从1开始,逐一递增<br>行号默认没有显示，可以按<code>:</code>进入命令模式,<br>输入 <code>set nu</code>显示行号,<br>输入 <code>set nonu</code>隐藏行号,</p>
-<p>vim 三种模式  可以用ftp打开，</p>
-<ul>
-<li>交互命令模式: interactive Mode<br>不能对文件直接编辑，可以输入快捷键删除行、复制行、上下左右移动光标、粘贴、跳转到指定行、撤销操作，这是运行Vim程序的打开文件的默认模式<br>按字母键h,j,k,l或方向键↑↓←→光标在文本中上下左右移动一个字符<br>数字健0或Home键 将光标定位到一行的开始位置<br>美元键$或end键 将光标定位到一行的行尾<br>^ 光标移动到行首</li>
-</ul>
-<p><code>gg</code> 光标移动到第一行首行<br><code>G</code> <code>Shft+g</code>光标移动到末行行首 go<br><code>7+ Shft+g</code> 或 <code>7gg</code> 如果我们要跳转到第7行行首<br><code>行号+G</code>或<code>行号+gg</code>跳转到指定行</p>
-<p>ctrl+b 向上翻页 before<br>ctrl+f 向下翻页 after</p>
-<p><code>w</code> 一个单词一个单词地移动<br><code>u</code> 撤销最近的修改，undo<br>4u 或者连按4次u 撤销最近4次修改<br>ctrl+r 取消撤销，重做之前的修改 redo<br>ctrl c cancel</p>
-<p>光标定位的字符，按 x 键会删除这个字符，和插入模式下的Back键一样<br>按 x 之前输入数字 一次性删除多个字符<br>例如先按4再按x，光标所在字符为起点删除4个字符<br>d 剪切删除单词或者行，被删除的内容会被暂存在內存里，<br>连按两次d来删除光标所在的那一行<br><code>dd</code> 也可以和数字配合 一次性删除多行<br>先输入2,再按下dd,就会删除从光标所在行开始向下的2行<br>dw 删除从光标当前字符开始到下一个空格的所有字符<br>3dw 或 d3w 删除3个单词</p>
-<p>d0 删除从光标处到行首的所有字符<br>d$ 删除从光标处到行未的所有字符</p>
-<p><code>yy</code> 按两次y 复制光标所在行到内存中 yank<br><code>数字 yy</code>   ：以光标所在行为准（包含当前行），向下复制指定的行数</p>
-<p><code>yw</code> 复制一个单词<br><code>y$</code> 是复制从光标所在处到行末的所有字符<br><code>y0</code> 是复制从光标所在处到行首的所有字符</p>
-<p><code>p</code> 内容会被粘贴到光标之后 paste<br>如果你用yy复制了一行,再用p来粘贴，那么这一行会被粘贴到光标所在行的下一行处</p>
-<p>在p前面加上次数，将同样的內容粘贴多次<br>7p,表示粘贴7次</p>
-<p>在交互模式下,将光标置于想要替换的字符上 按下r键 replace<br>接着输入你要替换的字符<br>rs表示替换当前字符为S<br>如果用大写的R,那就是切换到替换模式了，可一次性替换多个字符<br>左下角会显示– REPLACE –， Esc退出</p>
-<p>—- 搜索及替换命令<br><code>/</code> 进入查找模式<br><code>/pattern</code>：从光标开始处向文件尾搜索 光标就会转到文件中下一个查找到的匹配处<br><code>?pattern</code>：从光标开始处向文件开头搜索pattern</p>
-<p><code>:s/搜索的字符串/新字符串</code> 替换光标所在行的第一个符合条件的字符串为新字符串<br><code>:s/搜索的字符串/新字符串/g</code> 替换光标所在行的全部符合条件的字符串</p>
-<p><code>:%s/搜索的字符串/新字符串</code> 替换整个文档中每行的第一处符合条件的字符串<br><code>:%s/搜索的字符串/新字符串/g</code> 替换整个文档所有匹配的字符串<br><code>%</code>表示整个文件 <code>g</code> 全局global<br>vim打开的文件下把a替换成b （:%s /A/B/g）</p>
-<p><code>:#,# s/旧字符串/新字符串/g</code>替换文件中第#行到第#行的所有匹配的旧字符串为新字符串<br><code>:2,4 s/man/hero/g</code><br><code>1，$ s/p1/p2/g</code>：将当前行中所有p1均用p2替代<br><code>n1,n2 s/p1/p2/g</code>：将第n1至n2行中所有p1均用p2替代</p>
-<p>n：在同一方向重复上一次搜索命令  查找下一个匹配项 next<br>N shift n：在反向上重复上一次搜索命令  在搜索结果中切换上一个匹配项</p>
-<p><code>:r file_path</code> 在光标处的下一行插人一个文件的内容</p>
-<ul>
-<li>编辑插入模式：对文件内容编辑insert<br>按下面的键都可以进入</li>
-<li><code>i</code> 光标移动到当前光标所在字符前</li>
-<li><code>I</code> 光标移动到当前光标所在行行首</li>
-<li><code>a</code> 光标移动到当前光标所在字符后 after</li>
-<li><code>s</code> 删除光标所在的字符并进入</li>
-<li><code>S</code> 删除光标所在的行并进入</li>
-<li><code>A</code> 光标移动到当前光标所在行行尾</li>
-<li><code>o</code> 当前光标移动到当前光标所在行下面新增一行</li>
-<li><code>O</code> 当前光标移动到当前光标所在行上面新增一行</li>
-<li><code>Esc</code> 退出回到交互模式 escape</li>
-</ul>
-<p><code>:w</code> 保存，冒号进入命令模式 write<br><code>:w 路径</code> 另存为</p>
-<p><code>:wq</code> 或 <code>:x</code> 没用修改退出文件/文件已修改，保存并退出<br><code>:q!</code> 强制退出，刚才的修改操作不保存<br><code>:!command</code> 外部命令 在vim调用外部命令<br><code>:!ls</code>Vim打开的文件的所在目录运行命令</p>
-<p>:syntax on 着色显示  语法<br>:syntax off 着色关闭</p>
-<p><code>:sp</code> 默认横向分屏打开同一个文件 split<br><code>:sp file_path</code> 默认横向分屏打开不同文件 split<br><code>:vsp</code> 垂直分屏打开同一个文件 split<br><code>:sp file_path</code> 默认横向分屏打开不同文件 split </p>
-<p>分屏模式下的主要快捷键<br><code>Ctr+W</code>然后再按<code>Ctrl+w</code>从一个 viewport移动光标到另一个 viewport</p>
-<p>Ctr+W然后按h 移动光标到左边的 viewport<br><code>ctrl+W</code>然后按<code>j</code> 移动光标到下方的 viewport<br>Ctr+W然后按k 移动光标到上边的 viewport<br>Ctr+W然后按l 移动光标到右边的 viewport<br>Ctr+W然后按+ 扩大当前 viewport<br>Ctr+W然后按- 缩小当前 viewport<br>Ctr+W然后按= 重新均匀分配各个 viewport的占比<br>Ctr+W然后按r 调换各个 viewport的位置<br>Ctr+W然后按R 反向调换各个 viewport的位置<br>Ctr+w然后按q或按C 或者 输入<code>:quit</code>或<code>:close</code> 关闭当前 viewport<br>Ctr+W然后按o， 或者 输入```:only`` 只保留当前所在 viewport,关闭其他 viewport</p>
-<p>vim中的计算器<br>进入编辑模式<br>ctrl+R = 光标会变到最后一行<br>输入需要计算的内容，回车</p>
-<ul>
-<li>末行命令模式Command Mode：末行输入命令对文件（搜索、替换、保存、退出、撤销、语法高亮、显示行号）发送一些命令给终端命令行，例如<code>ls</code>、<code>cp</code><br>交互命令模式按下 按冒号键<code>:</code>（shift + ;）可以进入<br>回车后才执行<br>退出方式<br>法一：esc 法二：2次esc 法三：删除末行<br>使用vim同时打开多个文件,在末行模式下进行切换文件查看当前已经打开的文件名称:<code>:files</code></li>
-</ul>
-<p>可视模式，相当于高亮选取文本后的交互<br>v进入字符可视模式，方向键或hjkl选中内容按d可以删除<br>V进入行可视模式，<br>Ctr+v 进入块可视模式，配合d和I(大写的i)键可以实现很方便的操作<br>d键用于删除选中的内容，I(大写的i)键用于插入内容</p>
-<p>vi 命令涉及到很多实用快捷操作 ，</p>
-<p>nohl 取消高亮 no highlight<br>—- 删除命令</p>
-<p>ndw或ndW：删除光标处开始及其后的n-1个字</p>
-<p><code>vimtutor</code>教程</p>
-<p>gVim Gnome Vim 图形界面版本</p>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/04/21/windows-dos-ming-ling/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/04/21/windows-dos-ming-ling/" class="post-title-link" itemprop="url">windows dos命令</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-      
-
-      <time title="创建时间：2021-04-20 16:21:41 / 修改时间：02:40:23" itemprop="dateCreated datePublished" datetime="2021-04-20T16:21:41Z">2021-04-20</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" itemprop="url" rel="index"><span itemprop="name">操作系统</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p><code>dir</code> (directory) ：列出当前目录下的文件以及文件夹<br> <code>md</code> (make directory)： 创建目录<br> <code>rd</code> (remove directory)：删除目录<br> <code>cd</code> (change directory)：进入指定目录<br> <code>cd..</code> : 退回到上一级目录<br> <code>cd\</code> : 退回到根目录<br> <code>del</code>：删除文件<br> <code>exit</code>：退出dos命令行<br> <code>cls</code> (clear screen): 清屏</p>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/04/20/django-yun-wei/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/04/20/django-yun-wei/" class="post-title-link" itemprop="url">django运维</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-      
-
-      <time title="创建时间：2021-04-19 17:46:44 / 修改时间：01:31:09" itemprop="dateCreated datePublished" datetime="2021-04-19T17:46:44Z">2021-04-19</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h3 id="日志记录"><a href="#日志记录" class="headerlink" title="日志记录"></a>日志记录</h3><ul>
-<li>按类别记录、按日期存储<h3 id="添加监控"><a href="#添加监控" class="headerlink" title="添加监控"></a>添加监控</h3></li>
-<li>服务器监控、bug自动通知</li>
-<li>数据备份</li>
-</ul>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/22/">22</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/23/">23</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 <script src="/js/comments.js"></script>
 </div>

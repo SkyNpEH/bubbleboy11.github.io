@@ -28,7 +28,7 @@
 <meta property="og:description" content="查询条件的使用结果集QuerySet常用方法    Queryset表示从数据库中取出来的对象的集合    它可以含有零个、一个或者多个过滤器（filter）（相当于数据库的where）    从模型的Manager那里取得QuerySet    QuerySet的筛选结果本身还是QuerySet    QuerySet是惰性的（不是每一次都去数据库执行sql，比如：把用户取出一个结果集，查找一次">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-08-20T16:21:41.000Z">
-<meta property="article:modified_time" content="2021-04-24T12:41:04.690Z">
+<meta property="article:modified_time" content="2021-05-04T12:38:31.287Z">
 <meta property="article:author" content="外心人D">
 <meta name="twitter:card" content="summary">
 
@@ -95,7 +95,7 @@
 
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-overview-active">
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           文章目录
@@ -108,6 +108,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8C%89%E5%AD%97%E6%AE%B5%E6%9F%A5%E6%89%BE%E5%8F%AF%E4%BB%A5%E7%94%A8%E7%9A%84%E6%9D%A1%E4%BB%B6%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-text">按字段查找可以用的条件的使用</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -120,7 +121,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">214</span>
+          <span class="site-state-item-count">228</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -201,7 +202,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-24 12:41:04" itemprop="dateModified" datetime="2021-04-24T12:41:04Z">2021-04-24</time>
+        <time title="修改时间：2021-05-04 12:38:31" itemprop="dateModified" datetime="2021-05-04T12:38:31Z">2021-05-04</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -224,8 +225,8 @@
     
     <div class="post-body" itemprop="articleBody">
         <p>查询条件的使用<br>结果集QuerySet常用方法<br>    Queryset表示从数据库中取出来的对象的集合<br>    它可以含有零个、一个或者多个过滤器（filter）（相当于数据库的where）<br>    从模型的Manager那里取得QuerySet<br>    QuerySet的筛选结果本身还是QuerySet<br>    QuerySet是惰性的（不是每一次都去数据库执行sql，比如：把用户取出一个结果集，查找一次后不会去数据库中查找了，会在用户结果集中查找）</p>
-<p>get:返回一条且只能有一条数据，返回值是一个对象，参数可以写查询条件。</p>
 <p>注意：对一个QuerySet实例对象，可以继续调用上面所有函数</p>
+<p>get:返回一条且只能有一条数据，返回值是一个对象，参数可以写查询条件。</p>
 <ul>
 <li><code>get_or_create()</code>——有则返回，没有则创建记录，可以实现链式的调用，通过第一次的过滤还可以再过滤<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">obj=User.objects.get_or_create(username=<span class="string">'zhangsan'</span>,password=<span class="string">'123456'</span>,nickname=<span class="string">'张三'</span>)</span><br><span class="line">obj</span><br><span class="line">Out[<span class="number">7</span>]: (&lt;WeiboUser: WeiboUser object&gt;, <span class="literal">False</span>)</span><br><span class="line">obj = User.objects.get_or_create(username=<span class="string">'zhangsan2'</span>,password=<span class="string">'1111'</span>,nickname=<span class="string">'qq'</span>)</span><br><span class="line">obj</span><br><span class="line">Out[<span class="number">9</span>]: (&lt;WeiboUser: WeiboUser object&gt;, <span class="literal">True</span>)</span><br><span class="line">obj = User.objects.get_or_create(username=<span class="string">'zhangsan2'</span>,password=<span class="string">'123456'</span>,nickname=<span class="string">'qq'</span>)</span><br></pre></td></tr></tbody></table></figure>
 
@@ -242,10 +243,30 @@
 </ul>
 <p>方法二：使用<code>django.core.paginator</code>进行分页处理(分页处理器)<br>分页处理相关类：<br>Paginator——分页器<br>Page——某一页对象<br>异常：<br>InvalidPage——无效的页码<br>PageNotAnInteger——页码必须是整数<br>EmptyPage——空页（没有数据）</p>
 <p>分页处理器<br>    步骤一：取得分页器Paginator(objects,page_size)<br>objects——要进行分页的数据，就是我们之前查询获得的结果集<br>page_size——每页的数据放多少<br>Python<br>    1    p = Paginator(objects,2)<br>    分页器的属性：<br>    count——数据记录的总条数<br>    num_pages——总页数（总记录条数/每页大小）<br>    page_range——页码范围<br>    步骤二：取得页面实例page=p.page(page_num)<br>page_num——当前页的页码，如第几页<br>Python<br>    1    p = Paginator(objects,2)<br>    2    page = p.page(3)<br>    页面实例的属性：<br>    number——当前页的页码<br>    object_list——当前页的数据列表<br>    paginator——分页器对象的引用<br>    页面实例的常用方法：<br>    has_next()——是否还有下一页<br>    has_previous()——是否还有上一页<br>    has_other_pages()——是否还有其他页（上/下一页）<br>    next_page_number()——下一页的页码，如果没有，触发InvalidPage异常<br>    previous_page_number()——上一页的页码，如果没有，触发InvalidPage异常</p>
-<p>查询条件的使用<br>查询语法：<br>字段名称__查询条件 = “查询内容” 注意是双下划线<br>    相等/等于<br>exact——等于xx值（默认的形式）<br>如：id_exact=6 或者 id=6<br>    iexact——像xx值（默认的形式）<br>    如：name_iexact=’zhangsan’<br>    # name LIKE ‘zhangsan’<br>    Python<br>    1    WeiboUser.objects.filter(username__iexact=’gan’)</p>
+<h5 id="按字段查找可以用的条件的使用"><a href="#按字段查找可以用的条件的使用" class="headerlink" title="按字段查找可以用的条件的使用"></a>按字段查找可以用的条件的使用</h5><p>查询语法：<br>字段名称__查询条件 = “查询内容” 注意是双下划线<br>    相等/等于</p>
+<ol>
+<li><code>exact</code> / <code>iexact</code>：精确匹配/忽略大小写的精确匹配查询 等于xx值（默认的形式）</li>
+</ol>
+<p>如：id_exact=6 或者 id=6<br>如：name_iexact=’zhangsan’<br>    # name LIKE ‘zhangsan’<br>    </p><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">WeiboUser.objects.filter(username__iexact=<span class="string">'gan'</span>)</span><br></pre></td></tr></tbody></table></figure><br>2. <code>contains</code> / <code>icontains</code> / <code>startswith</code> / <code>istartswith</code> / <code>endswith</code> / <code>iendswith</code>：基于<code>like</code>的模糊查询<p></p>
 <pre><code>是否包含xx字符串
 </code></pre>
-<p>contains, icontains——包含xx值<br>如：name__contains= ‘san’<br>    以xx开始<br>startswith、istartswith<br>    以xx结束<br>endswith、iendswith<br>    xx选项__in[列表]或（元组）<br>status__in=(2,4)<br>    gt大于某个值、gte大于等于某个值、lt小于某个值、lte小于或等于某个值、isnull是否为空值等等<br>    date/datetime查询条件<br>date——日期<br>year——年<br>month——月份<br>day——天<br>hour/minute/second——时分秒<br>week/week_day——星期<br>Python<br>    1    # 查询在2020年1月1日之后创建的数据<br>    2    user_list = WeiboUser.objects.filter(created_at__gt=’2020-1-1’)</p>
+<p>contains, icontains——包含xx值<br>如：name__contains= ‘san’<br>    以xx开始<br>startswith、istartswith<br>    以xx结束<br>endswith、iendswith</p>
+<ol start="3">
+<li><p><code>in</code> ：集合运算<br> xx选项__in[列表]或（元组）<br>status__in=(2,4)</p>
+</li>
+<li><p><code>gt</code> / <code>gte</code> / <code>lt</code> / <code>lte</code>：大于/大于等于/小于/小于等于关系运算<br><code>isnull</code>：查询空值（True）或非空值（False）</p>
+</li>
+<li><p><code>range</code>：指定范围查询（SQL中的<code>between…and…</code>）</p>
+</li>
+<li><p> 查询时间日期<br>date 查询条件<br><code>date</code>/<code>datetime</code>——日期<br><code>year</code>——年<br><code>month</code>——月份<br><code>day</code>——天<br><code>hour</code>/<code>minute</code>/<code>second</code>——时分秒<br><code>week</code>/<code>week_day</code>——星期</p>
+</li>
+</ol>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span>    <span class="comment"># 查询在2020年1月1日之后创建的数据</span></span><br><span class="line"><span class="number">2</span>    user_list = WeiboUser.objects.filter(created_at__gt=<span class="string">'2020-1-1'</span>)</span><br></pre></td></tr></tbody></table></figure>
+<ol start="7">
+<li><code>range</code>：指定范围查询（SQL中的<code>between…and…</code>）</li>
+<li><code>search</code>：基于全文索引的全文检索（一般很少使用）</li>
+<li><code>regex</code> / <code>iregex</code>：基于正则表达式的模糊匹配查询</li>
+</ol>
 <p>外键关联查询<br>查询条件是外键的某个属性（字段）<br>Python<br>1    # 查询外键关联表字段包含’xx’的在本表数据<br>2    model.objects.filter(model__column__icontains=’xx’)<br>手动添加微博及评论，然后举例外键关联查询：</p>
 <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> weibo.models <span class="keyword">import</span> WeiboUser <span class="keyword">as</span> User</span><br><span class="line">user = User.objects.get(pk=<span class="number">4</span>)</span><br><span class="line">user</span><br><span class="line">Out[<span class="number">4</span>]: &lt;WeiboUser: User:zhangsan pk:<span class="number">4</span>,nickname:zhangsan status:<span class="number">1</span>&gt;</span><br><span class="line"><span class="keyword">from</span> weibo.models <span class="keyword">import</span> Weibo </span><br><span class="line"> weibo = Weibo.objects.create(user=user,content=<span class="string">'微博内容'</span>)</span><br><span class="line">weibo.pk</span><br><span class="line">Out[<span class="number">8</span>]: <span class="number">1</span></span><br></pre></td></tr></tbody></table></figure>
 <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> weibo.models <span class="keyword">import</span> Comment</span><br><span class="line">Comment.objects.create(user=user,weibo=weibo,content=<span class="string">'zhangsan 评论'</span>)</span><br><span class="line">Out[<span class="number">10</span>]: &lt;Comment: Comment object&gt;</span><br><span class="line">Comment.objects.create(user=user,weibo=weibo,content=<span class="string">'zhangsan 评论2'</span>)</span><br><span class="line">Out[<span class="number">11</span>]: &lt;Comment: Comment object&gt;</span><br><span class="line">lisi = User.objects.get(pk=<span class="number">5</span>)</span><br><span class="line">Comment.objects.create(user=lisi,weibo=weibo,content=<span class="string">'lisi评论'</span>)</span><br><span class="line">Out[<span class="number">13</span>]: &lt;Comment: Comment object&gt;</span><br><span class="line">Comment.objects.create(user=lisi,weibo=weibo,content=<span class="string">'lisi评论2'</span>)</span><br><span class="line">Out[<span class="number">14</span>]: &lt;Comment: Comment object&gt;</span><br></pre></td></tr></tbody></table></figure><script>
@@ -284,8 +305,8 @@
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2020/08/21/kong-3/" rel="next" title="Gunicorn">
-                  Gunicorn <i class="fa fa-chevron-right"></i>
+                <a href="/2020/08/21/flask-restful-xiang-mu/" rel="next" title="flask restful项目">
+                  flask restful项目 <i class="fa fa-chevron-right"></i>
                 </a>
             </div>
           </div>

@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<meta name="hexo-config" content="{&quot;hostname&quot;:&quot;bubbleboy11.github.io&quot;,&quot;root&quot;:&quot;/&quot;,&quot;images&quot;:&quot;/images&quot;,&quot;scheme&quot;:&quot;Muse&quot;,&quot;version&quot;:&quot;8.3.0&quot;,&quot;exturl&quot;:false,&quot;sidebar&quot;:{&quot;position&quot;:&quot;left&quot;,&quot;display&quot;:&quot;post&quot;,&quot;padding&quot;:18,&quot;offset&quot;:12},&quot;copycode&quot;:true,&quot;bookmark&quot;:{&quot;enable&quot;:false,&quot;color&quot;:&quot;#222&quot;,&quot;save&quot;:&quot;auto&quot;},&quot;fancybox&quot;:false,&quot;mediumzoom&quot;:false,&quot;lazyload&quot;:false,&quot;pangu&quot;:false,&quot;comments&quot;:{&quot;style&quot;:&quot;tabs&quot;,&quot;active&quot;:null,&quot;storage&quot;:true,&quot;lazyload&quot;:false,&quot;nav&quot;:null},&quot;motion&quot;:{&quot;enable&quot;:true,&quot;async&quot;:false,&quot;transition&quot;:{&quot;post_block&quot;:&quot;fadeIn&quot;,&quot;post_header&quot;:&quot;fadeInDown&quot;,&quot;post_body&quot;:&quot;fadeInDown&quot;,&quot;coll_header&quot;:&quot;fadeInLeft&quot;,&quot;sidebar&quot;:&quot;fadeInUp&quot;}},&quot;prism&quot;:false,&quot;i18n&quot;:{&quot;placeholder&quot;:&quot;搜索...&quot;,&quot;empty&quot;:&quot;没有找到任何搜索结果：${query}&quot;,&quot;hits_time&quot;:&quot;找到 ${hits} 个搜索结果（用时 ${time} 毫秒）&quot;,&quot;hits&quot;:&quot;找到 ${hits} 个搜索结果&quot;}}">
+<meta name="description" content="了解并实现PageObeject自动化设计模式  一种在测试自动化中变得流行的设计模式，使得自动化测试脚本的减少代码重复、更易读、减少维护成本页面、操作、脚本、case 分开  PO三层模式 第一层 对 Selenium进行二次封装，定义一个所有页面都继承的BasePage 封装 Selenium基本方法例如:元素定位，元素等待，导航页面。 不需要全部封装，用到多少方法就封装多少方法。  第二层">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PageObject框架设计">
+<meta property="og:url" content="https://bubbleboy11.github.io/2021/05/02/pageobject-kuang-jia-she-ji/index.html">
+<meta property="og:site_name" content="外心人D的博客">
+<meta property="og:description" content="了解并实现PageObeject自动化设计模式  一种在测试自动化中变得流行的设计模式，使得自动化测试脚本的减少代码重复、更易读、减少维护成本页面、操作、脚本、case 分开  PO三层模式 第一层 对 Selenium进行二次封装，定义一个所有页面都继承的BasePage 封装 Selenium基本方法例如:元素定位，元素等待，导航页面。 不需要全部封装，用到多少方法就封装多少方法。  第二层">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-05-01T17:46:44.000Z">
+<meta property="article:modified_time" content="2021-05-02T03:52:22.860Z">
+<meta property="article:author" content="外心人D">
+<meta property="article:tag" content="测试">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://bubbleboy11.github.io/2021/05/02/pageobject-kuang-jia-she-ji/">
+
+
+
+<meta name="hexo-config-page" content="{&quot;sidebar&quot;:&quot;&quot;,&quot;isHome&quot;:false,&quot;isPost&quot;:true,&quot;lang&quot;:&quot;zh-CN&quot;}">
+<meta name="hexo-config-calendar" content="">
+<script data-pjax src="/js/load-config.js"></script>
+  <title>PageObject框架设计 | 外心人D的博客</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="外心人D的博客" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">外心人D的博客</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E5%B1%82"><span class="nav-text">第一层</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E5%B1%82"><span class="nav-text">第二层</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AC%AC%E4%B8%89%E5%B1%82"><span class="nav-text">第三层</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">外心人D</p>
+  <div class="site-description" itemprop="description">本博客大多内容为慕课和网上博客，并非原创</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">228</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/05/02/pageobject-kuang-jia-she-ji/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          PageObject框架设计
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-05-01 17:46:44" itemprop="dateCreated datePublished" datetime="2021-05-01T17:46:44Z">2021-05-01</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-05-02 03:52:22" itemprop="dateModified" datetime="2021-05-02T03:52:22Z">2021-05-02</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%97%85%E6%B8%B8%E7%BD%91%E9%A1%B9%E7%9B%AE/" itemprop="url" rel="index"><span itemprop="name">旅游网项目</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>了解并实现PageObeject自动化设计模式</p>
+<ul>
+<li>一种在测试自动化中变得流行的设计模式，使得自动化测试脚本的减少代码重复、更易读、减少维护成本<br>页面、操作、脚本、case 分开</li>
+</ul>
+<p>PO三层模式</p>
+<h4 id="第一层"><a href="#第一层" class="headerlink" title="第一层"></a>第一层</h4><ul>
+<li>对 Selenium进行二次封装，定义一个所有页面都继承的<code>BasePage</code></li>
+<li>封装 Selenium基本方法例如:元素定位，元素等待，导航页面。</li>
+<li>不需要全部封装，用到多少方法就封装多少方法。</li>
+</ul>
+<h4 id="第二层"><a href="#第二层" class="headerlink" title="第二层"></a>第二层</h4><ul>
+<li>页面元素迸行分离，每个元素只定位一次，隔离定位，如果页面改变，只需要改变相应的元素定位。</li>
+<li>业务逻辑分离或操作元素动作分离。</li>
+</ul>
+<h4 id="第三层"><a href="#第三层" class="headerlink" title="第三层"></a>第三层</h4><ul>
+<li>使用单元测试unittest框架对业务逻辑进行测试</li>
+</ul>
+<p>PO设计模式的优点</p>
+<ul>
+<li>页面频繁变化，导致页面U元素频繁变动，元素定位改变。</li>
+<li>传统线性自动化，多个用例脚本中需要反复的定位同一个元素。</li>
+<li>修改元素定位时容易维护</li>
+</ul>
+<p><code>traveltest\pages\base_page.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> selenium <span class="keyword">import</span> webdriver</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BasePage</span>():</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    第一层 basepage层 定义一个所有页面都继承的page层</span></span><br><span class="line"><span class="string">    对selenium我们要使用的底层方法进行一次封装</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, driver, path=None</span>):</span></span><br><span class="line">        <span class="comment"># 为了方便编写，把driver初始化，后续改回来</span></span><br><span class="line">        driver_path = <span class="string">'C:\\Users\\rose\\Downloads\\msedgedriver.exe'</span></span><br><span class="line">        <span class="comment"># self.driver = webdriver.Edge(driver_path)</span></span><br><span class="line">        self.driver = driver</span><br><span class="line">        self.driver.implicitly_wait(<span class="number">10</span>)  <span class="comment"># 隐式等待10秒</span></span><br><span class="line">        self.load_page(path)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">load_page</span>(<span class="params">self, path=None</span>):</span></span><br><span class="line">        <span class="keyword">if</span> path:</span><br><span class="line">            self.driver.get(path)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">by_xpath</span>(<span class="params">self, xpath</span>):</span></span><br><span class="line">        <span class="keyword">return</span> self.driver.find_element_by_xpath(xpath)</span><br></pre></td></tr></tbody></table></figure>
+
+
+<p><code>traveltest（实战项目第七节后）\pages\first_page.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> selenium <span class="keyword">import</span> webdriver</span><br><span class="line"><span class="keyword">from</span> pages.base_page <span class="keyword">import</span> BasePage</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FirstPage</span>(<span class="params">BasePage</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    第二层</span></span><br><span class="line"><span class="string">    各个页面单独封装成层，页面的元素、操作、流程</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">direct_to_login</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="comment"># 跳转至登录页：点击 我的</span></span><br><span class="line">        <span class="keyword">return</span> self.by_xpath(<span class="string">"//*[@id='app']/div[1]/div[5]/div[3]"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">direct_to_product</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="comment"># 点击 首页</span></span><br><span class="line">        <span class="keyword">return</span> self.by_xpath(<span class="string">"//*[@id='app']/div[1]/div[5]/div[1]"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 方法流程</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">cross_to_login</span>(<span class="params">self</span>):</span></span><br><span class="line">        self.direct_to_login().click()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">cross_to_product</span>(<span class="params">self</span>):</span></span><br><span class="line">        self.direct_to_product().click()</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>traveltest（实战项目第七节后）\pages\login_page.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> selenium <span class="keyword">import</span> webdriver</span><br><span class="line"><span class="keyword">from</span> pages.base_page <span class="keyword">import</span> BasePage</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LoginPage</span>(<span class="params">BasePage</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    第二层</span></span><br><span class="line"><span class="string">    各个页面单独封装成层，页面的元素、操作、流程</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">login_username</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="comment"># 登录，输入用户名</span></span><br><span class="line">        <span class="keyword">return</span> self.by_xpath(</span><br><span class="line">            <span class="string">"//*[@id='app']/div[1]/form/div[1]/div[2]/div/input"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">login_pass</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="comment"># 登录，输入密码</span></span><br><span class="line">        <span class="keyword">return</span> self.by_xpath(</span><br><span class="line">            <span class="string">"//*[@id='app']/div[1]/form/div[2]/div[2]/div/input"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">login_button</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="comment"># 点击登录</span></span><br><span class="line">        <span class="keyword">return</span> self.by_xpath(<span class="string">"//*[@id='app']/div[1]/form/div[3]/button"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 登录</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">login</span>(<span class="params">self, username, password</span>):</span></span><br><span class="line">        self.login_username().send_keys(username)</span><br><span class="line">        self.login_pass().send_keys(password)</span><br><span class="line">        self.login_button().click()</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>traveltest（实战项目第七节后）\pages\order_page.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> selenium <span class="keyword">import</span> webdriver</span><br><span class="line"><span class="keyword">from</span> pages.base_page <span class="keyword">import</span> BasePage</span><br><span class="line"><span class="keyword">from</span> time <span class="keyword">import</span> sleep</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">OrderPage</span>(<span class="params">BasePage</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    第二层</span></span><br><span class="line"><span class="string">    各个页面单独封装成层，页面的元素、操作、流程</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">product</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> self.by_xpath(<span class="string">"//*[@id='app']/div[1]/div[4]/div[2]/a[1]"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">ticket_book</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> self.by_xpath(<span class="string">"//*[@id='app']/div[1]/div[5]/div[2]/div[2]/a"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">book_date</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> self.by_xpath(</span><br><span class="line">            <span class="string">"//*[@id='app']/div[1]/form/div[1]/div[1]/div[2]/div/input"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">to_order</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> self.by_xpath(<span class="string">"//*[@id='app']/div[1]/form/div[4]/div/button"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">pay_off</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> self.by_xpath(<span class="string">"//*[@id='app']/div[1]/form/div/div/button"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">confirm</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> self.by_xpath(<span class="string">"/html/body/div[5]/div[3]/button[2]"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 下单成功</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">place_order</span>(<span class="params">self</span>):</span></span><br><span class="line">        self.product().click()</span><br><span class="line">        self.ticket_book().click()</span><br><span class="line">        self.book_date().send_keys(<span class="string">"2021-05-01"</span>)</span><br><span class="line">        self.to_order().click()</span><br><span class="line">        sleep(<span class="number">2</span>)</span><br><span class="line">        el = self.pay_off()</span><br><span class="line">        self.driver.execute_script(<span class="string">'arguments[0].click()'</span>, el)</span><br><span class="line">        sleep(<span class="number">2</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>traveltest（实战项目第七节后）\test_travel_po.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> unittest</span><br><span class="line"><span class="keyword">from</span> selenium <span class="keyword">import</span> webdriver</span><br><span class="line"><span class="keyword">from</span> time <span class="keyword">import</span> sleep</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> pages.first_page <span class="keyword">import</span> FirstPage</span><br><span class="line"><span class="keyword">from</span> pages.login_page <span class="keyword">import</span> LoginPage</span><br><span class="line"><span class="keyword">from</span> pages.order_page <span class="keyword">import</span> OrderPage</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TestTravel</span>(<span class="params">unittest.TestCase</span>):</span></span><br><span class="line">    <span class="comment"># 初始化操作 打开浏览器&amp;浏览器设置</span></span><br><span class="line">    <span class="comment"># 最终结束操作 关闭浏览器</span></span><br><span class="line">    <span class="comment"># 第三层</span></span><br><span class="line">    <span class="comment"># 用例分为 登录、下单两个部分</span></span><br><span class="line"><span class="meta">    @classmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">setUpClass</span>(<span class="params">cls</span>):</span></span><br><span class="line">        <span class="comment"># driver_path = 'C:\\Users\\rose\\Downloads\\msedgedriver.exe'</span></span><br><span class="line">        driver_path = <span class="string">'C:\\Users\\rose\\Downloads\\chromedriver.exe'</span></span><br><span class="line">        <span class="comment"># cls.dr = webdriver.Edge(driver_path)</span></span><br><span class="line">        cls.dr = webdriver.Chrome(driver_path)</span><br><span class="line">        cls.dr.maximize_window()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">test_a_order</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="comment"># 初始化参数</span></span><br><span class="line">        username = <span class="string">'13500000001'</span></span><br><span class="line">        password = <span class="string">'Success@2020'</span></span><br><span class="line">        <span class="comment"># 初始化界面</span></span><br><span class="line">        first_page = FirstPage(driver=self.dr,</span><br><span class="line">                               path=<span class="string">"http://django.t.mukewang.com/#/"</span>)</span><br><span class="line">        login_page = LoginPage(driver=self.dr)</span><br><span class="line">        order_page = OrderPage(driver=self.dr)</span><br><span class="line">        <span class="comment"># 跳转登录</span></span><br><span class="line">        first_page.cross_to_login()</span><br><span class="line">        <span class="comment"># 登录</span></span><br><span class="line">        login_page.login(username, password)</span><br><span class="line">        <span class="comment"># 跳转至首页</span></span><br><span class="line">        first_page.cross_to_product()</span><br><span class="line">        <span class="comment"># 下单</span></span><br><span class="line">        order_page.place_order()</span><br><span class="line"></span><br><span class="line"><span class="meta">    @classmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">tearDownClass</span>(<span class="params">cls</span>):</span></span><br><span class="line">        cls.dr.quit()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    unittest.main()</span><br></pre></td></tr></tbody></table></figure>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%B5%8B%E8%AF%95/" rel="tag"># 测试</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/05/01/django-web-ui-ce-shi/" rel="prev" title="django web ui测试">
+                  <i class="fa fa-chevron-left"></i> django web ui测试
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/05/03/shu-ju-qu-dong-zai-zi-dong-hua-ce-shi-zhong-de-ying-yong/" rel="next" title="数据驱动在自动化测试中的应用">
+                  数据驱动在自动化测试中的应用 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+<script src="/js/comments.js"></script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">外心人D</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

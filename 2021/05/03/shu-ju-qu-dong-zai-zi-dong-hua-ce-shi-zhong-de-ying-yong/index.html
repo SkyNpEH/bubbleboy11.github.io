@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<meta name="hexo-config" content="{&quot;hostname&quot;:&quot;bubbleboy11.github.io&quot;,&quot;root&quot;:&quot;/&quot;,&quot;images&quot;:&quot;/images&quot;,&quot;scheme&quot;:&quot;Muse&quot;,&quot;version&quot;:&quot;8.3.0&quot;,&quot;exturl&quot;:false,&quot;sidebar&quot;:{&quot;position&quot;:&quot;left&quot;,&quot;display&quot;:&quot;post&quot;,&quot;padding&quot;:18,&quot;offset&quot;:12},&quot;copycode&quot;:true,&quot;bookmark&quot;:{&quot;enable&quot;:false,&quot;color&quot;:&quot;#222&quot;,&quot;save&quot;:&quot;auto&quot;},&quot;fancybox&quot;:false,&quot;mediumzoom&quot;:false,&quot;lazyload&quot;:false,&quot;pangu&quot;:false,&quot;comments&quot;:{&quot;style&quot;:&quot;tabs&quot;,&quot;active&quot;:null,&quot;storage&quot;:true,&quot;lazyload&quot;:false,&quot;nav&quot;:null},&quot;motion&quot;:{&quot;enable&quot;:true,&quot;async&quot;:false,&quot;transition&quot;:{&quot;post_block&quot;:&quot;fadeIn&quot;,&quot;post_header&quot;:&quot;fadeInDown&quot;,&quot;post_body&quot;:&quot;fadeInDown&quot;,&quot;coll_header&quot;:&quot;fadeInLeft&quot;,&quot;sidebar&quot;:&quot;fadeInUp&quot;}},&quot;prism&quot;:false,&quot;i18n&quot;:{&quot;placeholder&quot;:&quot;搜索...&quot;,&quot;empty&quot;:&quot;没有找到任何搜索结果：${query}&quot;,&quot;hits_time&quot;:&quot;找到 ${hits} 个搜索结果（用时 ${time} 毫秒）&quot;,&quot;hits&quot;:&quot;找到 ${hits} 个搜索结果&quot;}}">
+<meta name="description" content="数据驱动在自动化测试中的应用自动化测试模型介绍 线性测试：每个测试脚本相对独立，一个脚本文件都是独立编写测试内容等，任何一个脚本都可以拿出来单独执行。开发和维护的成本很高  模块化驱动测试：把重复的操作单独成立公关模块。如登陆模块，写好之后后续用例只需要调用对应模块即可。较好的解决了脚本重复问题。分为PageObject和分层模式。分层模式，设计思维从页面模式中抽离，做成业务化的思维，业务流程横跨">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据驱动在自动化测试中的应用">
+<meta property="og:url" content="https://bubbleboy11.github.io/2021/05/03/shu-ju-qu-dong-zai-zi-dong-hua-ce-shi-zhong-de-ying-yong/index.html">
+<meta property="og:site_name" content="外心人D的博客">
+<meta property="og:description" content="数据驱动在自动化测试中的应用自动化测试模型介绍 线性测试：每个测试脚本相对独立，一个脚本文件都是独立编写测试内容等，任何一个脚本都可以拿出来单独执行。开发和维护的成本很高  模块化驱动测试：把重复的操作单独成立公关模块。如登陆模块，写好之后后续用例只需要调用对应模块即可。较好的解决了脚本重复问题。分为PageObject和分层模式。分层模式，设计思维从页面模式中抽离，做成业务化的思维，业务流程横跨">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-05-02T17:46:44.000Z">
+<meta property="article:modified_time" content="2021-05-02T06:09:20.744Z">
+<meta property="article:author" content="外心人D">
+<meta property="article:tag" content="测试">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://bubbleboy11.github.io/2021/05/03/shu-ju-qu-dong-zai-zi-dong-hua-ce-shi-zhong-de-ying-yong/">
+
+
+
+<meta name="hexo-config-page" content="{&quot;sidebar&quot;:&quot;&quot;,&quot;isHome&quot;:false,&quot;isPost&quot;:true,&quot;lang&quot;:&quot;zh-CN&quot;}">
+<meta name="hexo-config-calendar" content="">
+<script data-pjax src="/js/load-config.js"></script>
+  <title>数据驱动在自动化测试中的应用 | 外心人D的博客</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="外心人D的博客" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">外心人D的博客</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E9%A9%B1%E5%8A%A8%E5%9C%A8%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8"><span class="nav-text">数据驱动在自动化测试中的应用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E6%A8%A1%E5%9E%8B%E4%BB%8B%E7%BB%8D"><span class="nav-text">自动化测试模型介绍</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">外心人D</p>
+  <div class="site-description" itemprop="description">本博客大多内容为慕课和网上博客，并非原创</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">228</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/05/03/shu-ju-qu-dong-zai-zi-dong-hua-ce-shi-zhong-de-ying-yong/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          数据驱动在自动化测试中的应用
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2021-05-02 17:46:44 / 修改时间：06:09:20" itemprop="dateCreated datePublished" datetime="2021-05-02T17:46:44Z">2021-05-02</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%97%85%E6%B8%B8%E7%BD%91%E9%A1%B9%E7%9B%AE/" itemprop="url" rel="index"><span itemprop="name">旅游网项目</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="数据驱动在自动化测试中的应用"><a href="#数据驱动在自动化测试中的应用" class="headerlink" title="数据驱动在自动化测试中的应用"></a>数据驱动在自动化测试中的应用</h1><h2 id="自动化测试模型介绍"><a href="#自动化测试模型介绍" class="headerlink" title="自动化测试模型介绍"></a>自动化测试模型介绍</h2><ul>
+<li><p><code>线性</code>测试：每个测试脚本相对独立，一个脚本文件都是独立编写测试内容等，任何一个脚本都可以拿出来单独执行。开发和维护的成本很高</p>
+</li>
+<li><p><code>模块化驱动</code>测试：把重复的操作单独成立公关模块。如登陆模块，写好之后后续用例只需要调用对应模块即可。较好的解决了脚本重复问题。分为PageObject和分层模式。分层模式，设计思维从页面模式中抽离，做成业务化的思维，业务流程横跨多个界面只要是固化流程就好</p>
+</li>
+<li><p><code>数据驱动</code>测试：针对测试数据改变而影响数据驱动测试而提出的。就是将测试数据做成参数化。<br>不仅解决脚本重复的问题，还增加了可重用性和可维护性。<br>测试数据改的时不需要修改测试代码</p>
+</li>
+<li><p><code>关键字驱动</code>测试：市面的很多工具、平台等都是关键字模式。<br>将底层代码封装，给用户提供独立的图形界面。<br>减少编写代码，从而降低脚本的编写难度</p>
+</li>
+<li><p>数据驱动的应用</p>
+</li>
+</ul>
+<p><code>traveltest（实战项目第七节后）\test_login_ddt.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> unittest</span><br><span class="line"><span class="keyword">from</span> selenium <span class="keyword">import</span> webdriver</span><br><span class="line"><span class="keyword">from</span> time <span class="keyword">import</span> sleep</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> pages.first_page <span class="keyword">import</span> FirstPage</span><br><span class="line"><span class="keyword">from</span> pages.login_page <span class="keyword">import</span> LoginPage</span><br><span class="line"><span class="keyword">from</span> pages.order_page <span class="keyword">import</span> OrderPage</span><br><span class="line"><span class="keyword">from</span> ddt <span class="keyword">import</span> ddt, data</span><br><span class="line"><span class="keyword">from</span> xlrd <span class="keyword">import</span> open_workbook</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">getExcelData</span>():</span></span><br><span class="line">    excelFile = open_workbook(<span class="string">"d:/data.xlsx"</span>)</span><br><span class="line">    <span class="comment"># 获取excel的工作簿</span></span><br><span class="line">    sheet = excelFile.sheet_by_index(<span class="number">0</span>)</span><br><span class="line">    <span class="comment"># 获取行数</span></span><br><span class="line">    rowNumber = sheet.nrows</span><br><span class="line">    dataList = []</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, rowNumber):  <span class="comment"># 第一行是表头，从第二行开始</span></span><br><span class="line">        dataList.append(sheet.row_values(i))</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> dataList</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@ddt</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TestTravel</span>(<span class="params">unittest.TestCase</span>):</span></span><br><span class="line">    <span class="comment"># 初始化操作 打开浏览器&amp;浏览器设置</span></span><br><span class="line">    <span class="comment"># 最终结束操作 关闭浏览器</span></span><br><span class="line">    <span class="comment"># 用例分为 登录、下单两个部分</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">setUp</span>(<span class="params">self</span>):</span>  <span class="comment"># self 每次重新打开浏览器</span></span><br><span class="line">        driver_path = <span class="string">'C:\\Users\\rose\\Downloads\\chromedriver.exe'</span></span><br><span class="line">        cls.dr = webdriver.Chrome(driver_path)</span><br><span class="line">        self.dr.maximize_window()</span><br><span class="line"></span><br><span class="line"><span class="meta">    @data(*getExcelData())</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">test_login_ddt</span>(<span class="params">self, data</span>):</span></span><br><span class="line">        <span class="comment"># 初始化参数</span></span><br><span class="line">        username, password = tuple(data)</span><br><span class="line">        <span class="comment"># 初始化界面</span></span><br><span class="line">        first_page = FirstPage(driver=self.dr,</span><br><span class="line">                               path=<span class="string">"http://django.t.mukewang.com/#/"</span>)</span><br><span class="line">        login_page = LoginPage(driver=self.dr)</span><br><span class="line">        order_page = OrderPage(driver=self.dr)</span><br><span class="line">        <span class="comment"># 跳转登录</span></span><br><span class="line">        first_page.cross_to_login()</span><br><span class="line">        <span class="comment"># 登录</span></span><br><span class="line">        login_page.login(username, password)</span><br><span class="line">        sleep(<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">tearDown</span>(<span class="params">self</span>):</span>  <span class="comment"># self 每次重新打开浏览器并关闭</span></span><br><span class="line">        self.dr.quit()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    unittest.main()</span><br></pre></td></tr></tbody></table></figure><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%B5%8B%E8%AF%95/" rel="tag"># 测试</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/05/02/pageobject-kuang-jia-she-ji/" rel="prev" title="PageObject框架设计">
+                  <i class="fa fa-chevron-left"></i> PageObject框架设计
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/05/03/ce-shi-bao-gao-shi-zhan/" rel="next" title="测试报告实战">
+                  测试报告实战 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+<script src="/js/comments.js"></script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">外心人D</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
