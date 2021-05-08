@@ -118,7 +118,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">228</span>
+          <span class="site-state-item-count">231</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -158,6 +158,230 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/04/04/django-yong-hu-guan-li/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/04/04/django-yong-hu-guan-li/" class="post-title-link" itemprop="url">django用户管理</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-04-04 07:39:20" itemprop="dateCreated datePublished" datetime="2021-04-04T07:39:20Z">2021-04-04</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-05-07 09:06:19" itemprop="dateModified" datetime="2021-05-07T09:06:19Z">2021-05-07</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%97%85%E6%B8%B8%E7%BD%91%E9%A1%B9%E7%9B%AE/" itemprop="url" rel="index"><span itemprop="name">旅游网项目</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="django用户管理"><a href="#django用户管理" class="headerlink" title="django用户管理"></a>django用户管理</h2><h2 id="实现步骤"><a href="#实现步骤" class="headerlink" title="实现步骤"></a>实现步骤</h2><h3 id="自定义用户管理类"><a href="#自定义用户管理类" class="headerlink" title="自定义用户管理类"></a>自定义用户管理类</h3><p><code>trip\accounts\admin.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyUserAdmin</span>():</span></span><br><span class="line">    <span class="keyword">pass</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="继承自UserAdmin"><a href="#继承自UserAdmin" class="headerlink" title="继承自UserAdmin"></a>继承自<code>UserAdmin</code></h3><p><code>trip\accounts\admin.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.contrib.auth.admin <span class="keyword">import</span> UserAdmin</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyUserAdmin</span>(<span class="params">UserAdmin</span>):</span></span><br><span class="line">    <span class="keyword">pass</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="配置列表显示字段、搜索字段"><a href="#配置列表显示字段、搜索字段" class="headerlink" title="配置列表显示字段、搜索字段"></a>配置列表显示字段、搜索字段</h3><p>通过装饰器注册把模型注册到后台管理，可在admin后台对模型字段数据进行增删改查<br><code>trip\accounts\admin.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.contrib <span class="keyword">import</span> admin</span><br><span class="line"><span class="keyword">from</span> django.contrib.auth.admin <span class="keyword">import</span> UserAdmin</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> accounts.models <span class="keyword">import</span> User</span><br><span class="line"><span class="comment"># Register your models here.</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@admin.register(User)</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyUserAdmin</span>(<span class="params">UserAdmin</span>):</span></span><br><span class="line">    <span class="string">""" 用户基础信息管理 """</span></span><br><span class="line">    <span class="comment"># 列表中显示的内容</span></span><br><span class="line">    list_display = (<span class="string">'username'</span>, <span class="string">'nickname'</span>, <span class="string">'is_active'</span>, <span class="string">'is_staff'</span>,</span><br><span class="line">                    <span class="string">'date_joined'</span>)</span><br><span class="line">    <span class="comment"># 搜索字段</span></span><br><span class="line">    search_fields = (</span><br><span class="line">        <span class="string">'username'</span>,</span><br><span class="line">        <span class="string">'nickname'</span>,</span><br><span class="line">    )</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="增加user表单列表增加显示昵称字段"><a href="#增加user表单列表增加显示昵称字段" class="headerlink" title="增加user表单列表增加显示昵称字段"></a>增加user表单列表增加显示昵称字段</h3><p>通过装饰器注册把模型注册到后台管理，可在admin后台对模型字段数据进行增删改查<br><code>trip\accounts\admin.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.contrib <span class="keyword">import</span> admin</span><br><span class="line"><span class="keyword">from</span> django.contrib.auth.admin <span class="keyword">import</span> UserAdmin</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> accounts.models <span class="keyword">import</span> User</span><br><span class="line"><span class="comment"># Register your models here.</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@admin.register(User)</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyUserAdmin</span>(<span class="params">UserAdmin</span>):</span></span><br><span class="line">    <span class="string">""" 用户基础信息管理 """</span></span><br><span class="line">    <span class="comment"># 新增的表单</span></span><br><span class="line">    add_fieldsets = UserAdmin.add_fieldsets + ((<span class="literal">None</span>, {</span><br><span class="line">        <span class="string">'fields'</span>: (<span class="string">'nickname'</span>, )</span><br><span class="line">    }), )</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2021/04/04/django-yong-hu-guan-li/0.png" alt="description"><br><img src="/2021/04/04/django-yong-hu-guan-li/1.png" alt="description"></p>
+<h3 id="修改user表单列表增加显示昵称字段和头像"><a href="#修改user表单列表增加显示昵称字段和头像" class="headerlink" title="修改user表单列表增加显示昵称字段和头像"></a>修改user表单列表增加显示昵称字段和头像</h3><p>通过装饰器注册把模型注册到后台管理，可在admin后台对模型字段数据进行增删改查<br><code>trip\accounts\admin.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.contrib <span class="keyword">import</span> admin</span><br><span class="line"><span class="keyword">from</span> django.contrib.auth.admin <span class="keyword">import</span> UserAdmin</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> accounts.models <span class="keyword">import</span> User</span><br><span class="line"><span class="comment"># Register your models here.</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@admin.register(User)</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyUserAdmin</span>(<span class="params">UserAdmin</span>):</span></span><br><span class="line">    <span class="string">""" 用户基础信息管理 """</span></span><br><span class="line">    <span class="comment"># 修改的表单</span></span><br><span class="line">    fieldsets = UserAdmin.fieldsets + ((<span class="literal">None</span>, {</span><br><span class="line">        <span class="string">'fields'</span>: (<span class="string">'nickname'</span>, <span class="string">'avatar'</span>)</span><br><span class="line">    }), )</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2021/04/04/django-yong-hu-guan-li/2.png" alt="description"></p>
+<h3 id="批量禁用-启用选中用户-商品"><a href="#批量禁用-启用选中用户-商品" class="headerlink" title="批量禁用/启用选中用户/商品"></a>批量禁用/启用选中用户/商品</h3><p>我们需要选择一批对象，然后执行某个操作。</p>
+<ul>
+<li><p>第一步：在相关的类中 定义操作函数 添加自定义方法 </p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">My</span>():</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">action_name</span>(<span class="params">modeladmin, request, queryset</span>):</span></span><br><span class="line">        <span class="keyword">pass</span></span><br></pre></td></tr></tbody></table></figure></li>
+<li><p>第二步：命名动作界面显示的操作名称</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">aciton_name.short_description = <span class="string">'将选中的商品下线'</span></span><br></pre></td></tr></tbody></table></figure>
+</li>
+<li><p>第三步：配置<code>ModelAdmin</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ProductAdmin</span>(<span class="params">admin.ModelAdmin</span>):</span></span><br><span class="line">    actions = [<span class="string">'action_name'</span>]</span><br></pre></td></tr></tbody></table></figure>
+
+</li>
+</ul>
+<p>通过装饰器注册把模型注册到后台管理，可在admin后台对模型字段数据进行增删改查<br><code>trip\accounts\admin.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@admin.register(User)</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyUserAdmin</span>(<span class="params">UserAdmin</span>):</span></span><br><span class="line">    <span class="string">""" 用户基础信息管理 """</span></span><br><span class="line">    actions = [<span class="string">'disable_user'</span>, <span class="string">'enable_user'</span>]</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">disable_user</span>(<span class="params">self, request, queryset</span>):</span></span><br><span class="line">        <span class="string">""" 批量禁用用户 """</span></span><br><span class="line">        queryset.update(is_active=<span class="literal">False</span>)</span><br><span class="line">    <span class="comment"># 命名动作界面显示的操作名称</span></span><br><span class="line">    disable_user.short_description = <span class="string">'批量禁用用户'</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">enable_user</span>(<span class="params">self, request, queryset</span>):</span></span><br><span class="line">        <span class="string">""" 批量启用用户 """</span></span><br><span class="line">        queryset.update(is_active=<span class="literal">True</span>)</span><br><span class="line">    <span class="comment"># 命名动作界面显示的操作名称</span></span><br><span class="line">    enable_user.short_description = <span class="string">'批量启用用户'</span></span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2021/04/04/django-yong-hu-guan-li/3.png" alt="description"></p>
+<h4 id="法二"><a href="#法二" class="headerlink" title="法二"></a>法二</h4><p>另一种方法是单独建立一个定义函数，同时类中的actions引用该函数。<br>这样该定义函数就可以被其他的类也同时使用。</p>
+<p>在公用的包中新增公用的自定义函数模块<code>admin_actions.py</code></p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/04/04/edge-flag/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/04/04/edge-flag/" class="post-title-link" itemprop="url">edge flag</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-04-03 16:21:41" itemprop="dateCreated datePublished" datetime="2021-04-03T16:21:41Z">2021-04-03</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-04-21 11:29:42" itemprop="dateModified" datetime="2021-04-21T11:29:42Z">2021-04-21</time>
+      </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h3 id="edge-flag"><a href="#edge-flag" class="headerlink" title="edge flag"></a>edge flag</h3><ul>
+<li>Parallel downloading</li>
+<li>Global Media Controls</li>
+<li>Global Media Controls Picture-in-Picture</li>
+<li>Tab Hover Cards</li>
+<li>tab groups</li>
+</ul>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1086,231 +1310,8 @@
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/04/01/lu-you-wang-men-piao-zhi-fu-jie-kou-lian-diao/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/04/01/lu-you-wang-men-piao-zhi-fu-jie-kou-lian-diao/" class="post-title-link" itemprop="url">旅游网门票支付接口联调</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-04-01 15:29:44" itemprop="dateCreated datePublished" datetime="2021-04-01T15:29:44Z">2021-04-01</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-05-02 12:31:04" itemprop="dateModified" datetime="2021-05-02T12:31:04Z">2021-05-02</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%97%85%E6%B8%B8%E7%BD%91%E9%A1%B9%E7%9B%AE/" itemprop="url" rel="index"><span itemprop="name">旅游网项目</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h2 id="门票支付接口联调"><a href="#门票支付接口联调" class="headerlink" title="门票支付接口联调"></a>门票支付接口联调</h2><h4 id="实现步骤"><a href="#实现步骤" class="headerlink" title="实现步骤"></a>实现步骤</h4><ul>
-<li>第一步，阅读接口文档</li>
-<li>第二步，配置接口地址<br>在填写订单提交之后跳转订单支付页面，会把流水id从url传递到订单支付页面，显示订单下面的门票的信息，通过ajax的http的get请求获取订单的详细信息，通过ajax的post请求点击立即支付，跳转到我的订单列表<br><code>src\utils\apis.js</code><figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> SightApis = {</span><br><span class="line">  <span class="comment">// 订单详情、订单支付、订单删除、订单取消</span></span><br><span class="line">  orderDetailUrl: apiHost + <span class="string">'/order/order/detail/#{sn}/'</span>,</span><br><span class="line">}</span><br><span class="line"><span class="keyword">export</span> {</span><br><span class="line">  OrderApis</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-</li>
-</ul>
-<p><code>src\views\order\Pay.vue</code></p>
-<figure class="highlight html"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 订单确认及支付 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"page-order-pay"</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- 订单号 --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">van-cell</span> <span class="attr">title</span>=<span class="string">"订单号"</span> <span class="attr">:value</span>=<span class="string">"sn"</span> <span class="attr">class</span>=<span class="string">"order-mum"</span> /&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- 描述信息 --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"order-info"</span> <span class="attr">v-for</span>=<span class="string">"item in orderDetail.items"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">:key</span>=<span class="string">"item.pk"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"left"</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">h3</span>&gt;</span>{{ item.flash_name }}<span class="tag">&lt;/<span class="name">h3</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">div</span>&gt;</span><span class="tag">&lt;<span class="name">van-icon</span> <span class="attr">name</span>=<span class="string">"clock-o"</span> /&gt;</span> {{ item.remark }}<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">      <span class="comment">&lt;!-- &lt;div class="tips"&gt;短信接收&lt;/div&gt; --&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"right"</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">van-icon</span> <span class="attr">name</span>=<span class="string">"arrow"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- //描述信息 --&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- 提交表单 --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">van-submit-bar</span> <span class="attr">:price</span>=<span class="string">"orderDetail.buy_amount * 100"</span> <span class="attr">button-text</span>=<span class="string">"立即支付"</span> @<span class="attr">submit</span>=<span class="string">"onSubmit"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure>
-<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { OrderApis } <span class="keyword">from</span> <span class="string">'@/utils/apis'</span></span><br><span class="line"><span class="keyword">import</span> { ajax } <span class="keyword">from</span> <span class="string">'@/utils/ajax'</span></span><br><span class="line"><span class="keyword">import</span> * <span class="keyword">as</span> constants <span class="keyword">from</span> <span class="string">'@/utils/constants'</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> {</span><br><span class="line">  data () {</span><br><span class="line">    <span class="keyword">return</span> {</span><br><span class="line">      <span class="comment">// 订单的流水号</span></span><br><span class="line">      sn: <span class="string">''</span>,</span><br><span class="line">      <span class="comment">// 订单的信息</span></span><br><span class="line">      orderDetail: {}</span><br><span class="line">    }</span><br><span class="line">  },</span><br><span class="line">  methods: {</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 获取订单的详细信息</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    getOrderDetail () {</span><br><span class="line">      <span class="comment">// SightApis.ticketDetailUrl的#{sn}替换为通过created函数里面从url中动态传递过来的sn</span></span><br><span class="line">      <span class="keyword">const</span> url = OrderApis.orderDetailUrl.replace(<span class="string">'#{sn}'</span>, <span class="built_in">this</span>.sn)</span><br><span class="line">      ajax.get(url).then(<span class="function">(<span class="params">{ data }</span>) =&gt;</span> {</span><br><span class="line">        <span class="built_in">this</span>.orderDetail = data</span><br><span class="line">      })</span><br><span class="line">    },</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 确认支付</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    onSubmit () {</span><br><span class="line">      <span class="built_in">this</span>.$dialog.confirm({</span><br><span class="line">        title: <span class="string">'温馨提示'</span>,</span><br><span class="line">        message: <span class="string">`确认支付<span class="subst">${<span class="built_in">this</span>.orderDetail.buy_amount}</span>吗？`</span></span><br><span class="line">      }).then(<span class="function">() =&gt;</span> {</span><br><span class="line">        <span class="keyword">const</span> url = OrderApis.orderDetailUrl.replace(<span class="string">'#{sn}'</span>, <span class="built_in">this</span>.sn)</span><br><span class="line">        <span class="comment">// 调用支付接口</span></span><br><span class="line">        ajax.post(url).then(<span class="function">() =&gt;</span> {</span><br><span class="line">          <span class="comment">// 提示语</span></span><br><span class="line">          <span class="built_in">this</span>.$notify({</span><br><span class="line">            type: <span class="string">'success'</span>,</span><br><span class="line">            message: <span class="string">'支付成功, 已为您跳转到订单列表'</span></span><br><span class="line">          })</span><br><span class="line">          <span class="comment">// 跳转到我的订单列表</span></span><br><span class="line">          <span class="built_in">this</span>.$router.replace({ <span class="attr">name</span>: <span class="string">'OrderList'</span>, <span class="attr">params</span>: { <span class="attr">status</span>: constants.ORDER_STATUS_ALL}})</span><br><span class="line">        })</span><br><span class="line">      })</span><br><span class="line">    },</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 后退</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    goBack () {</span><br><span class="line">      <span class="built_in">this</span>.$dialog.confirm({</span><br><span class="line">        title: <span class="string">'温馨提示'</span>,</span><br><span class="line">        message: <span class="string">'您还没有支付，确认放弃支付吗？'</span></span><br><span class="line">      }).then(<span class="function">() =&gt;</span> {</span><br><span class="line">        <span class="built_in">this</span>.$router.go(<span class="number">-1</span>)</span><br><span class="line">        <span class="comment">// on confirm</span></span><br><span class="line">      })</span><br><span class="line">    },</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 取消订单</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    onCancelOrder () {</span><br><span class="line">      <span class="built_in">this</span>.$dialog.confirm({</span><br><span class="line">        title: <span class="string">'温馨提示'</span>,</span><br><span class="line">        message: <span class="string">'确认取消该订单？'</span></span><br><span class="line">      }).then(<span class="function">() =&gt;</span> {</span><br><span class="line">        <span class="comment">// TODO 调用接口on confirm</span></span><br><span class="line">        <span class="built_in">this</span>.$router.go(<span class="number">-1</span>)</span><br><span class="line">      })</span><br><span class="line">    }</span><br><span class="line">  },</span><br><span class="line">  created () {</span><br><span class="line">    <span class="comment">// 组件被挂载或创建的时候获取订单流水号</span></span><br><span class="line">    <span class="built_in">this</span>.sn = <span class="built_in">this</span>.$route.params.sn</span><br><span class="line">    <span class="comment">// 获取订单信息</span></span><br><span class="line">    <span class="built_in">this</span>.getOrderDetail()</span><br><span class="line">  }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-<ul>
-<li>第三步，使用axios获取数据</li>
-<li>第四步，将数据设置到模型层</li>
-</ul>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/04/01/lu-you-wang-men-piao-xiang-xi-xin-xi-jie-kou-lian-diao/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/04/01/lu-you-wang-men-piao-xiang-xi-xin-xi-jie-kou-lian-diao/" class="post-title-link" itemprop="url">门票详细信息接口联调</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-04-01 11:19:44" itemprop="dateCreated datePublished" datetime="2021-04-01T11:19:44Z">2021-04-01</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-05-02 12:30:45" itemprop="dateModified" datetime="2021-05-02T12:30:45Z">2021-05-02</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%97%85%E6%B8%B8%E7%BD%91%E9%A1%B9%E7%9B%AE/" itemprop="url" rel="index"><span itemprop="name">旅游网项目</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="门票详细信息接口联调"><a href="#门票详细信息接口联调" class="headerlink" title="门票详细信息接口联调"></a>门票详细信息接口联调</h1><h4 id="实现步骤"><a href="#实现步骤" class="headerlink" title="实现步骤"></a>实现步骤</h4><ul>
-<li>第一步，阅读接口文档</li>
-<li>第二步，配置接口地址<br><code>src\utils\apis.js</code><figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> SightApis = {</span><br><span class="line">  <span class="comment">// 门票详情</span></span><br><span class="line">  ticketDetailUrl: apiHost + <span class="string">'/sight/ticket/detail/#{id}/'</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> {</span><br><span class="line">  SightApis</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-</li>
-</ul>
-<p><code>src\components\sight\TicketTips.vue</code></p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;!-- 门票的预订须知弹框内容 --&gt;</span><br><span class="line">  &lt;div class="ticket-tips-box"&gt;</span><br><span class="line">    &lt;h3&gt;预订须知&lt;/h3&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;h4&gt;有效期&lt;/h4&gt;</span><br><span class="line">      &lt;p&gt;{{ ticketDetail.expire_date }} 日内有效&lt;/p&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;h4&gt;退改政策&lt;/h4&gt;</span><br><span class="line">      &lt;p&gt;{{ ticketDetail.return_policy }}&lt;/p&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;h4&gt;发票&lt;/h4&gt;</span><br><span class="line">      &lt;p v-if="ticketDetail.has_invoice"&gt;我司提供发票&lt;/p&gt;</span><br><span class="line">      &lt;p v-else&gt;不提供发票&lt;/p&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;h4&gt;预订须知&lt;/h4&gt;</span><br><span class="line">      &lt;div v-html="ticketDetail.tips" v-if="ticketDetail.tips"&gt;&lt;/div&gt;</span><br><span class="line">      &lt;div v-else&gt;</span><br><span class="line">        暂无</span><br><span class="line">      &lt;/div&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;h4&gt;入园方式&lt;/h4&gt;</span><br><span class="line">      &lt;p&gt;{{ ticketDetail.entry_way }}&lt;/p&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div v-if="ticketDetail.remark"&gt;</span><br><span class="line">      &lt;h4&gt;备注信息&lt;/h4&gt;</span><br><span class="line">      &lt;p&gt;{{ ticketDetail.remark }}&lt;/p&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">export default {</span><br><span class="line">  props: ['ticketDetail']</span><br><span class="line">}</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>src\views\order\Submit.vue</code></p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;!-- 填写订单 --&gt;</span><br><span class="line">  &lt;div class="page-order-submit"&gt;</span><br><span class="line">    &lt;!-- 页面导航 --&gt;</span><br><span class="line">    &lt;van-nav-bar title="填写订单"</span><br><span class="line">      left-text="返回"</span><br><span class="line">      left-arrow</span><br><span class="line">      @click-left="goBack"/&gt;</span><br><span class="line">    &lt;!-- 描述信息 --&gt;</span><br><span class="line">    &lt;div class="order-info"&gt;</span><br><span class="line">      &lt;div class="left"&gt;</span><br><span class="line">        &lt;h3&gt;{{ ticketDetail.name }}&lt;/h3&gt;</span><br><span class="line">        &lt;div class="tips"&gt;{{ ticketDetail.desc }}&lt;/div&gt;</span><br><span class="line">        &lt;div class="tags"&gt;</span><br><span class="line">          &lt;span&gt;</span><br><span class="line">            &lt;van-icon name="clock-o" /&gt;明日可定</span><br><span class="line">          &lt;/span&gt;</span><br><span class="line">          &lt;span&gt;</span><br><span class="line">            &lt;van-icon name="clock-o" /&gt;条件退</span><br><span class="line">          &lt;/span&gt;</span><br><span class="line">        &lt;/div&gt;</span><br><span class="line">      &lt;/div&gt;</span><br><span class="line">      &lt;div class="right"&gt;</span><br><span class="line">        &lt;div class="text-warning"&gt;￥{{ ticketDetail.sell_price }}/张&lt;/div&gt;</span><br><span class="line">        &lt;van-button plain hairline type="info"</span><br><span class="line">          size="mini"</span><br><span class="line">          @click="showPopup=true"&gt;预订须知&lt;/van-button&gt;</span><br><span class="line">        &lt;van-popup</span><br><span class="line">          v-model="showPopup"</span><br><span class="line">          closeable</span><br><span class="line">          position="bottom"</span><br><span class="line">          :style="{ height: '80%' }"</span><br><span class="line">        &gt;</span><br><span class="line">          &lt;TicketTips :ticketDetail="ticketDetail"/&gt;</span><br><span class="line">        &lt;/van-popup&gt;</span><br><span class="line">      &lt;/div&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;!-- //描述信息 --&gt;</span><br><span class="line">    &lt;!-- 提交表单 --&gt;</span><br><span class="line">    &lt;van-form @submit="onSubmit" class="form-box"&gt;</span><br><span class="line">      &lt;van-cell-group class="form-group"&gt;</span><br><span class="line">        &lt;van-cell title="选择出行日期"</span><br><span class="line">          :value="form.play_date"</span><br><span class="line">          @click="showCalendar = true" /&gt;</span><br><span class="line">        &lt;van-calendar v-model="showCalendar" @confirm="onConfirm" /&gt;</span><br><span class="line">      &lt;/van-cell-group&gt;</span><br><span class="line">      &lt;van-cell-group class="form-group"&gt;</span><br><span class="line">        &lt;van-cell title="购买数量"&gt;</span><br><span class="line">          &lt;van-stepper v-model="form.buy_count" integer min="1"/&gt;</span><br><span class="line">        &lt;/van-cell&gt;</span><br><span class="line">      &lt;/van-cell-group&gt;</span><br><span class="line">      &lt;van-cell-group class="form-group"&gt;</span><br><span class="line">        &lt;van-field</span><br><span class="line">          v-model="form.to_user"</span><br><span class="line">          type="text"</span><br><span class="line">          label="收件人"</span><br><span class="line">          placeholder="输入收件人"</span><br><span class="line">          :rules="[{ required: true, message: '请输入收件人' }]"</span><br><span class="line">        /&gt;</span><br><span class="line">        &lt;van-field</span><br><span class="line">          v-model="form.to_phone"</span><br><span class="line">          type="text"</span><br><span class="line">          label="手机号码"</span><br><span class="line">          placeholder="输入手机号码"</span><br><span class="line">          :rules="[{ required: true, message: '请输入手机号码' }]"</span><br><span class="line">        /&gt;</span><br><span class="line">      &lt;/van-cell-group&gt;</span><br><span class="line">      &lt;van-submit-bar :price="totalPrice" button-text="提交订单"/&gt;</span><br><span class="line">    &lt;/van-form&gt;</span><br><span class="line">    &lt;!-- //提交表单 --&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import { OrderApis, SightApis } from '@/utils/apis'</span><br><span class="line">import { ajax } from '@/utils/ajax'</span><br><span class="line">import { mapState } from 'vuex'</span><br><span class="line">import TicketTips from '@/components/sight/TicketTips'</span><br><span class="line">export default {</span><br><span class="line">  components: {</span><br><span class="line">    TicketTips</span><br><span class="line">  },</span><br><span class="line">  data () {</span><br><span class="line">    return {</span><br><span class="line">      // 门票ID</span><br><span class="line">      id: '',</span><br><span class="line">      // 预订须知弹框显示</span><br><span class="line">      showPopup: false,</span><br><span class="line">      // 日期选择弹框</span><br><span class="line">      showCalendar: false,</span><br><span class="line">      // 门票的详细信息</span><br><span class="line">      ticketDetail: {},</span><br><span class="line">      form: {</span><br><span class="line">        play_date: '',</span><br><span class="line">        buy_count: 1,</span><br><span class="line">        to_user: '',</span><br><span class="line">        to_phone: ''</span><br><span class="line">      }</span><br><span class="line">    }</span><br><span class="line">  },</span><br><span class="line">  computed: {</span><br><span class="line">    /**</span><br><span class="line">     * 计算总价</span><br><span class="line">     */</span><br><span class="line">    totalPrice () {</span><br><span class="line">      return this.ticketDetail.sell_price * this.form.buy_count * 100</span><br><span class="line">    },</span><br><span class="line">    /**</span><br><span class="line">     * 从vuex读取手机号码</span><br><span class="line">     */</span><br><span class="line">    ...mapState({</span><br><span class="line">      phoneNum: state =&gt; state.user.username,</span><br><span class="line">      nickname: state =&gt; state.user.nickname</span><br><span class="line">    })</span><br><span class="line">  },</span><br><span class="line">  methods: {</span><br><span class="line">    /**</span><br><span class="line">     * 门票详情</span><br><span class="line">     */</span><br><span class="line">    getTicketDetail () {</span><br><span class="line">      // SightApis.ticketDetailUrl的#{id}替换为通过created函数里面从url中动态传递过来的id</span><br><span class="line">      const url = SightApis.ticketDetailUrl.replace('#{id}', this.id)</span><br><span class="line">      ajax.get(url).then(({ data }) =&gt; {</span><br><span class="line">        this.ticketDetail = data</span><br><span class="line">      })</span><br><span class="line">    },</span><br><span class="line">    onSubmit () {</span><br><span class="line">      console.log('提交表单')</span><br><span class="line">      // ajax接口的调用</span><br><span class="line">      ajax.post(OrderApis.ticketSubmitUrl, {</span><br><span class="line">        ticket_id: this.id, // 通过url传递动态参数</span><br><span class="line">        ...this.form</span><br><span class="line">      }).then(({ data }) =&gt; {</span><br><span class="line">        // 提示用户</span><br><span class="line">        this.$notify({</span><br><span class="line">          type: 'success',</span><br><span class="line">          message: '提交成功，请支付'</span><br><span class="line">        })</span><br><span class="line">        // 跳转到待支付的页面，会把流水id从url传递到支付页面，防止点击后退的时候再去重复提交一个相同的订单</span><br><span class="line">        this.$router.replace({ name: 'OrderPay', params: { sn: data.sn } })</span><br><span class="line">      })</span><br><span class="line">    },</span><br><span class="line">    formatDate (date) {</span><br><span class="line">      return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`</span><br><span class="line">    },</span><br><span class="line">    /**</span><br><span class="line">     * 选择日期</span><br><span class="line">     */</span><br><span class="line">    onConfirm (date) {</span><br><span class="line">      // 隐藏日历弹框</span><br><span class="line">      this.showCalendar = false</span><br><span class="line">      // 保存数据</span><br><span class="line">      this.form.play_date = this.formatDate(date)</span><br><span class="line">    },</span><br><span class="line">    goBack () {</span><br><span class="line">      this.$router.go(-1)</span><br><span class="line">    }</span><br><span class="line">  },</span><br><span class="line">  created () {</span><br><span class="line">    // 门票ID</span><br><span class="line">    this.id = this.$route.params.id</span><br><span class="line">    this.form.to_user = this.nickname || ''</span><br><span class="line">    this.form.to_phone = this.phoneNum || ''</span><br><span class="line">    // 获取门票信息</span><br><span class="line">    this.getTicketDetail()</span><br><span class="line">  }</span><br><span class="line">}</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></tbody></table></figure>
-
-<ul>
-<li>第三步，使用axios获取数据</li>
-<li>第四步，将数据设置到模型层</li>
-</ul>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/5/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/page/7/">7</a><span class="space">&hellip;</span><a class="page-number" href="/page/23/">23</a><a class="extend next" rel="next" href="/page/7/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/5/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/page/7/">7</a><span class="space">&hellip;</span><a class="page-number" href="/page/24/">24</a><a class="extend next" rel="next" href="/page/7/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 <script src="/js/comments.js"></script>
 </div>

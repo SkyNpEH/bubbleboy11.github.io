@@ -118,7 +118,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">228</span>
+          <span class="site-state-item-count">231</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -158,6 +158,229 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/04/01/lu-you-wang-men-piao-zhi-fu-jie-kou-lian-diao/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/04/01/lu-you-wang-men-piao-zhi-fu-jie-kou-lian-diao/" class="post-title-link" itemprop="url">旅游网门票支付接口联调</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-04-01 15:29:44" itemprop="dateCreated datePublished" datetime="2021-04-01T15:29:44Z">2021-04-01</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-05-02 12:31:04" itemprop="dateModified" datetime="2021-05-02T12:31:04Z">2021-05-02</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%97%85%E6%B8%B8%E7%BD%91%E9%A1%B9%E7%9B%AE/" itemprop="url" rel="index"><span itemprop="name">旅游网项目</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="门票支付接口联调"><a href="#门票支付接口联调" class="headerlink" title="门票支付接口联调"></a>门票支付接口联调</h2><h4 id="实现步骤"><a href="#实现步骤" class="headerlink" title="实现步骤"></a>实现步骤</h4><ul>
+<li>第一步，阅读接口文档</li>
+<li>第二步，配置接口地址<br>在填写订单提交之后跳转订单支付页面，会把流水id从url传递到订单支付页面，显示订单下面的门票的信息，通过ajax的http的get请求获取订单的详细信息，通过ajax的post请求点击立即支付，跳转到我的订单列表<br><code>src\utils\apis.js</code><figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> SightApis = {</span><br><span class="line">  <span class="comment">// 订单详情、订单支付、订单删除、订单取消</span></span><br><span class="line">  orderDetailUrl: apiHost + <span class="string">'/order/order/detail/#{sn}/'</span>,</span><br><span class="line">}</span><br><span class="line"><span class="keyword">export</span> {</span><br><span class="line">  OrderApis</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+</li>
+</ul>
+<p><code>src\views\order\Pay.vue</code></p>
+<figure class="highlight html"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 订单确认及支付 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"page-order-pay"</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- 订单号 --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">van-cell</span> <span class="attr">title</span>=<span class="string">"订单号"</span> <span class="attr">:value</span>=<span class="string">"sn"</span> <span class="attr">class</span>=<span class="string">"order-mum"</span> /&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- 描述信息 --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"order-info"</span> <span class="attr">v-for</span>=<span class="string">"item in orderDetail.items"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">:key</span>=<span class="string">"item.pk"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"left"</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">h3</span>&gt;</span>{{ item.flash_name }}<span class="tag">&lt;/<span class="name">h3</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">div</span>&gt;</span><span class="tag">&lt;<span class="name">van-icon</span> <span class="attr">name</span>=<span class="string">"clock-o"</span> /&gt;</span> {{ item.remark }}<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">      <span class="comment">&lt;!-- &lt;div class="tips"&gt;短信接收&lt;/div&gt; --&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"right"</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">van-icon</span> <span class="attr">name</span>=<span class="string">"arrow"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- //描述信息 --&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- 提交表单 --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">van-submit-bar</span> <span class="attr">:price</span>=<span class="string">"orderDetail.buy_amount * 100"</span> <span class="attr">button-text</span>=<span class="string">"立即支付"</span> @<span class="attr">submit</span>=<span class="string">"onSubmit"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { OrderApis } <span class="keyword">from</span> <span class="string">'@/utils/apis'</span></span><br><span class="line"><span class="keyword">import</span> { ajax } <span class="keyword">from</span> <span class="string">'@/utils/ajax'</span></span><br><span class="line"><span class="keyword">import</span> * <span class="keyword">as</span> constants <span class="keyword">from</span> <span class="string">'@/utils/constants'</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> {</span><br><span class="line">  data () {</span><br><span class="line">    <span class="keyword">return</span> {</span><br><span class="line">      <span class="comment">// 订单的流水号</span></span><br><span class="line">      sn: <span class="string">''</span>,</span><br><span class="line">      <span class="comment">// 订单的信息</span></span><br><span class="line">      orderDetail: {}</span><br><span class="line">    }</span><br><span class="line">  },</span><br><span class="line">  methods: {</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 获取订单的详细信息</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    getOrderDetail () {</span><br><span class="line">      <span class="comment">// SightApis.ticketDetailUrl的#{sn}替换为通过created函数里面从url中动态传递过来的sn</span></span><br><span class="line">      <span class="keyword">const</span> url = OrderApis.orderDetailUrl.replace(<span class="string">'#{sn}'</span>, <span class="built_in">this</span>.sn)</span><br><span class="line">      ajax.get(url).then(<span class="function">(<span class="params">{ data }</span>) =&gt;</span> {</span><br><span class="line">        <span class="built_in">this</span>.orderDetail = data</span><br><span class="line">      })</span><br><span class="line">    },</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 确认支付</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    onSubmit () {</span><br><span class="line">      <span class="built_in">this</span>.$dialog.confirm({</span><br><span class="line">        title: <span class="string">'温馨提示'</span>,</span><br><span class="line">        message: <span class="string">`确认支付<span class="subst">${<span class="built_in">this</span>.orderDetail.buy_amount}</span>吗？`</span></span><br><span class="line">      }).then(<span class="function">() =&gt;</span> {</span><br><span class="line">        <span class="keyword">const</span> url = OrderApis.orderDetailUrl.replace(<span class="string">'#{sn}'</span>, <span class="built_in">this</span>.sn)</span><br><span class="line">        <span class="comment">// 调用支付接口</span></span><br><span class="line">        ajax.post(url).then(<span class="function">() =&gt;</span> {</span><br><span class="line">          <span class="comment">// 提示语</span></span><br><span class="line">          <span class="built_in">this</span>.$notify({</span><br><span class="line">            type: <span class="string">'success'</span>,</span><br><span class="line">            message: <span class="string">'支付成功, 已为您跳转到订单列表'</span></span><br><span class="line">          })</span><br><span class="line">          <span class="comment">// 跳转到我的订单列表</span></span><br><span class="line">          <span class="built_in">this</span>.$router.replace({ <span class="attr">name</span>: <span class="string">'OrderList'</span>, <span class="attr">params</span>: { <span class="attr">status</span>: constants.ORDER_STATUS_ALL}})</span><br><span class="line">        })</span><br><span class="line">      })</span><br><span class="line">    },</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 后退</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    goBack () {</span><br><span class="line">      <span class="built_in">this</span>.$dialog.confirm({</span><br><span class="line">        title: <span class="string">'温馨提示'</span>,</span><br><span class="line">        message: <span class="string">'您还没有支付，确认放弃支付吗？'</span></span><br><span class="line">      }).then(<span class="function">() =&gt;</span> {</span><br><span class="line">        <span class="built_in">this</span>.$router.go(<span class="number">-1</span>)</span><br><span class="line">        <span class="comment">// on confirm</span></span><br><span class="line">      })</span><br><span class="line">    },</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 取消订单</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    onCancelOrder () {</span><br><span class="line">      <span class="built_in">this</span>.$dialog.confirm({</span><br><span class="line">        title: <span class="string">'温馨提示'</span>,</span><br><span class="line">        message: <span class="string">'确认取消该订单？'</span></span><br><span class="line">      }).then(<span class="function">() =&gt;</span> {</span><br><span class="line">        <span class="comment">// TODO 调用接口on confirm</span></span><br><span class="line">        <span class="built_in">this</span>.$router.go(<span class="number">-1</span>)</span><br><span class="line">      })</span><br><span class="line">    }</span><br><span class="line">  },</span><br><span class="line">  created () {</span><br><span class="line">    <span class="comment">// 组件被挂载或创建的时候获取订单流水号</span></span><br><span class="line">    <span class="built_in">this</span>.sn = <span class="built_in">this</span>.$route.params.sn</span><br><span class="line">    <span class="comment">// 获取订单信息</span></span><br><span class="line">    <span class="built_in">this</span>.getOrderDetail()</span><br><span class="line">  }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+<ul>
+<li>第三步，使用axios获取数据</li>
+<li>第四步，将数据设置到模型层</li>
+</ul>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/04/01/lu-you-wang-men-piao-xiang-xi-xin-xi-jie-kou-lian-diao/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/04/01/lu-you-wang-men-piao-xiang-xi-xin-xi-jie-kou-lian-diao/" class="post-title-link" itemprop="url">门票详细信息接口联调</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-04-01 11:19:44" itemprop="dateCreated datePublished" datetime="2021-04-01T11:19:44Z">2021-04-01</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-05-02 12:30:45" itemprop="dateModified" datetime="2021-05-02T12:30:45Z">2021-05-02</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%97%85%E6%B8%B8%E7%BD%91%E9%A1%B9%E7%9B%AE/" itemprop="url" rel="index"><span itemprop="name">旅游网项目</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="门票详细信息接口联调"><a href="#门票详细信息接口联调" class="headerlink" title="门票详细信息接口联调"></a>门票详细信息接口联调</h1><h4 id="实现步骤"><a href="#实现步骤" class="headerlink" title="实现步骤"></a>实现步骤</h4><ul>
+<li>第一步，阅读接口文档</li>
+<li>第二步，配置接口地址<br><code>src\utils\apis.js</code><figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> SightApis = {</span><br><span class="line">  <span class="comment">// 门票详情</span></span><br><span class="line">  ticketDetailUrl: apiHost + <span class="string">'/sight/ticket/detail/#{id}/'</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> {</span><br><span class="line">  SightApis</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+</li>
+</ul>
+<p><code>src\components\sight\TicketTips.vue</code></p>
+<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;!-- 门票的预订须知弹框内容 --&gt;</span><br><span class="line">  &lt;div class="ticket-tips-box"&gt;</span><br><span class="line">    &lt;h3&gt;预订须知&lt;/h3&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;h4&gt;有效期&lt;/h4&gt;</span><br><span class="line">      &lt;p&gt;{{ ticketDetail.expire_date }} 日内有效&lt;/p&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;h4&gt;退改政策&lt;/h4&gt;</span><br><span class="line">      &lt;p&gt;{{ ticketDetail.return_policy }}&lt;/p&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;h4&gt;发票&lt;/h4&gt;</span><br><span class="line">      &lt;p v-if="ticketDetail.has_invoice"&gt;我司提供发票&lt;/p&gt;</span><br><span class="line">      &lt;p v-else&gt;不提供发票&lt;/p&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;h4&gt;预订须知&lt;/h4&gt;</span><br><span class="line">      &lt;div v-html="ticketDetail.tips" v-if="ticketDetail.tips"&gt;&lt;/div&gt;</span><br><span class="line">      &lt;div v-else&gt;</span><br><span class="line">        暂无</span><br><span class="line">      &lt;/div&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;h4&gt;入园方式&lt;/h4&gt;</span><br><span class="line">      &lt;p&gt;{{ ticketDetail.entry_way }}&lt;/p&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div v-if="ticketDetail.remark"&gt;</span><br><span class="line">      &lt;h4&gt;备注信息&lt;/h4&gt;</span><br><span class="line">      &lt;p&gt;{{ ticketDetail.remark }}&lt;/p&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">export default {</span><br><span class="line">  props: ['ticketDetail']</span><br><span class="line">}</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>src\views\order\Submit.vue</code></p>
+<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;!-- 填写订单 --&gt;</span><br><span class="line">  &lt;div class="page-order-submit"&gt;</span><br><span class="line">    &lt;!-- 页面导航 --&gt;</span><br><span class="line">    &lt;van-nav-bar title="填写订单"</span><br><span class="line">      left-text="返回"</span><br><span class="line">      left-arrow</span><br><span class="line">      @click-left="goBack"/&gt;</span><br><span class="line">    &lt;!-- 描述信息 --&gt;</span><br><span class="line">    &lt;div class="order-info"&gt;</span><br><span class="line">      &lt;div class="left"&gt;</span><br><span class="line">        &lt;h3&gt;{{ ticketDetail.name }}&lt;/h3&gt;</span><br><span class="line">        &lt;div class="tips"&gt;{{ ticketDetail.desc }}&lt;/div&gt;</span><br><span class="line">        &lt;div class="tags"&gt;</span><br><span class="line">          &lt;span&gt;</span><br><span class="line">            &lt;van-icon name="clock-o" /&gt;明日可定</span><br><span class="line">          &lt;/span&gt;</span><br><span class="line">          &lt;span&gt;</span><br><span class="line">            &lt;van-icon name="clock-o" /&gt;条件退</span><br><span class="line">          &lt;/span&gt;</span><br><span class="line">        &lt;/div&gt;</span><br><span class="line">      &lt;/div&gt;</span><br><span class="line">      &lt;div class="right"&gt;</span><br><span class="line">        &lt;div class="text-warning"&gt;￥{{ ticketDetail.sell_price }}/张&lt;/div&gt;</span><br><span class="line">        &lt;van-button plain hairline type="info"</span><br><span class="line">          size="mini"</span><br><span class="line">          @click="showPopup=true"&gt;预订须知&lt;/van-button&gt;</span><br><span class="line">        &lt;van-popup</span><br><span class="line">          v-model="showPopup"</span><br><span class="line">          closeable</span><br><span class="line">          position="bottom"</span><br><span class="line">          :style="{ height: '80%' }"</span><br><span class="line">        &gt;</span><br><span class="line">          &lt;TicketTips :ticketDetail="ticketDetail"/&gt;</span><br><span class="line">        &lt;/van-popup&gt;</span><br><span class="line">      &lt;/div&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;!-- //描述信息 --&gt;</span><br><span class="line">    &lt;!-- 提交表单 --&gt;</span><br><span class="line">    &lt;van-form @submit="onSubmit" class="form-box"&gt;</span><br><span class="line">      &lt;van-cell-group class="form-group"&gt;</span><br><span class="line">        &lt;van-cell title="选择出行日期"</span><br><span class="line">          :value="form.play_date"</span><br><span class="line">          @click="showCalendar = true" /&gt;</span><br><span class="line">        &lt;van-calendar v-model="showCalendar" @confirm="onConfirm" /&gt;</span><br><span class="line">      &lt;/van-cell-group&gt;</span><br><span class="line">      &lt;van-cell-group class="form-group"&gt;</span><br><span class="line">        &lt;van-cell title="购买数量"&gt;</span><br><span class="line">          &lt;van-stepper v-model="form.buy_count" integer min="1"/&gt;</span><br><span class="line">        &lt;/van-cell&gt;</span><br><span class="line">      &lt;/van-cell-group&gt;</span><br><span class="line">      &lt;van-cell-group class="form-group"&gt;</span><br><span class="line">        &lt;van-field</span><br><span class="line">          v-model="form.to_user"</span><br><span class="line">          type="text"</span><br><span class="line">          label="收件人"</span><br><span class="line">          placeholder="输入收件人"</span><br><span class="line">          :rules="[{ required: true, message: '请输入收件人' }]"</span><br><span class="line">        /&gt;</span><br><span class="line">        &lt;van-field</span><br><span class="line">          v-model="form.to_phone"</span><br><span class="line">          type="text"</span><br><span class="line">          label="手机号码"</span><br><span class="line">          placeholder="输入手机号码"</span><br><span class="line">          :rules="[{ required: true, message: '请输入手机号码' }]"</span><br><span class="line">        /&gt;</span><br><span class="line">      &lt;/van-cell-group&gt;</span><br><span class="line">      &lt;van-submit-bar :price="totalPrice" button-text="提交订单"/&gt;</span><br><span class="line">    &lt;/van-form&gt;</span><br><span class="line">    &lt;!-- //提交表单 --&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import { OrderApis, SightApis } from '@/utils/apis'</span><br><span class="line">import { ajax } from '@/utils/ajax'</span><br><span class="line">import { mapState } from 'vuex'</span><br><span class="line">import TicketTips from '@/components/sight/TicketTips'</span><br><span class="line">export default {</span><br><span class="line">  components: {</span><br><span class="line">    TicketTips</span><br><span class="line">  },</span><br><span class="line">  data () {</span><br><span class="line">    return {</span><br><span class="line">      // 门票ID</span><br><span class="line">      id: '',</span><br><span class="line">      // 预订须知弹框显示</span><br><span class="line">      showPopup: false,</span><br><span class="line">      // 日期选择弹框</span><br><span class="line">      showCalendar: false,</span><br><span class="line">      // 门票的详细信息</span><br><span class="line">      ticketDetail: {},</span><br><span class="line">      form: {</span><br><span class="line">        play_date: '',</span><br><span class="line">        buy_count: 1,</span><br><span class="line">        to_user: '',</span><br><span class="line">        to_phone: ''</span><br><span class="line">      }</span><br><span class="line">    }</span><br><span class="line">  },</span><br><span class="line">  computed: {</span><br><span class="line">    /**</span><br><span class="line">     * 计算总价</span><br><span class="line">     */</span><br><span class="line">    totalPrice () {</span><br><span class="line">      return this.ticketDetail.sell_price * this.form.buy_count * 100</span><br><span class="line">    },</span><br><span class="line">    /**</span><br><span class="line">     * 从vuex读取手机号码</span><br><span class="line">     */</span><br><span class="line">    ...mapState({</span><br><span class="line">      phoneNum: state =&gt; state.user.username,</span><br><span class="line">      nickname: state =&gt; state.user.nickname</span><br><span class="line">    })</span><br><span class="line">  },</span><br><span class="line">  methods: {</span><br><span class="line">    /**</span><br><span class="line">     * 门票详情</span><br><span class="line">     */</span><br><span class="line">    getTicketDetail () {</span><br><span class="line">      // SightApis.ticketDetailUrl的#{id}替换为通过created函数里面从url中动态传递过来的id</span><br><span class="line">      const url = SightApis.ticketDetailUrl.replace('#{id}', this.id)</span><br><span class="line">      ajax.get(url).then(({ data }) =&gt; {</span><br><span class="line">        this.ticketDetail = data</span><br><span class="line">      })</span><br><span class="line">    },</span><br><span class="line">    onSubmit () {</span><br><span class="line">      console.log('提交表单')</span><br><span class="line">      // ajax接口的调用</span><br><span class="line">      ajax.post(OrderApis.ticketSubmitUrl, {</span><br><span class="line">        ticket_id: this.id, // 通过url传递动态参数</span><br><span class="line">        ...this.form</span><br><span class="line">      }).then(({ data }) =&gt; {</span><br><span class="line">        // 提示用户</span><br><span class="line">        this.$notify({</span><br><span class="line">          type: 'success',</span><br><span class="line">          message: '提交成功，请支付'</span><br><span class="line">        })</span><br><span class="line">        // 跳转到待支付的页面，会把流水id从url传递到支付页面，防止点击后退的时候再去重复提交一个相同的订单</span><br><span class="line">        this.$router.replace({ name: 'OrderPay', params: { sn: data.sn } })</span><br><span class="line">      })</span><br><span class="line">    },</span><br><span class="line">    formatDate (date) {</span><br><span class="line">      return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`</span><br><span class="line">    },</span><br><span class="line">    /**</span><br><span class="line">     * 选择日期</span><br><span class="line">     */</span><br><span class="line">    onConfirm (date) {</span><br><span class="line">      // 隐藏日历弹框</span><br><span class="line">      this.showCalendar = false</span><br><span class="line">      // 保存数据</span><br><span class="line">      this.form.play_date = this.formatDate(date)</span><br><span class="line">    },</span><br><span class="line">    goBack () {</span><br><span class="line">      this.$router.go(-1)</span><br><span class="line">    }</span><br><span class="line">  },</span><br><span class="line">  created () {</span><br><span class="line">    // 门票ID</span><br><span class="line">    this.id = this.$route.params.id</span><br><span class="line">    this.form.to_user = this.nickname || ''</span><br><span class="line">    this.form.to_phone = this.phoneNum || ''</span><br><span class="line">    // 获取门票信息</span><br><span class="line">    this.getTicketDetail()</span><br><span class="line">  }</span><br><span class="line">}</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></tbody></table></figure>
+
+<ul>
+<li>第三步，使用axios获取数据</li>
+<li>第四步，将数据设置到模型层</li>
+</ul>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -419,7 +642,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-05-01 02:01:50" itemprop="dateModified" datetime="2021-05-01T02:01:50Z">2021-05-01</time>
+        <time title="修改时间：2021-05-07 09:08:11" itemprop="dateModified" datetime="2021-05-07T09:08:11Z">2021-05-07</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -451,19 +674,23 @@
 </li>
 <li><p>两种方式解决用户问题</p>
 <ul>
-<li><p>方式1：使用OneToOneField对用户进行扩展</p>
-</li>
-<li><p>方式2：替换现有的用户模型</p>
-<ul>
-<li>步骤一：配置用户模型，告诉django框架<br><code>setting.py</code>  <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">AUTH_USER_MODEL = <span class="string">'accounts.User'</span></span><br></pre></td></tr></tbody></table></figure></li>
-<li>步骤二：继承自<code>AbstractUser</code>抽象模型，不会生成对应的数据表</li>
+<li>方式1：使用OneToOneField对用户进行扩展</li>
+<li>方式2：替换现有的用户模型<ul>
+<li>步骤一：配置用户模型，告诉django框架</li>
 </ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><code>setting.py</code>  </p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">AUTH_USER_MODEL = <span class="string">'accounts.User'</span></span><br></pre></td></tr></tbody></table></figure>
+
+<pre><code>- 步骤二：继承自`AbstractUser`抽象模型，不会生成对应的数据表
+</code></pre>
 <p><code>accounts\models.py</code></p>
 <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.contrib.auth.models <span class="keyword">import</span> AbstractUser</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">User</span>(<span class="params">AbstractUser</span>):</span></span><br><span class="line">```    </span><br><span class="line">    - 步骤三：添加字段，同步模型到数据库</span><br><span class="line">```bash</span><br><span class="line">python manage.py check</span><br><span class="line">python manage.py makemigrations</span><br><span class="line">python manage.py makemigrate</span><br></pre></td></tr></tbody></table></figure>
 <p>数据库生成表格<br><code>account_user</code>和<code>account_user_group</code>和<code>account_user_user_permissions</code></p>
-</li>
-</ul>
-</li>
+<ul>
 <li><p>创建普通用户 命令行输入命令</p>
 <figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python manage.py shell  // django控制台</span><br></pre></td></tr></tbody></table></figure>
 <p>或者pycharm的<code>Python Console</code><br>引入用户</p>
@@ -1175,266 +1402,8 @@
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/mvc/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/mvc/" class="post-title-link" itemprop="url">MVC</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-24 12:20:07" itemprop="dateModified" datetime="2021-04-24T12:20:07Z">2021-04-24</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>什么是 MVC模式？<br>mvc出现的意义就是解耦，比如：模型代表数据，视图代表展示层，控制器代表操作，<br>解耦数据、展示和操作。</p>
-<p>M=Mode 模型：负责业务对象和数据库的交互(ORM)。数据模型层，通常对数据加工和一些其它处理 ( 数据相关操作 )。<br>V=View 视图：负责与用户的交互展示，前端输出的内容,比如:颜色、文字、表单等等。视图层，跟用户交互的页面上东西。<br>一个视图的工作就是：从参数获取数据，装载一个HTML页面模板，然后将根据获取的数据对模板进行渲染。<br>C= Controller控制器：起到粘合剂的作用，接收请求参数调用模型和视图完成请求，C进行处理，与M和V进行交互，返回应答，实现的功能,比如:加减乘除、增删改写。业务处理层，处理业务逻辑。</p>
-<p>M:model，模型，和MVC中M功能相同，和数据库进行交互<br>V：view，视图，和MVC中C功能相同，接受请求，进行处理，和M和T进行交互，返回应答<br>T：Template模板，和MVC中V功能相同，产生HTML页面</p>
-<p>&nbsp; &nbsp; &nbsp;图解：典型的一个web框架使用MVC模式怎么处理请求。首先用户在浏览器输入url之后，后端web框架通过url的routes，寻找url匹配之后调用那个controller，在controller通过model跟数据库一个交互，然后通过调用view层去展示逻辑这里一般指模板渲染。但随着现在这种前后分离比较流行之后，视图层只是做序列化的工作。</p>
-<h3 id="ORM-Object-Relational-Mapping，对象关系映射"><a href="#ORM-Object-Relational-Mapping，对象关系映射" class="headerlink" title="ORM Object Relational Mapping，对象关系映射"></a>ORM Object Relational Mapping，对象关系映射</h3><p>&nbsp; &nbsp;用于实现业务对象与数据表中的字段映射 ，比较流行 Sqlalchemy / Django自带的 Django ORM / 轻量级Peewee 。<br>优势：代码更加面向对象面向对象的编程思想，代码量更少，灵活性高，方便扩充，提升开发效率。<br>◆少写(几乎不写)SQL,提升开发效率<br>◆支持多种类型的数据库,方便切换<br>◆ORM技术成熟,能解决绝大部分问题</p>
-<p>缺点：拼接对象比较耗时，有一定性能影响<br>一般都是优先使用 ORM 框架提升开发效率和可维护性</p>
-<p>Django框架提供了ORM来解决数据持久化问题，<br>因为Python是面向对象的编程语言，在Python程序中使用对象模型来保存数据，<br>而关系型数据库使用关系模型，用二维表来保存数据，这两种模型并不匹配。<br>使用ORM是为了实现对象模型到关系模型的<strong>双向转换</strong>，这样就不用在Python代码中书写SQL语句和游标操作，因为这些都会由ORM自动完成。</p>
-<p>模型类都直接或间接继承自<code>Model</code>类，<br>模型类跟关系型数据库的二维表对应，<br>模型对象跟表中的记录对应，<br>模型对象的属性跟表中的字段对应。</p>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/os-mo-kuai/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/os-mo-kuai/" class="post-title-link" itemprop="url">OS模块</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-25 04:49:24" itemprop="dateModified" datetime="2021-04-25T04:49:24Z">2021-04-25</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>OS模块 operating system 提供了不少与操作系统相关联的函数<br>sys: 通常用于命令行参数</p>
-<p>要使用这个模块，你必须先导入它，然后才可以调用相关的各种功能。<br>模块导入：<code>import os</code></p>
-<p>函数/变量描述<br>environ包含环境变量的映射</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">```sep```路径中使用的分隔符</span><br><span class="line">```pathsep```分隔不同路径的分隔符</span><br><span class="line">```linesep```行分隔符(\n'、\r'或\r\n')</span><br><span class="line">```urandom(n)```返回n个```的强加密随机数据</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">python中的```os.system(cmd)``` 可以执行系统命令，调用其它程序</span><br><span class="line"></span><br><span class="line">### Linux下面， python程序使用 ```os.system```来调用其它程序时，返回值是一个16位的数字， 低位字节 表示结束进程的信号数值，如果低8位字节值为0， 高8位字节表示退出码</span><br><span class="line">```py</span><br><span class="line">import os</span><br><span class="line">print(os.system('ifconfig'))</span><br></pre></td></tr></tbody></table></figure>
-<p>在Linux平台上 只需要在命令末尾加上shell后台运算符<code>&amp;</code>即可：</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">os.system(<span class="string">'ping www.baidu.com &amp;'</span>)</span><br></pre></td></tr></tbody></table></figure>
-<p>在aa文件夹下创建了bb,cc两个文件夹，并且用ls展示出来</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line">path = <span class="string">'/root/Download/dir/'</span></span><br><span class="line">pathb = <span class="string">'{}{}'</span>.format(path,<span class="string">'bb'</span>)</span><br><span class="line">pathc = <span class="string">'{}{}'</span>.format(path,<span class="string">'cc'</span>)</span><br><span class="line"> </span><br><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> os.path.exists(pathb):</span><br><span class="line">    os.system(<span class="string">"mkdir {}"</span>.format(pathb))</span><br><span class="line"> </span><br><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> os.path.exists(pathc):</span><br><span class="line">    os.system(<span class="string">"mkdir {}"</span>.format(pathc))</span><br><span class="line"> </span><br><span class="line">os.system(path)</span><br><span class="line"><span class="comment"># bb cc</span></span><br></pre></td></tr></tbody></table></figure>
-
-
-<h3 id="windows-下面，python程序使用-os-system来调用其它程序时，返回值就是被调用程序的退出码"><a href="#windows-下面，python程序使用-os-system来调用其它程序时，返回值就是被调用程序的退出码" class="headerlink" title="windows 下面，python程序使用 os.system来调用其它程序时，返回值就是被调用程序的退出码"></a>windows 下面，python程序使用 <code>os.system</code>来调用其它程序时，返回值就是被调用程序的退出码</h3><p>加不加<code>print()</code>都一样会在终端输出</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line">os.system(<span class="string">'ipconfig'</span>)</span><br><span class="line">print(os.system(<span class="string">'ipconfig'</span>))</span><br><span class="line">print(os.system(<span class="string">'dir'</span>))  <span class="comment"># 显示当前文件夹下的全部目录和文件夹</span></span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight plain"><figcaption><span>e:\\test\\test.txt')```  删除指定文件夹下的文件</span></figcaption><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">```os.system('rd e:\\test')```  删除一个空文件夹</span><br><span class="line">```os.system('taskkill  /F /IM chrome.exe')``` 关闭进程</span><br><span class="line"></span><br><span class="line">在python 中执行 ```os.system(“ping www.baidu.com”) ```等命令的时候会阻塞，</span><br><span class="line">它会等待 ```os.system``` 里的命令执行完才会返回。</span><br><span class="line">有的时候我们需要并行运行：</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">用DOS的```start```命令通常也能使命令并行启动：</span><br><span class="line">```py</span><br><span class="line">os.system('start ping www.baidu.com')  # 在终端显示结果</span><br><span class="line">os.system('start ping www.baidu.com')  # 弹出cmd程序运行 </span><br></pre></td></tr></tbody></table></figure>
-
-<h2 id="调用其它程序，并且判断其返回码"><a href="#调用其它程序，并且判断其返回码" class="headerlink" title="调用其它程序，并且判断其返回码"></a>调用其它程序，并且判断其返回码</h2><p>程序执行结束退出，会有一个退出码。通常表示程序是否正确执行退出，<br>如果执行成功，那么会返回<code>0</code>，表示命令执行成功<br> 不管是windows，Linux， Python使用 os.system 调用 其它程序，该程序的退出码如果是0，os.system 调用 返回码肯定也是0。判断调用这个程序是否成功。 那么只需要根据调用的返回值是否为零即可判断。</p>
-<h3 id="win"><a href="#win" class="headerlink" title="win"></a>win</h3><figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line">ret = os.system(<span class="string">'dir C:\\abc'</span>)</span><br><span class="line"><span class="keyword">if</span> ret==<span class="number">0</span>:</span><br><span class="line">    <span class="keyword">print</span> (<span class="string">'被调用程序正常退出'</span>)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    <span class="keyword">print</span> (<span class="string">'被调用程序异常退出'</span>)</span><br><span class="line"><span class="comment">#  驱动器 C 中的卷是 OS</span></span><br><span class="line"><span class="comment">#  卷的序列号是 127E-A945</span></span><br><span class="line"><span class="comment">#  C:\abc 的目录</span></span><br><span class="line"><span class="comment"># 2020/04/19  09:47    &lt;DIR&gt;          第2章 面试流程介绍</span></span><br><span class="line"><span class="comment"># 2020/03/01  22:17    &lt;DIR&gt;          网络工程师</span></span><br><span class="line"><span class="comment">#               14 个文件    337,432,340 字节</span></span><br><span class="line"><span class="comment">#               32 个目录 26,577,518,592 可用字节</span></span><br><span class="line"><span class="comment"># 被调用程序正常退出</span></span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line"><span class="comment"># path = 'C:/abc'  # win不支持</span></span><br><span class="line">path = <span class="string">'C:\\abc'</span>  </span><br><span class="line"> </span><br><span class="line"><span class="keyword">if</span> os.system(<span class="string">"dir {}"</span>.format(path)) == <span class="number">0</span>:</span><br><span class="line">    print(<span class="string">"return 0 represent success!"</span>)</span><br><span class="line"><span class="comment"># 2021/04/03  23:30    &lt;DIR&gt;          .</span></span><br><span class="line"><span class="comment"># 2021/04/03  23:30    &lt;DIR&gt;          ..</span></span><br><span class="line"><span class="comment"># 2020/03/31  18:34       187,965,472 AtomSetup-x64.exe</span></span><br><span class="line"><span class="comment"># 2021/02/24  13:00           330,823 Carefree_1.9.dsf</span></span><br><span class="line"><span class="comment">#               14 个文件    337,432,340 字节</span></span><br><span class="line"><span class="comment">#               32 个目录 26,576,957,440 可用字节</span></span><br><span class="line"><span class="comment"># return 0 represent success!</span></span><br></pre></td></tr></tbody></table></figure>
-
-<h3 id="linux"><a href="#linux" class="headerlink" title="linux"></a>linux</h3><figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#coding = utf-8</span></span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line">path = <span class="string">'/root/Downloads/dir/'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> os.system(<span class="string">"ls {}"</span>.format(path)) == <span class="number">0</span>:</span><br><span class="line">    print(<span class="string">"return 0 represent success!"</span>)</span><br></pre></td></tr></tbody></table></figure>
-
-<h2 id="调用其它程序，并且获取输出结果"><a href="#调用其它程序，并且获取输出结果" class="headerlink" title="调用其它程序，并且获取输出结果"></a>调用其它程序，并且获取输出结果</h2><p>如果想获取被调用的程序输出到终端的信息 并进行处理，可以使用 <code>subprocess</code>库里面的<code>check_output</code> 函数，参数<code>encoding</code>应该设置为该程序输出信息文本的编码方式。 很多程序通常会根据当前终端使用的字符编码格式来决定 输出文本的编码方式。<br>比如 通常在中文windows的cmd终端上，字符编码方式为 <code>gbk</code>，<br>正确指定了字符编码方式， <code>check_output</code> 函数 才能正确将 终端上输出的 文本字节串，解码为python里面的unicode字符串对象</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> subprocess</span><br><span class="line">info = subprocess.check_output(<span class="string">'dir'</span>, shell=<span class="literal">True</span>, encoding=<span class="string">'gbk'</span>)</span><br><span class="line">print(info)</span><br></pre></td></tr></tbody></table></figure>
-<figure class="highlight angelscript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"> 驱动器 C 中的卷是 OS</span><br><span class="line"> 卷的序列号是 <span class="number">127</span>E-A945</span><br><span class="line"></span><br><span class="line"> C:\python代码\牛客网剑指offer66题思路分析 的目录</span><br><span class="line"></span><br><span class="line"><span class="number">2021</span>/<span class="number">03</span>/<span class="number">08</span>  <span class="number">22</span>:<span class="number">18</span>    &lt;DIR&gt;          .</span><br><span class="line"><span class="number">2021</span>/<span class="number">03</span>/<span class="number">08</span>  <span class="number">22</span>:<span class="number">18</span>    &lt;DIR&gt;          ..</span><br><span class="line"><span class="number">2021</span>/<span class="number">02</span>/<span class="number">24</span>  <span class="number">11</span>:<span class="number">36</span>    &lt;DIR&gt;          .idea</span><br><span class="line"><span class="number">2020</span>/<span class="number">12</span>/<span class="number">26</span>  <span class="number">16</span>:<span class="number">18</span>    &lt;DIR&gt;          .pytest_cache</span><br><span class="line"><span class="number">2021</span>/<span class="number">01</span>/<span class="number">24</span>  <span class="number">10</span>:<span class="number">29</span>    &lt;DIR&gt;          .vscode</span><br><span class="line"><span class="number">2021</span>/<span class="number">03</span>/<span class="number">27</span>  <span class="number">20</span>:<span class="number">07</span>    &lt;DIR&gt;          <span class="number">6</span>大排序</span><br><span class="line"><span class="number">2021</span>/<span class="number">02</span>/<span class="number">25</span>  <span class="number">12</span>:<span class="number">52</span>    &lt;DIR&gt;          Python<span class="number">-100</span>-Days-master2021/<span class="number">01</span>/<span class="number">24</span>  <span class="number">21</span>:<span class="number">08</span>    &lt;DIR&gt;          python_data_structures_and_algorithms-master</span><br><span class="line"><span class="number">2021</span>/<span class="number">02</span>/<span class="number">18</span>  <span class="number">20</span>:<span class="number">36</span>    &lt;DIR&gt;          __pycache__</span><br><span class="line"><span class="number">2021</span>/<span class="number">04</span>/<span class="number">04</span>  <span class="number">16</span>:<span class="number">04</span>    &lt;DIR&gt;          代码</span><br><span class="line"><span class="number">2021</span>/<span class="number">03</span>/<span class="number">08</span>  <span class="number">20</span>:<span class="number">34</span>    &lt;DIR&gt;          图解说明</span><br><span class="line"><span class="number">2021</span>/<span class="number">02</span>/<span class="number">24</span>  <span class="number">11</span>:<span class="number">34</span>    &lt;DIR&gt;          爬虫</span><br><span class="line">               <span class="number">0</span> 个文件              <span class="number">0</span> 字节</span><br><span class="line">              <span class="number">12</span> 个目录 <span class="number">26</span>,<span class="number">584</span>,<span class="number">457</span>,<span class="number">216</span> 可用字节</span><br></pre></td></tr></tbody></table></figure>
-
-<p>实时 获取 cmd输出并打印</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> subprocess</span><br><span class="line">cmd = <span class="string">'ping www.baidu.com'</span></span><br><span class="line">screenData = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=<span class="literal">True</span>)</span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    line = screenData.stdout.readline()</span><br><span class="line">    print(line.decode(<span class="string">'gbk'</span>).strip(<span class="string">"b'"</span>))</span><br><span class="line">    <span class="keyword">if</span> line == <span class="string">b''</span> <span class="keyword">or</span> subprocess.Popen.poll(screenData) == <span class="number">0</span>:</span><br><span class="line">        screenData.stdout.close()</span><br><span class="line">        <span class="keyword">break</span></span><br></pre></td></tr></tbody></table></figure>
-
-<h2 id="非阻塞式调用其它程序"><a href="#非阻塞式调用其它程序" class="headerlink" title="非阻塞式调用其它程序"></a>非阻塞式调用其它程序</h2><p>调用 os.system 和 subprocess.check_output 时，都会等待该程序退出后，才会继续执行后续的代码。</p>
-<p>如果我们的Python程序本身并不需要等待外部程序结束。 比如，我们启动 <code>wget</code> 下载命令， 下载1个文件。让它下载就可以了， 然后我们的程序还要继续去做其他的任务。 这时候， 我们就不能用<code>os.system</code>， 因为它会等待 外部程序结束。 我们可以用<code>subprocess</code>里面的<code>Popen</code>，</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">print(dir(os))</span><br><span class="line"><span class="comment"># &lt;returns a list of all module functions&gt;</span></span><br><span class="line"></span><br><span class="line">print(help(os))</span><br><span class="line"><span class="comment"># &lt;returns an extensive manual page created from the module's docstrings&gt;</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>os.path</code> </p>
-<h3 id="文件目录相关操作"><a href="#文件目录相关操作" class="headerlink" title="文件目录相关操作"></a>文件目录相关操作</h3><figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line">print(os.path)</span><br><span class="line"><span class="comment"># &lt;module 'ntpath' from 'C:\\Users\\rose\\AppData\\Local\\Programs\\Python\\Python38\\lib\\ntpath.py'&gt;</span></span><br><span class="line">print(sys.path)  <span class="comment"># 模块的路径集</span></span><br><span class="line">[<span class="string">'c:\\python代码\\牛客网剑指offer66题思路分析\\代码'</span>, <span class="string">'C:\\Users\\rose\\AppData\\Local\\Programs\\Python\\Python38\\python38.zip'</span>, <span class="string">'C:\\Users\\rose\\AppData\\Local\\Programs\\Python\\Python38\\DLLs'</span>, <span class="string">'C:\\Users\\rose\\AppData\\Local\\Programs\\Python\\Python38\\lib'</span>, <span class="string">'C:\\Users\\rose\\AppData\\Local\\Programs\\Python\\Python38'</span>, <span class="string">'C:\\Users\\rose\\AppData\\Roaming\\Python\\Python38\\site-packages'</span>, <span class="string">'C:\\Users\\rose\\AppData\\Local\\Programs\\Python\\Python38\\lib\\site-packages'</span>]</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line">print(<span class="string">'当前 Python 解释器路径：'</span>)</span><br><span class="line">print(sys.executable)</span><br><span class="line"><span class="string">r"""</span></span><br><span class="line"><span class="string">当前 Python 解释器路径：</span></span><br><span class="line"><span class="string">C:\Users\jpch89\AppData\Local\Programs\Python\Python36\python.EXE</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"></span><br><span class="line">print()</span><br><span class="line">print(<span class="string">'当前 Python 解释器目录：'</span>)</span><br><span class="line">print(os.path.dirname(sys.executable))</span><br><span class="line"><span class="string">r"""</span></span><br><span class="line"><span class="string">当前 Python 解释器目录：</span></span><br><span class="line"><span class="string">C:\Users\jpch89\AppData\Local\Programs\Python\Python36</span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight plain"><figcaption><span>返回文件名</span></figcaption><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">```os.path.dirname(path)```    返回文件目录路径</span><br><span class="line">```os.path.split(path)``` 用元祖返回目录路径和文件名，且两者用","分割</span><br><span class="line">```os.path.join(path1[, path2[, ...]])```表示当前所处的文件夹上一级文件夹的绝对路径，把目录和文件名合成一个路径 </span><br><span class="line"></span><br><span class="line">```py</span><br><span class="line">print(os.path.basename('/root/runoob.txt'))  # runoob.txt</span><br><span class="line">print(os.path.dirname('/root/runoob.txt'))  # /root</span><br><span class="line">print(os.path.split('/root/runoob.txt'))  # ('/root', 'runoob.txt')</span><br><span class="line">print(os.path.join('root', 'test', 'runoob.txt'))  # root\test\runoob.txt</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>os.path.splitext(path)</code><br>Split the pathname path into a pair (root, ext) such that root + ext == path, and ext is empty or begins with a period and contains at most one period. Leading periods on the basename are ignored; splitext(‘.cshrc’) returns (‘.cshrc’, ‘’).</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">```os.path.isdir("dir1")```判断是否是文件夹，</span><br><span class="line">```os.path.isfile("file")```判断是否是文件</span><br><span class="line"></span><br><span class="line">```os.path.abspath('.')```表示当前所处的文件夹的绝对路径  </span><br><span class="line">```os.path.abspath('..')```表示当前所处的文件夹上一级文件夹的绝对路径</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">```os.listdir(path)```返回指定的文件夹所包含的文件或文件夹名字的列表。</span><br><span class="line"></span><br><span class="line">### 执行文件处理操作的方法</span><br><span class="line">```os.rename(current_file_name, new_file_name)```重命名文件</span><br><span class="line">两个参数，当前的文件名和新文件名。</span><br><span class="line">```py</span><br><span class="line">import os</span><br><span class="line"> </span><br><span class="line"># 重命名一个已经存在的文件test1.txt到test2.txt。</span><br><span class="line">os.rename( "test1.txt", "test2.txt" )</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">unlink的功能和remove一样是删除一个文件，但是删除一个删除一个正在使用的文件会报错。</span><br><span class="line"></span><br><span class="line">```os.remove(file_name)```删除文件，path是文件的路径，</span><br><span class="line">如果这个路径是一个文件夹，则会抛出OSError的错误，这时需用用```rmdir()```来删除</span><br><span class="line">```py</span><br><span class="line">import os</span><br><span class="line"> </span><br><span class="line"># 删除一个已经存在的文件test2.txt</span><br><span class="line">os.remove("test2.txt")</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">在删除这个目录之前，它的所有内容应该先被清除</span><br><span class="line">```py</span><br><span class="line">import os</span><br><span class="line"> </span><br><span class="line"># 删除”/tmp/test”目录</span><br><span class="line">os.rmdir( "/tmp/test"  )</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight plain"><figcaption><span>递归地删除目录。如果子目录成功被删除，则将会成功删除父目录，子目录没成功删除，将抛异常。</span></figcaption><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">```py</span><br><span class="line">import os</span><br><span class="line">for root, dirs, files in os.walk(top, topdown=False):</span><br><span class="line">    for name in files:</span><br><span class="line">        os.remove(os.path.join(root, name))</span><br><span class="line">    for name in dirs:</span><br><span class="line">        os.rmdir(os.path.join(root, name))</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>shutil.rmtree()</code></p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">```py</span><br><span class="line">import os</span><br><span class="line"> </span><br><span class="line"># 在当前目录下创建一个目录test</span><br><span class="line">os.mkdir("test")</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">参数是你想设成当前目录的目录名称</span><br><span class="line"></span><br><span class="line">```py</span><br><span class="line">import os</span><br><span class="line"> </span><br><span class="line"># 将当前目录改为"/home/newdir"</span><br><span class="line">os.chdir("/home/newdir")</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">参数是你想设成当前目录的目录名称</span><br><span class="line"></span><br><span class="line">```py</span><br><span class="line">import os</span><br><span class="line"> </span><br><span class="line"># 打印当前的目录路径</span><br><span class="line">print(os.getcwd())</span><br></pre></td></tr></tbody></table></figure>
-
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/6/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><span class="page-number current">7</span><a class="page-number" href="/page/8/">8</a><span class="space">&hellip;</span><a class="page-number" href="/page/23/">23</a><a class="extend next" rel="next" href="/page/8/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/6/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><span class="page-number current">7</span><a class="page-number" href="/page/8/">8</a><span class="space">&hellip;</span><a class="page-number" href="/page/24/">24</a><a class="extend next" rel="next" href="/page/8/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 <script src="/js/comments.js"></script>
 </div>

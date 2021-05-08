@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<meta name="hexo-config" content="{&quot;hostname&quot;:&quot;bubbleboy11.github.io&quot;,&quot;root&quot;:&quot;/&quot;,&quot;images&quot;:&quot;/images&quot;,&quot;scheme&quot;:&quot;Muse&quot;,&quot;version&quot;:&quot;8.3.0&quot;,&quot;exturl&quot;:false,&quot;sidebar&quot;:{&quot;position&quot;:&quot;left&quot;,&quot;display&quot;:&quot;post&quot;,&quot;padding&quot;:18,&quot;offset&quot;:12},&quot;copycode&quot;:true,&quot;bookmark&quot;:{&quot;enable&quot;:false,&quot;color&quot;:&quot;#222&quot;,&quot;save&quot;:&quot;auto&quot;},&quot;fancybox&quot;:false,&quot;mediumzoom&quot;:false,&quot;lazyload&quot;:false,&quot;pangu&quot;:false,&quot;comments&quot;:{&quot;style&quot;:&quot;tabs&quot;,&quot;active&quot;:null,&quot;storage&quot;:true,&quot;lazyload&quot;:false,&quot;nav&quot;:null},&quot;motion&quot;:{&quot;enable&quot;:true,&quot;async&quot;:false,&quot;transition&quot;:{&quot;post_block&quot;:&quot;fadeIn&quot;,&quot;post_header&quot;:&quot;fadeInDown&quot;,&quot;post_body&quot;:&quot;fadeInDown&quot;,&quot;coll_header&quot;:&quot;fadeInLeft&quot;,&quot;sidebar&quot;:&quot;fadeInUp&quot;}},&quot;prism&quot;:false,&quot;i18n&quot;:{&quot;placeholder&quot;:&quot;搜索...&quot;,&quot;empty&quot;:&quot;没有找到任何搜索结果：${query}&quot;,&quot;hits_time&quot;:&quot;找到 ${hits} 个搜索结果（用时 ${time} 毫秒）&quot;,&quot;hits&quot;:&quot;找到 ${hits} 个搜索结果&quot;}}">
+<meta name="description" content="drf认证依赖的是django.contrib的auth，对列表的多个认证类，drf会按照从上到下的顺序对每一个类进行认证，并使用第一个成功通过的验证类的返回值来设置request.user和request.auth setting.py 12345678# DRF 全局配置REST_FRAMEWORK &#x3D; {    # 配置默认认证类 authentication: 对用户登录的身份进行校验.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="drf认证和权限">
+<meta property="og:url" content="https://bubbleboy11.github.io/2020/08/21/drf-ren-zheng-he-quan-xian/index.html">
+<meta property="og:site_name" content="外心人D的博客">
+<meta property="og:description" content="drf认证依赖的是django.contrib的auth，对列表的多个认证类，drf会按照从上到下的顺序对每一个类进行认证，并使用第一个成功通过的验证类的返回值来设置request.user和request.auth setting.py 12345678# DRF 全局配置REST_FRAMEWORK &#x3D; {    # 配置默认认证类 authentication: 对用户登录的身份进行校验.">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-08-20T16:21:41.000Z">
+<meta property="article:modified_time" content="2021-05-07T11:57:13.719Z">
+<meta property="article:author" content="外心人D">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://bubbleboy11.github.io/2020/08/21/drf-ren-zheng-he-quan-xian/">
+
+
+
+<meta name="hexo-config-page" content="{&quot;sidebar&quot;:&quot;&quot;,&quot;isHome&quot;:false,&quot;isPost&quot;:true,&quot;lang&quot;:&quot;zh-CN&quot;}">
+<meta name="hexo-config-calendar" content="">
+<script data-pjax src="/js/load-config.js"></script>
+  <title>drf认证和权限 | 外心人D的博客</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="外心人D的博客" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">外心人D的博客</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#drf%E8%AE%A4%E8%AF%81"><span class="nav-text">drf认证</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%9F%E6%88%90Token"><span class="nav-text">生成Token</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B9%E5%BC%8F%E4%B8%80-manage-py-%E7%94%9F%E6%88%90Token"><span class="nav-text">方式一 manage.py 生成Token</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B9%E5%BC%8F%E4%BA%8C-Django%E4%BF%A1%E5%8F%B7%E6%9C%BA%E5%88%B6%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90Token"><span class="nav-text">方式二 Django信号机制自动生成Token</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#drf%E6%9D%83%E9%99%90"><span class="nav-text">drf权限</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">外心人D</p>
+  <div class="site-description" itemprop="description">本博客大多内容为慕课和网上博客，并非原创</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">231</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/drf-ren-zheng-he-quan-xian/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          drf认证和权限
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-05-07 11:57:13" itemprop="dateModified" datetime="2021-05-07T11:57:13Z">2021-05-07</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="drf认证"><a href="#drf认证" class="headerlink" title="drf认证"></a>drf认证</h2><p>依赖的是<code>django.contrib</code>的<code>auth</code>，对列表的多个认证类，drf会按照从上到下的顺序对每一个类进行认证，并使用第一个成功通过的验证类的返回值来设置<code>request.user</code>和<code>request.auth</code></p>
+<p><code>setting.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># DRF 全局配置</span></span><br><span class="line">REST_FRAMEWORK = {</span><br><span class="line">    <span class="comment"># 配置默认认证类 authentication: 对用户登录的身份进行校验. </span></span><br><span class="line">    <span class="string">"DEFAULT_AUTHENTICATION_CLASSES"</span>: [</span><br><span class="line">        <span class="string">"rest_framework.authentication.BasicAuthentication"</span>,</span><br><span class="line">        <span class="string">"rest_framework.authentication.SessionAuthentication"</span></span><br><span class="line">    ]</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<ul>
+<li><p><code>BasicAuthentication</code>是通过base64对用户名和密码加密成字符串，但是易破解，用于测试环境而不是生成环境<br>认证成功会把<code>request.user</code>设置<code>User</code>类的实例，<code>request.auth</code>设置为<code>None</code>，失败会在header添加www-Authentication</p>
+</li>
+<li><p><code>SessionAuthentication</code>依赖django的会话，通常在前端js里面使用http ajax请求的时候用，需要给后端提供CSRF令牌<br>认证成功会把<code>request.user</code>设置<code>User</code>类的实例，<code>request.auth</code>设置为<code>None</code>，失败会返回403 forbidden</p>
+</li>
+</ul>
+<h3 id="生成Token"><a href="#生成Token" class="headerlink" title="生成Token"></a>生成Token</h3><h4 id="方式一-manage-py-生成Token"><a href="#方式一-manage-py-生成Token" class="headerlink" title="方式一 manage.py 生成Token"></a>方式一 <code>manage.py</code> 生成Token</h4><p><code>setting.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">INSTALLED_APPS = [</span><br><span class="line">    <span class="string">"rest_framework.authtoken"</span>,  <span class="comment"># DRF自带的token认证</span></span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"><span class="comment"># DRF 全局配置</span></span><br><span class="line">REST_FRAMEWORK = {</span><br><span class="line">    <span class="comment"># 配置默认认证类 authentication: 对用户登录的身份进行校验. </span></span><br><span class="line">    <span class="string">"DEFAULT_AUTHENTICATION_CLASSES"</span>: [</span><br><span class="line">        <span class="string">"rest_framework.authentication.TokenAuthentication"</span>,</span><br><span class="line">    ]</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python manage.py drf_create_token admin  <span class="comment"># admin是用户名</span></span><br></pre></td></tr></tbody></table></figure>
+<p>只能供管理员测试，每新增一个用户就要手动输入一条命令太麻烦</p>
+<h4 id="方式二-Django信号机制自动生成Token"><a href="#方式二-Django信号机制自动生成Token" class="headerlink" title="方式二 Django信号机制自动生成Token"></a>方式二 Django信号机制自动生成Token</h4><p>在新建用户的时候触发一个信号，执行一个函数能生成Token<br>提供获取Token的API接口给每个用户</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.conf <span class="keyword">import</span> settings</span><br><span class="line"><span class="keyword">from</span> django.db.models.signals <span class="keyword">import</span> post_save</span><br><span class="line"><span class="keyword">from</span> django.dispatch <span class="keyword">import</span> receiver</span><br><span class="line"><span class="keyword">from</span> rest_framework.authtoken.models <span class="keyword">import</span> Token</span><br><span class="line"></span><br><span class="line"><span class="meta">@receiver(post_save, sender=settings.AUTH_USER_MODEL)  # Django的信号机制</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">generate_token</span>(<span class="params">sender, instance=None, created=False, **kwargs</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    当User模型类创建用户实例并保存的时候，调用safe方法传递信号给receiver自动生成Token</span></span><br><span class="line"><span class="string">    :param sender:</span></span><br><span class="line"><span class="string">    :param instance:新建的用户实例</span></span><br><span class="line"><span class="string">    :param created:</span></span><br><span class="line"><span class="string">    :param kwargs:</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="keyword">if</span> created:</span><br><span class="line">        Token.objects.create(user=instance)</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>drf_tutorial\urls.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework.authtoken <span class="keyword">import</span> views</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    path(<span class="string">"api-token-auth/"</span>, views.obtain_auth_token),  <span class="comment"># 获取Token的接口</span></span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>登录后台新建用户，激活员工，数据表<code>authtoken_token</code>的key值会增加一个</p>
+<p>获取token需要用户名密码认证<br>用POST方法在postman获取，选择no-auth<br>body</p>
+<figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">{</span><br><span class="line">    <span class="attr">"username"</span>: <span class="string">"user01"</span>,</span><br><span class="line">    <span class="attr">"password"</span>: <span class="string">"my123password"</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>body设为none ,Auth设为API Key</p>
+<figure class="highlight apache"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Key</span>: Authorization</span><br><span class="line"><span class="attribute">Value</span>: <span class="number">69</span>d<span class="number">53</span>cdb<span class="number">0</span>b<span class="number">395</span>d<span class="number">638</span>b<span class="number">50</span>b<span class="number">51</span>d<span class="number">5</span>f<span class="number">3008</span>f<span class="number">66499</span>b<span class="number">4</span>b<span class="number">8</span></span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get</span>(<span class="params">self, request</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    :param request:</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    queryset = Course.objects.all()</span><br><span class="line">    s = CourseSerializer(instance=queryset,</span><br><span class="line">                         many=<span class="literal">True</span>)  <span class="comment"># 这里是instance = xx 查询集</span></span><br><span class="line">    print(type(request), type(request.data), type(s), type(s.data))</span><br><span class="line">    <span class="comment"># &lt;class 'rest_framework.request.Request'&gt; &lt;class 'dict'&gt; &lt;class 'rest_framework.serializers.ListSerializer'&gt; &lt;class 'rest_framework.utils.serializer_helpers.ReturnList'&gt;</span></span><br><span class="line">    print(self.request.user, self.request.auth)  <span class="comment"># admin None 默认模式</span></span><br><span class="line">    print(type(self.request.user), type(self.request.auth))</span><br><span class="line">    <span class="comment"># &lt;class 'django.contrib.auth.models.User'&gt; &lt;class 'NoneType'&gt; 默认模式</span></span><br><span class="line">    <span class="comment"># user01 69d53cdb0b395d638b50b51d5f3008f66499b4b8 token模式</span></span><br><span class="line">    <span class="comment"># &lt;class 'django.contrib.auth.models.User'&gt; &lt;class 'rest_framework.authtoken.models.Token'&gt;  token模式</span></span><br><span class="line">    <span class="keyword">return</span> Response(s.data, status=status.HTTP_200_OK)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>认证成功会把<code>request.user</code>设置<code>User</code>类的实例，<code>request.auth</code>设置为数据表<code>authtoken_token</code>的key值<code>69d53cdb0b395d638b50b51d5f3008f66499b4b8</code>，失败会在header添加www-Authentication</p>
+<h2 id="drf权限"><a href="#drf权限" class="headerlink" title="drf权限"></a>drf权限</h2><p>常用的权限类设置权限策略<br>如何自定义对象级别权限</p>
+<p>权限检测后的处理，认证URL设置，全局权限控制与ViewSet的权限。</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># DRF 全局配置</span></span><br><span class="line">REST_FRAMEWORK = {</span><br><span class="line">    <span class="comment"># 配置默认授权类 权限permisson: 对登录验证通过的用户能访问的api和对api能取得的对应级别数据</span></span><br><span class="line">    <span class="string">"DEFAULT_PERMISSION_CLASSES"</span>: [</span><br><span class="line">        <span class="comment"># "rest_framework.permissions.AllowAny"  # 默认，允许所有请求，不需要认证</span></span><br><span class="line">        <span class="string">"rest_framework.permissions.IsAuthenticated"</span>  <span class="comment"># 只有登录才能进行操作，不登录不能进行任何操作</span></span><br><span class="line">    ]</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+
+<p>设置登录的用户能修改自己的信息，不能修改别人的信息<br><code>course\permissions.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework <span class="keyword">import</span> permissions</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">IsOwnerOrReadOnly</span>(<span class="params">permissions.BasePermission</span>):</span></span><br><span class="line">    <span class="string">"""自定义权限：只允许对象的所有者能够编辑"""</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">has_object_permission</span>(<span class="params">self, request, view, obj</span>):</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        所有的request请求都有读权限，因此一律允许GET/HEAD/OPTIONS方法</span></span><br><span class="line"><span class="string">        :param request:</span></span><br><span class="line"><span class="string">        :param view:</span></span><br><span class="line"><span class="string">        :param obj:</span></span><br><span class="line"><span class="string">        :return: bool</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="keyword">if</span> request.method <span class="keyword">in</span> permissions.SAFE_METHODS:  <span class="comment"># SAFE_METHODS = ("GET", "HEAD", "OPTIONS")</span></span><br><span class="line">            <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line">        <span class="comment"># 对象的所有者才有写权限</span></span><br><span class="line">        <span class="keyword">return</span> obj.teacher == request.user  <span class="comment"># obj = queryset = Course.objects.all()</span></span><br></pre></td></tr></tbody></table></figure>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/08/21/liu-lan-qi-zhong-duan-cha-kan-yuan-su-biao-qian/" rel="prev" title="浏览器终端查看元素标签">
+                  <i class="fa fa-chevron-left"></i> 浏览器终端查看元素标签
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/08/21/yun-wei/" rel="next" title="运维">
+                  运维 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+<script src="/js/comments.js"></script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">外心人D</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

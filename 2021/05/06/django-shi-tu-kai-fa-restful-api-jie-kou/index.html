@@ -20,15 +20,15 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
 
 <meta name="hexo-config" content="{&quot;hostname&quot;:&quot;bubbleboy11.github.io&quot;,&quot;root&quot;:&quot;/&quot;,&quot;images&quot;:&quot;/images&quot;,&quot;scheme&quot;:&quot;Muse&quot;,&quot;version&quot;:&quot;8.3.0&quot;,&quot;exturl&quot;:false,&quot;sidebar&quot;:{&quot;position&quot;:&quot;left&quot;,&quot;display&quot;:&quot;post&quot;,&quot;padding&quot;:18,&quot;offset&quot;:12},&quot;copycode&quot;:true,&quot;bookmark&quot;:{&quot;enable&quot;:false,&quot;color&quot;:&quot;#222&quot;,&quot;save&quot;:&quot;auto&quot;},&quot;fancybox&quot;:false,&quot;mediumzoom&quot;:false,&quot;lazyload&quot;:false,&quot;pangu&quot;:false,&quot;comments&quot;:{&quot;style&quot;:&quot;tabs&quot;,&quot;active&quot;:null,&quot;storage&quot;:true,&quot;lazyload&quot;:false,&quot;nav&quot;:null},&quot;motion&quot;:{&quot;enable&quot;:true,&quot;async&quot;:false,&quot;transition&quot;:{&quot;post_block&quot;:&quot;fadeIn&quot;,&quot;post_header&quot;:&quot;fadeInDown&quot;,&quot;post_body&quot;:&quot;fadeInDown&quot;,&quot;coll_header&quot;:&quot;fadeInLeft&quot;,&quot;sidebar&quot;:&quot;fadeInUp&quot;}},&quot;prism&quot;:false,&quot;i18n&quot;:{&quot;placeholder&quot;:&quot;搜索...&quot;,&quot;empty&quot;:&quot;没有找到任何搜索结果：${query}&quot;,&quot;hits_time&quot;:&quot;找到 ${hits} 个搜索结果（用时 ${time} 毫秒）&quot;,&quot;hits&quot;:&quot;找到 ${hits} 个搜索结果&quot;}}">
-<meta name="description" content="django视图开发RESTful API接口 缺点：分页、排序、认证、权限、限流都需要自己实现  原生django 实现数据接口的方式FBV Function Based View 基于函数的视图 JsonResponse直接返回json数据 对于POST请求，用装饰器，取消csrf的限制，就不用setting里面去注释掉了  course\views.py下面两种方法等价 1234567891">
+<meta name="description" content="django视图开发RESTful API接口 缺点：分页、排序、认证、权限、限流都需要自己实现  原生django 实现数据接口的方式写法一 1234from django import httpreturn http.JsonResponse(data)return http.HttpResponse(&#39;&#39;, status&#x3D;200)  写法二 123from django.http impor">
 <meta property="og:type" content="article">
 <meta property="og:title" content="django视图开发RESTful API接口">
 <meta property="og:url" content="https://bubbleboy11.github.io/2021/05/06/django-shi-tu-kai-fa-restful-api-jie-kou/index.html">
 <meta property="og:site_name" content="外心人D的博客">
-<meta property="og:description" content="django视图开发RESTful API接口 缺点：分页、排序、认证、权限、限流都需要自己实现  原生django 实现数据接口的方式FBV Function Based View 基于函数的视图 JsonResponse直接返回json数据 对于POST请求，用装饰器，取消csrf的限制，就不用setting里面去注释掉了  course\views.py下面两种方法等价 1234567891">
+<meta property="og:description" content="django视图开发RESTful API接口 缺点：分页、排序、认证、权限、限流都需要自己实现  原生django 实现数据接口的方式写法一 1234from django import httpreturn http.JsonResponse(data)return http.HttpResponse(&#39;&#39;, status&#x3D;200)  写法二 123from django.http impor">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-05-05T16:21:41.000Z">
-<meta property="article:modified_time" content="2021-05-05T03:34:02.925Z">
+<meta property="article:modified_time" content="2021-05-05T15:11:42.986Z">
 <meta property="article:author" content="外心人D">
 <meta name="twitter:card" content="summary">
 
@@ -121,7 +121,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">228</span>
+          <span class="site-state-item-count">231</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -196,7 +196,7 @@
       <span class="post-meta-item-text">发表于</span>
       
 
-      <time title="创建时间：2021-05-05 16:21:41 / 修改时间：03:34:02" itemprop="dateCreated datePublished" datetime="2021-05-05T16:21:41Z">2021-05-05</time>
+      <time title="创建时间：2021-05-05 16:21:41 / 修改时间：15:11:42" itemprop="dateCreated datePublished" datetime="2021-05-05T16:21:41Z">2021-05-05</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -221,8 +221,16 @@
         <h1 id="django视图开发RESTful-API接口"><a href="#django视图开发RESTful-API接口" class="headerlink" title="django视图开发RESTful API接口"></a>django视图开发RESTful API接口</h1><blockquote>
 <p>缺点：分页、排序、认证、权限、限流都需要自己实现</p>
 </blockquote>
-<h2 id="原生django-实现数据接口的方式"><a href="#原生django-实现数据接口的方式" class="headerlink" title="原生django 实现数据接口的方式"></a>原生django 实现数据接口的方式</h2><h3 id="FBV-Function-Based-View-基于函数的视图"><a href="#FBV-Function-Based-View-基于函数的视图" class="headerlink" title="FBV Function Based View 基于函数的视图"></a>FBV Function Based View 基于函数的视图</h3><ul>
+<h2 id="原生django-实现数据接口的方式"><a href="#原生django-实现数据接口的方式" class="headerlink" title="原生django 实现数据接口的方式"></a>原生django 实现数据接口的方式</h2><p>写法一</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django <span class="keyword">import</span> http</span><br><span class="line"></span><br><span class="line"><span class="keyword">return</span> http.JsonResponse(data)</span><br><span class="line"><span class="keyword">return</span> http.HttpResponse(<span class="string">''</span>, status=<span class="number">200</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>写法二</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.http <span class="keyword">import</span> HttpResponse</span><br><span class="line"><span class="keyword">return</span> JsonResponse(data)</span><br><span class="line"><span class="keyword">return</span> HttpResponse(data)</span><br></pre></td></tr></tbody></table></figure>
+
+<ul>
 <li><code>JsonResponse</code>直接返回json数据</li>
+</ul>
+<h3 id="FBV-Function-Based-View-基于函数的视图"><a href="#FBV-Function-Based-View-基于函数的视图" class="headerlink" title="FBV Function Based View 基于函数的视图"></a>FBV Function Based View 基于函数的视图</h3><ul>
 <li>对于POST请求，用装饰器，取消csrf的限制，就不用setting里面去注释掉了</li>
 </ul>
 <p><code>course\views.py</code><br>下面两种方法等价</p>
@@ -232,10 +240,11 @@
 
 <h3 id="CBV-Classed-Based-View-基于类的视图"><a href="#CBV-Classed-Based-View-基于类的视图" class="headerlink" title="CBV Classed Based View 基于类的视图"></a>CBV Classed Based View 基于类的视图</h3><figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.http <span class="keyword">import</span> JsonResponse</span><br><span class="line"><span class="keyword">from</span> django.views <span class="keyword">import</span> View</span><br><span class="line"><span class="keyword">from</span> django.views.decorators.csrf <span class="keyword">import</span> csrf_exempt</span><br><span class="line"></span><br><span class="line">course_dict = {<span class="string">'name'</span>: <span class="string">"课程"</span>, <span class="string">'introduction'</span>: <span class="string">"课程简介"</span>, <span class="string">'price'</span>: <span class="string">"课程价格"</span>}</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CourseList</span>(<span class="params">View</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span>(<span class="params">self, request</span>):</span></span><br><span class="line">        <span class="keyword">return</span> JsonResponse(course_dict)</span><br><span class="line"></span><br><span class="line"><span class="meta">    @csrf_exempt</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">post</span>(<span class="params">self, request</span>):</span></span><br><span class="line">        course = json.loads(request.body.decode(<span class="string">'utf-8'</span>))  <span class="comment"># 解析数据不是字典而是字符串类型，要safe=False</span></span><br><span class="line">        <span class="keyword">return</span> JsonResponse(course, safe=<span class="literal">False</span>)  <span class="comment"># safe默认True</span></span><br></pre></td></tr></tbody></table></figure>
 
+
 <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> Json</span><br><span class="line"><span class="keyword">from</span> django.http <span class="keyword">import</span> HttpResponse</span><br><span class="line"><span class="keyword">from</span> django.views <span class="keyword">import</span> View</span><br><span class="line"><span class="keyword">from</span> django.views.decorators.csrf <span class="keyword">import</span> csrf_exempt</span><br><span class="line"></span><br><span class="line">course_dict = {<span class="string">'name'</span>: <span class="string">"课程"</span>, <span class="string">'introduction'</span>: <span class="string">"课程简介"</span>, <span class="string">'price'</span>: <span class="string">"课程价格"</span>}</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CourseList</span>(<span class="params">View</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span>(<span class="params">self, request</span>):</span></span><br><span class="line">        <span class="keyword">return</span> HttpResponse(json.dumps(course_dict), content_type=<span class="string">'application/json'</span>)</span><br><span class="line"></span><br><span class="line"><span class="meta">    @csrf_exempt</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">post</span>(<span class="params">self, request</span>):</span></span><br><span class="line">        course = json.loads(request.body.decode(<span class="string">'utf-8'</span>))</span><br><span class="line">        <span class="keyword">return</span> HttpResponse(json.dumps(course), content_type=<span class="string">'application/json'</span>)</span><br></pre></td></tr></tbody></table></figure>
 
-
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.views <span class="keyword">import</span> View</span><br><span class="line"><span class="keyword">from</span> django.utils.decorators <span class="keyword">import</span> method_decorator</span><br><span class="line">course_dict = {<span class="string">'name'</span>: <span class="string">"课程"</span>, <span class="string">'introduction'</span>: <span class="string">"课程简介"</span>, <span class="string">'price'</span>: <span class="string">"课程价格"</span>}</span><br><span class="line"></span><br><span class="line"><span class="meta">@method_decorator(csrf_exempt, name='dispatch')  # 不是post，是由django的请求响应原理决定的，</span></span><br><span class="line"><span class="comment"># 当http request拿到的时候，首先到达dispatch方法，通过dispatch方法处理后再找到post方法</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CourseList</span>(<span class="params">View</span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span>(<span class="params">self, request</span>):</span></span><br><span class="line">        <span class="keyword">return</span> JsonResponse(course_dict)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">post</span>(<span class="params">self, request</span>):</span></span><br><span class="line">        course = json.loads(request.body.decode(<span class="string">'utf-8'</span>))  <span class="comment"># 解析数据不是字典而是字符串类型，要safe=False</span></span><br><span class="line">        <span class="keyword">return</span> JsonResponse(course, safe=<span class="literal">False</span>)  <span class="comment"># safe默认True</span></span><br></pre></td></tr></tbody></table></figure><script>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.views <span class="keyword">import</span> View</span><br><span class="line"><span class="keyword">from</span> django.utils.decorators <span class="keyword">import</span> method_decorator</span><br><span class="line">course_dict = {<span class="string">'name'</span>: <span class="string">"课程"</span>, <span class="string">'introduction'</span>: <span class="string">"课程简介"</span>, <span class="string">'price'</span>: <span class="string">"课程价格"</span>}</span><br><span class="line"></span><br><span class="line"><span class="meta">@method_decorator(csrf_exempt, name='dispatch')  # 不是post，是由django的请求响应原理决定的，</span></span><br><span class="line"><span class="comment"># 当http request拿到的时候，首先到达dispatch方法，通过dispatch方法处理后再找到post方法</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CourseList</span>(<span class="params">View</span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span>(<span class="params">self, request</span>):</span></span><br><span class="line">        <span class="keyword">return</span> JsonResponse(course_dict)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">post</span>(<span class="params">self, request</span>):</span></span><br><span class="line">        course = json.loads(request.body.decode(<span class="string">'utf-8'</span>))  <span class="comment"># 解析数据不是字典而是字符串类型，要safe=False</span></span><br><span class="line">        <span class="keyword">return</span> JsonResponse(course, safe=<span class="literal">False</span>)  <span class="comment"># safe默认True</span></span><br></pre></td></tr></tbody></table></figure>
+<script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
@@ -266,13 +275,13 @@
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2021/05/05/xu-lie-hua/" rel="prev" title="序列化">
-                  <i class="fa fa-chevron-left"></i> 序列化
+                <a href="/2021/05/06/drf-shi-tu-kai-fa-restfulapi-jie-kou-de-fang-shi/" rel="prev" title="DRF视图开发RESTful API接口的方式">
+                  <i class="fa fa-chevron-left"></i> DRF视图开发RESTful API接口的方式
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2021/05/06/drf-shi-tu-kai-fa-restful-api-jie-kou-de-fang-shi/" rel="next" title="DRF视图开发RESTful API接口的方式">
-                  DRF视图开发RESTful API接口的方式 <i class="fa fa-chevron-right"></i>
+                <a href="/2021/05/08/drf-de-api-jie-kou-wen-dang/" rel="next" title="DRF的API接口文档">
+                  DRF的API接口文档 <i class="fa fa-chevron-right"></i>
                 </a>
             </div>
           </div>

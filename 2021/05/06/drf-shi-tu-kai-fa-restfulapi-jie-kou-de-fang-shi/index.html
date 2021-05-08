@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<meta name="hexo-config" content="{&quot;hostname&quot;:&quot;bubbleboy11.github.io&quot;,&quot;root&quot;:&quot;/&quot;,&quot;images&quot;:&quot;/images&quot;,&quot;scheme&quot;:&quot;Muse&quot;,&quot;version&quot;:&quot;8.3.0&quot;,&quot;exturl&quot;:false,&quot;sidebar&quot;:{&quot;position&quot;:&quot;left&quot;,&quot;display&quot;:&quot;post&quot;,&quot;padding&quot;:18,&quot;offset&quot;:12},&quot;copycode&quot;:true,&quot;bookmark&quot;:{&quot;enable&quot;:false,&quot;color&quot;:&quot;#222&quot;,&quot;save&quot;:&quot;auto&quot;},&quot;fancybox&quot;:false,&quot;mediumzoom&quot;:false,&quot;lazyload&quot;:false,&quot;pangu&quot;:false,&quot;comments&quot;:{&quot;style&quot;:&quot;tabs&quot;,&quot;active&quot;:null,&quot;storage&quot;:true,&quot;lazyload&quot;:false,&quot;nav&quot;:null},&quot;motion&quot;:{&quot;enable&quot;:true,&quot;async&quot;:false,&quot;transition&quot;:{&quot;post_block&quot;:&quot;fadeIn&quot;,&quot;post_header&quot;:&quot;fadeInDown&quot;,&quot;post_body&quot;:&quot;fadeInDown&quot;,&quot;coll_header&quot;:&quot;fadeInLeft&quot;,&quot;sidebar&quot;:&quot;fadeInUp&quot;}},&quot;prism&quot;:false,&quot;i18n&quot;:{&quot;placeholder&quot;:&quot;搜索...&quot;,&quot;empty&quot;:&quot;没有找到任何搜索结果：${query}&quot;,&quot;hits_time&quot;:&quot;找到 ${hits} 个搜索结果（用时 ${time} 毫秒）&quot;,&quot;hits&quot;:&quot;找到 ${hits} 个搜索结果&quot;}}">
+<meta name="description" content="DRF视图开发RESTful API接口的方式 优点：集成了分页、排序、认证、权限、限流  基于函数的视图 Function Based View灵活，一个接口对应一个函数，面向过程的方式重复率高，要自己实现的东西多  CourseSerializer(instance&#x3D;course, data&#x3D;request.data) 把data的数据序列化后保存或跟新到 course 这个对象里面   in">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DRF视图开发RESTful API接口的方式">
+<meta property="og:url" content="https://bubbleboy11.github.io/2021/05/06/drf-shi-tu-kai-fa-restfulapi-jie-kou-de-fang-shi/index.html">
+<meta property="og:site_name" content="外心人D的博客">
+<meta property="og:description" content="DRF视图开发RESTful API接口的方式 优点：集成了分页、排序、认证、权限、限流  基于函数的视图 Function Based View灵活，一个接口对应一个函数，面向过程的方式重复率高，要自己实现的东西多  CourseSerializer(instance&#x3D;course, data&#x3D;request.data) 把data的数据序列化后保存或跟新到 course 这个对象里面   in">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://bubbleboy11.github.io/2021/05/06/drf-shi-tu-kai-fa-restfulapi-jie-kou-de-fang-shi/0.png">
+<meta property="og:image" content="https://bubbleboy11.github.io/2021/05/06/drf-shi-tu-kai-fa-restfulapi-jie-kou-de-fang-shi/2.png">
+<meta property="og:image" content="https://bubbleboy11.github.io/2021/05/06/drf-shi-tu-kai-fa-restfulapi-jie-kou-de-fang-shi/3.png">
+<meta property="article:published_time" content="2021-05-05T16:21:41.000Z">
+<meta property="article:modified_time" content="2021-05-07T13:37:07.844Z">
+<meta property="article:author" content="外心人D">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://bubbleboy11.github.io/2021/05/06/drf-shi-tu-kai-fa-restfulapi-jie-kou-de-fang-shi/0.png">
+
+
+<link rel="canonical" href="https://bubbleboy11.github.io/2021/05/06/drf-shi-tu-kai-fa-restfulapi-jie-kou-de-fang-shi/">
+
+
+
+<meta name="hexo-config-page" content="{&quot;sidebar&quot;:&quot;&quot;,&quot;isHome&quot;:false,&quot;isPost&quot;:true,&quot;lang&quot;:&quot;zh-CN&quot;}">
+<meta name="hexo-config-calendar" content="">
+<script data-pjax src="/js/load-config.js"></script>
+  <title>DRF视图开发RESTful API接口的方式 | 外心人D的博客</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="外心人D的博客" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">外心人D的博客</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#DRF%E8%A7%86%E5%9B%BE%E5%BC%80%E5%8F%91RESTful-API%E6%8E%A5%E5%8F%A3%E7%9A%84%E6%96%B9%E5%BC%8F"><span class="nav-text">DRF视图开发RESTful API接口的方式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E5%87%BD%E6%95%B0%E7%9A%84%E8%A7%86%E5%9B%BE-Function-Based-View"><span class="nav-text">基于函数的视图 Function Based View</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E6%89%80%E6%9C%89%E8%AF%BE%E7%A8%8B%E4%BF%A1%E6%81%AF%E6%88%96%E6%96%B0%E5%A2%9E%E4%B8%80%E4%B8%AA%E8%AF%BE%E7%A8%8B"><span class="nav-text">获取所有课程信息或新增一个课程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E4%B8%80%E4%B8%AA%E8%AF%BE%E7%A8%8B%E7%9A%84%E8%AF%A6%E7%BB%86%E4%BF%A1%E6%81%AF%E3%80%81%E6%9B%B4%E6%96%B0%E3%80%81%E5%88%A0%E9%99%A4%E4%B8%80%E4%B8%AA%E8%AF%BE%E7%A8%8B"><span class="nav-text">获取一个课程的详细信息、更新、删除一个课程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E7%B1%BB%E7%9A%84%E8%A7%86%E5%9B%BE-Classed-Based-View"><span class="nav-text">基于类的视图 Classed Based View</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E6%89%80%E6%9C%89%E8%AF%BE%E7%A8%8B%E4%BF%A1%E6%81%AF%E6%88%96%E6%96%B0%E5%A2%9E%E4%B8%80%E4%B8%AA%E8%AF%BE%E7%A8%8B-1"><span class="nav-text">获取所有课程信息或新增一个课程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E4%B8%80%E4%B8%AA%E8%AF%BE%E7%A8%8B%E7%9A%84%E8%AF%A6%E7%BB%86%E4%BF%A1%E6%81%AF%E3%80%81%E6%9B%B4%E6%96%B0%E3%80%81%E5%88%A0%E9%99%A4%E4%B8%80%E4%B8%AA%E8%AF%BE%E7%A8%8B-1"><span class="nav-text">获取一个课程的详细信息、更新、删除一个课程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%9A%E7%94%A8%E7%B1%BB%E8%A7%86%E5%9B%BE-Generic-Classed-Based-View-GenericAPIView-%E6%95%B4%E5%90%88%E4%BA%86%E5%A2%9E%E5%88%A0%E6%94%B9%E6%9F%A5%E7%9A%84%E7%B1%BB"><span class="nav-text">通用类视图 Generic Classed Based View GenericAPIView 整合了增删改查的类</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E6%89%80%E6%9C%89%E8%AF%BE%E7%A8%8B%E4%BF%A1%E6%81%AF%E6%88%96%E6%96%B0%E5%A2%9E%E4%B8%80%E4%B8%AA%E8%AF%BE%E7%A8%8B-2"><span class="nav-text">获取所有课程信息或新增一个课程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E4%B8%80%E4%B8%AA%E8%AF%BE%E7%A8%8B%E7%9A%84%E8%AF%A6%E7%BB%86%E4%BF%A1%E6%81%AF%E3%80%81%E6%9B%B4%E6%96%B0%E3%80%81%E5%88%A0%E9%99%A4%E4%B8%80%E4%B8%AA%E8%AF%BE%E7%A8%8B-2"><span class="nav-text">获取一个课程的详细信息、更新、删除一个课程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DRF%E7%9A%84%E8%A7%86%E5%9B%BE%E9%9B%86viewsets-%E6%95%B4%E5%90%88%E4%BA%86FBV-CBV-GCBV%E7%9A%84%E6%96%B9%E6%B3%95"><span class="nav-text">DRF的视图集viewsets 整合了FBV CBV GCBV的方法</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">外心人D</p>
+  <div class="site-description" itemprop="description">本博客大多内容为慕课和网上博客，并非原创</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">231</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/05/06/drf-shi-tu-kai-fa-restfulapi-jie-kou-de-fang-shi/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          DRF视图开发RESTful API接口的方式
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-05-05 16:21:41" itemprop="dateCreated datePublished" datetime="2021-05-05T16:21:41Z">2021-05-05</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-05-07 13:37:07" itemprop="dateModified" datetime="2021-05-07T13:37:07Z">2021-05-07</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="DRF视图开发RESTful-API接口的方式"><a href="#DRF视图开发RESTful-API接口的方式" class="headerlink" title="DRF视图开发RESTful API接口的方式"></a>DRF视图开发RESTful API接口的方式</h1><blockquote>
+<p>优点：集成了分页、排序、认证、权限、限流</p>
+</blockquote>
+<h2 id="基于函数的视图-Function-Based-View"><a href="#基于函数的视图-Function-Based-View" class="headerlink" title="基于函数的视图 Function Based View"></a>基于函数的视图 Function Based View</h2><p>灵活，一个接口对应一个函数，面向过程的方式重复率高，要自己实现的东西多</p>
+<ul>
+<li><code>CourseSerializer(instance=course, data=request.data)</code> 把<code>data</code>的数据序列化后保存或跟新到 <code>course</code> 这个对象里面  <ul>
+<li><code>instance</code> 要序列化的查询集实例，要序列化的 <code>course</code> 是查询出来的实例</li>
+<li><code>data</code> 数据哪里来的，<code>request.data</code> 是前端传递过来的数据  </li>
+</ul>
+</li>
+</ul>
+<h3 id="获取所有课程信息或新增一个课程"><a href="#获取所有课程信息或新增一个课程" class="headerlink" title="获取所有课程信息或新增一个课程"></a>获取所有课程信息或新增一个课程</h3><p><code>course\views.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework <span class="keyword">import</span> status</span><br><span class="line"><span class="keyword">from</span> rest_framework.authentication <span class="keyword">import</span> BasicAuthentication, SessionAuthentication, TokenAuthentication</span><br><span class="line"><span class="keyword">from</span> rest_framework.decorators <span class="keyword">import</span> api_view, authentication_classes, permission_classes</span><br><span class="line"><span class="keyword">from</span> rest_framework.permissions <span class="keyword">import</span> IsAuthenticated</span><br><span class="line"><span class="keyword">from</span> rest_framework.response <span class="keyword">import</span> Response</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> .models <span class="keyword">import</span> Course</span><br><span class="line"><span class="keyword">from</span> .serializers <span class="keyword">import</span> CourseSerializer</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="string">"""一、 函数式编程 Function Based View"""</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@api_view(["GET", "POST"])</span></span><br><span class="line"><span class="meta">@authentication_classes(</span></span><br><span class="line">    (BasicAuthentication, SessionAuthentication, TokenAuthentication))</span><br><span class="line"><span class="meta">@permission_classes((IsAuthenticated, ))</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">course_list</span>(<span class="params">request</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    获取所有课程信息或新增一个课程</span></span><br><span class="line"><span class="string">    :param request:</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="keyword">if</span> request.method == <span class="string">"GET"</span>:</span><br><span class="line">        <span class="comment"># 创建序列化器对象并指定要序列化的模型，序列化课程的所有字段</span></span><br><span class="line">        s = CourseSerializer(instance=Course.objects.all(), many=<span class="literal">True</span>)</span><br><span class="line">        <span class="comment"># 通过序列化器从模型类里面拿到数据的data属性获得模型对应的字典并通过创建Response对象返回JSON格式的数据</span></span><br><span class="line">        print(type(request), type(request.data), type(s), type(s.data))</span><br><span class="line">        <span class="comment"># &lt;class 'rest_framework.request.Request'&gt; &lt;class 'dict'&gt; &lt;class 'rest_framework.serializers.ListSerializer'&gt; &lt;class 'rest_framework.utils.serializer_helpers.ReturnList'&gt; </span></span><br><span class="line">        <span class="keyword">return</span> Response(data=s.data, status=status.HTTP_200_OK)  <span class="comment"># 获取当然有返回对应的数据给前端</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">elif</span> request.method == <span class="string">"POST"</span>:</span><br><span class="line">        <span class="comment"># 反序列化：前端POST过来的数据request.data转换成django能够识别的queryset或模型类实例instance</span></span><br><span class="line">        s = CourseSerializer(data=request.data)</span><br><span class="line">        <span class="comment"># partial=True属性适用于非必填的字段部分更新用，前端传递的数据比django ORM的模型类的字段要少</span></span><br><span class="line">        <span class="comment"># 如果把这个字段设置为主键或必填的字段（没有设置null=True，blank=True），那前端必须传过来，否则is_valid()为False</span></span><br><span class="line">        <span class="comment"># 对数据进行校验是否符合定义的字段属性再返回</span></span><br><span class="line">        <span class="keyword">if</span> s.is_valid():</span><br><span class="line">            <span class="comment"># 模型类.save()方法保存对象实例，相当于执行了创建数据的sql语句，序列化时只可读属性前端不能传过来</span></span><br><span class="line">            <span class="comment"># quest可以获取当前登录的用户，是哪一个用户post过来的就把它设为讲师，</span></span><br><span class="line">            <span class="comment"># 因为前端用户已经登录了，POST创建的course实例数据时没有teacher这个外键字段的，但又是模型类必填的，把课程信息的讲师设为自己登录的这个用户</span></span><br><span class="line">            s.save(teacher=request.user)</span><br><span class="line">            print(type(request), type(request.data), type(s), type(s.data))</span><br><span class="line">            <span class="comment"># &lt;class 'rest_framework.request.Request'&gt; &lt;class 'dict'&gt; &lt;class 'course.serializers.CourseSerializer'&gt; &lt;class 'rest_framework.utils.serializer_helpers.ReturnDict'&gt;</span></span><br><span class="line">            <span class="keyword">return</span> Response(data=s.data,</span><br><span class="line">                            status=status.HTTP_201_CREATED)  <span class="comment"># 反序列化后的数据返回给前端</span></span><br><span class="line">        <span class="keyword">return</span> Response(s.errors, status=status.HTTP_400_BAD_REQUEST)  <span class="comment"># 新增当然有返回对应的数据给前端</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>配置URL映射 <code>course\urls.py</code> 域名：应该尽量将 API 部署在专用域名之</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.urls <span class="keyword">import</span> path, include</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> course <span class="keyword">import</span> views</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    <span class="comment"># Function Based View</span></span><br><span class="line">    <span class="comment"># 获取所有课程信息或新增一个课程</span></span><br><span class="line">    path(<span class="string">"fbv/list/"</span>, views.course_list, name=<span class="string">"fbv-list"</span>),</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
+<p>DRF本身自带了一套页面，可以方便我们查看我们使用DRF定制的数据接口，如下图所示。<br><img src="/2021/05/06/drf-shi-tu-kai-fa-restfulapi-jie-kou-de-fang-shi/0.png" alt="http://127.0.0.1:8000/course/fbv/list/"></p>
+<p>POST请求添加数据</p>
+<figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">{</span><br><span class="line">    <span class="attr">"name"</span>: <span class="string">"Python体验课"</span>,</span><br><span class="line">    <span class="attr">"introduction"</span>: <span class="string">"9元包邮"</span>,</span><br><span class="line">    <span class="attr">"price"</span>: <span class="string">"9.00"</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+<p><code>id</code> 不需要，<code>teacher</code> 是当前已登录的用户，<code>created_at</code> 和 <code>updated_at</code> django ORM 会自动加上</p>
+<p><img src="/2021/05/06/drf-shi-tu-kai-fa-restfulapi-jie-kou-de-fang-shi/2.png" alt="description"></p>
+<h3 id="获取一个课程的详细信息、更新、删除一个课程"><a href="#获取一个课程的详细信息、更新、删除一个课程" class="headerlink" title="获取一个课程的详细信息、更新、删除一个课程"></a>获取一个课程的详细信息、更新、删除一个课程</h3><p><code>course\views.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework <span class="keyword">import</span> status</span><br><span class="line"><span class="keyword">from</span> rest_framework.authentication <span class="keyword">import</span> BasicAuthentication, SessionAuthentication, TokenAuthentication</span><br><span class="line"><span class="keyword">from</span> rest_framework.decorators <span class="keyword">import</span> api_view, authentication_classes, permission_classes</span><br><span class="line"><span class="keyword">from</span> rest_framework.permissions <span class="keyword">import</span> IsAuthenticated</span><br><span class="line"><span class="keyword">from</span> rest_framework.response <span class="keyword">import</span> Response</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> .models <span class="keyword">import</span> Course</span><br><span class="line"><span class="keyword">from</span> .serializers <span class="keyword">import</span> CourseSerializer</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="string">"""一、 函数式编程 Function Based View"""</span></span><br><span class="line"><span class="meta">@api_view(["GET", "PUT", "DELETE"])</span></span><br><span class="line"><span class="comment"># 对象级别的设置优先全局设置</span></span><br><span class="line"><span class="meta">@authentication_classes(</span></span><br><span class="line">    (BasicAuthentication, SessionAuthentication, TokenAuthentication))</span><br><span class="line"><span class="meta">@permission_classes((IsAuthenticated, ))</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">course_detail</span>(<span class="params">request, pk</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    获取一个课程的详细信息、更新、删除一个课程</span></span><br><span class="line"><span class="string">    :param request:</span></span><br><span class="line"><span class="string">    :param pk: url传递过来的主键</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        <span class="comment"># 通过pk获取课程的queryset</span></span><br><span class="line">        course = Course.objects.get(pk=pk)</span><br><span class="line">    <span class="keyword">except</span> Course.DoesNotExist:  <span class="comment"># 前端传递过来的pk在数据表查不到，不存在</span></span><br><span class="line">        <span class="keyword">return</span> Response(data={<span class="string">"msg"</span>: <span class="string">"没有此课程信息"</span>},</span><br><span class="line">                        status=status.HTTP_404_NOT_FOUND)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">if</span> request.method == <span class="string">"GET"</span>:</span><br><span class="line">            s = CourseSerializer(instance=course)</span><br><span class="line">            print(type(request), type(request.data), type(s), type(s.data))</span><br><span class="line">            <span class="comment"># &lt;class 'rest_framework.request.Request'&gt; &lt;class 'dict'&gt; &lt;class 'course.serializers.CourseSerializer'&gt; &lt;class 'rest_framework.utils.serializer_helpers.ReturnDict'&gt;</span></span><br><span class="line">            <span class="keyword">return</span> Response(data=s.data, status=status.HTTP_200_OK)  <span class="comment"># 获取当然有返回对应的数据给前端</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">elif</span> request.method == <span class="string">"PUT"</span>:</span><br><span class="line">            s = CourseSerializer(instance=course, data=request.data)</span><br><span class="line">            <span class="comment"># `instance` 要序列化的查询集实例，要序列化的 `course` 是查询出来的实例</span></span><br><span class="line">            <span class="comment"># `data` 数据哪里来的，`request.data` 是前端传递过来的数据，，就是Postman body里面 raw-json的数据</span></span><br><span class="line">            <span class="comment"># 把`data`的数据序列化后保存或跟新到 `course` 这个对象里面 </span></span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> s.is_valid():</span><br><span class="line">                s.save()  <span class="comment"># 不用像POST请求一样设置teacher字段为当前登录的用户，</span></span><br><span class="line">                <span class="comment"># PUT为更新操作，这条数据teacher字段已经有了并且是登录用户，是当前登录用户更改自己的数据，不能把别人的课程改成自己是讲师</span></span><br><span class="line">                print(type(request), type(request.data), type(s), type(s.data))</span><br><span class="line">                <span class="comment"># &lt;class 'rest_framework.request.Request'&gt; &lt;class 'dict'&gt; &lt;class 'course.serializers.CourseSerializer'&gt; &lt;class 'rest_framework.utils.serializer_helpers.ReturnDict'&gt;</span></span><br><span class="line">                <span class="keyword">return</span> Response(data=s.data, status=status.HTTP_200_OK)  <span class="comment"># 更新当然有返回数据</span></span><br><span class="line">            <span class="keyword">return</span> Response(data=s.errors, status=status.HTTP_400_BAD_REQUEST)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">elif</span> request.method == <span class="string">"DELETE"</span>:</span><br><span class="line">            course.delete()</span><br><span class="line">            <span class="keyword">return</span> Response(status=status.HTTP_204_NO_CONTENT)  <span class="comment"># 删除不返回数据，只返回状态码</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>配置URL映射<code>course\urls.py</code> 域名：应该尽量将 API 部署在专用域名之</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.urls <span class="keyword">import</span> path, include</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> course <span class="keyword">import</span> views</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    <span class="comment"># Function Based View</span></span><br><span class="line">    <span class="comment"># 获取一个课程的详细信息、更新、删除一个课程，类型是int，名称是pk</span></span><br><span class="line">    path(<span class="string">"fbv/detail/&lt;int:pk&gt;/"</span>, views.course_detail, name=<span class="string">"fbv-detail"</span>),  <span class="comment"># 结尾的/不能少</span></span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="/2021/05/06/drf-shi-tu-kai-fa-restfulapi-jie-kou-de-fang-shi/3.png" alt="'http://127.0.0.1:8000/course/fbv/detail/1/'"></p>
+<h2 id="基于类的视图-Classed-Based-View"><a href="#基于类的视图-Classed-Based-View" class="headerlink" title="基于类的视图 Classed Based View"></a>基于类的视图 Classed Based View</h2><p>可以用到python类的特性，封装继承多态，减少代码重复率</p>
+<h3 id="获取所有课程信息或新增一个课程-1"><a href="#获取所有课程信息或新增一个课程-1" class="headerlink" title="获取所有课程信息或新增一个课程"></a>获取所有课程信息或新增一个课程</h3><p><code>course\views.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework.decorators <span class="keyword">import</span> permission_classes</span><br><span class="line"><span class="keyword">from</span> rest_framework.permissions <span class="keyword">import</span> IsAuthenticated</span><br><span class="line"></span><br><span class="line"><span class="string">"""二、 类视图 Class Based View"""</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CourseList</span>(<span class="params">APIView</span>):</span></span><br><span class="line">    <span class="comment"># 获取所有课程信息或新增一个课程</span></span><br><span class="line">    permission_classes = (IsAuthenticated, )  <span class="comment"># settings.py中已设置，此处是多余的</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span>(<span class="params">self, request</span>):</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        :param request:</span></span><br><span class="line"><span class="string">        :return:</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        queryset = Course.objects.all()</span><br><span class="line">        s = CourseSerializer(instance=queryset, many=<span class="literal">True</span>)  <span class="comment"># 这里是instance = xx 查询集</span></span><br><span class="line">        print(type(request), type(request.data), type(s), type(s.data))</span><br><span class="line">        <span class="comment"># &lt;class 'rest_framework.request.Request'&gt; &lt;class 'dict'&gt; &lt;class 'rest_framework.serializers.ListSerializer'&gt; &lt;class 'rest_framework.utils.serializer_helpers.ReturnList'&gt;</span></span><br><span class="line">        <span class="keyword">return</span> Response(s.data, status=status.HTTP_200_OK)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">post</span>(<span class="params">self, request</span>):</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        :param request:</span></span><br><span class="line"><span class="string">        :return:</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        s = CourseSerializer(</span><br><span class="line">            data=request.data)  <span class="comment"># 这里是data = xx, return前要先调用.is_valid()</span></span><br><span class="line">        <span class="keyword">if</span> s.is_valid():</span><br><span class="line">            s.save(teacher=self.request.user)</span><br><span class="line">            print(type(request.data), type(s), type(s.data))</span><br><span class="line">            <span class="comment"># &lt;class 'dict'&gt; &lt;class 'course.serializers.CourseSerializer'&gt; &lt;class 'rest_framework.utils.serializer_helpers.ReturnDict'&gt;</span></span><br><span class="line">            <span class="keyword">return</span> Response(data=s.data, status=status.HTTP_201_CREATED)</span><br><span class="line">        <span class="keyword">return</span> Response(data=s.errors, status=status.HTTP_400_BAD_REQUEST)</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>course\urls.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">urlpatterns = [</span><br><span class="line">    <span class="comment"># Class Based View</span></span><br><span class="line">    path(<span class="string">"cbv/list/"</span>, views.CourseList.as_view(), name=<span class="string">"cbv-list"</span>),</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="获取一个课程的详细信息、更新、删除一个课程-1"><a href="#获取一个课程的详细信息、更新、删除一个课程-1" class="headerlink" title="获取一个课程的详细信息、更新、删除一个课程"></a>获取一个课程的详细信息、更新、删除一个课程</h3><p><code>course\views.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework.decorators <span class="keyword">import</span> permission_classes</span><br><span class="line"><span class="keyword">from</span> rest_framework.permissions <span class="keyword">import</span> IsAuthenticated</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CourseDetail</span>(<span class="params">APIView</span>):</span></span><br><span class="line">    permission_classes = (IsAuthenticated, )</span><br><span class="line"></span><br><span class="line"><span class="meta">    @staticmethod  # 没有用到self</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_object</span>(<span class="params">pk</span>):</span></span><br><span class="line">        <span class="comment"># 获取实例对象</span></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            <span class="keyword">return</span> Course.objects.get(pk=pk)</span><br><span class="line">        <span class="keyword">except</span> Course.DoesNotExist:</span><br><span class="line">            <span class="keyword">return</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span>(<span class="params">self, request, pk</span>):</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        :param request:</span></span><br><span class="line"><span class="string">        :param pk:</span></span><br><span class="line"><span class="string">        :return:</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        obj = self.get_object(pk=pk)</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> obj:</span><br><span class="line">            <span class="keyword">return</span> Response(data={<span class="string">"msg"</span>: <span class="string">"没有此课程信息"</span>},</span><br><span class="line">                            status=status.HTTP_404_NOT_FOUND)</span><br><span class="line"></span><br><span class="line">        s = CourseSerializer(instance=obj)</span><br><span class="line">        <span class="keyword">return</span> Response(s.data, status=status.HTTP_200_OK)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">put</span>(<span class="params">self, request, pk</span>):</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        :param request:</span></span><br><span class="line"><span class="string">        :param pk:</span></span><br><span class="line"><span class="string">        :return:</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        obj = self.get_object(pk=pk)</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> obj:</span><br><span class="line">            <span class="keyword">return</span> Response(data={<span class="string">"msg"</span>: <span class="string">"没有此课程信息"</span>},</span><br><span class="line">                            status=status.HTTP_404_NOT_FOUND)</span><br><span class="line"></span><br><span class="line">        s = CourseSerializer(instance=obj, data=request.data)  <span class="comment"># 反序列化</span></span><br><span class="line">        <span class="keyword">if</span> s.is_valid():</span><br><span class="line">            s.save()</span><br><span class="line">            <span class="keyword">return</span> Response(data=s.data, status=status.HTTP_200_OK)</span><br><span class="line">        <span class="keyword">return</span> Response(data=s.errors, status=status.HTTP_400_BAD_REQUEST)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">delete</span>(<span class="params">self, request, pk</span>):</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        :param request:</span></span><br><span class="line"><span class="string">        :param pk:</span></span><br><span class="line"><span class="string">        :return:</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        obj = self.get_object(pk=pk)</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> obj:</span><br><span class="line">            <span class="keyword">return</span> Response(data={<span class="string">"msg"</span>: <span class="string">"没有此课程信息"</span>},</span><br><span class="line">                            status=status.HTTP_404_NOT_FOUND)</span><br><span class="line">        obj.delete()</span><br><span class="line">        <span class="keyword">return</span> Response(status=status.HTTP_204_NO_CONTENT)</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>course\urls.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">urlpatterns = [</span><br><span class="line">    <span class="comment"># Class Based View</span></span><br><span class="line">    path(<span class="string">"cbv/detail/&lt;int:pk&gt;/"</span>,</span><br><span class="line">         views.CourseDetail.as_view(),</span><br><span class="line">         name=<span class="string">"cbv-detail"</span>),</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="通用类视图-Generic-Classed-Based-View-GenericAPIView-整合了增删改查的类"><a href="#通用类视图-Generic-Classed-Based-View-GenericAPIView-整合了增删改查的类" class="headerlink" title="通用类视图 Generic Classed Based View GenericAPIView 整合了增删改查的类"></a>通用类视图 Generic Classed Based View <code>GenericAPIView</code> 整合了增删改查的类</h2><p><code>mixin</code>与多种通用CRUD类视图的继承关系。<br>灵活度低，只有自带的增删改查</p>
+<h3 id="获取所有课程信息或新增一个课程-2"><a href="#获取所有课程信息或新增一个课程-2" class="headerlink" title="获取所有课程信息或新增一个课程"></a>获取所有课程信息或新增一个课程</h3><p><code>course\views.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework <span class="keyword">import</span> generics</span><br><span class="line"><span class="keyword">from</span> rest_framework.permissions <span class="keyword">import</span> IsAuthenticated</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> .models <span class="keyword">import</span> Course</span><br><span class="line"><span class="keyword">from</span> .permissions <span class="keyword">import</span> IsOwnerOrReadOnly</span><br><span class="line"><span class="keyword">from</span> .serializers <span class="keyword">import</span> CourseSerializer</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GCourseList</span>(<span class="params">generics.ListCreateAPIView</span>):</span></span><br><span class="line">    queryset = Course.objects.all()</span><br><span class="line">    serializer_class = CourseSerializer</span><br><span class="line">    permission_classes = (IsAuthenticated, )</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">perform_create</span>(<span class="params">self, serializer</span>):</span></span><br><span class="line">        serializer.save(teacher=self.request.user)  <span class="comment"># 当前请求的登录用户赋值给teacher</span></span><br></pre></td></tr></tbody></table></figure>
+<p><code>course\urls.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">urlpatterns = [</span><br><span class="line">    <span class="comment"># Generic Class Based View</span></span><br><span class="line">    path(<span class="string">"gcbv/list/"</span>, views.GCourseList.as_view(), name=<span class="string">"gcbv-list"</span>),</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="获取一个课程的详细信息、更新、删除一个课程-2"><a href="#获取一个课程的详细信息、更新、删除一个课程-2" class="headerlink" title="获取一个课程的详细信息、更新、删除一个课程"></a>获取一个课程的详细信息、更新、删除一个课程</h3><p><code>course\views.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework <span class="keyword">import</span> generics</span><br><span class="line"><span class="keyword">from</span> rest_framework.permissions <span class="keyword">import</span> IsAuthenticated</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> .models <span class="keyword">import</span> Course</span><br><span class="line"><span class="keyword">from</span> .permissions <span class="keyword">import</span> IsOwnerOrReadOnly</span><br><span class="line"><span class="keyword">from</span> .serializers <span class="keyword">import</span> CourseSerializer</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GCourseDetail</span>(<span class="params">generics.RetrieveUpdateDestroyAPIView</span>):</span></span><br><span class="line">    queryset = Course.objects.all()</span><br><span class="line">    serializer_class = CourseSerializer</span><br><span class="line">    permission_classes = (IsAuthenticated, IsOwnerOrReadOnly)</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">urlpatterns = [</span><br><span class="line">    <span class="comment"># Generic Class Based View</span></span><br><span class="line">    path(<span class="string">"gcbv/detail/&lt;int:pk&gt;/"</span>,</span><br><span class="line">         views.GCourseDetail.as_view(),</span><br><span class="line">         name=<span class="string">"gcbv-detail"</span>),</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="DRF的视图集viewsets-整合了FBV-CBV-GCBV的方法"><a href="#DRF的视图集viewsets-整合了FBV-CBV-GCBV的方法" class="headerlink" title="DRF的视图集viewsets 整合了FBV CBV GCBV的方法"></a>DRF的视图集<code>viewsets</code> 整合了FBV CBV GCBV的方法</h2><p>高度定制化、灵活性低，开发效率高，几行代码可以完成CRUD<br><code>course\views.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework <span class="keyword">import</span> viewsets</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CourseViewSet</span>(<span class="params">viewsets.ModelViewSet</span>):</span></span><br><span class="line">    queryset = Course.objects.all()</span><br><span class="line">    serializer_class = CourseSerializer</span><br><span class="line">    permission_classes = (IsAuthenticated, IsOwnerOrReadOnly)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">perform_create</span>(<span class="params">self, serializer</span>):</span></span><br><span class="line">        serializer.save(teacher=self.request.user)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>配置路由法一</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">urlpatterns = [</span><br><span class="line">    <span class="comment"># Generic Class Based View 同一个类视图对应2个不同的url</span></span><br><span class="line">    <span class="comment"># 给视图集指定请求的url应该调用哪些方法 </span></span><br><span class="line">    <span class="comment"># 字典的key是HTTP方法，value是调用视图集里面父类方法</span></span><br><span class="line">    <span class="comment"># value的list是视图集ModelViewSet的源码ListModelMixin的list方法</span></span><br><span class="line">    <span class="comment"># value的create是视图集ModelViewSet的源码CreateModelMixin的create方法</span></span><br><span class="line">    path(<span class="string">"viewsets/"</span>,</span><br><span class="line">         views.CourseViewSet.as_view({</span><br><span class="line">             <span class="string">"get"</span>: <span class="string">"list"</span>,</span><br><span class="line">             <span class="string">"post"</span>: <span class="string">"create"</span></span><br><span class="line">         }),</span><br><span class="line">         name=<span class="string">"viewsets-list"</span>),</span><br><span class="line">         </span><br><span class="line">    path(<span class="string">"viewsets/&lt;int:pk&gt;/"</span>,</span><br><span class="line">         views.CourseViewSet.as_view({</span><br><span class="line">             <span class="string">"get"</span>: <span class="string">"retrieve"</span>,</span><br><span class="line">             <span class="string">"put"</span>: <span class="string">"update"</span>,</span><br><span class="line">             <span class="string">"patch"</span>: <span class="string">"partial_update"</span>,</span><br><span class="line">             <span class="string">"delete"</span>: <span class="string">"destroy"</span></span><br><span class="line">         }),</span><br><span class="line">         name=<span class="string">"viewsets-detail"</span>),</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>配置路由法二<br>drf自带路由<code>routers</code> 更快更省事。<br>``</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.urls <span class="keyword">import</span> path, include</span><br><span class="line"><span class="keyword">from</span> rest_framework.routers <span class="keyword">import</span> DefaultRouter</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> course <span class="keyword">import</span> views</span><br><span class="line"></span><br><span class="line">router = DefaultRouter()</span><br><span class="line"><span class="comment"># 视图集注册到路由实例</span></span><br><span class="line">router.register(prefix=<span class="string">"viewsets"</span>, viewset=views.CourseViewSet)</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    path(<span class="string">""</span>, include(router.urls))</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/05/05/xu-lie-hua/" rel="prev" title="序列化">
+                  <i class="fa fa-chevron-left"></i> 序列化
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/05/06/django-shi-tu-kai-fa-restful-api-jie-kou/" rel="next" title="django视图开发RESTful API接口">
+                  django视图开发RESTful API接口 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+<script src="/js/comments.js"></script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">外心人D</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
