@@ -28,7 +28,7 @@
 <meta property="og:description" content="Python使用多线程应用程序必须 通过操作系统提供的 系统调用，请求操作系统分配一个新的线程。线程执行代码都是在cpu中执行的 当多个线程运行时，可能会出现的问题及解决方案 通过线程执行的函数无法获取返回值——线程间如何通信：通过队列 多个线程同时修改文件可能造成数据错错乱——线程间如何避免资源抢占：创建线程锁 线程数量太多可能会造成资源不足，甚至死机等情况——如何避免创建线程数量过多：创建线程">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-04-07T16:21:41.000Z">
-<meta property="article:modified_time" content="2021-05-02T12:01:17.761Z">
+<meta property="article:modified_time" content="2021-05-12T14:44:56.301Z">
 <meta property="article:author" content="外心人D">
 <meta property="article:tag" content="多线程">
 <meta name="twitter:card" content="summary">
@@ -122,18 +122,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">231</span>
+          <span class="site-state-item-count">241</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
-        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-count">21</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
-        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-count">38</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -203,7 +203,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-05-02 12:01:17" itemprop="dateModified" datetime="2021-05-02T12:01:17Z">2021-05-02</time>
+        <time title="修改时间：2021-05-12 14:44:56" itemprop="dateModified" datetime="2021-05-12T14:44:56Z">2021-05-12</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -236,11 +236,12 @@
 <blockquote>
 <p>但实际上，当Python解释器程序运行起来（成为一个进程），OS就自动的创建一个线程，通常称为<strong>主线程</strong>，在这个主线程里面执行代码指令。<br>当解释器执行我们python程序代码的时候。 我们的代码就在这个主线程中解释执行。</p>
 </blockquote>
-<h4 id="threading-模块方法-Thread-通过类实例化对象数据属性-描述解释器执行到下面代码时，"><a href="#threading-模块方法-Thread-通过类实例化对象数据属性-描述解释器执行到下面代码时，" class="headerlink" title="threading 模块方法 Thread 通过类实例化对象数据属性 描述解释器执行到下面代码时，"></a><code>threading</code> 模块方法 <code>Thread</code> 通过类实例化对象数据属性 描述解释器执行到下面代码时，</h4><figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">thread = threading.Thread(target=func, daemon=<span class="literal">False</span>, args=(<span class="string">'参数1'</span>, <span class="string">'参数2'</span>), name=<span class="string">'thread_name'</span>)</span><br></pre></td></tr></tbody></table></figure>
+<h4 id="threading-模块方法-Thread-通过类实例化对象数据属性-描述解释器执行到下面代码时，"><a href="#threading-模块方法-Thread-通过类实例化对象数据属性-描述解释器执行到下面代码时，" class="headerlink" title="threading 模块方法 Thread 通过类实例化对象数据属性 描述解释器执行到下面代码时，"></a><code>threading</code> 模块方法 <code>Thread</code> 通过类实例化对象数据属性 描述解释器执行到下面代码时，</h4><figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">thread = threading.Thread(target=func, daemon=<span class="literal">False</span>, args=(<span class="string">'参数1'</span>, <span class="string">'参数2'</span>), kwargs={}, name=<span class="string">'thread_name'</span>)</span><br></pre></td></tr></tbody></table></figure>
 <p>创建<code>Thread</code>类的实例对象，但这时，新的线程还没有创建。通过线程执行的函数无法获取返回值<br>Thread类的初始化参数 有两个</p>
 <ul>
 <li><code>target</code> 指定新线程的 <strong>入口函数</strong>，要执行线程的函数名（对象），新线程创建后就会执行该入口函数里面的代码</li>
 <li><code>args</code> 指定了 传给线程 入口函数<code>func</code> 的参数，必须放在一个元组里面，里面的元素依次作为入口函数的参数。</li>
+<li><code>kwargs</code> 是可选参数，字典类型。</li>
 <li><code>name</code>线程名</li>
 <li><code>ident</code>线程的标识符</li>
 <li><code>daemon</code>值是一个bool值，这个线程是否是守护线程<br>默认为<code>daemon=False</code>，即我们说这个线程是一个<code>none daemon</code>的线程会阻塞主线程的退出，那主线程永远会等待子线程全部退出后自己才退出。<br>在none daemon线程中子线程因程序bug或其他原因而不能正常的退出时，那主线程就一直被阻塞，一直等待着子线程退出，这样线程所占用的资源就一直不能被释放。<code>join</code>函数能解决这样的问题。<br>主线程是非daemon线程，启动的子线程缺省也是 非daemon线程 线程，<br>要等到 主线程和子线程 都结束，程序才会结束。<br>Python程序中当所有的 <code>非daemon线程</code> 结束了，整个程序才会结束</li>
