@@ -20,15 +20,15 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
 
 <meta name="hexo-config" content="{&quot;hostname&quot;:&quot;bubbleboy11.github.io&quot;,&quot;root&quot;:&quot;/&quot;,&quot;images&quot;:&quot;/images&quot;,&quot;scheme&quot;:&quot;Muse&quot;,&quot;version&quot;:&quot;8.3.0&quot;,&quot;exturl&quot;:false,&quot;sidebar&quot;:{&quot;position&quot;:&quot;left&quot;,&quot;display&quot;:&quot;post&quot;,&quot;padding&quot;:18,&quot;offset&quot;:12},&quot;copycode&quot;:true,&quot;bookmark&quot;:{&quot;enable&quot;:false,&quot;color&quot;:&quot;#222&quot;,&quot;save&quot;:&quot;auto&quot;},&quot;fancybox&quot;:false,&quot;mediumzoom&quot;:false,&quot;lazyload&quot;:false,&quot;pangu&quot;:false,&quot;comments&quot;:{&quot;style&quot;:&quot;tabs&quot;,&quot;active&quot;:null,&quot;storage&quot;:true,&quot;lazyload&quot;:false,&quot;nav&quot;:null},&quot;motion&quot;:{&quot;enable&quot;:true,&quot;async&quot;:false,&quot;transition&quot;:{&quot;post_block&quot;:&quot;fadeIn&quot;,&quot;post_header&quot;:&quot;fadeInDown&quot;,&quot;post_body&quot;:&quot;fadeInDown&quot;,&quot;coll_header&quot;:&quot;fadeInLeft&quot;,&quot;sidebar&quot;:&quot;fadeInUp&quot;}},&quot;prism&quot;:false,&quot;i18n&quot;:{&quot;placeholder&quot;:&quot;搜索...&quot;,&quot;empty&quot;:&quot;没有找到任何搜索结果：${query}&quot;,&quot;hits_time&quot;:&quot;找到 ${hits} 个搜索结果（用时 ${time} 毫秒）&quot;,&quot;hits&quot;:&quot;找到 ${hits} 个搜索结果&quot;}}">
-<meta name="description" content="Python的垃圾回收机制原理  引用计数为主（缺点：循环引用无法解决） 引入标记清除和分代回收解决引用计数问题 引用计数为主+标记清除和分代回收（收集）为辅  引用计数（reference count）  每个对象都有存有指向该对象的引用总数 查看某个对象的引用计数 sys.getrefcount() 可以使用del关键字删除某个引用，减少对象引用计数，并不是销毁对象，释放已创建的变量（已占用的">
+<meta name="description" content="垃圾回收、循环引用和弱引用 Python使用了自动化内存管理，这种管理机制以引用计数为基础，同时也引入了标记-清除和分代收集两种机制为辅的策略。 123456typedef struct _object {    &#x2F;* 引用计数 *&#x2F;    int ob_refcnt;    &#x2F;* 对象指针 *&#x2F;    struct _typeobject *ob_type;} PyObject;  12345">
 <meta property="og:type" content="article">
 <meta property="og:title" content="垃圾回收">
 <meta property="og:url" content="https://bubbleboy11.github.io/2020/08/21/la-ji-hui-shou/index.html">
 <meta property="og:site_name" content="外心人D的博客">
-<meta property="og:description" content="Python的垃圾回收机制原理  引用计数为主（缺点：循环引用无法解决） 引入标记清除和分代回收解决引用计数问题 引用计数为主+标记清除和分代回收（收集）为辅  引用计数（reference count）  每个对象都有存有指向该对象的引用总数 查看某个对象的引用计数 sys.getrefcount() 可以使用del关键字删除某个引用，减少对象引用计数，并不是销毁对象，释放已创建的变量（已占用的">
+<meta property="og:description" content="垃圾回收、循环引用和弱引用 Python使用了自动化内存管理，这种管理机制以引用计数为基础，同时也引入了标记-清除和分代收集两种机制为辅的策略。 123456typedef struct _object {    &#x2F;* 引用计数 *&#x2F;    int ob_refcnt;    &#x2F;* 对象指针 *&#x2F;    struct _typeobject *ob_type;} PyObject;  12345">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-08-20T16:21:41.000Z">
-<meta property="article:modified_time" content="2021-04-02T12:24:45.733Z">
+<meta property="article:modified_time" content="2021-05-20T09:43:45.400Z">
 <meta property="article:author" content="外心人D">
 <meta name="twitter:card" content="summary">
 
@@ -120,18 +120,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">241</span>
+          <span class="site-state-item-count">246</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
-        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-count">22</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
-        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-count">39</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -201,7 +201,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-02 12:24:45" itemprop="dateModified" datetime="2021-04-02T12:24:45Z">2021-04-02</time>
+        <time title="修改时间：2021-05-20 09:43:45" itemprop="dateModified" datetime="2021-05-20T09:43:45Z">2021-05-20</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -223,7 +223,17 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <p>Python的垃圾回收机制原理</p>
+        <ul>
+<li><p>垃圾回收、循环引用和弱引用</p>
+<p>Python使用了自动化内存管理，这种管理机制以<strong>引用计数</strong>为基础，同时也引入了<strong>标记-清除</strong>和<strong>分代收集</strong>两种机制为辅的策略。</p>
+<figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">object</span> {</span></span><br><span class="line">    <span class="comment">/* 引用计数 */</span></span><br><span class="line">    <span class="keyword">int</span> ob_refcnt;</span><br><span class="line">    <span class="comment">/* 对象指针 */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> _<span class="title">typeobject</span> *<span class="title">ob_type</span>;</span></span><br><span class="line">} PyObject;</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 增加引用计数的宏定义 */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> Py_INCREF(op)   ((op)-&gt;ob_refcnt++)</span></span><br><span class="line"><span class="comment">/* 减少引用计数的宏定义 */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> Py_DECREF(op) \ <span class="comment">//减少计数</span></span></span><br><span class="line">    <span class="keyword">if</span> (--(op)-&gt;ob_refcnt != <span class="number">0</span>) \</span><br><span class="line">        ; \</span><br><span class="line">    <span class="keyword">else</span> \</span><br><span class="line">        __Py_Dealloc((PyObject *)(op))</span><br></pre></td></tr></tbody></table></figure>
+
+
+</li>
+</ul>
+<p>Python的垃圾回收机制原理</p>
 <ul>
 <li>引用计数为主（缺点：循环引用无法解决）</li>
 <li>引入标记清除和分代回收解决引用计数问题</li>
@@ -235,23 +245,49 @@
 <li>查看某个对象的引用计数 <code>sys.getrefcount()</code></li>
 <li>可以使用del关键字删除某个引用，减少对象引用计数，并不是销毁对象，释放已创建的变量（已占用的资源）。</li>
 </ul>
-<p>① 什么时候对象的引用计数加1呢？<br>    -  对象创建 a = 1,</p>
-<pre><code>-   对象被引用 b = a
+<p>对每一个对象保存一个整型的引用计数器属性。用于记录对象被引用的情况。<br>对于一个对象A，只要有任何一个对象引用了A，则A的引用计数器就加1；<br>当引用失效时，引用计数器就减1。<br>只要对象的引用计数器的值为0，即表示对象A不能在被使用，可进行回收。</p>
+<p>优点：</p>
+<p>实现简单，垃圾对象便于辨识；判定效率高，回收没有延迟性。<br>缺点：</p>
+<p>他需要单独的字段存储计数器，这样的做法增加了存储空间的开销。</p>
+<p>每次赋值都需要更新计数器，伴随着加法和减法操作，这增加了时间开销。</p>
+<p>引用计数器还有一个严重的问题，即无法处理循环引用的问题，这是一条致命的缺陷，导致在Java回收的垃圾回收器中没有使用这类算法。</p>
+<p>Python的引用计数算法和实施方案<br>引用计数算法，是很多语言的资源回收选择，例如因人工智能而大火的Python，它是同时支持引用计数和垃圾回收机制的。</p>
+<p>具体哪种最优是要看场景的，业界有大规模实践中仅保留引用计数机制，以提高吞吐量的尝试。</p>
+<p>Java并没有选择引用计数是因为其存在一个基本的难题，也就是很难处理循环引用关系。</p>
+<p>Python是如何解决循环引用的？</p>
+<p>手动解除：很好理解，就是在合适的时机，解除引用关系。</p>
+<p>使用弱引用weakref，weakref是Python提供的标准库，旨在解决循环引用问题。</p>
+<p>① 什么时候对象的引用计数加1呢？<br>    -  对象创建 <code>a = 1,</code></p>
+<pre><code>-  对象被引用 `b = a`
 
--  对象作为参数传递 func(a)
+-  对象作为参数传递，传入到一个函数中，`func(a)`
 
--   对象存储在容器中 l = [a]
+-  对象作为一个元素，对象存储在容器中 `l = [a]`
 </code></pre>
 <p>② 什么时候引用计数会减1呢？</p>
-<pre><code>-  显示使用 del a 
+<pre><code>-  对象的别名被显式销毁，例如`del a`
 
--  引用指向了别的对象 b=None
-
--  离开的对象的作用域（比如函数执行结束）
-
--  从一个容器移除对象或者销毁容器
+-  对象的别名被赋予和引用指向了别的对象 `b=None` `a = 24`
 </code></pre>
+<ul>
+<li>一个对象离开它的作用域，例如f函数执行完毕时，f函数中的局部变量（全局变量不会）</li>
+<li>对象所在的容器被销毁，或从容器中删除对象</li>
+</ul>
 <p>③ 当对象的引用计数减少为0时，就意味着对象已经再没有被使用了，python虚拟机就会去把对象占用的内存回收掉，将其内存释放掉。</p>
+<p>  引用计数可能会导致循环引用问题，而循环引用会导致内存泄露，如下面的代码所示。为了解决这个问题，Python中引入了“标记-清除”和“分代收集”。在创建一个对象的时候，对象被放在第一代中，如果在第一代的垃圾检查中对象存活了下来，该对象就会被放到第二代中，同理在第二代的垃圾检查中对象存活下来，该对象就会被放到第三代中。</p>
+  <figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 循环引用会导致内存泄露 - Python除了引用技术还引入了标记清理和分代回收</span></span><br><span class="line"><span class="comment"># 在Python 3.6以前如果重写__del__魔术方法会导致循环引用处理失效</span></span><br><span class="line"><span class="comment"># 如果不想造成循环引用可以使用弱引用</span></span><br><span class="line">list1 = []</span><br><span class="line">list2 = [] </span><br><span class="line">list1.append(list2)</span><br><span class="line">list2.append(list1)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>  以下情况会导致垃圾回收：</p>
+<ul>
+<li><p>调用<code>gc.collect()</code></p>
+</li>
+<li><p><code>gc</code>模块的计数器达到阀值</p>
+</li>
+<li><p>程序退出</p>
+<p>如果循环引用中两个对象都定义了<code>__del__</code>方法，<code>gc</code>模块不会销毁这些不可达对象，因为gc模块不知道应该先调用哪个对象的<code>__del__</code>方法，这个问题在Python 3.6中得到了解决。</p>
+<p>也可以通过<code>weakref</code>模块构造弱引用的方式来解决循环引用的问题。</p>
+</li>
+</ul>
 <p>值(number\str)类型先随机 分配一个内存从一个随机数开始，</p>
 <p>python里面一切皆对象，比如创建一个列表 [1]，这个一个list对象。实际上Python的C语言实现中对于每个对象它都有几个字段，如它是什么类型以及引用计数即 ref 的值等，引用计数ref 就是C语言实现里面一个int值，用来计算有多少个变量在引用它。</p>
 <figure class="highlight angelscript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">a = [<span class="number">1</span>]   # [<span class="number">1</span>]对象引用计数增加<span class="number">1</span>，<span class="built_in">ref</span>=<span class="number">1</span></span><br><span class="line">b = a     # [<span class="number">1</span>]对象引用计数增加<span class="number">1</span>，<span class="built_in">ref</span>=<span class="number">2</span></span><br><span class="line">b = None  # [<span class="number">1</span>]对象引用计数减少<span class="number">1</span>，<span class="built_in">ref</span>=<span class="number">1</span></span><br><span class="line">del a     # [<span class="number">1</span>]对象引用计数减少<span class="number">1</span>，<span class="built_in">ref</span>=<span class="number">0</span></span><br></pre></td></tr></tbody></table></figure>
