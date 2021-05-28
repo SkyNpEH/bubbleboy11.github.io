@@ -118,18 +118,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">246</span>
+          <span class="site-state-item-count">254</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
-        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-count">23</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
-        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-count">40</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -158,6 +158,249 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/04/15/admin-guan-li-jing-dian-he-men-piao/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/04/15/admin-guan-li-jing-dian-he-men-piao/" class="post-title-link" itemprop="url">使用admin管理景点和门票</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-04-15 13:39:20" itemprop="dateCreated datePublished" datetime="2021-04-15T13:39:20Z">2021-04-15</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-05-04 12:16:59" itemprop="dateModified" datetime="2021-05-04T12:16:59Z">2021-05-04</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%97%85%E6%B8%B8%E7%BD%91%E9%A1%B9%E7%9B%AE/" itemprop="url" rel="index"><span itemprop="name">旅游网项目</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="将景点添加到后台管理"><a href="#将景点添加到后台管理" class="headerlink" title="将景点添加到后台管理"></a>将景点添加到后台管理</h2><p><code>utils\actions.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.contrib <span class="keyword">import</span> messages</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">set_invalid</span>(<span class="params">modeladmin, request, queryset</span>):</span></span><br><span class="line">    <span class="string">""" 批量禁用 """</span></span><br><span class="line">    queryset.update(is_valid=<span class="literal">False</span>)</span><br><span class="line">    messages.success(request, <span class="string">'操作成功'</span>)</span><br><span class="line"></span><br><span class="line">set_invalid.short_description = <span class="string">'禁用所选对象'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">set_valid</span>(<span class="params">modeladmin, request, queryset</span>):</span></span><br><span class="line">    <span class="string">""" 批量启用 """</span></span><br><span class="line">    queryset.update(is_valid=<span class="literal">True</span>)</span><br><span class="line">    messages.success(request, <span class="string">'操作成功'</span>)</span><br><span class="line">set_valid.short_description = <span class="string">'启用所选对象'</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>通过装饰器注册把模型注册到后台管理，可在admin后台对模型字段数据进行增删改查<br><code>sight\admin.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.contrib <span class="keyword">import</span> admin</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> sight.models <span class="keyword">import</span> Sight</span><br><span class="line"><span class="keyword">from</span> utils.actions <span class="keyword">import</span> set_invalid, set_valid</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@admin.register(Sight)</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SightAdmin</span>(<span class="params">admin.ModelAdmin</span>):</span></span><br><span class="line">    <span class="string">""" 景点基础信息 """</span></span><br><span class="line">    list_display = (<span class="string">'name'</span>, <span class="string">'desc'</span>, <span class="string">'main_img'</span>, <span class="string">'score'</span>, <span class="string">'province'</span>, <span class="string">'city'</span>,</span><br><span class="line">                    <span class="string">'area'</span>, <span class="string">'town'</span>, <span class="string">'is_valid'</span>, <span class="string">'created_at'</span>, <span class="string">'updated_at'</span>)</span><br><span class="line">    search_fields = (<span class="string">'name'</span>, <span class="string">'desc'</span>)</span><br><span class="line">    list_filter = (<span class="string">'is_top'</span>, <span class="string">'is_hot'</span>)</span><br><span class="line">    list_per_page = <span class="number">20</span></span><br><span class="line">    actions = [set_invalid, set_valid]</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2021/04/15/admin-guan-li-jing-dian-he-men-piao/0.png" alt="description"><br><img src="/2021/04/15/admin-guan-li-jing-dian-he-men-piao/1.png" alt="description"></p>
+<h2 id="将景点详情添加到后台管理"><a href="#将景点详情添加到后台管理" class="headerlink" title="将景点详情添加到后台管理"></a>将景点详情添加到后台管理</h2><p><code>sight\models.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Sight</span>(<span class="params">CommonModel</span>):</span></span><br><span class="line">    <span class="string">""" 景点基础信息 """</span></span><br><span class="line">    name = models.CharField(<span class="string">'名称'</span>, max_length=<span class="number">64</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__str__</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="string">"""后台景点对象改成对应的景点中文名"""</span></span><br><span class="line">        <span class="keyword">return</span> self.name</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Info</span>(<span class="params">models.Model</span>):</span></span><br><span class="line">    <span class="string">""" 景点详情 """</span></span><br><span class="line">    sight = models.OneToOneField(Sight, on_delete=models.CASCADE, verbose_name=<span class="string">'关联景点'</span>)</span><br></pre></td></tr></tbody></table></figure>
+<h3 id="关联搜索-在后台管理配置搜索条件"><a href="#关联搜索-在后台管理配置搜索条件" class="headerlink" title="关联搜索 在后台管理配置搜索条件"></a>关联搜索 在后台管理配置搜索条件</h3><ul>
+<li><code>search_fields</code>——支持搜索的字段<h4 id="场景：：按景点名搜索"><a href="#场景：：按景点名搜索" class="headerlink" title="场景：：按景点名搜索"></a>场景：：按景点名搜索</h4><code>sight_info</code>表格里面没有<code>name</code>字段，<code>sight</code>表才有<code>name</code>字段，1对1的关联关系，用<code>search_fields = ('sight__name', )</code><br>通过装饰器注册把模型注册到后台管理，可在admin后台对模型字段数据进行增删改查<br><code>sight\admin.py</code><figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.contrib <span class="keyword">import</span> admin</span><br><span class="line"><span class="keyword">from</span> sight.models <span class="keyword">import</span> Info</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@admin.register(Info)</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">InfoAdmin</span>(<span class="params">admin.ModelAdmin</span>):</span></span><br><span class="line">    <span class="string">""" 景点详细信息 """</span></span><br><span class="line">    list_display = (<span class="string">'sight'</span>, <span class="string">'entry_explain'</span>, <span class="string">'play_way'</span>, <span class="string">'tips'</span>, <span class="string">'traffic'</span>)</span><br><span class="line">    search_fields = (<span class="string">'sight__name'</span>, )</span><br></pre></td></tr></tbody></table></figure>
+<img src="/2021/04/15/admin-guan-li-jing-dian-he-men-piao/2.png" alt="description"><br><img src="/2021/04/15/admin-guan-li-jing-dian-he-men-piao/3.png" alt="description"><br><img src="/2021/04/15/admin-guan-li-jing-dian-he-men-piao/11.png" alt="description"><br><img src="/2021/04/15/admin-guan-li-jing-dian-he-men-piao/4.png" alt="description"></li>
+</ul>
+<h2 id="将景点评论及回复添加到后台管理"><a href="#将景点评论及回复添加到后台管理" class="headerlink" title="将景点评论及回复添加到后台管理"></a>将景点评论及回复添加到后台管理</h2><p>通过装饰器注册把模型注册到后台管理，可在admin后台对模型字段数据进行增删改查<br><code>sight\admin.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.contrib <span class="keyword">import</span> admin</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> sight.models <span class="keyword">import</span> Comment</span><br><span class="line"><span class="keyword">from</span> utils.actions <span class="keyword">import</span> set_invalid, set_valid</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@admin.register(Comment)</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CommentsAdmin</span>(<span class="params">admin.ModelAdmin</span>):</span></span><br><span class="line">    <span class="string">""" 评论及回复 """</span></span><br><span class="line">    list_display = (<span class="string">'user'</span>, <span class="string">'sight'</span>, <span class="string">'content'</span>, <span class="string">'score'</span>, <span class="string">'is_top'</span>,</span><br><span class="line">                    <span class="string">'love_count'</span>)</span><br><span class="line">    search_fields = (<span class="string">'sight__name'</span>, )</span><br><span class="line">    actions = [set_invalid, set_valid]</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2021/04/15/admin-guan-li-jing-dian-he-men-piao/5.png" alt="description"><br><img src="/2021/04/15/admin-guan-li-jing-dian-he-men-piao/6.png" alt="description"></p>
+<p>通过装饰器注册把模型注册到后台管理，可在admin后台对模型字段数据进行增删改查<br><code>sight\admin.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.contrib <span class="keyword">import</span> admin</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> sight.models <span class="keyword">import</span> Ticket</span><br><span class="line"><span class="keyword">from</span> utils.actions <span class="keyword">import</span> set_invalid, set_valid</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@admin.register(Ticket)</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TicketAdmin</span>(<span class="params">admin.ModelAdmin</span>):</span></span><br><span class="line">    <span class="string">""" 门票管理 """</span></span><br><span class="line">    list_display = (<span class="string">'sight'</span>, <span class="string">'name'</span>, <span class="string">'types'</span>, <span class="string">'price'</span>, <span class="string">'discount'</span>,</span><br><span class="line">                    <span class="string">'total_stock'</span>, <span class="string">'remain_stock'</span>, <span class="string">'is_valid'</span>)</span><br><span class="line">    search_fields = (<span class="string">'sight__name'</span>, )</span><br><span class="line">    actions = [set_invalid, set_valid]</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2021/04/15/admin-guan-li-jing-dian-he-men-piao/7.png" alt="description"><br><img src="/2021/04/15/admin-guan-li-jing-dian-he-men-piao/8.png" alt="description"></p>
+<p><code>sight\apps.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SightConfig</span>(<span class="params">AppConfig</span>):</span></span><br><span class="line">    name = <span class="string">'sight'</span></span><br><span class="line">    verbose_name = <span class="string">'景点模块'</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>sight\models.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Sight</span>(<span class="params">CommonModel</span>):</span></span><br><span class="line">    <span class="string">""" 景点基础信息 """</span></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        db_table = <span class="string">'sight'</span></span><br><span class="line">        ordering = [<span class="string">'-updated_at'</span>]</span><br><span class="line">        verbose_name = <span class="string">'景点基础信息'</span></span><br><span class="line">        verbose_name_plural = <span class="string">'景点基础信息'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Info</span>(<span class="params">models.Model</span>):</span></span><br><span class="line">    <span class="string">""" 景点详情 """</span></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        db_table = <span class="string">'sight_info'</span></span><br><span class="line">        verbose_name = <span class="string">'景点详情'</span></span><br><span class="line">        verbose_name_plural = <span class="string">'景点详情'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Ticket</span>(<span class="params">CommonModel</span>):</span></span><br><span class="line">    <span class="string">""" 门票 """</span></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        db_table = <span class="string">'sight_ticket'</span></span><br><span class="line">        verbose_name = <span class="string">'门票'</span></span><br><span class="line">        verbose_name_plural = <span class="string">'门票'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Comment</span>(<span class="params">CommonModel</span>):</span></span><br><span class="line">    <span class="string">""" 评论及回复 """</span></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        db_table = <span class="string">'sight_comment'</span></span><br><span class="line">        verbose_name = <span class="string">'评论及回复'</span></span><br><span class="line">        verbose_name_plural = <span class="string">'评论及回复'</span></span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2021/04/15/admin-guan-li-jing-dian-he-men-piao/9.png" alt="description"></p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/04/15/django-fu-wen-ben/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/04/15/django-fu-wen-ben/" class="post-title-link" itemprop="url">django富文本</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-04-15 13:39:20" itemprop="dateCreated datePublished" datetime="2021-04-15T13:39:20Z">2021-04-15</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-05-05 10:16:16" itemprop="dateModified" datetime="2021-05-05T10:16:16Z">2021-05-05</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%97%85%E6%B8%B8%E7%BD%91%E9%A1%B9%E7%9B%AE/" itemprop="url" rel="index"><span itemprop="name">旅游网项目</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="富文本支持"><a href="#富文本支持" class="headerlink" title="富文本支持"></a>富文本支持</h1><h2 id="实现步骤"><a href="#实现步骤" class="headerlink" title="实现步骤"></a>实现步骤</h2><ul>
+<li>配置富文本扩展<br>新建<code>/static</code> 和 <code>/media</code> </li>
+</ul>
+<p><code>trip\settings.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">INSTALLED_APPS = [</span><br><span class="line">    <span class="comment"># 富文本编辑器</span></span><br><span class="line">    <span class="string">'ckeditor'</span>,</span><br><span class="line">    <span class="string">'ckeditor_uploader'</span>,</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 静态文件的搜索地址</span></span><br><span class="line">STATIC_URL = <span class="string">'/static/'</span></span><br><span class="line">STATIC_ROOT = os.path.join(BASE_DIR, <span class="string">'static'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 富文本编辑器文件上传的位置</span></span><br><span class="line">CKEDITOR_UPLOAD_PATH = <span class="string">"uploads/"</span></span><br><span class="line"></span><br><span class="line">MEDIA_URL = <span class="string">'http://localhost:8080/'</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 自己上传的图片就会在media/uploads/下</span></span><br><span class="line">MEDIA_ROOT = os.path.join(BASE_DIR, <span class="string">'media'</span>)</span><br><span class="line"><span class="comment"># 通过访问 'http://localhost:8080/media/对应的图片地址'就可以访问</span></span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python manage.py collectstatic</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>trip\urls.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">urlpatterns = [</span><br><span class="line">    <span class="comment"># 富文本相关的配置</span></span><br><span class="line">    path(<span class="string">'ckeditor/'</span>, include(<span class="string">'ckeditor_uploader.urls'</span>)),</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
+<ul>
+<li><p>在django项目中安装富文本扩展</p>
+</li>
+<li><p>景点描述、景点详情富文本支持</p>
+</li>
+</ul>
+<p><code>models.TextField</code>替换成<code>RichTextField</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> ckeditor.fields <span class="keyword">import</span> RichTextField</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Sight</span>(<span class="params">CommonModel</span>):</span></span><br><span class="line">    <span class="string">""" 景点基础信息 """</span></span><br><span class="line"></span><br><span class="line">    name = models.CharField(<span class="string">'名称'</span>, max_length=<span class="number">64</span>)</span><br><span class="line">    <span class="comment"># content = models.TextField('详细')</span></span><br><span class="line">    content = RichTextField(<span class="string">'详细'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> ckeditor.fields <span class="keyword">import</span> RichTextField</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Info</span>(<span class="params">models.Model</span>):</span></span><br><span class="line">    <span class="string">""" 景点详情 """</span></span><br><span class="line">    sight = models.OneToOneField(Sight,</span><br><span class="line">                                 on_delete=models.CASCADE,</span><br><span class="line">                                 verbose_name=<span class="string">'关联景点'</span>)</span><br><span class="line">    entry_explain = models.RichTextField(<span class="string">'入园参考'</span>,</span><br><span class="line">                                     max_length=<span class="number">1024</span>,</span><br><span class="line">                                     null=<span class="literal">True</span>,</span><br><span class="line">                                     blank=<span class="literal">True</span>)</span><br><span class="line">    play_way = models.RichTextField(<span class="string">'特色玩法'</span>, null=<span class="literal">True</span>, blank=<span class="literal">True</span>)</span><br><span class="line">    tips = models.RichTextField(<span class="string">'温馨提示'</span>, null=<span class="literal">True</span>, blank=<span class="literal">True</span>)</span><br><span class="line">    traffic = models.RichTextField(<span class="string">'交通到达'</span>, null=<span class="literal">True</span>, blank=<span class="literal">True</span>)</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2021/04/15/django-fu-wen-ben/1.png" alt="description"></p>
+<ul>
+<li>门票信息富文本支持<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> ckeditor.fields <span class="keyword">import</span> RichTextField</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Ticket</span>(<span class="params">CommonModel</span>):</span></span><br><span class="line">    <span class="string">""" 门票 """</span></span><br><span class="line">    sight = models.ForeignKey(Sight,</span><br><span class="line">                              related_name=<span class="string">'tickets'</span>,</span><br><span class="line">                              verbose_name=<span class="string">'景点门票'</span>,</span><br><span class="line">                              on_delete=models.PROTECT)</span><br><span class="line">    tips = RichTextField(<span class="string">'预定须知'</span>, null=<span class="literal">True</span>, blank=<span class="literal">True</span>)</span><br><span class="line">    remark = RichTextField(<span class="string">'其他说明'</span>, null=<span class="literal">True</span>, blank=<span class="literal">True</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+</li>
+</ul>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python manage.py check</span><br><span class="line">python manage.py makemigrations</span><br><span class="line">python manage.py migrate</span><br></pre></td></tr></tbody></table></figure>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1013,7 +1256,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-11 04:29:19" itemprop="dateModified" datetime="2021-04-11T04:29:19Z">2021-04-11</time>
+        <time title="修改时间：2021-05-23 07:44:09" itemprop="dateModified" datetime="2021-05-23T07:44:09Z">2021-05-23</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1036,7 +1279,7 @@
     
     <div class="post-body" itemprop="articleBody">
           <p>uuid Universally Unique Identifier<br>python标准库<br>即通用唯一识别码，通常作为数据库的一个主键。</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> uuid</span><br><span class="line"></span><br><span class="line">user_id = uuid.uuid4()</span><br><span class="line">print(user_id)</span><br><span class="line"><span class="comment"># 12d0957b-18e5-4a4a-b5ee-d38e5f2789ce</span></span><br><span class="line">print(user_id)</span><br><span class="line"><span class="comment"># 0a1a3b75-c511-4a3e-8c74-5ea3eacce2ad</span></span><br></pre></td></tr></tbody></table></figure><script>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> uuid</span><br><span class="line"></span><br><span class="line">user_id = uuid.uuid4()</span><br><span class="line">print(user_id, type(user_id))</span><br><span class="line"><span class="comment"># 12d0957b-18e5-4a4a-b5ee-d38e5f2789ce</span></span><br><span class="line">print(type(user_id))</span><br><span class="line"><span class="comment"># &lt;class 'uuid.UUID'&gt;</span></span><br><span class="line">print(str(user_id))</span><br><span class="line"><span class="comment"># 12d0957b-18e5-4a4a-b5ee-d38e5f2789ce</span></span><br></pre></td></tr></tbody></table></figure><script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
@@ -1111,7 +1354,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-05-12 14:44:56" itemprop="dateModified" datetime="2021-05-12T14:44:56Z">2021-05-12</time>
+        <time title="修改时间：2021-05-24 15:29:42" itemprop="dateModified" datetime="2021-05-24T15:29:42Z">2021-05-24</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1338,6 +1581,19 @@
 <figure class="highlight yaml"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">-N---&gt;</span> <span class="number">5</span><span class="string">;</span> <span class="attr">balance:</span> <span class="number">0</span></span><br><span class="line"><span class="string">-N---&gt;</span> <span class="number">8</span><span class="string">;</span> <span class="attr">balance:</span> <span class="number">0</span></span><br><span class="line"><span class="string">-N---&gt;</span> <span class="number">5</span><span class="string">;</span> <span class="attr">balance:</span> <span class="number">0</span></span><br><span class="line"><span class="string">-N---&gt;</span> <span class="number">8</span><span class="string">;</span> <span class="attr">balance:</span> <span class="number">5</span></span><br><span class="line"><span class="string">-N---&gt;</span> <span class="number">5</span><span class="string">;</span> <span class="attr">balance:</span> <span class="number">0</span></span><br><span class="line"><span class="string">-N---&gt;</span> <span class="number">8</span><span class="string">;</span> <span class="attr">balance:</span> <span class="number">5</span></span><br><span class="line"><span class="string">-N---&gt;</span> <span class="number">5</span><span class="string">;</span> <span class="attr">balance:</span> <span class="number">0</span></span><br><span class="line"><span class="string">-N---&gt;</span> <span class="number">8</span><span class="string">;</span> <span class="attr">balance:</span> <span class="number">5</span></span><br><span class="line"><span class="string">-N---&gt;</span> <span class="number">5</span><span class="string">;</span> <span class="attr">balance:</span> <span class="number">0</span></span><br><span class="line"><span class="string">-N---&gt;</span> <span class="number">8</span><span class="string">;</span> <span class="attr">balance:</span> <span class="number">5</span></span><br><span class="line"><span class="string">-N---&gt;</span> <span class="number">5</span><span class="string">;</span> <span class="attr">balance:</span> <span class="number">0</span></span><br><span class="line"><span class="string">-N---&gt;</span> <span class="number">8</span><span class="string">;</span> <span class="attr">balance:</span> <span class="number">5</span></span><br><span class="line"><span class="string">-N---&gt;</span> <span class="number">5</span><span class="string">;</span> <span class="attr">balance:</span> <span class="number">0</span></span><br></pre></td></tr></tbody></table></figure>
 
 
+
+
+<p>什么是死锁：<br>由于两个或者两个以上的线程在执行的过程中，由于竞争资源或者由于彼此通信而造成的阻塞现象，<br>若无外力处理，他们将无法继续进行下去。</p>
+<p>死锁发生的必要条件：</p>
+<ol>
+<li>互斥条件：在线程中资源的使用具有排他性。</li>
+<li>请求和保护条件：自己的资源不愿意放出去，别人的资源拿不进来。</li>
+<li>不剥夺条件：自己的资源，不适用前也不能被别的线程使用，知道自己使用完成后自动释放出去别的线程才能使用。</li>
+<li>环路等待条件：环形等待，（想想三角恋关系就能理解了！）<br>死锁产生的原因：<br>从上面的四个必要条件，我们可以总结出产生的原因有：</li>
+<li>一个线程占有别的线程所需要的资源；</li>
+<li>都不想放弃自己拥有的资源。</li>
+</ol>
+<p>如何避免死锁：破坏四个必要条件就o</p>
 <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"><span class="comment"># 获得一把锁</span></span><br><span class="line">my_lock = threading.Lock()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 我的银行账户</span></span><br><span class="line">balance = <span class="number">0</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">change_it</span>(<span class="params">n</span>):</span></span><br><span class="line">    <span class="string">""" 改变我的余额 ,先存后取，结果应该为0"""</span></span><br><span class="line">    <span class="keyword">global</span> balance</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        print(<span class="string">'start lock'</span>)</span><br><span class="line">        <span class="comment"># 添加获取锁</span></span><br><span class="line">        my_lock.acquire()</span><br><span class="line">        print(<span class="string">'locked one '</span>)</span><br><span class="line">        <span class="comment"># 资源已经被锁住了，不能重复锁定, 产生死锁</span></span><br><span class="line">        my_lock.acquire()</span><br><span class="line">        print(<span class="string">'locked two'</span>)</span><br><span class="line">        balance = balance + n</span><br><span class="line">        time.sleep(<span class="number">2</span>)</span><br><span class="line">        balance = balance - n</span><br><span class="line">        time.sleep(<span class="number">1</span>)</span><br><span class="line">        print(<span class="string">'-N---&gt; {0}; balance: {1}'</span>.format(n, balance))</span><br><span class="line">    <span class="keyword">finally</span>:</span><br><span class="line">        <span class="comment"># 改完了一定要释放锁</span></span><br><span class="line">        my_lock.release()</span><br><span class="line">        my_lock.release()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ChangeBalanceThread</span>(<span class="params">threading.Thread</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    改变银行余额的线程</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, num, *args, **kwargs</span>):</span></span><br><span class="line">        super().__init__(*args, **kwargs)</span><br><span class="line">        self.num = num</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">run</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">100</span>):</span><br><span class="line">            change_it(self.num)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    t1 = ChangeBalanceThread(<span class="number">5</span>)</span><br><span class="line">    t2 = ChangeBalanceThread(<span class="number">8</span>)</span><br><span class="line">    t1.start()</span><br><span class="line">    t2.start()</span><br><span class="line">    t1.join()</span><br><span class="line">    t2.join()</span><br><span class="line">    print(<span class="string">'the last: {0}'</span>.format(balance))</span><br></pre></td></tr></tbody></table></figure>
 <figure class="highlight sql"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">start</span> <span class="keyword">lock</span></span><br><span class="line"><span class="keyword">locked</span> one</span><br><span class="line"><span class="keyword">start</span> <span class="keyword">lock</span></span><br></pre></td></tr></tbody></table></figure>
 
@@ -1351,6 +1607,14 @@
 </ul>
 <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"><span class="comment"># 获得一把锁</span></span><br><span class="line">your_lock = threading.RLock()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 我的银行账户</span></span><br><span class="line">balance = <span class="number">0</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">change_it</span>(<span class="params">n</span>):</span></span><br><span class="line">    <span class="string">""" 改变我的余额 ,先存后取，结果应该为0"""</span></span><br><span class="line">    <span class="keyword">global</span> balance</span><br><span class="line"></span><br><span class="line">    <span class="keyword">with</span> your_lock:</span><br><span class="line">        balance = balance + n</span><br><span class="line">        time.sleep(<span class="number">2</span>)</span><br><span class="line">        balance = balance - n</span><br><span class="line">        time.sleep(<span class="number">1</span>)</span><br><span class="line">        print(<span class="string">'-N---&gt; {0}; balance: {1}'</span>.format(n, balance))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ChangeBalanceThread</span>(<span class="params">threading.Thread</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    改变银行余额的线程</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, num, *args, **kwargs</span>):</span></span><br><span class="line">        super().__init__(*args, **kwargs)</span><br><span class="line">        self.num = num</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">run</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">100</span>):</span><br><span class="line">            change_it(self.num)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    t1 = ChangeBalanceThread(<span class="number">5</span>)</span><br><span class="line">    t2 = ChangeBalanceThread(<span class="number">8</span>)</span><br><span class="line">    t1.start()</span><br><span class="line">    t2.start()</span><br><span class="line">    t1.join()</span><br><span class="line">    t2.join()</span><br><span class="line">    print(<span class="string">'the last: {0}'</span>.format(balance))</span><br></pre></td></tr></tbody></table></figure>
 <figure class="highlight yaml"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">-N---&gt;</span> <span class="number">5</span><span class="string">;</span> <span class="attr">balance:</span> <span class="number">0</span></span><br><span class="line"><span class="string">-N---&gt;</span> <span class="number">5</span><span class="string">;</span> <span class="attr">balance:</span> <span class="number">0</span></span><br><span class="line"><span class="string">-N---&gt;</span> <span class="number">8</span><span class="string">;</span> <span class="attr">balance:</span> <span class="number">0</span></span><br><span class="line"><span class="string">-N---&gt;</span> <span class="number">5</span><span class="string">;</span> <span class="attr">balance:</span> <span class="number">0</span></span><br><span class="line"><span class="string">-N---&gt;</span> <span class="number">8</span><span class="string">;</span> <span class="attr">balance:</span> <span class="number">0</span></span><br><span class="line"><span class="string">-N---&gt;</span> <span class="number">8</span><span class="string">;</span> <span class="attr">balance:</span> <span class="number">0</span></span><br><span class="line"><span class="string">-N---&gt;</span> <span class="number">5</span><span class="string">;</span> <span class="attr">balance:</span> <span class="number">0</span></span><br></pre></td></tr></tbody></table></figure>
+
+
+
+
+
+<p>银行转账:两个账户同时给对方转账，模拟线程死锁</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> threading <span class="keyword">import</span> Thread, Lock</span><br><span class="line"><span class="keyword">from</span> time <span class="keyword">import</span> sleep</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 账户类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Account</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, _id, balance, lock</span>):</span>  <span class="comment"># 每个账户自带一个锁，只要数字balance要变动，就要提前上锁</span></span><br><span class="line">        self.id = _id</span><br><span class="line">        self.balance = balance  <span class="comment"># 存款</span></span><br><span class="line">        self.lock = lock  <span class="comment"># 维护锁</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 取钱</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">withdraw</span>(<span class="params">self, amount</span>):</span></span><br><span class="line">        self.balance -= amount</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 存钱</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">deposit</span>(<span class="params">self, amount</span>):</span></span><br><span class="line">        self.balance += amount</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 查看余额</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_balance</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> self.balance</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 生成两个账户</span></span><br><span class="line">Tom = Account(<span class="string">'Tom'</span>, <span class="number">12000</span>, Lock())  <span class="comment"># Lock()直接创建了一个锁</span></span><br><span class="line">Abby = Account(<span class="string">'Abby'</span>, <span class="number">9000</span>, Lock())</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 转账函数，转账基本原则：谁的账户要动，需要先上锁</span></span><br><span class="line"><span class="comment"># from_参数为要转出账户,to参数为转入账户</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">transfer</span>(<span class="params">from_, to, amount</span>):</span></span><br><span class="line">    <span class="comment"># from_账户上锁</span></span><br><span class="line">    <span class="keyword">if</span> from_.lock.acquire():</span><br><span class="line">        from_.withdraw(amount)  <span class="comment"># from_账户钱减少</span></span><br><span class="line">        sleep(<span class="number">0.1</span>)</span><br><span class="line">        <span class="comment"># to账户要动了，也要上锁</span></span><br><span class="line">        <span class="keyword">if</span> to.lock.acquire():</span><br><span class="line">            to.deposit(amount)  <span class="comment"># to 存钱</span></span><br><span class="line">            to.lock.release()  <span class="comment"># 加钱完毕，解锁</span></span><br><span class="line">        <span class="comment"># from_账户也转账完毕，解锁</span></span><br><span class="line">        from_.lock.release()</span><br><span class="line">    print(<span class="string">'%s给%s转了%d元'</span> % (from_._id, to._id, amount))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 生成两个线程，同时转账</span></span><br><span class="line">t1 = Thread(target=transfer, args=(Tom, Abby, <span class="number">4000</span>))  <span class="comment"># Tom给Abby转4000</span></span><br><span class="line">t2 = Thread(target=transfer, args=(Abby, Tom, <span class="number">1500</span>))  <span class="comment"># Abby给Tom转2500</span></span><br><span class="line"><span class="comment"># 流程：两个线程同时执行，线程t1给Tom上锁，线程t2给Abby上锁，两个线程都向下走，准备给对方上锁，发现对方已经锁上了，资源互不释放，造成死锁</span></span><br><span class="line"></span><br><span class="line">t1.start()</span><br><span class="line">t2.start()</span><br><span class="line">t1.join()</span><br><span class="line">t2.join()</span><br><span class="line">print(<span class="string">'Tom:'</span>, Tom.get_balance())</span><br><span class="line">print(<span class="string">'Abby:'</span>, Abby.get_balance())</span><br></pre></td></tr></tbody></table></figure>
+
 
 <p><code>Timer</code> 定时器<br>表示一个操作应该在等待一定的时间之后运行，是Thread的子类。</p>
 <p><code>cancel()</code>：停止计时器并取消执行；仅在等待状态时有效，<br>简单的示例，五秒后自动拍照：</p>
@@ -1792,213 +2056,8 @@
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/04/05/python-range/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/04/05/python-range/" class="post-title-link" itemprop="url">python range</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-04-04 16:21:41" itemprop="dateCreated datePublished" datetime="2021-04-04T16:21:41Z">2021-04-04</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-05-02 12:12:10" itemprop="dateModified" datetime="2021-05-02T12:12:10Z">2021-05-02</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p><code>xrange()</code> 函数用法与 <code>range</code> 完全相同，所不同的是生成的不是一个数组，而是一个生成器。<br><code>xrange(stop)</code><br><code>xrange(start, stop[, step])</code></p>
-<p>start: 计数从 start 开始。默认是从 0 开始。<br>例如 xrange(5) 等价于 xrange(0， 5)</p>
-<p>stop: 计数到 stop 结束，但不包括 stop。<br>例如：xrange(0，5) 是 [0, 1, 2, 3, 4] 没有 5</p>
-<p>step：步长，默认为1。<br>例如：<code>xrange(0，5)</code> 等价于 xrange(0, 5, 1)</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">print(range(<span class="number">0</span>, <span class="number">8</span>))</span><br><span class="line"><span class="comment"># range(0, 8)</span></span><br><span class="line">print(range(<span class="number">8</span>))</span><br><span class="line"><span class="comment"># range(0, 8)</span></span><br><span class="line">print(list(range(<span class="number">8</span>)))</span><br><span class="line"><span class="comment"># [0, 1, 2, 3, 4, 5, 6, 7]</span></span><br><span class="line">print(range(<span class="number">3</span>, <span class="number">5</span>))</span><br><span class="line"><span class="comment"># range(3, 5)</span></span><br><span class="line">print(list(range(<span class="number">3</span>, <span class="number">5</span>)))</span><br><span class="line"><span class="comment"># [3, 4]</span></span><br><span class="line">print(range(<span class="number">0</span>, <span class="number">6</span>, <span class="number">2</span>))</span><br><span class="line"><span class="comment"># range(0, 6, 2)  # 步长为 2</span></span><br><span class="line">print(list(range(<span class="number">0</span>, <span class="number">6</span>, <span class="number">2</span>)))</span><br><span class="line"><span class="comment"># [0, 2, 4]</span></span><br><span class="line">print(list(range(<span class="number">-1</span>, <span class="number">-10</span>, <span class="number">-3</span>)))</span><br><span class="line"><span class="comment"># [-1, -4, -7]</span></span><br><span class="line"></span><br><span class="line">a = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>]</span><br><span class="line">print(list(range(len(a) - <span class="number">1</span>, <span class="number">-1</span>, <span class="number">-1</span>)))</span><br><span class="line"><span class="comment"># [4, 3, 2, 1, 0]</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(len(a) - <span class="number">1</span>, <span class="number">-1</span>, <span class="number">-1</span>):</span><br><span class="line">    print(i)</span><br><span class="line"><span class="comment"># 4</span></span><br><span class="line"><span class="comment"># 3</span></span><br><span class="line"><span class="comment"># 2</span></span><br><span class="line"><span class="comment"># 1</span></span><br><span class="line"><span class="comment"># 0</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(len(a) - <span class="number">1</span>, <span class="number">0</span>, <span class="number">-1</span>):</span><br><span class="line">    print(i)</span><br><span class="line"><span class="comment"># 4</span></span><br><span class="line"><span class="comment"># 3</span></span><br><span class="line"><span class="comment"># 2</span></span><br><span class="line"><span class="comment"># 1 不是0结束</span></span><br></pre></td></tr></tbody></table></figure>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/04/05/python-yi-xing-duo-shu-ru/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/04/05/python-yi-xing-duo-shu-ru/" class="post-title-link" itemprop="url">实现一行输入多个</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-04-04 16:21:41" itemprop="dateCreated datePublished" datetime="2021-04-04T16:21:41Z">2021-04-04</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-05 15:28:18" itemprop="dateModified" datetime="2021-04-05T15:28:18Z">2021-04-05</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>实现一行输入多个数字，并以空格隔开。</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># a, b = map(int, input("请输入").split())</span></span><br><span class="line"><span class="comment"># print(a, b)</span></span><br><span class="line"><span class="comment"># print(type(a))</span></span><br></pre></td></tr></tbody></table></figure>
-<figure class="highlight vala"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># 输入</span></span><br><span class="line"><span class="meta"># 1 2</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># 运行结果</span></span><br><span class="line"><span class="meta"># 1 2</span></span><br><span class="line"><span class="meta"># &lt;class 'int'&gt;</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p>实现一行输入多个单词，每个单词之间用逗号隔开。</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">str1, str2 = map(str, input(<span class="string">"请输入"</span>).split(<span class="string">','</span>))</span><br><span class="line">print(str1, str2)</span><br><span class="line">print(type(str1))</span><br></pre></td></tr></tbody></table></figure>
-<figure class="highlight vala"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># 输入</span></span><br><span class="line"><span class="meta"># cyf,wlp</span></span><br><span class="line"><span class="meta"># 运行结果</span></span><br><span class="line"><span class="meta"># cyf wlp</span></span><br><span class="line"><span class="meta"># &lt;class 'str'&gt;</span></span><br></pre></td></tr></tbody></table></figure><script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/25/">25</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/26/">26</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 <script src="/js/comments.js"></script>
 </div>

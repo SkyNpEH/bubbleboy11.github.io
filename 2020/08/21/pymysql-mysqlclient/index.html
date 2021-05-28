@@ -28,7 +28,7 @@
 <meta property="og:description" content="单独使用django的model,批量导入数据这是因为 Django 在连接 MySQL 数据库时默认使用的是 MySQLdb 驱动， 然而我们没有安装该驱动， 因为它并不支持 Python3， 我们现在安装的是 PyMySQL 驱动， 如何让当前的 Django 通过 PyMySQL 来连接 MySQL 数据库呢？ 方法很简单。在…&#x2F;guest&#x2F;init.py 目录下添加： 12import p">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-08-20T16:21:41.000Z">
-<meta property="article:modified_time" content="2021-05-19T07:10:06.729Z">
+<meta property="article:modified_time" content="2021-05-24T13:48:59.771Z">
 <meta property="article:author" content="外心人D">
 <meta name="twitter:card" content="summary">
 
@@ -120,18 +120,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">246</span>
+          <span class="site-state-item-count">254</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
-        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-count">23</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
-        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-count">40</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -201,7 +201,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-05-19 07:10:06" itemprop="dateModified" datetime="2021-05-19T07:10:06Z">2021-05-19</time>
+        <time title="修改时间：2021-05-24 13:48:59" itemprop="dateModified" datetime="2021-05-24T13:48:59Z">2021-05-24</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -232,6 +232,18 @@
 
 
 <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> MySQLdb</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MysqlAPI</span>(<span class="params">object</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, db_ip, db_name, db_password, table_name, db_charset</span>):</span></span><br><span class="line">        self.db_ip = db_ip</span><br><span class="line">        self.db_name = db_name</span><br><span class="line">        self.db_password = db_password</span><br><span class="line">        self.table_name = table_name</span><br><span class="line">        self.db_charset = db_charset</span><br><span class="line">        self.conn = MySQLdb.connect(host=self.db_ip,</span><br><span class="line">                                    user=self.db_name,</span><br><span class="line">                                    password=self.db_password,</span><br><span class="line">                                    db=self.table_name,</span><br><span class="line">                                    charset=self.db_charset)</span><br><span class="line">        self.cur = self.conn.cursor()</span><br></pre></td></tr></tbody></table></figure>
+
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">import</span> pymysql</span><br><span class="line"></span><br><span class="line"><span class="comment">#连接mysql</span></span><br><span class="line">con = pymysql.connect(<span class="string">'localhost'</span>,<span class="string">'root'</span>,<span class="string">'123456'</span>,<span class="string">'db2'</span>,charset=<span class="string">'utf8'</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#创建操作mysql的游标</span></span><br><span class="line">cur = con.cursor()</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    <span class="comment"># 将所有需要事物的sql语句放在一个try里</span></span><br><span class="line">    sql1 = <span class="string">'insert into bank values("lili",500)'</span></span><br><span class="line">    sql2 = <span class="string">'insert into bank values("bob",1000)'</span>    </span><br><span class="line">  </span><br><span class="line">    <span class="comment">#执行  </span></span><br><span class="line">    cur.execute(sql1)</span><br><span class="line">    cur.execute(sql2)</span><br><span class="line">    <span class="comment">#提交</span></span><br><span class="line">    con.commit()</span><br><span class="line"><span class="comment">#异常    </span></span><br><span class="line"><span class="keyword">except</span>:</span><br><span class="line">    print(<span class="string">'-----rollback------'</span>)    </span><br><span class="line">    <span class="comment">#回滚</span></span><br><span class="line">    con.rollback()</span><br><span class="line"></span><br><span class="line"><span class="comment">#关闭游标</span></span><br><span class="line">cur.close()</span><br><span class="line"><span class="comment">#关闭连接mysql</span></span><br><span class="line">con.close()</span><br></pre></td></tr></tbody></table></figure>
+
+<p>使用pymysql向数据表中添加数据，并记录时间戳</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pymysql</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"><span class="comment">#建立连接</span></span><br><span class="line">con = pymysql.connect(<span class="string">'mysql服务端ip'</span>,<span class="string">'用户'</span>,<span class="string">'该用户mysql密码'</span>,<span class="string">'库名'</span>,charset=<span class="string">'utf8'</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#游标</span></span><br><span class="line">cur = con.cursor()</span><br><span class="line"></span><br><span class="line"><span class="comment">#准备200万条数据</span></span><br><span class="line">data_list = []</span><br><span class="line">t1 = time.time()</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">2000000</span>):</span><br><span class="line">    name = <span class="string">'Tom_%s'</span>(i)</span><br><span class="line">    data_list.append(name)</span><br><span class="line">t2 = time.time()</span><br><span class="line">print(<span class="string">'name is ready ! cost %s seconds'</span>%(t2 - t1))</span><br><span class="line"></span><br><span class="line">sql = <span class="string">'insert into students(name) value(%s)'</span></span><br><span class="line">cur.executemany(sql,data_list)</span><br><span class="line">con.commit()</span><br><span class="line"></span><br><span class="line">t3  =time.time()</span><br><span class="line">print(<span class="string">'insert is over !! cost %s seconds'</span>%(t3 - t2))</span><br><span class="line"></span><br><span class="line">cur.close()</span><br><span class="line">con.close()</span><br></pre></td></tr></tbody></table></figure>
+
+<p>mysql中测试有索引查询和无索引查询的时间差异</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#开启运行时间检测</span></span><br><span class="line">show variables like <span class="string">'%pro%'</span>;</span><br><span class="line"><span class="comment">#若其中profiling显示off，执行下面命令开启一下</span></span><br><span class="line">set profiling=<span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">#执行查询语句，查最后一个(无索引)</span></span><br><span class="line">select name <span class="keyword">from</span> students where name=<span class="string">'Tom_99999'</span>;</span><br><span class="line"><span class="comment">#查看执行时间</span></span><br><span class="line">show profiles;</span><br><span class="line"></span><br><span class="line"><span class="comment">#在name字段创建索引</span></span><br><span class="line"><span class="comment">#语法：create index 索引名(一般与字段名一样) on 表名(要加索引的字段)</span></span><br><span class="line">create index name on students(name);</span><br><span class="line"><span class="comment">#执行查询语句(有索引),可能Mysql开了查询缓存，你查另外一个值</span></span><br><span class="line">select name <span class="keyword">from</span> students where name=<span class="string">'Tom_88888'</span>;</span><br><span class="line"><span class="comment">#查看执行时间</span></span><br><span class="line">show profiles;</span><br><span class="line"></span><br><span class="line"><span class="comment">#关闭运行时间检测</span></span><br><span class="line">set profiling=<span class="number">0</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight scheme"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">```</span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
+<p>```</p>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -263,8 +275,8 @@
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2020/08/21/pytest/" rel="prev" title="HTML">
-                  <i class="fa fa-chevron-left"></i> HTML
+                <a href="/2020/08/21/pytest/" rel="prev" title="pytest">
+                  <i class="fa fa-chevron-left"></i> pytest
                 </a>
             </div>
             <div class="post-nav-item">

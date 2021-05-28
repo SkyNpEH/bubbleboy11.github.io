@@ -118,18 +118,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">246</span>
+          <span class="site-state-item-count">254</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
-        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-count">23</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
-        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-count">40</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -158,6 +158,237 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/04/19/django-sql-zhu-ru-xss/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/04/19/django-sql-zhu-ru-xss/" class="post-title-link" itemprop="url">django sql注入</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-04-18 17:46:44" itemprop="dateCreated datePublished" datetime="2021-04-18T17:46:44Z">2021-04-18</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-05-01 07:13:53" itemprop="dateModified" datetime="2021-05-01T07:13:53Z">2021-05-01</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><code>system\urls.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">urlpatterns = [</span><br><span class="line">    <span class="comment"># 危险的SQL注入</span></span><br><span class="line">    path(<span class="string">'danger/sql/'</span>, views.danger_sql, name=<span class="string">"danger_sql"</span>),</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>system\views.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.db <span class="keyword">import</span> connection</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">danger_sql</span>(<span class="params">request</span>):</span></span><br><span class="line">    <span class="string">""" 危险的SQL注入</span></span><br><span class="line"><span class="string">    正常输入：</span></span><br><span class="line"><span class="string">    http://127.0.0.1:8000/system/danger/sql/?types=10</span></span><br><span class="line"><span class="string">    异常输入：</span></span><br><span class="line"><span class="string">    http://127.0.0.1:8000/system/danger/sql/?types=10' UNION select version(), database() -- ';</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    types = request.GET.get(<span class="string">'types'</span>, <span class="string">''</span>)</span><br><span class="line">    <span class="comment"># 1. 危险的写法</span></span><br><span class="line">    <span class="comment"># sql = "SELECT `name`, `img` FROM system_slider WHERE `types` ='{}';".format(types)</span></span><br><span class="line">    <span class="comment"># # sql = "SELECT `name`, `img` FROM system_slider WHERE `types` ='10' UNION select version(), database() -- ';';"</span></span><br><span class="line">    <span class="comment"># with connection.cursor() as c:</span></span><br><span class="line">    <span class="comment">#     c.execute(sql)</span></span><br><span class="line">    <span class="comment">#     data_list = c.fetchall()</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 2. 安全的写法</span></span><br><span class="line">    sql = <span class="string">"SELECT `name`, `img` FROM system_slider WHERE `types` =%s;"</span></span><br><span class="line">    <span class="keyword">with</span> connection.cursor() <span class="keyword">as</span> c:</span><br><span class="line">        c.execute(sql, (types, ))</span><br><span class="line">        data_list = c.fetchall()</span><br><span class="line">    <span class="keyword">return</span> render(request, <span class="string">'danger_sql.html'</span>, {<span class="string">'data_list'</span>: data_list})</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>system\templates\danger_sql.html</code></p>
+<figure class="highlight html"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">"en"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">title</span>&gt;</span>危险的SQL注入<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">h3</span>&gt;</span>查询的内容<span class="tag">&lt;/<span class="name">h3</span>&gt;</span></span><br><span class="line">  {% for item in data_list %}</span><br><span class="line">  <span class="tag">&lt;<span class="name">p</span>&gt;</span>{{ item }}<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">  {% endfor %}</span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>system\urls.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">urlpatterns = [</span><br><span class="line">    <span class="comment"># 跨站点脚本攻击</span></span><br><span class="line">    path(<span class="string">'danger/xss/'</span>, views.danger_xss, name=<span class="string">"danger_xss"</span>),</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>system\views.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">danger_xss</span>(<span class="params">request</span>):</span></span><br><span class="line">    <span class="string">""" 跨站点脚本攻击</span></span><br><span class="line"><span class="string">    输入测试：</span></span><br><span class="line"><span class="string">    &lt;script&gt;window.alert('你好');window.location.href='http://www.imooc.com';&lt;/script&gt;</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="keyword">if</span> request.method == <span class="string">'POST'</span>:</span><br><span class="line">        name = request.POST.get(<span class="string">'name'</span>, <span class="string">''</span>)</span><br><span class="line">        desc = request.POST.get(<span class="string">'desc'</span>, <span class="string">''</span>)</span><br><span class="line">        Slider.objects.create(name=name, desc=desc, img=<span class="string">'test.jpg'</span>)</span><br><span class="line">        <span class="keyword">return</span> redirect(<span class="string">'.'</span>)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        types = <span class="number">10</span></span><br><span class="line">        sql = <span class="string">"SELECT `name`, `img`, `desc` FROM system_slider WHERE `types` =%s;"</span></span><br><span class="line">        <span class="keyword">with</span> connection.cursor() <span class="keyword">as</span> c:</span><br><span class="line">            c.execute(sql, (types, ))</span><br><span class="line">            data_list = c.fetchall()</span><br><span class="line">    <span class="keyword">return</span> render(request, <span class="string">'danger_xss.html'</span>, {<span class="string">'data_list'</span>: data_list})</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>system\templates\danger_xss.html</code></p>
+<figure class="highlight html"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">"en"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">title</span>&gt;</span>危险的跨站点脚本攻击<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">h3</span>&gt;</span>内容输入<span class="tag">&lt;/<span class="name">h3</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">form</span> <span class="attr">action</span>=<span class="string">"."</span> <span class="attr">method</span>=<span class="string">"post"</span> <span class="attr">enctype</span>=<span class="string">"multipart/form-data"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span>&gt;</span>名称：<span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"name"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span>&gt;</span>描述：<span class="tag">&lt;<span class="name">textarea</span> <span class="attr">name</span>=<span class="string">"desc"</span> <span class="attr">cols</span>=<span class="string">"40"</span> <span class="attr">rows</span>=<span class="string">"10"</span>&gt;</span><span class="tag">&lt;/<span class="name">textarea</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span>&gt;</span><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"submit"</span> <span class="attr">value</span>=<span class="string">"提交"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">h3</span>&gt;</span>内容展示<span class="tag">&lt;/<span class="name">h3</span>&gt;</span></span><br><span class="line">{% for item in data_list %}</span><br><span class="line">  <span class="tag">&lt;<span class="name">p</span>&gt;</span>{{ item|safe|escape }}<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">  {% endfor %}</span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure>
+<p>  <code>&lt;p&gt;{{ item|safe|escape }}&lt;/p&gt;</code>改成  <code>&lt;p&gt;{{ item }}&lt;/p&gt;</code>才安全</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/04/19/django-jie-kou-ce-shi/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/04/19/django-jie-kou-ce-shi/" class="post-title-link" itemprop="url">django旅游网接口测试</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-04-18 17:46:44" itemprop="dateCreated datePublished" datetime="2021-04-18T17:46:44Z">2021-04-18</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-05-02 04:07:09" itemprop="dateModified" datetime="2021-05-02T04:07:09Z">2021-05-02</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%97%85%E6%B8%B8%E7%BD%91%E9%A1%B9%E7%9B%AE/" itemprop="url" rel="index"><span itemprop="name">旅游网项目</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"></span><br><span class="line">phone = <span class="string">"13912312345"</span></span><br><span class="line">nick = <span class="string">"fengluojifan"</span></span><br><span class="line">passwd = <span class="string">"123456"</span></span><br><span class="line"><span class="comment"># 1. 注册账户</span></span><br><span class="line">url_regis = <span class="string">"http://trip.imooc.zhaedu.com/api/accounts/user/register/"</span></span><br><span class="line">data_regis = {<span class="string">"username"</span>: phone, <span class="string">"nickname"</span>: nick, <span class="string">"password"</span>: passwd}</span><br><span class="line">res_regis = requests.post(url=url_regis, data=data_regis)</span><br><span class="line">print(res_regis.text)</span><br><span class="line"><span class="comment"># 2. 登录</span></span><br><span class="line">url_login = <span class="string">"http://trip.imooc.zhaedu.com/api/accounts/user/login/"</span></span><br><span class="line">data_login = {<span class="string">"username"</span>: phone, <span class="string">"password"</span>: passwd}</span><br><span class="line">res_login = requests.post(url=url_login, data=data_login)</span><br><span class="line">print(res_login.text)</span><br><span class="line">cookies = requests.utils.dict_from_cookiejar(res_login.cookies)</span><br><span class="line">print(cookies)</span><br><span class="line"><span class="comment"># 3. 用户信息查询</span></span><br><span class="line">url_view = <span class="string">"http://trip.imooc.zhaedu.com/api/accounts/user/detail/"</span></span><br><span class="line">res_view = requests.get(url=url_view, cookies=cookies)</span><br><span class="line">print(res_view.text)</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight clojure"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">{</span><br><span class="line">    <span class="string">"error_code"</span>: <span class="string">"400000"</span>,</span><br><span class="line">    <span class="string">"error_msg"</span>: <span class="string">"\u53c2\u6570\u683c\u5f0f\u4e0d\u6b63\u786e."</span>,</span><br><span class="line">    <span class="string">"error_list"</span>: {</span><br><span class="line">        <span class="string">"username"</span>: [{</span><br><span class="line">            <span class="string">"message"</span>: <span class="string">"\u624b\u673a\u53f7\u7801\u5df2\u88ab\u6ce8\u518c."</span>,</span><br><span class="line">            <span class="string">"code"</span>: <span class="string">"400007"</span></span><br><span class="line">        }],</span><br><span class="line">        <span class="string">"nickname"</span>: [{</span><br><span class="line">            <span class="string">"message"</span>: <span class="string">"\u7528\u6237\u6635\u79f0\u5df2\u88ab\u4f7f\u7528."</span>,</span><br><span class="line">            <span class="string">"code"</span>: <span class="string">"400005"</span></span><br><span class="line">        }]</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line">{</span><br><span class="line">    <span class="string">"user"</span>: {</span><br><span class="line">        <span class="string">"avatar"</span>: <span class="string">""</span>,</span><br><span class="line">        <span class="string">"username"</span>: <span class="string">"13912312345"</span>,</span><br><span class="line">        <span class="string">"integral"</span>: <span class="number">0</span>,</span><br><span class="line">        <span class="string">"nickname"</span>: <span class="string">"fengluojifan"</span>,</span><br><span class="line">        <span class="string">"level"</span>: <span class="number">0</span></span><br><span class="line">    },</span><br><span class="line">    <span class="string">"profile"</span>: {</span><br><span class="line">        <span class="string">"real_name"</span>: <span class="string">""</span>,</span><br><span class="line">        <span class="string">"email"</span>: null,</span><br><span class="line">        <span class="string">"sex"</span>: <span class="number">1</span>,</span><br><span class="line">        <span class="string">"age"</span>: <span class="number">0</span></span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line">{'sessionid': 'r4ez07oo3gbit8angxoewctf3dm2cobc'}</span><br><span class="line">{</span><br><span class="line">    <span class="string">"user"</span>: {</span><br><span class="line">        <span class="string">"avatar"</span>: <span class="string">""</span>,</span><br><span class="line">        <span class="string">"username"</span>: <span class="string">"13912312345"</span>,</span><br><span class="line">        <span class="string">"integral"</span>: <span class="number">0</span>,</span><br><span class="line">        <span class="string">"nickname"</span>: <span class="string">"fengluojifan"</span>,</span><br><span class="line">        <span class="string">"level"</span>: <span class="number">0</span></span><br><span class="line">    },</span><br><span class="line">    <span class="string">"profile"</span>: {</span><br><span class="line">        <span class="string">"real_name"</span>: <span class="string">""</span>,</span><br><span class="line">        <span class="string">"email"</span>: null,</span><br><span class="line">        <span class="string">"sex"</span>: <span class="number">1</span>,</span><br><span class="line">        <span class="string">"age"</span>: <span class="number">0</span></span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>test_account.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> unittest</span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TestAccount2</span>(<span class="params">unittest.TestCase</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">test_login_normal2</span>(<span class="params">self</span>):</span></span><br><span class="line">        phone = <span class="string">"13912312345"</span></span><br><span class="line">        passwd = <span class="string">"123456"</span></span><br><span class="line">        url_login = <span class="string">"http://trip.imooc.zhaedu.com/api/accounts/user/login/"</span></span><br><span class="line">        data_login = {<span class="string">"username"</span>: phone, <span class="string">"password"</span>: passwd}</span><br><span class="line">        res_login = requests.post(url=url_login, data=data_login)</span><br><span class="line">        print(res_login.text)</span><br><span class="line">        self.assertIn(<span class="string">"fengluojifan"</span>, res_login.text)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">test_login_wrong2</span>(<span class="params">self</span>):</span></span><br><span class="line">        phone = <span class="string">"13912312345"</span></span><br><span class="line">        passwd = <span class="string">"123459"</span></span><br><span class="line">        url_login = <span class="string">"http://trip.imooc.zhaedu.com/api/accounts/user/login/"</span></span><br><span class="line">        data_login = {<span class="string">"username"</span>: phone, <span class="string">"password"</span>: passwd}</span><br><span class="line">        res_login = requests.post(url=url_login, data=data_login)</span><br><span class="line">        print(res_login.text)</span><br><span class="line">        self.assertIn(<span class="string">"error_code"</span>, res_login.text)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    unittest.main()</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> unittest</span><br><span class="line"><span class="keyword">from</span> test_account <span class="keyword">import</span> TestAccount</span><br><span class="line"><span class="keyword">from</span> test_account2 <span class="keyword">import</span> TestAccount2</span><br><span class="line"></span><br><span class="line">suite = unittest.TestSuite()</span><br><span class="line"></span><br><span class="line"><span class="comment"># suite.addTest(TestAccount('test_login_normal'))</span></span><br><span class="line"><span class="comment"># suite.addTest(TestAccount2('test_login_wrong2'))</span></span><br><span class="line"></span><br><span class="line">suite.addTests(</span><br><span class="line">    [TestAccount(<span class="string">'test_login_normal'</span>),</span><br><span class="line">     TestAccount2(<span class="string">'test_login_wrong2'</span>)])</span><br><span class="line"></span><br><span class="line">unittest.TextTestRunner().run(suite)</span><br></pre></td></tr></tbody></table></figure>
+
+
+<p>测试结果写入txt文件中</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> unittest</span><br><span class="line"><span class="keyword">from</span> test_account <span class="keyword">import</span> TestAccount</span><br><span class="line"><span class="keyword">from</span> test_account2 <span class="keyword">import</span> TestAccount2</span><br><span class="line"></span><br><span class="line">suite = unittest.TestSuite()</span><br><span class="line"></span><br><span class="line"><span class="comment"># suite.addTest(TestAccount('test_login_normal'))</span></span><br><span class="line"><span class="comment"># suite.addTest(TestAccount2('test_login_wrong2'))</span></span><br><span class="line"></span><br><span class="line">suite.addTests(</span><br><span class="line">    [TestAccount(<span class="string">'test_login_normal'</span>),</span><br><span class="line">     TestAccount2(<span class="string">'test_login_wrong2'</span>)])</span><br><span class="line"><span class="comment"># 输出到文本文件中测试结果</span></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">"result.txt"</span>, <span class="string">"w"</span>) <span class="keyword">as</span> f:</span><br><span class="line">    unittest.TextTestRunner(stream=f, verbosity=<span class="number">2</span>).run(suite)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>测试结果写入html文件中</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> unittest</span><br><span class="line"><span class="keyword">from</span> test_account <span class="keyword">import</span> TestAccount</span><br><span class="line"><span class="keyword">from</span> test_account2 <span class="keyword">import</span> TestAccount2</span><br><span class="line"><span class="keyword">from</span> HTMLTestReportCN <span class="keyword">import</span> HTMLTestRunner</span><br><span class="line"></span><br><span class="line">suite = unittest.TestSuite()</span><br><span class="line"><span class="comment"># suite.addTest(TestAccount('test_login_normal'))</span></span><br><span class="line"><span class="comment"># # suite.addTest(TestAccount2('test_login_wrong2'))</span></span><br><span class="line">suite.addTests(</span><br><span class="line">    [TestAccount(<span class="string">'test_login_normal'</span>),</span><br><span class="line">     TestAccount2(<span class="string">'test_login_wrong2'</span>)])</span><br><span class="line"></span><br><span class="line">f = open(<span class="string">"result.html"</span>, <span class="string">"wb"</span>)</span><br><span class="line">HTMLTestRunner(stream=f, title=<span class="string">"风落的测试报告"</span>, description=<span class="string">"太棒了"</span>).run(suite)</span><br><span class="line">f.close()</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> unittest</span><br><span class="line"><span class="keyword">from</span> test_account <span class="keyword">import</span> TestAccount</span><br><span class="line"><span class="keyword">from</span> test_account2 <span class="keyword">import</span> TestAccount2</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">suite = unittest.TestLoader().loadTestsFromTestCase(TestAccount)</span><br><span class="line"></span><br><span class="line">unittest.TextTestRunner().run(suite)</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>unittest.defaultTestLoader.discover("./")</code>当前文件夹目录下的所有测试用例都执行</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> unittest</span><br><span class="line"><span class="keyword">from</span> test_account <span class="keyword">import</span> TestAccount</span><br><span class="line"><span class="keyword">from</span> test_account2 <span class="keyword">import</span> TestAccount2</span><br><span class="line"></span><br><span class="line">suite = unittest.defaultTestLoader.discover(<span class="string">"./"</span>)</span><br><span class="line"></span><br><span class="line">unittest.TextTestRunner().run(suite)</span><br></pre></td></tr></tbody></table></figure>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1015,7 +1246,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-17 00:55:23" itemprop="dateModified" datetime="2021-04-17T00:55:23Z">2021-04-17</time>
+        <time title="修改时间：2021-05-27 05:08:42" itemprop="dateModified" datetime="2021-05-27T05:08:42Z">2021-05-27</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1061,10 +1292,6 @@
 
 <p><code>trip\urls.py</code></p>
 <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">urlpatterns = [</span><br><span class="line">    <span class="comment"># 统计报表</span></span><br><span class="line">    path(<span class="string">'master/'</span>, include(<span class="string">'master.urls'</span>)),</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
-
-
-
-
 
 <h3 id="配置静态文件"><a href="#配置静态文件" class="headerlink" title="配置静态文件"></a>配置静态文件</h3><ul>
 <li><p>法一<br><code>trip\urls.py</code></p>
@@ -1239,251 +1466,8 @@
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/04/15/admin-guan-li-jing-dian-he-men-piao/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/04/15/admin-guan-li-jing-dian-he-men-piao/" class="post-title-link" itemprop="url">使用admin管理景点和门票</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-04-15 13:39:20" itemprop="dateCreated datePublished" datetime="2021-04-15T13:39:20Z">2021-04-15</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-05-04 12:16:59" itemprop="dateModified" datetime="2021-05-04T12:16:59Z">2021-05-04</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%97%85%E6%B8%B8%E7%BD%91%E9%A1%B9%E7%9B%AE/" itemprop="url" rel="index"><span itemprop="name">旅游网项目</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h2 id="将景点添加到后台管理"><a href="#将景点添加到后台管理" class="headerlink" title="将景点添加到后台管理"></a>将景点添加到后台管理</h2><p><code>utils\actions.py</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.contrib <span class="keyword">import</span> messages</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">set_invalid</span>(<span class="params">modeladmin, request, queryset</span>):</span></span><br><span class="line">    <span class="string">""" 批量禁用 """</span></span><br><span class="line">    queryset.update(is_valid=<span class="literal">False</span>)</span><br><span class="line">    messages.success(request, <span class="string">'操作成功'</span>)</span><br><span class="line"></span><br><span class="line">set_invalid.short_description = <span class="string">'禁用所选对象'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">set_valid</span>(<span class="params">modeladmin, request, queryset</span>):</span></span><br><span class="line">    <span class="string">""" 批量启用 """</span></span><br><span class="line">    queryset.update(is_valid=<span class="literal">True</span>)</span><br><span class="line">    messages.success(request, <span class="string">'操作成功'</span>)</span><br><span class="line">set_valid.short_description = <span class="string">'启用所选对象'</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p>通过装饰器注册把模型注册到后台管理，可在admin后台对模型字段数据进行增删改查<br><code>sight\admin.py</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.contrib <span class="keyword">import</span> admin</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> sight.models <span class="keyword">import</span> Sight</span><br><span class="line"><span class="keyword">from</span> utils.actions <span class="keyword">import</span> set_invalid, set_valid</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@admin.register(Sight)</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SightAdmin</span>(<span class="params">admin.ModelAdmin</span>):</span></span><br><span class="line">    <span class="string">""" 景点基础信息 """</span></span><br><span class="line">    list_display = (<span class="string">'name'</span>, <span class="string">'desc'</span>, <span class="string">'main_img'</span>, <span class="string">'score'</span>, <span class="string">'province'</span>, <span class="string">'city'</span>,</span><br><span class="line">                    <span class="string">'area'</span>, <span class="string">'town'</span>, <span class="string">'is_valid'</span>, <span class="string">'created_at'</span>, <span class="string">'updated_at'</span>)</span><br><span class="line">    search_fields = (<span class="string">'name'</span>, <span class="string">'desc'</span>)</span><br><span class="line">    list_filter = (<span class="string">'is_top'</span>, <span class="string">'is_hot'</span>)</span><br><span class="line">    list_per_page = <span class="number">20</span></span><br><span class="line">    actions = [set_invalid, set_valid]</span><br></pre></td></tr></tbody></table></figure>
-<p><img src="/2021/04/15/admin-guan-li-jing-dian-he-men-piao/0.png" alt="description"><br><img src="/2021/04/15/admin-guan-li-jing-dian-he-men-piao/1.png" alt="description"></p>
-<h2 id="将景点详情添加到后台管理"><a href="#将景点详情添加到后台管理" class="headerlink" title="将景点详情添加到后台管理"></a>将景点详情添加到后台管理</h2><p><code>sight\models.py</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Sight</span>(<span class="params">CommonModel</span>):</span></span><br><span class="line">    <span class="string">""" 景点基础信息 """</span></span><br><span class="line">    name = models.CharField(<span class="string">'名称'</span>, max_length=<span class="number">64</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__str__</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="string">"""后台景点对象改成对应的景点中文名"""</span></span><br><span class="line">        <span class="keyword">return</span> self.name</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Info</span>(<span class="params">models.Model</span>):</span></span><br><span class="line">    <span class="string">""" 景点详情 """</span></span><br><span class="line">    sight = models.OneToOneField(Sight, on_delete=models.CASCADE, verbose_name=<span class="string">'关联景点'</span>)</span><br></pre></td></tr></tbody></table></figure>
-<h3 id="关联搜索-在后台管理配置搜索条件"><a href="#关联搜索-在后台管理配置搜索条件" class="headerlink" title="关联搜索 在后台管理配置搜索条件"></a>关联搜索 在后台管理配置搜索条件</h3><ul>
-<li><code>search_fields</code>——支持搜索的字段<h4 id="场景：：按景点名搜索"><a href="#场景：：按景点名搜索" class="headerlink" title="场景：：按景点名搜索"></a>场景：：按景点名搜索</h4><code>sight_info</code>表格里面没有<code>name</code>字段，<code>sight</code>表才有<code>name</code>字段，1对1的关联关系，用<code>search_fields = ('sight__name', )</code><br>通过装饰器注册把模型注册到后台管理，可在admin后台对模型字段数据进行增删改查<br><code>sight\admin.py</code><figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.contrib <span class="keyword">import</span> admin</span><br><span class="line"><span class="keyword">from</span> sight.models <span class="keyword">import</span> Info</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@admin.register(Info)</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">InfoAdmin</span>(<span class="params">admin.ModelAdmin</span>):</span></span><br><span class="line">    <span class="string">""" 景点详细信息 """</span></span><br><span class="line">    list_display = (<span class="string">'sight'</span>, <span class="string">'entry_explain'</span>, <span class="string">'play_way'</span>, <span class="string">'tips'</span>, <span class="string">'traffic'</span>)</span><br><span class="line">    search_fields = (<span class="string">'sight__name'</span>, )</span><br></pre></td></tr></tbody></table></figure>
-<img src="/2021/04/15/admin-guan-li-jing-dian-he-men-piao/2.png" alt="description"><br><img src="/2021/04/15/admin-guan-li-jing-dian-he-men-piao/3.png" alt="description"><br><img src="/2021/04/15/admin-guan-li-jing-dian-he-men-piao/11.png" alt="description"><br><img src="/2021/04/15/admin-guan-li-jing-dian-he-men-piao/4.png" alt="description"></li>
-</ul>
-<h2 id="将景点评论及回复添加到后台管理"><a href="#将景点评论及回复添加到后台管理" class="headerlink" title="将景点评论及回复添加到后台管理"></a>将景点评论及回复添加到后台管理</h2><p>通过装饰器注册把模型注册到后台管理，可在admin后台对模型字段数据进行增删改查<br><code>sight\admin.py</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.contrib <span class="keyword">import</span> admin</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> sight.models <span class="keyword">import</span> Comment</span><br><span class="line"><span class="keyword">from</span> utils.actions <span class="keyword">import</span> set_invalid, set_valid</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@admin.register(Comment)</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CommentsAdmin</span>(<span class="params">admin.ModelAdmin</span>):</span></span><br><span class="line">    <span class="string">""" 评论及回复 """</span></span><br><span class="line">    list_display = (<span class="string">'user'</span>, <span class="string">'sight'</span>, <span class="string">'content'</span>, <span class="string">'score'</span>, <span class="string">'is_top'</span>,</span><br><span class="line">                    <span class="string">'love_count'</span>)</span><br><span class="line">    search_fields = (<span class="string">'sight__name'</span>, )</span><br><span class="line">    actions = [set_invalid, set_valid]</span><br></pre></td></tr></tbody></table></figure>
-<p><img src="/2021/04/15/admin-guan-li-jing-dian-he-men-piao/5.png" alt="description"><br><img src="/2021/04/15/admin-guan-li-jing-dian-he-men-piao/6.png" alt="description"></p>
-<p>通过装饰器注册把模型注册到后台管理，可在admin后台对模型字段数据进行增删改查<br><code>sight\admin.py</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.contrib <span class="keyword">import</span> admin</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> sight.models <span class="keyword">import</span> Ticket</span><br><span class="line"><span class="keyword">from</span> utils.actions <span class="keyword">import</span> set_invalid, set_valid</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@admin.register(Ticket)</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TicketAdmin</span>(<span class="params">admin.ModelAdmin</span>):</span></span><br><span class="line">    <span class="string">""" 门票管理 """</span></span><br><span class="line">    list_display = (<span class="string">'sight'</span>, <span class="string">'name'</span>, <span class="string">'types'</span>, <span class="string">'price'</span>, <span class="string">'discount'</span>,</span><br><span class="line">                    <span class="string">'total_stock'</span>, <span class="string">'remain_stock'</span>, <span class="string">'is_valid'</span>)</span><br><span class="line">    search_fields = (<span class="string">'sight__name'</span>, )</span><br><span class="line">    actions = [set_invalid, set_valid]</span><br></pre></td></tr></tbody></table></figure>
-<p><img src="/2021/04/15/admin-guan-li-jing-dian-he-men-piao/7.png" alt="description"><br><img src="/2021/04/15/admin-guan-li-jing-dian-he-men-piao/8.png" alt="description"></p>
-<p><code>sight\apps.py</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SightConfig</span>(<span class="params">AppConfig</span>):</span></span><br><span class="line">    name = <span class="string">'sight'</span></span><br><span class="line">    verbose_name = <span class="string">'景点模块'</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>sight\models.py</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Sight</span>(<span class="params">CommonModel</span>):</span></span><br><span class="line">    <span class="string">""" 景点基础信息 """</span></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        db_table = <span class="string">'sight'</span></span><br><span class="line">        ordering = [<span class="string">'-updated_at'</span>]</span><br><span class="line">        verbose_name = <span class="string">'景点基础信息'</span></span><br><span class="line">        verbose_name_plural = <span class="string">'景点基础信息'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Info</span>(<span class="params">models.Model</span>):</span></span><br><span class="line">    <span class="string">""" 景点详情 """</span></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        db_table = <span class="string">'sight_info'</span></span><br><span class="line">        verbose_name = <span class="string">'景点详情'</span></span><br><span class="line">        verbose_name_plural = <span class="string">'景点详情'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Ticket</span>(<span class="params">CommonModel</span>):</span></span><br><span class="line">    <span class="string">""" 门票 """</span></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        db_table = <span class="string">'sight_ticket'</span></span><br><span class="line">        verbose_name = <span class="string">'门票'</span></span><br><span class="line">        verbose_name_plural = <span class="string">'门票'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Comment</span>(<span class="params">CommonModel</span>):</span></span><br><span class="line">    <span class="string">""" 评论及回复 """</span></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        db_table = <span class="string">'sight_comment'</span></span><br><span class="line">        verbose_name = <span class="string">'评论及回复'</span></span><br><span class="line">        verbose_name_plural = <span class="string">'评论及回复'</span></span><br></pre></td></tr></tbody></table></figure>
-<p><img src="/2021/04/15/admin-guan-li-jing-dian-he-men-piao/9.png" alt="description"></p>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/04/15/django-fu-wen-ben/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/04/15/django-fu-wen-ben/" class="post-title-link" itemprop="url">django富文本</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-04-15 13:39:20" itemprop="dateCreated datePublished" datetime="2021-04-15T13:39:20Z">2021-04-15</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-05-05 10:16:16" itemprop="dateModified" datetime="2021-05-05T10:16:16Z">2021-05-05</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%97%85%E6%B8%B8%E7%BD%91%E9%A1%B9%E7%9B%AE/" itemprop="url" rel="index"><span itemprop="name">旅游网项目</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="富文本支持"><a href="#富文本支持" class="headerlink" title="富文本支持"></a>富文本支持</h1><h2 id="实现步骤"><a href="#实现步骤" class="headerlink" title="实现步骤"></a>实现步骤</h2><ul>
-<li>配置富文本扩展<br>新建<code>/static</code> 和 <code>/media</code> </li>
-</ul>
-<p><code>trip\settings.py</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">INSTALLED_APPS = [</span><br><span class="line">    <span class="comment"># 富文本编辑器</span></span><br><span class="line">    <span class="string">'ckeditor'</span>,</span><br><span class="line">    <span class="string">'ckeditor_uploader'</span>,</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 静态文件的搜索地址</span></span><br><span class="line">STATIC_URL = <span class="string">'/static/'</span></span><br><span class="line">STATIC_ROOT = os.path.join(BASE_DIR, <span class="string">'static'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 富文本编辑器文件上传的位置</span></span><br><span class="line">CKEDITOR_UPLOAD_PATH = <span class="string">"uploads/"</span></span><br><span class="line"></span><br><span class="line">MEDIA_URL = <span class="string">'http://localhost:8080/'</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 自己上传的图片就会在media/uploads/下</span></span><br><span class="line">MEDIA_ROOT = os.path.join(BASE_DIR, <span class="string">'media'</span>)</span><br><span class="line"><span class="comment"># 通过访问 'http://localhost:8080/media/对应的图片地址'就可以访问</span></span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python manage.py collectstatic</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>trip\urls.py</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">urlpatterns = [</span><br><span class="line">    <span class="comment"># 富文本相关的配置</span></span><br><span class="line">    path(<span class="string">'ckeditor/'</span>, include(<span class="string">'ckeditor_uploader.urls'</span>)),</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
-<ul>
-<li><p>在django项目中安装富文本扩展</p>
-</li>
-<li><p>景点描述、景点详情富文本支持</p>
-</li>
-</ul>
-<p><code>models.TextField</code>替换成<code>RichTextField</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> ckeditor.fields <span class="keyword">import</span> RichTextField</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Sight</span>(<span class="params">CommonModel</span>):</span></span><br><span class="line">    <span class="string">""" 景点基础信息 """</span></span><br><span class="line"></span><br><span class="line">    name = models.CharField(<span class="string">'名称'</span>, max_length=<span class="number">64</span>)</span><br><span class="line">    <span class="comment"># content = models.TextField('详细')</span></span><br><span class="line">    content = RichTextField(<span class="string">'详细'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> ckeditor.fields <span class="keyword">import</span> RichTextField</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Info</span>(<span class="params">models.Model</span>):</span></span><br><span class="line">    <span class="string">""" 景点详情 """</span></span><br><span class="line">    sight = models.OneToOneField(Sight,</span><br><span class="line">                                 on_delete=models.CASCADE,</span><br><span class="line">                                 verbose_name=<span class="string">'关联景点'</span>)</span><br><span class="line">    entry_explain = models.RichTextField(<span class="string">'入园参考'</span>,</span><br><span class="line">                                     max_length=<span class="number">1024</span>,</span><br><span class="line">                                     null=<span class="literal">True</span>,</span><br><span class="line">                                     blank=<span class="literal">True</span>)</span><br><span class="line">    play_way = models.RichTextField(<span class="string">'特色玩法'</span>, null=<span class="literal">True</span>, blank=<span class="literal">True</span>)</span><br><span class="line">    tips = models.RichTextField(<span class="string">'温馨提示'</span>, null=<span class="literal">True</span>, blank=<span class="literal">True</span>)</span><br><span class="line">    traffic = models.RichTextField(<span class="string">'交通到达'</span>, null=<span class="literal">True</span>, blank=<span class="literal">True</span>)</span><br></pre></td></tr></tbody></table></figure>
-<p><img src="/2021/04/15/django-fu-wen-ben/1.png" alt="description"></p>
-<ul>
-<li>门票信息富文本支持<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> ckeditor.fields <span class="keyword">import</span> RichTextField</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Ticket</span>(<span class="params">CommonModel</span>):</span></span><br><span class="line">    <span class="string">""" 门票 """</span></span><br><span class="line">    sight = models.ForeignKey(Sight,</span><br><span class="line">                              related_name=<span class="string">'tickets'</span>,</span><br><span class="line">                              verbose_name=<span class="string">'景点门票'</span>,</span><br><span class="line">                              on_delete=models.PROTECT)</span><br><span class="line">    tips = RichTextField(<span class="string">'预定须知'</span>, null=<span class="literal">True</span>, blank=<span class="literal">True</span>)</span><br><span class="line">    remark = RichTextField(<span class="string">'其他说明'</span>, null=<span class="literal">True</span>, blank=<span class="literal">True</span>)</span><br></pre></td></tr></tbody></table></figure>
-
-</li>
-</ul>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python manage.py check</span><br><span class="line">python manage.py makemigrations</span><br><span class="line">python manage.py migrate</span><br></pre></td></tr></tbody></table></figure>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/3/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/25/">25</a><a class="extend next" rel="next" href="/page/5/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/3/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/26/">26</a><a class="extend next" rel="next" href="/page/5/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 <script src="/js/comments.js"></script>
 </div>
