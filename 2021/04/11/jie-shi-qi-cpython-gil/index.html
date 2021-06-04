@@ -20,15 +20,15 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
 
 <meta name="hexo-config" content="{&quot;hostname&quot;:&quot;bubbleboy11.github.io&quot;,&quot;root&quot;:&quot;/&quot;,&quot;images&quot;:&quot;/images&quot;,&quot;scheme&quot;:&quot;Muse&quot;,&quot;version&quot;:&quot;8.3.0&quot;,&quot;exturl&quot;:false,&quot;sidebar&quot;:{&quot;position&quot;:&quot;left&quot;,&quot;display&quot;:&quot;post&quot;,&quot;padding&quot;:18,&quot;offset&quot;:12},&quot;copycode&quot;:true,&quot;bookmark&quot;:{&quot;enable&quot;:false,&quot;color&quot;:&quot;#222&quot;,&quot;save&quot;:&quot;auto&quot;},&quot;fancybox&quot;:false,&quot;mediumzoom&quot;:false,&quot;lazyload&quot;:false,&quot;pangu&quot;:false,&quot;comments&quot;:{&quot;style&quot;:&quot;tabs&quot;,&quot;active&quot;:null,&quot;storage&quot;:true,&quot;lazyload&quot;:false,&quot;nav&quot;:null},&quot;motion&quot;:{&quot;enable&quot;:true,&quot;async&quot;:false,&quot;transition&quot;:{&quot;post_block&quot;:&quot;fadeIn&quot;,&quot;post_header&quot;:&quot;fadeInDown&quot;,&quot;post_body&quot;:&quot;fadeInDown&quot;,&quot;coll_header&quot;:&quot;fadeInLeft&quot;,&quot;sidebar&quot;:&quot;fadeInUp&quot;}},&quot;prism&quot;:false,&quot;i18n&quot;:{&quot;placeholder&quot;:&quot;搜索...&quot;,&quot;empty&quot;:&quot;没有找到任何搜索结果：${query}&quot;,&quot;hits_time&quot;:&quot;找到 ${hits} 个搜索结果（用时 ${time} 毫秒）&quot;,&quot;hits&quot;:&quot;找到 ${hits} 个搜索结果&quot;}}">
-<meta name="description" content="写在源文件中的源代码是人类可读的源。它需要”编译”，高级语言翻译成计算机能识别的语言，这样 CPU 可以按给定二进制指令执行程序。 一解释器的作用Python解释器作用：运行文件 当我们编写Python代码时，我们得到的是一个包含Python代码的以.py为扩展名的文本文件。要运行代码，就需要Python解释器去执行.py文件。由于整个Python语言从规范到解释器都是开源的，所以理论上，只要水平">
+<meta name="description" content="写在源文件中的源代码是人类可读的源。它需要”编译”，高级语言翻译成计算机能识别的语言，这样 CPU 可以按给定二进制指令执行程序。 go语言直接编译成二进制 解释器的作用Python解释器&#x2F;java虚拟机作用：运行文件 当我们编写Python代码时，我们得到的是一个包含Python代码的以.py为扩展名的文本文件。要运行代码，就需要Python解释器去执行.py文件。由于整个Python语言从规范">
 <meta property="og:type" content="article">
 <meta property="og:title" content="解释器 CPython GIL">
 <meta property="og:url" content="https://bubbleboy11.github.io/2021/04/11/jie-shi-qi-cpython-gil/index.html">
 <meta property="og:site_name" content="外心人D的博客">
-<meta property="og:description" content="写在源文件中的源代码是人类可读的源。它需要”编译”，高级语言翻译成计算机能识别的语言，这样 CPU 可以按给定二进制指令执行程序。 一解释器的作用Python解释器作用：运行文件 当我们编写Python代码时，我们得到的是一个包含Python代码的以.py为扩展名的文本文件。要运行代码，就需要Python解释器去执行.py文件。由于整个Python语言从规范到解释器都是开源的，所以理论上，只要水平">
+<meta property="og:description" content="写在源文件中的源代码是人类可读的源。它需要”编译”，高级语言翻译成计算机能识别的语言，这样 CPU 可以按给定二进制指令执行程序。 go语言直接编译成二进制 解释器的作用Python解释器&#x2F;java虚拟机作用：运行文件 当我们编写Python代码时，我们得到的是一个包含Python代码的以.py为扩展名的文本文件。要运行代码，就需要Python解释器去执行.py文件。由于整个Python语言从规范">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-04-10T16:21:41.000Z">
-<meta property="article:modified_time" content="2021-05-16T08:07:25.012Z">
+<meta property="article:modified_time" content="2021-06-01T14:41:53.208Z">
 <meta property="article:author" content="外心人D">
 <meta name="twitter:card" content="summary">
 
@@ -108,7 +108,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%80%E8%A7%A3%E9%87%8A%E5%99%A8%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="nav-text">一解释器的作用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Python%E8%A7%A3%E9%87%8A%E5%99%A8%E7%A7%8D%E7%B1%BB"><span class="nav-text">Python解释器种类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GIL-Global-Interpreter-Lock-%E5%85%A8%E5%B1%80%E8%A7%A3%E9%87%8A%E5%99%A8%E9%94%81"><span class="nav-text">GIL Global Interpreter Lock (全局解释器锁)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%A8%E5%B1%80%E9%94%81%E6%98%AF%E4%B8%BB%E8%A6%81%E7%9A%84%E4%BD%9C%E7%94%A8%E5%BD%B1%E5%93%8D"><span class="nav-text">全局锁是主要的作用影响</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%A6%96%E5%85%88%E5%8C%BA%E5%88%86CPU%E5%92%8CIO%E5%AF%86%E9%9B%86%E7%A8%8B%E5%BA%8F"><span class="nav-text">首先区分CPU和IO密集程序</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E8%A7%84%E9%81%BFGIL%E5%BD%B1%E5%93%8D"><span class="nav-text">如何规避GIL影响</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GIL%E5%AE%9E%E7%8E%B0"><span class="nav-text">GIL实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GIL%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F"><span class="nav-text">GIL执行顺序</span></a></li></ol></li></ol></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A7%A3%E9%87%8A%E5%99%A8%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="nav-text">解释器的作用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Python%E8%A7%A3%E9%87%8A%E5%99%A8%E7%A7%8D%E7%B1%BB"><span class="nav-text">Python解释器种类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GIL-Global-Interpreter-Lock-%E5%85%A8%E5%B1%80%E8%A7%A3%E9%87%8A%E5%99%A8%E9%94%81"><span class="nav-text">GIL Global Interpreter Lock (全局解释器锁)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%A8%E5%B1%80%E9%94%81%E6%98%AF%E4%B8%BB%E8%A6%81%E7%9A%84%E4%BD%9C%E7%94%A8%E5%BD%B1%E5%93%8D"><span class="nav-text">全局锁是主要的作用影响</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%A6%96%E5%85%88%E5%8C%BA%E5%88%86CPU%E5%92%8CIO%E5%AF%86%E9%9B%86%E7%A8%8B%E5%BA%8F"><span class="nav-text">首先区分CPU和IO密集程序</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E8%A7%84%E9%81%BFGIL%E5%BD%B1%E5%93%8D"><span class="nav-text">如何规避GIL影响</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GIL%E5%AE%9E%E7%8E%B0"><span class="nav-text">GIL实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GIL%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F"><span class="nav-text">GIL执行顺序</span></a></li></ol></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -121,13 +121,13 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">254</span>
+          <span class="site-state-item-count">260</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
-        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-count">24</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -202,7 +202,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-05-16 08:07:25" itemprop="dateModified" datetime="2021-05-16T08:07:25Z">2021-05-16</time>
+        <time title="修改时间：2021-06-01 14:41:53" itemprop="dateModified" datetime="2021-06-01T14:41:53Z">2021-06-01</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -225,7 +225,8 @@
     
     <div class="post-body" itemprop="articleBody">
         <p>写在源文件中的源代码是人类可读的源。<br>它需要”编译”，高级语言翻译成计算机能识别的语言，这样 CPU 可以按给定二进制指令执行程序。</p>
-<h1 id="一解释器的作用"><a href="#一解释器的作用" class="headerlink" title="一解释器的作用"></a>一解释器的作用</h1><p>Python解释器作用：运行文件</p>
+<p>go语言直接编译成二进制</p>
+<h1 id="解释器的作用"><a href="#解释器的作用" class="headerlink" title="解释器的作用"></a>解释器的作用</h1><p>Python解释器/java虚拟机作用：运行文件</p>
 <p>当我们编写Python代码时，我们得到的是一个包含Python代码的以.py为扩展名的文本文件。要运行代码，就需要Python解释器去执行.py文件。由于整个Python语言从规范到解释器都是开源的，所以理论上，只要水平够高，任何人都可以编写Python解释器来执行Python代码（当然难度很大）。事实上，确实存在多种Python解释器。</p>
 <h3 id="Python解释器种类"><a href="#Python解释器种类" class="headerlink" title="Python解释器种类"></a>Python解释器种类</h3><ul>
 <li><p>CPython，C语言开发的解释器[官方]，应用广泛的解释器。  当我们从Python官方网站下载并安装好Python，获得了一个官方版本的解释器：<br>在命令行下运行python就是启动CPython解释器。教程的所有代码也都在CPython下执行。</p>

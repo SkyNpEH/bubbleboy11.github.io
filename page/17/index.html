@@ -118,13 +118,13 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">254</span>
+          <span class="site-state-item-count">260</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
-        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-count">24</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -158,6 +158,941 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/la-ji-hui-shou/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/la-ji-hui-shou/" class="post-title-link" itemprop="url">垃圾回收</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-05-20 09:43:45" itemprop="dateModified" datetime="2021-05-20T09:43:45Z">2021-05-20</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <ul>
+<li><p>垃圾回收、循环引用和弱引用</p>
+<p>Python使用了自动化内存管理，这种管理机制以<strong>引用计数</strong>为基础，同时也引入了<strong>标记-清除</strong>和<strong>分代收集</strong>两种机制为辅的策略。</p>
+<figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">object</span> {</span></span><br><span class="line">    <span class="comment">/* 引用计数 */</span></span><br><span class="line">    <span class="keyword">int</span> ob_refcnt;</span><br><span class="line">    <span class="comment">/* 对象指针 */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> _<span class="title">typeobject</span> *<span class="title">ob_type</span>;</span></span><br><span class="line">} PyObject;</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 增加引用计数的宏定义 */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> Py_INCREF(op)   ((op)-&gt;ob_refcnt++)</span></span><br><span class="line"><span class="comment">/* 减少引用计数的宏定义 */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> Py_DECREF(op) \ <span class="comment">//减少计数</span></span></span><br><span class="line">    <span class="keyword">if</span> (--(op)-&gt;ob_refcnt != <span class="number">0</span>) \</span><br><span class="line">        ; \</span><br><span class="line">    <span class="keyword">else</span> \</span><br><span class="line">        __Py_Dealloc((PyObject *)(op))</span><br></pre></td></tr></tbody></table></figure>
+
+
+</li>
+</ul>
+<p>Python的垃圾回收机制原理</p>
+<ul>
+<li>引用计数为主（缺点：循环引用无法解决）</li>
+<li>引入标记清除和分代回收解决引用计数问题</li>
+<li>引用计数为主+标记清除和分代回收（收集）为辅</li>
+</ul>
+<p>引用计数（reference count）</p>
+<ul>
+<li>每个对象都有存有指向该对象的引用总数</li>
+<li>查看某个对象的引用计数 <code>sys.getrefcount()</code></li>
+<li>可以使用del关键字删除某个引用，减少对象引用计数，并不是销毁对象，释放已创建的变量（已占用的资源）。</li>
+</ul>
+<p>对每一个对象保存一个整型的引用计数器属性。用于记录对象被引用的情况。<br>对于一个对象A，只要有任何一个对象引用了A，则A的引用计数器就加1；<br>当引用失效时，引用计数器就减1。<br>只要对象的引用计数器的值为0，即表示对象A不能在被使用，可进行回收。</p>
+<p>优点：</p>
+<p>实现简单，垃圾对象便于辨识；判定效率高，回收没有延迟性。<br>缺点：</p>
+<p>他需要单独的字段存储计数器，这样的做法增加了存储空间的开销。</p>
+<p>每次赋值都需要更新计数器，伴随着加法和减法操作，这增加了时间开销。</p>
+<p>引用计数器还有一个严重的问题，即无法处理循环引用的问题，这是一条致命的缺陷，导致在Java回收的垃圾回收器中没有使用这类算法。</p>
+<p>Python的引用计数算法和实施方案<br>引用计数算法，是很多语言的资源回收选择，例如因人工智能而大火的Python，它是同时支持引用计数和垃圾回收机制的。</p>
+<p>具体哪种最优是要看场景的，业界有大规模实践中仅保留引用计数机制，以提高吞吐量的尝试。</p>
+<p>Java并没有选择引用计数是因为其存在一个基本的难题，也就是很难处理循环引用关系。</p>
+<p>Python是如何解决循环引用的？</p>
+<p>手动解除：很好理解，就是在合适的时机，解除引用关系。</p>
+<p>使用弱引用weakref，weakref是Python提供的标准库，旨在解决循环引用问题。</p>
+<p>① 什么时候对象的引用计数加1呢？<br>    -  对象创建 <code>a = 1,</code></p>
+<pre><code>-  对象被引用 `b = a`
+
+-  对象作为参数传递，传入到一个函数中，`func(a)`
+
+-  对象作为一个元素，对象存储在容器中 `l = [a]`
+</code></pre>
+<p>② 什么时候引用计数会减1呢？</p>
+<pre><code>-  对象的别名被显式销毁，例如`del a`
+
+-  对象的别名被赋予和引用指向了别的对象 `b=None` `a = 24`
+</code></pre>
+<ul>
+<li>一个对象离开它的作用域，例如f函数执行完毕时，f函数中的局部变量（全局变量不会）</li>
+<li>对象所在的容器被销毁，或从容器中删除对象</li>
+</ul>
+<p>③ 当对象的引用计数减少为0时，就意味着对象已经再没有被使用了，python虚拟机就会去把对象占用的内存回收掉，将其内存释放掉。</p>
+<p>  引用计数可能会导致循环引用问题，而循环引用会导致内存泄露，如下面的代码所示。为了解决这个问题，Python中引入了“标记-清除”和“分代收集”。在创建一个对象的时候，对象被放在第一代中，如果在第一代的垃圾检查中对象存活了下来，该对象就会被放到第二代中，同理在第二代的垃圾检查中对象存活下来，该对象就会被放到第三代中。</p>
+  <figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 循环引用会导致内存泄露 - Python除了引用技术还引入了标记清理和分代回收</span></span><br><span class="line"><span class="comment"># 在Python 3.6以前如果重写__del__魔术方法会导致循环引用处理失效</span></span><br><span class="line"><span class="comment"># 如果不想造成循环引用可以使用弱引用</span></span><br><span class="line">list1 = []</span><br><span class="line">list2 = [] </span><br><span class="line">list1.append(list2)</span><br><span class="line">list2.append(list1)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>  以下情况会导致垃圾回收：</p>
+<ul>
+<li><p>调用<code>gc.collect()</code></p>
+</li>
+<li><p><code>gc</code>模块的计数器达到阀值</p>
+</li>
+<li><p>程序退出</p>
+<p>如果循环引用中两个对象都定义了<code>__del__</code>方法，<code>gc</code>模块不会销毁这些不可达对象，因为gc模块不知道应该先调用哪个对象的<code>__del__</code>方法，这个问题在Python 3.6中得到了解决。</p>
+<p>也可以通过<code>weakref</code>模块构造弱引用的方式来解决循环引用的问题。</p>
+</li>
+</ul>
+<p>值(number\str)类型先随机 分配一个内存从一个随机数开始，</p>
+<p>python里面一切皆对象，比如创建一个列表 [1]，这个一个list对象。实际上Python的C语言实现中对于每个对象它都有几个字段，如它是什么类型以及引用计数即 ref 的值等，引用计数ref 就是C语言实现里面一个int值，用来计算有多少个变量在引用它。</p>
+<figure class="highlight angelscript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">a = [<span class="number">1</span>]   # [<span class="number">1</span>]对象引用计数增加<span class="number">1</span>，<span class="built_in">ref</span>=<span class="number">1</span></span><br><span class="line">b = a     # [<span class="number">1</span>]对象引用计数增加<span class="number">1</span>，<span class="built_in">ref</span>=<span class="number">2</span></span><br><span class="line">b = None  # [<span class="number">1</span>]对象引用计数减少<span class="number">1</span>，<span class="built_in">ref</span>=<span class="number">1</span></span><br><span class="line">del a     # [<span class="number">1</span>]对象引用计数减少<span class="number">1</span>，<span class="built_in">ref</span>=<span class="number">0</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>a = [1],当把列表 [1] 赋值给 a 的时候，它的引用计数就会增加1，此时列表 [1] 对象的引用计数ref=1 ； b = a 又把 a 赋值给 b ，a和b 同时引用了列表[1]对象，ref又增加1，此时 ref =2。继续执行 b = None， 让b指向None，这个时候它就不会指向原来的列表[1]对象，列表[1]对象的引入计数就会减少1，又变成ref=1。执行del a ，引用计数就会减少1，这个时候 ref = 0。当对象的引用计数为0就可以回收掉，</p>
+<p>什么时候引用计数减少，比如让b 不在指向[ 1],这时候引用计数就会减少，还可以使用Python的del 操作符，del a 也会减少对象[1]引用计数。</p>
+<figure class="highlight capnproto"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// object.h</span><br><span class="line"><span class="class"><span class="keyword">struct</span> _<span class="title">object</span> </span>{</span><br><span class="line">    Py_ssize_t ob_refcnt;   <span class="comment"># 引用计数值</span></span><br><span class="line">}PyObject;</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> sys</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>a = [<span class="number">1</span>,<span class="number">2</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>sys.getrefcount(a)   <span class="comment"># 查看a的引用计数</span></span><br><span class="line"><span class="number">2</span>   <span class="comment"># 创建对象，a引用增加1，调用函数也会增加引用计数，因此这里是2</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>b = <span class="number">1</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>sys.getrefcount(<span class="number">1</span>)   </span><br><span class="line"><span class="number">189</span>  <span class="comment"># 跟python底层实现有关，小整数对象池，不只是b引用1，内部实现有很多引用它</span></span><br><span class="line"><span class="comment"># 所以结果和你想的不太一样</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>优点：引用计数有一个很大的优点，即实时性，任何内存，一旦没有指向它的引用，就会被立即回收，而其他的垃圾收集技术必须在某种特殊条件下才能进行无效内存的回收。</p>
+<p>缺点：循环引用的问题，引用计数机制所带来的维护引用计数的额外操作与Python运行中所进行的内存分配和释放，引用赋值的次数是成正比的，这显然比其它那些垃圾收集技术所带来的额外操作<br>只是与待回收的内存数量有关的效率要低。</p>
+<p>（2）引用计数无法解决循环引用问题<br>只关注那些可能会产生循环引用的对象，<br>显然，像是PyIntObject、PyStringObject这些不可变对象是不可能产生循环引用的，<br>因为它们内部不可能持有其它对象的引用。<br>Python中的循环引用总是发生在container对象之间，也就是能够在内部持有其它对象的对象，比如list、dict、class等等。这也使得该方法带来的开销只依赖于container对象的的数量<br>循环引用解决不了可能会造成内存泄漏致命问题，因为循环引用致命的缺陷导致Python还需要别的机制来去增强它的垃圾回收功能。</p>
+<p>循环引用，<br>因为对象之间相互引用，每个对象的引用都不会为0，所以这些对象所占用的内存始终都不会被释放掉。</p>
+<figure class="highlight angelscript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">a = [<span class="number">1</span>]    # 对象[<span class="number">1</span>]引用计数增加<span class="number">1</span>，<span class="built_in">ref</span>=<span class="number">1</span></span><br><span class="line">b = [<span class="number">2</span>]    # 对象[<span class="number">2</span>]引用计数增加<span class="number">1</span>，<span class="built_in">ref</span>=<span class="number">1</span></span><br><span class="line">a.append(b)  # b被a引用，对象[<span class="number">2</span>]引用计数增加<span class="number">1</span>，<span class="built_in">ref</span>=<span class="number">2</span></span><br><span class="line">b.append(a)  # a又被b引用，对象[<span class="number">1</span>]引用计数增加<span class="number">1</span>，<span class="built_in">ref</span>=<span class="number">2</span></span><br><span class="line">del a     # 对象[<span class="number">1</span>]引用计数减少<span class="number">1</span>，<span class="built_in">ref</span>=<span class="number">1</span></span><br><span class="line">del b     # 对象[<span class="number">2</span>]引用计数减少<span class="number">1</span>，<span class="built_in">ref</span>=<span class="number">1</span></span><br><span class="line"># 两个对象互相引用之后引用计数无法归零</span><br></pre></td></tr></tbody></table></figure>
+<pre><code>  a = [1]，[1]赋值给a, a指向[1]对象,此时 [1] 的引用计数为 ref=1,然后执行 b = [2], b指向了[2]列表对象, 此时 [2] 的引用计数为 ref=1。执行操作 a.append(b) ，这个时候 b被 a 引用，此时 [2] 对象的引用计数 ref=2，在执行b.append(a), 这时候 a 又被b引用，此时 [1] 对象的引用计数 ref=2。这时候会出现互相引用即循环引用。
+
+  执行del a 和del b 这时候把 a 和 b去掉，对象[1] 和 [2] 的引用计数都变成 ref=1,发现最后引用计数都没有变成0，而且两个对象出现互相引用这就出现了循环引用的问题之后引用计数无法归零，并且始终没有办法销毁 [1]和 [2] 这两个列表对象。循环引用的问题导致这两个对象始终没有办法去回收。
+</code></pre>
+<p>标记清除（Mark and Sweep）<br>图解：<br>标记清除的原理就是</p>
+<ol>
+<li>从垃圾回收的根对象(GC root object 标记为红色的点) 寻找跟对象的集合作为垃圾检测动作的起点，跟对象也就是一些全局引用和函数栈中的引用，这些引用所指向的对象是不可被删除的；</li>
+<li>沿着root object集合中的每一个引用，开始不断查找可达对象。如左边图可达对象其实就是一个有向图，线表示引用关系，<br>从图中可以看到有三个蓝色点是从根节点不可达的点(孤立点)，分别是被四个点包裹的中间点和左下角的两个相连的点。如右图标记清除就是把不可达的点标灰，凡是标灰的点就认为没有对象去引用它就可以把它清除掉，<br>如果能够到达某个对象，则说明这个对象是可达的标绿，那么就不会被删除，这个过程就是垃圾检测阶段；</li>
+<li>当检测阶段结束以后，所有的对象就分成可达和不可达两部分，所有的可达对象<br>都进行保留，其它的不可达对象所占用的内存将会被回收，这就是垃圾回收阶段。<br>（底层采用的是链表将这些集合的对象连接在一起）<br>标记和清除的过程效率不高</li>
+</ol>
+<p>垃圾回收</p>
+<ul>
+<li>满足特定条件，自动启动垃圾回收</li>
+<li>当Python运行时，会记录其中分配对象（object allocation）和取消分配对象（object deallocation）的次数</li>
+<li>当两者的差值高于某个阈值时，垃圾回收才会启动</li>
+<li>查看阈值gc.get threshold()<br>Python的GC模块主要运用了引用计数来跟踪和回收垃圾。在引用计数的基础上，还可以通过“标记－清除”解决容器对象可能产生的循环引用的问题。通过分代回收以空间换取时间进一步提高垃圾回收的效率。</li>
+</ul>
+<p>分代回收</p>
+<ul>
+<li>Python把对象的生命周期分为三代，分别是第0代、第1代、第2代。</li>
+<li>每一代使用双向链表来标记这些对象</li>
+<li>Python把一开始创建的新建对象称为第0代，<br>比如 a ↔ b ↔ c ↔ d。每隔一定时间Python就会执行一个操作对第0、1、2代分别执行标记回收。每一代都会有预值，每隔多少时间就会清除第0代，每隔多少时间就会清除第1代，每隔多少时间就会清除第2代。</li>
+<li>每一代执行完标记回收之后剩下的对象没有回收的就会换移到下一代。 当某一代对象经历过垃圾回收，依然存活，那么它就被归入下一代对象<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> gc</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>gc.get_threshold()</span><br><span class="line">(<span class="number">700</span>, <span class="number">10</span>, <span class="number">10</span>)  <span class="comment"># 第一个700为第0代预值，第二个10为第1代预值，第三个10为第2代预值</span></span><br></pre></td></tr></tbody></table></figure>
+get_threshold() -&gt; (threshold0, threshold1, threshold2)<br>当每一代达到预值，就会触发GC操作，如第0代链表长度达到700个对象触发一次GC操作，也就是把第0代执行一次分代回收。</li>
+</ul>
+<p>原理：将系统中的所有内存块根据其存活时间划分为不同的集合，<br>每一个集合就成为一个“代”，<br>Python默认定义了三代对象集合，垃圾收集的频率随着“代”的存活时间的增大而减小。也就是说，<br>活得越长的对象，就越不可能是垃圾，就应该减少对它的垃圾收集频率。那么如何来衡量这个存活<br>时间：通常是利用几次垃圾收集动作来衡量，如果一个对象经过的垃圾收集次数越多，可以得出：<br>该对象存活时间就越长。</p>
+<p>手动回收</p>
+<ul>
+<li>gc.collect()手动执行垃圾回收garbagecollector</li>
+<li>objgraph模块中的count()记录当前类产生的实例对象的个数</li>
+</ul>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> psutil</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> gc</span><br><span class="line"><span class="keyword">import</span> objgraph</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">show_memory_info</span>(<span class="params">hint</span>):</span></span><br><span class="line">    pid = os.getpid()</span><br><span class="line">    p = psutil.Process(pid)</span><br><span class="line"></span><br><span class="line">    info = p.memory_full_info()</span><br><span class="line">    memory = info.uss / <span class="number">1024.</span> / <span class="number">1024</span></span><br><span class="line">    print(<span class="string">"{}内存使用了{}MB"</span>.format(hint, memory))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func</span>():</span></span><br><span class="line">    show_memory_info(<span class="string">"局部变量初始化"</span>)</span><br><span class="line">    a = [i <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10000000</span>)]</span><br><span class="line">    show_memory_info(<span class="string">"局部变量创建后"</span>)</span><br><span class="line">    <span class="keyword">return</span> a</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func2</span>():</span></span><br><span class="line">    show_memory_info(<span class="string">"全局变量初始化"</span>)</span><br><span class="line">    <span class="keyword">global</span> a</span><br><span class="line">    a = [i <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10000000</span>)]</span><br><span class="line">    show_memory_info(<span class="string">"全局变量创建后"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># python内部引用计数</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">jishu</span>():</span></span><br><span class="line">    a = []</span><br><span class="line">    print(sys.getrefcount(a))</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">func</span>(<span class="params">a</span>):</span></span><br><span class="line">        print(sys.getrefcount(a))</span><br><span class="line"></span><br><span class="line">    func(a)</span><br><span class="line">    print(sys.getrefcount(a))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 循环引用</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func3</span>():</span></span><br><span class="line">    show_memory_info(<span class="string">"循环引用初始化"</span>)</span><br><span class="line">    a = [i <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10000000</span>)]</span><br><span class="line">    b = [i <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10000000</span>)]</span><br><span class="line">    show_memory_info(<span class="string">"ab创建完成"</span>)</span><br><span class="line">    a.append(b)</span><br><span class="line">    b.append(a)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    <span class="keyword">pass</span> </span><br><span class="line">    func()</span><br><span class="line">    show_memory_info(<span class="string">"局部变量完成后"</span>)</span><br><span class="line">    func2()</span><br><span class="line">    show_memory_info(<span class="string">"全局变量完成后"</span>)</span><br><span class="line">    l = func()</span><br><span class="line">    show_memory_info(<span class="string">"列表变量完成后"</span>)</span><br><span class="line">    jishu()</span><br><span class="line"></span><br><span class="line">    print(<span class="string">"手动回收垃圾"</span>)</span><br><span class="line">    show_memory_info(<span class="string">"初始化前"</span>)</span><br><span class="line">    a = [i <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10000000</span>)]</span><br><span class="line">    show_memory_info(<span class="string">"初始化后"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">del</span> a</span><br><span class="line">    gc.collect()</span><br><span class="line"></span><br><span class="line">    show_memory_info(<span class="string">"完成"</span>)</span><br><span class="line">    <span class="comment"># print(a)</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 循环引用</span></span><br><span class="line">    func3()</span><br><span class="line">    show_memory_info(<span class="string">"循环引用完成"</span>)</span><br><span class="line">    gc.collect()</span><br><span class="line">    show_memory_info(<span class="string">"手动垃圾回收完成"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># objgraph</span></span><br><span class="line">    a = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>]</span><br><span class="line">    b = [<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>]</span><br><span class="line"></span><br><span class="line">    a.append(b)</span><br><span class="line">    b.append(a)</span><br><span class="line"></span><br><span class="line">    objgraph.show_refs([a], filename = <span class="string">"objref.png"</span>)</span><br><span class="line">    objgraph.show_backrefs([a], filename = <span class="string">"backref.png"</span> )</span><br></pre></td></tr></tbody></table></figure><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/ru-he-pou-xi-cheng-xu-xing-neng/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/ru-he-pou-xi-cheng-xu-xing-neng/" class="post-title-link" itemprop="url">如何剖析程序性能</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-04-09 06:02:35" itemprop="dateModified" datetime="2021-04-09T06:02:35Z">2021-04-09</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E9%9D%A2%E8%AF%95/" itemprop="url" rel="index"><span itemprop="name">面试</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h3 id="使用各种profile工具（内置或第三方）"><a href="#使用各种profile工具（内置或第三方）" class="headerlink" title="使用各种profile工具（内置或第三方）"></a>使用各种profile工具（内置或第三方）</h3><ul>
+<li>二八定律，大部分时间消耗时在少量代码操作上。</li>
+<li>使用内置 profile / cprofile 等工具来衡量代码的运行时间</li>
+<li>对于web应用来说可以使用 pyflame( uber 开源)的火焰图工具分析程序性能。</li>
+</ul>
+<h3 id="服务端性能优化措施"><a href="#服务端性能优化措施" class="headerlink" title="服务端性能优化措施"></a>服务端性能优化措施</h3><p>web应用一般语言不会成为瓶颈</p>
+<ol>
+<li><p>数据结构和算法优化（高效的算法或者数据结构能带来性能提升非常大）</p>
+</li>
+<li><p>数据库层：索引优化，慢查询消除，批量操作减少IO，通过引入NoSQL提升系统性能</p>
+</li>
+<li><p>网络IO：批量操作，通过pipeline管道操作，减少数据库IO请求次数。</p>
+</li>
+<li><p>缓存：使用内存数据库 redis / memcached。(内存读取时间远高于磁盘读取，使用内存数据库抗一些并发比较高的请求)</p>
+</li>
+<li><p>异步：asyncio , celery (使用一些异步框架或者异步库)</p>
+</li>
+<li><p>并发： gevent / 多线程 （并发相关请求）</p>
+</li>
+</ol>
+<p>使用集群</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/zi-dian-qu-dai-switch/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/zi-dian-qu-dai-switch/" class="post-title-link" itemprop="url">HTML</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-04-02 12:24:46" itemprop="dateModified" datetime="2021-04-02T12:24:46Z">2021-04-02</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Markdown/" itemprop="url" rel="index"><span itemprop="name">Markdown</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sunday</span>():</span></span><br><span class="line">    print(<span class="string">'俺是星期天'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">monday</span>():</span></span><br><span class="line">    print(<span class="string">'俺是星期一'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">tuesday</span>():</span></span><br><span class="line">    print(<span class="string">'俺是星期二'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">default</span>():</span></span><br><span class="line">    print(<span class="string">'俺是default'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">switcher = {  <span class="comment"># 注意：()如果直接写在键值中，会导致所有函数都执行</span></span><br><span class="line">    <span class="number">0</span>: sunday,</span><br><span class="line">    <span class="number">1</span>: monday,</span><br><span class="line">    <span class="number">2</span>: tuesday</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">day = <span class="number">8</span></span><br><span class="line">day1 = <span class="number">1</span></span><br><span class="line"></span><br><span class="line">day_name = switcher.get(day, default)()  <span class="comment"># 加上括号执行函数</span></span><br><span class="line">day_name = switcher.get(day1, default)()  <span class="comment"># 加上括号执行函数</span></span><br><span class="line"><span class="comment"># 俺是default</span></span><br></pre></td></tr></tbody></table></figure><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/zi-fu-bian-ma/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/zi-fu-bian-ma/" class="post-title-link" itemprop="url">字符编码</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-05-27 01:58:37" itemprop="dateModified" datetime="2021-05-27T01:58:37Z">2021-05-27</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" itemprop="url" rel="index"><span itemprop="name">操作系统</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>编码和解码是Python中str和bytes这两种字符串类型之间的互相转换。<br>编码是一种用一种特定的方式对抽象字符（Unicode）转换为二进制形式（bytes）进行表示，也就是python3中的encode。<br>解码就是对用特定方式表示的二进制数据用特定的方式转化为Unicode，也就是decode。</p>
+<p>计算机是 以字节为单位 来 存储和传输数据的，<br>从文件中读入文字信息，从网络上接收 文字信息，获取的数据通常是使用某种字符编码后的 字节串<br>计算机使用0和1来存储文本。<br>比如字符“C”被存成“01000011”，那么计算机在显示这个字符时需要经过两个步骤：<br>计算机读取“01000011”，得到数字67，因为67被编码成“01000011”。<br>计算机在Unicode字符集中查找67，找到了“C”。<br>同样的：<br>我的电脑将“C”映射成Unicode字符集中的67。<br>我的电脑将67编码成“01000011”，并发送给Web服务器。<br>几乎所有的网络应用都使用了Unicode字符集，因为没有理由使用其他字符集。</p>
+<p>Unicode Universal Multiple-Octet Coded Character Set 统一码、万国码<br>Unicode是为了统一世界各国语言的不用，统一用2个bytes代表一个字符，可以表达2**16=65556个，特点：速度快，但浪费空间，<br>可以用在内存处理中，<br>如何用字节表示 字符对应的数字 就是 字符编码 规范<br>Unicode字符集包含了上百万个字符。最简单的编码是UTF-32，每个字符使用32位。，<br>计算机将32位视为数字，而计算机最在行的就是处理数字。但问题是，这样太浪费空间了。</p>
+<p>Unicode编码有不同的实现方式，比如：UTF-8、UTF-16 gbk，ASCII，等等。<br>这里的Unicode就像英语一样，做为国与国之间交流世界通用的标准，每个国家有自己的语言，<br>他们把标准的英文文档翻译成自己国家的文字，这是实现方式，就像utf-8。</p>
+<p>UTF-8（Unicode Transformation Format）是为unicode编码 设计 的一种 在存储 和传输时节省空间的编码方案。<br>广泛应用于互联网，它是一种变长的字符编码，可以根据具体情况用1-4个字节来表示一个字符。<br>比如英文字符这些原本就可以用ASCII码表示的字符用UTF-8表示时就只需要一个字节的空间，和ASCII是一样的。<br>对于多字节（n个字节）的字符，第一个字节的前n为都设为1，第n+1位设为0，后面字节的前两位都设为10。<br>剩下的二进制位全部用该字符的unicode码填充。<br>节省空间，在UTF-8中，字符“C”只需要8位，一些不常用的字符，比如“”需要32位。<br>其他的字符可能使用16位或24位。</p>
+<p>utf-8 为了改变Unicode的这种缺点，规定1个英文字符用1个字节表示，1个中文字符用3个字节表示，特点；节省空间，速度慢，用在硬盘数据传输，网络数据传输，相比硬盘和网络速度，体现不出来的，</p>
+<blockquote>
+<p>一个字节 由 8位二进制数字表示，最多可以表示从0到255，一共256个字符。</p>
+</blockquote>
+<h3 id="ASCII-American-Standard-Code-for-Information-Interchange"><a href="#ASCII-American-Standard-Code-for-Information-Interchange" class="headerlink" title="ASCII American Standard Code for Information Interchange"></a>ASCII American Standard Code for Information Interchange</h3><p>美国信息交换标准码，一种规则，表示数据的方式</p>
+<ul>
+<li>基于拉丁字母的一套电脑编码系统</li>
+<li>主要用于显示现代英语和其他西欧语言<br>使用7位或8位二进制数组合来表示128或256种可能的字符。 2^8=256</li>
+<li>标准ASCII码使用7位二进制来表示26个字母的大写字母和小写字母，10个数字0-9，标点符号，以及在美式英语种使用的控制字符。</li>
+<li>8位二进制后128个称为扩展ASCII码，用于表示特殊符号、外来语字母和图形符号。</li>
+</ul>
+<p>每个字符都对应唯一的一个数字，比如字符A对应的二进制数值是01000001，对应的十进制就是65。<br>ASCII 占1个字节bytes代表一个字符<br>GB2312 占2个字节，支持6700+汉字</p>
+<p>gbk  是中文的字符编码，用2个字节代表一个字符</p>
+<p>ASCII 这样的 用数字代表文字符号的规范，就被称之为 字符集</p>
+<p>Python中字符串的类型只有两种（str，bytes）文本字符串和字节字符串。<br>其中文本字符串类型被命名为str，内部采用Unicode字符集（兼容ASCII码），<br>而字节字符串则直接用来表示原始的字节序列（用print函数来打印字节字符串时，若字节在ascii码范围内，则显示为ascii码对应的字符，其余的则直接显示为16进制数），该类型被命名为bytes。</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> sys</span><br><span class="line">print(sys.platform)  <span class="comment"># win32</span></span><br><span class="line">print(sys.getdefaultencoding())  <span class="comment"># utf-8</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="字符编码"><a href="#字符编码" class="headerlink" title="字符编码"></a>字符编码</h2><h3 id="Python3"><a href="#Python3" class="headerlink" title="Python3"></a>Python3</h3><p>字符串str==unicode，是和人交互的，用来操作的，前缀带不带u，其实都一样。<br>每个字符用字符本身或者\u1234来表示，</p>
+<p>有三种前缀</p>
+<ul>
+<li><p>无前缀<br>一般英文字符在使用各种编码下, 基本都可以正常解析, 所以一般不带u；<br>但是中文, 必须表明所需编码, 否则一旦编码转换就会出现乱码。</p>
+</li>
+<li><p>前缀<code>u</code>/<code>U</code>:<br>一个具体的unicode字符表示法<code>\uxxxx</code>，<code>\u</code>会自动去寻找后面4位16进制数，然后去Unicode字符集寻找对应的字符来显式输出。<br>不是仅仅是针对中文, 可以针对任何的字符串，代表是对字符串进行unicode编码。但打印时都是打印字符本身。</p>
+</li>
+</ul>
+<figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//定义变量存放unicode编码表示的字符</span></span><br><span class="line"><span class="keyword">char</span> c = <span class="string">'\u005d'</span>;</span><br><span class="line">System.out.println(<span class="string">"c="</span> + c);  <span class="comment">// c=]</span></span><br></pre></td></tr></tbody></table></figure>
+
+<ul>
+<li>前缀<code>b</code>:<br>字节串bytes!=str：计算机自己能理解的“语言”是二进制数，最小的信息标识是二进制位，<br>文件操作模式会用到，给计算机传输到网络或者保存到文件<br>字节是将unicode编码后的utf或gbk字节串，bytes是(py2.x)的str<br>不能print，直接print你decode出来的那个str就行了，不需要再encode</li>
+</ul>
+<p>想在py3里看字符，必须得是unicode编码，其它编码一律按bytes格式展示。<br>unicode是某种特定编码的字节流，是bytes的子集。所有的unicode都能放进bytes，但某些bytes无法放进unicode。<br>不是utf-8，utf-8编码的是bytes</p>
+<h3 id="python2"><a href="#python2" class="headerlink" title="python2"></a>python2</h3><p>字符串有两种字符串类型unicode，str和是python3中的byte，<br>bytes==str<br>unicode!=str</p>
+<p><code>str.encode(encoding='UTF-8', errors='strict')</code>等同于在字符串前面加上<code>b</code><br>以指定的编码格式编码，把str类型的字符串转换为bytes字符串，字符对应的若干十六进制数，<br><code>\x</code>代表16进制 如<code>\xc9</code>，代表两位16进制，一个字节</p>
+<ul>
+<li><p>encoding – 要使用的编码</p>
+<ul>
+<li><p><code>utf-8</code> <code>UTF8</code> 用三个十六进制 3个字节 来表示一个中文字符，</p>
+</li>
+<li><p><code>gbk</code>编码中文用 二个十六进制 2个字节Bytes 来表示一个中文字符，<br>每个bytes，即8位bit的第一个位作为标志位，<br>标志位为1则表示是中文字符，如果标志位为0则表示为英文字符</p>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><code>errors</code> – 设置不同错误的处理方案。默认为 <code>'strict'</code>，意为编码错误引起一个UnicodeError。<br>其他可能得值有 ‘ignore’, ‘replace’, ‘xmlcharrefreplace’, ‘backslashreplace’ 以及通过 codecs.register_error() 注册的任何值。<br>该方法返回编码后的字符串，它是一个 bytes 对象。</li>
+</ul>
+<p><code>bytes.decode(encoding="utf-8", errors="strict")</code><br>以指定的编码格式解码 bytes 对象。</p>
+<ul>
+<li>encoding – 要使用的编码，默认 ‘utf-8’。</li>
+<li>errors – 设置不同错误的处理方案。默认为 ‘strict’,意为编码错误引起一个UnicodeError。<br>其他可能得值有 ‘ignore’, ‘replace’, ‘xmlcharrefreplace’, ‘backslashreplace’ 以及通过 codecs.register_error() 注册的任何值。</li>
+</ul>
+<p>当python解释器执行到产生字符串的代码时（例如x=’上’），<br>会申请新的内存地址，然后将’上’编码成文件开头指定的编码格式</p>
+<p>想看x在内存中的真实格式，可以将其放入列表中再打印，<br>而不要直接打印，因为直接print()会自动转换编码，</p>
+<p>字符串编码转换</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># python2 编码</span></span><br><span class="line"><span class="comment"># coding:gbk</span></span><br><span class="line">x=<span class="string">'上'</span></span><br><span class="line">y=<span class="string">'下'</span></span><br><span class="line">print([x,y]) <span class="comment"># ['\xc9\xcf', '\xcf\xc2']</span></span><br><span class="line">print(type(x),type(y)) <span class="comment"># (&lt;type 'str'&gt;, &lt;type 'str'&gt;)</span></span><br><span class="line"><span class="comment"># c9cf总共4位16进制数，</span></span><br><span class="line"><span class="comment"># 一个16进制 4个比特位</span></span><br><span class="line"><span class="comment"># 4个16进制数则是16个比特位，即2个Bytes</span></span><br><span class="line"></span><br><span class="line">x=<span class="string">'上'</span>.decode(<span class="string">'gbk'</span>)</span><br><span class="line">y=<span class="string">'下'</span>.decode(<span class="string">'gbk'</span>)</span><br><span class="line">print([x,y]) <span class="comment">#[u'\u4e0a', u'\u4e0b']</span></span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>s = <span class="string">u'中文'</span> <span class="comment"># python2中定义包含中文字符串必须加U前缀</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>type(s)</span><br><span class="line">&lt;type <span class="string">'unicode'</span>&gt;</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># python3 编码</span></span><br><span class="line">string = <span class="string">u'中文'</span></span><br><span class="line"><span class="comment"># 加u，'中文'也会被以unicode形式保存新的内存空间中</span></span><br><span class="line">print(string, type(string), len(string))  <span class="comment"># 中文 &lt;class 'str'&gt; 2</span></span><br><span class="line"></span><br><span class="line">s = <span class="string">'中文'</span></span><br><span class="line"><span class="comment"># 无需加u，'中文'也会被以unicode形式保存新的内存空间中</span></span><br><span class="line">print(s, type(s), len(s))  <span class="comment"># 中文 &lt;class 'str'&gt; 2</span></span><br><span class="line"></span><br><span class="line">print(string == s)  <span class="comment"># True</span></span><br><span class="line">print(string <span class="keyword">is</span> s)  <span class="comment"># True</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 将 Unicode 编码格式字符串转换成 UTF-8</span></span><br><span class="line">print(s.encode(), type(s.encode()), len(s.encode()))  <span class="comment"># 默认UTF-8</span></span><br><span class="line"><span class="comment"># b'\xe4\xb8\xad\xe6\x96\x87' &lt;class 'bytes'&gt; 6</span></span><br><span class="line"><span class="comment"># utf-8是多字节编码，\xe4\xb8\xad合起来是一个字符，</span></span><br><span class="line"><span class="comment"># 而unicode里面，\xe4, \xb8, \xad各自是一个字符，</span></span><br><span class="line"><span class="comment"># 相当于\u00e4, \u00b8, \u00ad，所以当然是乱码了</span></span><br><span class="line"></span><br><span class="line">print(s.encode(encoding=<span class="string">"UTF8"</span>), type(s.encode(encoding=<span class="string">"UTF-8"</span>)), len(s.encode(encoding=<span class="string">"UTF-8"</span>)))</span><br><span class="line"><span class="comment"># b'\xe4\xb8\xad\xe6\x96\x87' &lt;class 'bytes'&gt; 6</span></span><br><span class="line"></span><br><span class="line">print(<span class="string">b'\xe4\xb8\xad\xe6\x96\x87'</span>.decode(<span class="string">"UTF-8"</span>),\</span><br><span class="line">    type(<span class="string">b'\xe4\xb8\xad\xe6\x96\x87'</span>.decode(<span class="string">"UTF-8"</span>)),len(<span class="string">b'\xe4\xb8\xad\xe6\x96\x87'</span>.decode(<span class="string">"UTF-8"</span>)))</span><br><span class="line"><span class="comment"># 中文 &lt;class 'str'&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 将 Unicode 编码格式字符串 转换成 GBK 编码</span></span><br><span class="line">print(s.encode(<span class="string">"GBK"</span>), type(s.encode(<span class="string">"GBK"</span>)), len(s.encode(<span class="string">"GBK"</span>)))</span><br><span class="line"><span class="comment"># b'\xd6\xd0\xce\xc4' &lt;class 'bytes'&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 将 GBK 编码格式字符串 转化成 Unicode</span></span><br><span class="line">print(<span class="string">b'\xd6\xd0\xce\xc4'</span>.decode(<span class="string">'GBK'</span>),\</span><br><span class="line">    type(<span class="string">b'\xd6\xd0\xce\xc4'</span>.decode(<span class="string">'GBK'</span>, <span class="string">'strict'</span>)),len(<span class="string">b'\xd6\xd0\xce\xc4'</span>.decode(<span class="string">'GBK'</span>, <span class="string">'strict'</span>)))</span><br><span class="line"><span class="comment"># 中文 &lt;class 'str'&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 只有ascii字符集中的字符，三种编码方式得到的结果才完全一致。</span></span><br><span class="line">print(<span class="string">'abc'</span>.encode())  <span class="comment"># b'abc'</span></span><br><span class="line">print(<span class="string">'abc'</span>.encode(<span class="string">'GBK'</span>))  <span class="comment"># b'abc'</span></span><br><span class="line">print(<span class="string">'abc'</span>.encode(<span class="string">'latin-1'</span>))  <span class="comment"># b'abc'</span></span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> 大写(<span class="params">s</span>):</span></span><br><span class="line">    <span class="keyword">return</span> s.upper()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">print(大写(<span class="string">'abc'</span>))  <span class="comment"># 'ABC'</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>如果**<em>type(text) is str**</em>，<br>那么<code>text.encode(‘latin1’).decode(‘unicode_escape’)</code></p>
+<p>如果**<em>type(text) is bytes**</em>，<br>那么<code>text.decode('unicode_escape')</code></p>
+<h3 id="unicode-escape-unicode-escape-的解码与编码规则，"><a href="#unicode-escape-unicode-escape-的解码与编码规则，" class="headerlink" title="unicode_escape unicode-escape 的解码与编码规则，"></a>unicode_escape unicode-escape 的解码与编码规则，</h3><p>编码用unicode数字字符串表示字符</p>
+<p>解码碰到<code>\\</code>会去掉一个<code>\</code>，编码的时候会添上一个<code>\</code>,<br>所以就解释了<code>b'\uxxxx'</code>就是<code>b'\\uxxxx'</code> ，<br>因为\u的情况下面，根本不可能出现一个\的情况。<br>所以总的思路是出现<code>'\\uxxxx'</code>的字符串，首先通过一种常规的字符编码方式utf8 gbc随便你，<br>转换成<code>b'\\uxxxx'</code>的形式，然后再通过<code>'unicode_escape'</code>的编码解码，变成<code>'\uxxxx'</code>的形式，</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">print(<span class="string">'中文'</span>.encode(<span class="string">'unicode_escape'</span>))</span><br><span class="line"><span class="comment"># b'\\u4e2d\\u6587'</span></span><br><span class="line">print(type(<span class="string">'中文'</span>.encode(<span class="string">'unicode_escape'</span>)), len(<span class="string">'中文'</span>.encode(<span class="string">'unicode_escape'</span>)))</span><br><span class="line"><span class="comment"># &lt;class 'bytes'&gt; 12</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 一个反斜杠 unicode转义数字 写字符串</span></span><br><span class="line">print(<span class="string">'\u4e2d\u6587'</span>, type(<span class="string">'\u4e2d\u6587'</span>), len(<span class="string">'\u4e2d\u6587'</span>))</span><br><span class="line"><span class="comment"># 中文 &lt;class 'str'&gt; 2</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Python的字符串中应该不会出现'\uxxxx'的字符。</span></span><br><span class="line"><span class="comment"># 如果出现了，那应该是'\\uxxxx'注意前面应该是两个反斜杠，直接把\u的反斜杠转义了</span></span><br><span class="line"></span><br><span class="line">print(<span class="string">r'\u5bb6'</span>)  <span class="comment"># \u5bb6 </span></span><br><span class="line">print(<span class="string">b'\u5bb6'</span>)  <span class="comment"># b'\\u5bb6'</span></span><br><span class="line">print(<span class="string">b'\u5bb6'</span>.decode(<span class="string">'unicode_escape'</span>))  <span class="comment"># 家</span></span><br><span class="line">print(<span class="string">'\u5bb6'</span>)  <span class="comment"># 家</span></span><br><span class="line">print(<span class="string">'\\u5bb6'</span>)  <span class="comment"># \u5bb6</span></span><br><span class="line">print(<span class="string">'\\u5bb6'</span>.encode())  <span class="comment"># b'\\u5bb6'</span></span><br><span class="line">print(<span class="string">'\\u5bb6'</span>.encode().decode())  <span class="comment"># \u5bb6</span></span><br><span class="line">print(<span class="string">'\\u5bb6'</span>.encode().decode(<span class="string">'unicode_escape'</span>))  <span class="comment"># 家</span></span><br><span class="line"></span><br><span class="line">print(<span class="string">'\\u5bb6'</span>.encode(<span class="string">'unicode_escape'</span>))  <span class="comment"># b'\\\\u5bb6'</span></span><br><span class="line">print(<span class="string">'\\u5bb6'</span>.encode(<span class="string">'unicode_escape'</span>).decode(<span class="string">'unicode_escape'</span>))  <span class="comment"># \u5bb6</span></span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">b = <span class="string">b'apple'</span></span><br><span class="line">print(b, type(b))</span><br><span class="line"><span class="comment"># b'apple' &lt;class 'bytes'&gt;</span></span><br><span class="line">print(b[<span class="number">0</span>])  <span class="comment"># 97</span></span><br><span class="line">print(b[<span class="number">1</span>:])  <span class="comment"># b'pple'</span></span><br><span class="line">print(list(b))  <span class="comment"># [97, 112, 112, 108, 101]</span></span><br><span class="line"></span><br><span class="line">userInputTag = [<span class="string">"\xe5\x8f\xa4\xe8\xbf\xb9"</span>, <span class="string">"\xe5\xbb\xba\xe7\xad\x91"</span>]</span><br><span class="line">print(userInputTag[<span class="number">0</span>].encode(<span class="string">'latin-1'</span>).decode(<span class="string">'utf-8'</span>), type(userInputTag[<span class="number">0</span>]))</span><br><span class="line"><span class="comment"># 古迹 &lt;class 'str'&gt;</span></span><br></pre></td></tr></tbody></table></figure>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/xun-zhao-xuan-zhuan-pai-lie-shu-zu-zhong-de-zui-xiao-zhi/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/xun-zhao-xuan-zhuan-pai-lie-shu-zu-zhong-de-zui-xiao-zhi/" class="post-title-link" itemprop="url">HTML</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-04-02 12:24:46" itemprop="dateModified" datetime="2021-04-02T12:24:46Z">2021-04-02</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Markdown/" itemprop="url" rel="index"><span itemprop="name">Markdown</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <hr>
+<p>title: 寻找旋转排列数组中的最小值<br>date: 2020-08-20 16:21:41<br>author: 外心人D<br>toc: true<br>mathjax: false<br>summary: 爱编程<br>categories: Markdown<br>tags:</p>
+<ul>
+<li>Leetcode</li>
+<li>剑指offer</li>
+</ul>
+<hr>
+<h3 id="Go"><a href="#Go" class="headerlink" title="Go"></a>Go</h3><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/fu-bi-jiao/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/fu-bi-jiao/" class="post-title-link" itemprop="url">富比较</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-05-02 12:29:01" itemprop="dateModified" datetime="2021-05-02T12:29:01Z">2021-05-02</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><code>object.__lt__(self, other)</code> less than<br><code>object.__le__(self, other)</code> less than or equal<br><code>object.__eq__(self, other)</code> equal<br><code>object.__ne__(self, other)</code> not equal<br><code>object.__gt__(self, other)</code> great than<br><code>object.__ge__(self, other)</code> great than or equal<br>以上这些被称为“富比较”方法。<br>运算符号与方法名称的对应关系如下：<br><code>x&lt;y</code> 调用 <code>x.__lt__(y)</code>、<br><code>x&lt;=y</code> 调用 <code>x.__le__(y)</code>、<br><code>x==y</code> 调用 <code>x.__eq__(y)</code>、<br><code>x!=y</code> 调用 <code>x.__ne__(y)</code>、<br><code>x&gt;y</code> 调用 <code>x.__gt__(y)</code>、<br><code>x&gt;=y</code> 调用 <code>x.__ge__(y)</code>。</p>
+<p>如果指定的参数对没有相应的实现，富比较方法可能会返回单例对象 NotImplemented。按照惯例，成功的比较会返回 False 或 True。不过实际上这些方法可以返回任意值，因此如果比较运算符是要用于布尔值判断（例如作为 if 语句的条件），Python 会对返回值调用 bool() 以确定结果为真还是假。</p>
+<p>在默认情况下，object 通过使用 is 来实现 <strong>eq</strong>()，并在比较结果为假值时返回 NotImplemented: True if x is y else NotImplemented。<br>对于 <strong>ne</strong>()，默认会委托给 <strong>eq</strong>() 并对结果取反，除非结果为 NotImplemented。<br>比较运算符之间没有其他隐含关系或默认实现；例如，(x&lt;y or x==y) 为真并不意味着 x&lt;=y。 要根据单根运算自动生成排序操作，请参看 functools.total_ordering()。</p>
+<p>请查看 <strong>hash</strong>() 的相关段落，了解创建可支持自定义比较运算并可用作字典键的 hashable 对象时要注意的一些事项。</p>
+<p>这些方法并没有对调参数版本（在左边参数不支持该操作但右边参数支持时使用）；<br>而是 <strong>lt</strong>() 和 <strong>gt</strong>() 互为对方的反射， <strong>le</strong>() 和 <strong>ge</strong>() 互为对方的反射，而 <strong>eq</strong>() 和 <strong>ne</strong>() 则是它们自己的反射。<br>如果两个操作数的类型不同，且右操作数类型是左操作数类型的直接或间接子类，<br>则优先选择右操作数的反射方法，否则优先选择左操作数的方法。<br>虚拟子类不会被考虑。</p>
+<ol>
+<li>当自定义类中两个方法都定义了__lt__和__gt__方法，“&lt;”、“&gt;”分别调用__lt__和__gt__方法</li>
+</ol>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Test</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, value</span>):</span></span><br><span class="line">        self.value = value</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__lt__</span>(<span class="params">self, other</span>):</span></span><br><span class="line">        <span class="keyword">return</span> self.value &lt; other.value</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__gt__</span>(<span class="params">self, other</span>):</span></span><br><span class="line">        <span class="keyword">return</span> self.value &gt; other.value</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    test1 = Test(<span class="number">1</span>)</span><br><span class="line">    test2 = Test(<span class="number">2</span>)</span><br><span class="line">    print(test1 &lt; test2)  <span class="comment"># True</span></span><br><span class="line">    print(test1 &gt; test2)  <span class="comment"># False</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>故意在__lt__和__gt__方法里设置了逻辑矛盾的两个比较原则，看最终输出结果也印证了这两个方法分别被调用了，从而获得了逻辑矛盾的两个结果。<br>在一个类里面重载__lt__、__gt__方法后，</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Test</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, value</span>):</span></span><br><span class="line">        self.value = value</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__lt__</span>(<span class="params">self, other</span>):</span></span><br><span class="line">        <span class="keyword">return</span> self.value &lt; other.value</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__gt__</span>(<span class="params">self, other</span>):</span></span><br><span class="line">        <span class="keyword">return</span> self.value &lt; other.value</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    test1 = Test(<span class="number">1</span>)</span><br><span class="line">    test2 = Test(<span class="number">2</span>)</span><br><span class="line">    print(test1 &lt; test2)  <span class="comment"># True</span></span><br><span class="line">    print(test1 &gt; test2)  <span class="comment"># True</span></span><br></pre></td></tr></tbody></table></figure>
+
+
+<ol start="2">
+<li>当自定义类中只定义了__lt__方法，未定义__gt__方法时，<br>在计算car1 &lt; car2时，触发了比较函数__lt__，从而得到了结果True，<br>进行”&gt;”比较也是调用__lt__方法，只是对调用值求反。<br>在没有定义__gt__方法时，car1 &gt; car2也会调用__lt__方法，依次传入参数为car2和car1。</li>
+</ol>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Car</span>():</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, carname, oilcp100km, price</span>):</span></span><br><span class="line">        self.carname, self.oilcp100km, self.price = carname, oilcp100km, price</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__lt__</span>(<span class="params">self, other</span>):</span></span><br><span class="line">        print(<span class="string">"execute __lt__"</span>)</span><br><span class="line">        <span class="keyword">return</span> self.price &lt; other.price</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">car1 = Car(<span class="string">'爱丽舍'</span>, <span class="number">8</span>, <span class="number">10</span>)</span><br><span class="line">car2 = Car(<span class="string">'凯美瑞'</span>, <span class="number">7</span>, <span class="number">27</span>)</span><br><span class="line">car3 = Car(<span class="string">'爱丽舍'</span>, <span class="number">8</span>, <span class="number">10</span>)</span><br><span class="line">car4 = Car(<span class="string">'途观'</span>, <span class="number">12</span>, <span class="number">27</span>)</span><br><span class="line"></span><br><span class="line">print(car1 &gt; car2)</span><br><span class="line"><span class="comment"># execute __lt__</span></span><br><span class="line"><span class="comment"># False</span></span><br><span class="line">print(car1 &lt; car2)</span><br><span class="line"><span class="comment"># execute __lt__</span></span><br><span class="line"><span class="comment"># True</span></span><br></pre></td></tr></tbody></table></figure>
+
+<ol start="3">
+<li>当自定义类中定义了__gt__方法，未定义__lt__方法时，<br>进行”&lt;”比较也是调用__gt__方法，只是对调用值求反。<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Car</span>():</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, carname, oilcp100km, price</span>):</span></span><br><span class="line">        self.carname, self.oilcp100km, self.price = carname, oilcp100km, price</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__gt__</span>(<span class="params">self, other</span>):</span></span><br><span class="line">        print(<span class="string">"execute __gt__"</span>)</span><br><span class="line">        <span class="keyword">return</span> self.price &gt; other.price</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">car1 = Car(<span class="string">'爱丽舍'</span>, <span class="number">8</span>, <span class="number">10</span>)</span><br><span class="line">car2 = Car(<span class="string">'凯美瑞'</span>, <span class="number">7</span>, <span class="number">27</span>)</span><br><span class="line">car3 = Car(<span class="string">'爱丽舍'</span>, <span class="number">8</span>, <span class="number">10</span>)</span><br><span class="line">car4 = Car(<span class="string">'途观'</span>, <span class="number">12</span>, <span class="number">27</span>)</span><br><span class="line"></span><br><span class="line">print(car1 &lt; car2)</span><br><span class="line"><span class="comment"># execute __gt__</span></span><br><span class="line"><span class="comment"># True</span></span><br><span class="line">print(car1 &gt; car2)</span><br><span class="line"><span class="comment"># execute __gt__</span></span><br><span class="line"><span class="comment"># False</span></span><br></pre></td></tr></tbody></table></figure>
+
+</li>
+</ol>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/gong-han-mo-shi/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/gong-han-mo-shi/" class="post-title-link" itemprop="url">工厂模式</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-04-02 12:24:46" itemprop="dateModified" datetime="2021-04-02T12:24:46Z">2021-04-02</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h3 id="工厂模式-Factory"><a href="#工厂模式-Factory" class="headerlink" title="工厂模式(Factory)"></a>工厂模式(Factory)</h3><ul>
+<li>解决对象的创建问题（对象创建的一个工厂）</li>
+<li>解耦对象的创建和使用</li>
+<li>包括工厂方法和抽象工厂</li>
+<li>工厂模式会返回一个实例</li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 一个工厂方法的例子</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DogToy</span>:</span>  <span class="comment"># 狗玩具类</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">speak</span>(<span class="params">self</span>):</span></span><br><span class="line">        print(<span class="string">"wang wang"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CatToy</span>:</span>  <span class="comment"># 猫玩具类</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">speak</span>(<span class="params">self</span>):</span></span><br><span class="line">        print(<span class="string">"miao miao"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 定义工厂方法，传入一个类型</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">toy_factory</span>(<span class="params">toy_type</span>):</span></span><br><span class="line">    <span class="keyword">if</span> toy_type == <span class="string">'dog'</span>:  <span class="comment"># 类型是dog返回DogToy狗玩具实例</span></span><br><span class="line">        <span class="keyword">return</span> DogToy()</span><br><span class="line">    <span class="keyword">elif</span> toy_type == <span class="string">'cat'</span>:  <span class="comment"># 类型是cat返回CatToy狗玩具实例</span></span><br><span class="line">        <span class="keyword">return</span> CatToy()</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="构建者模式-Builder"><a href="#构建者模式-Builder" class="headerlink" title="构建者模式(Builder)"></a>构建者模式(Builder)</h3><ul>
+<li>用来控制复杂对象的构造，分步骤每一步创建单独的组件</li>
+<li>创建和表示分离。<ul>
+<li>比如你要买电脑，<ul>
+<li>工厂模式直接给你需要的电脑</li>
+<li>构造模式允许你自定义电脑的配置，组装完成后给你</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 一个构造模式的例子</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Computer</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, serial_number</span>):</span></span><br><span class="line">        self.serial = serial_number</span><br><span class="line">        self.memory = <span class="literal">None</span>  <span class="comment"># in gigabytes</span></span><br><span class="line">        self.hdd = <span class="literal">None</span>  <span class="comment"># in gigabytes</span></span><br><span class="line">        self.gpu = <span class="literal">None</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__str__</span>(<span class="params">self</span>):</span></span><br><span class="line">        info = (<span class="string">'Memory: {}GB'</span>.format(self.memory),</span><br><span class="line">                <span class="string">'Hard Disk: {}GB'</span>.format(self.hdd),</span><br><span class="line">                <span class="string">'Graphics Card: {}'</span>.format(self.gpu))</span><br><span class="line">        <span class="keyword">return</span> <span class="string">'\n'</span>.join(info)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ComputerBuilder</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>):</span></span><br><span class="line">        self.computer = Computer(<span class="string">'AG23385193'</span>)  <span class="comment"># 初始化Computer对象</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">configure_memory</span>(<span class="params">self, amount</span>):</span>  <span class="comment"># 配置内存</span></span><br><span class="line">        self.computer.memory = amount</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">configure_hdd</span>(<span class="params">self, amount</span>):</span></span><br><span class="line">        self.computer.hdd = amount</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">configure_gpu</span>(<span class="params">self, gpu_model</span>):</span>  <span class="comment"># 配置GPU</span></span><br><span class="line">        self.computer.gpu = gpu_model</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">HardwareEngineer</span>:</span>  <span class="comment"># 硬件组装的工程师</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>):</span></span><br><span class="line">        self.builder = <span class="literal">None</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">construct_computer</span>(<span class="params">self, memory, hdd, gpu</span>):</span>  <span class="comment"># 组装电脑，给内存硬件等</span></span><br><span class="line">        self.builder = ComputerBuilder()</span><br><span class="line">        [</span><br><span class="line">            step <span class="keyword">for</span> step <span class="keyword">in</span> (self.builder.configure_memory(memory),</span><br><span class="line">                              self.builder.configure_hdd(hdd),</span><br><span class="line">                              self.builder.configure_gpu(gpu))</span><br><span class="line">        ]</span><br><span class="line"></span><br><span class="line"><span class="meta">    @property</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">computer</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> self.builder.computer  <span class="comment"># 返回构造的电脑</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用builder，可以创建多个builder类实现不同的组装方式</span></span><br><span class="line">engineer = HardwareEngineer()</span><br><span class="line">engineer.construct_computer(hdd=<span class="number">500</span>, memory=<span class="number">8</span>, gpu=<span class="string">'GeForce GTX 650 Ti'</span>)</span><br><span class="line">print(engineer.computer)</span><br><span class="line"><span class="comment"># 输出结果：</span></span><br><span class="line"><span class="comment"># Memory: 8GB</span></span><br><span class="line"><span class="comment"># Hard Disk: 500GB</span></span><br><span class="line"><span class="comment"># Graphics Card: GeForce GTX 650 Ti</span></span><br></pre></td></tr></tbody></table></figure><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -549,1057 +1484,6 @@
 <p>示例：用gevent实现并发爬虫</p>
 <figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> gevent.monkey</span><br><span class="line">gevent.monkey.patch_all()  <span class="comment"># 修改内置库变成非阻塞</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> gevent</span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">fetch</span>(<span class="params">i</span>):</span></span><br><span class="line">    url = <span class="string">'http://httpbin.org/get'</span></span><br><span class="line">    resp = requests.get(url)</span><br><span class="line">    print(len(resp.text), i)  <span class="comment"># 返回结果长度，以及序号</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">asynchronous</span>():</span></span><br><span class="line">    threads = []</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, <span class="number">10</span>):  <span class="comment"># 添加10个线程</span></span><br><span class="line">        threads.append(gevent.spawn(fetch, i))</span><br><span class="line">    gevent.joinall(threads)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">print(<span class="string">'Asynchronous:'</span>)</span><br><span class="line">asynchronous()</span><br><span class="line"><span class="comment"># 输出结果：</span></span><br><span class="line"><span class="comment"># Asynchronous:</span></span><br><span class="line"><span class="comment"># 307 5</span></span><br><span class="line"><span class="comment"># 307 1</span></span><br><span class="line"><span class="comment"># 307 9</span></span><br><span class="line"><span class="comment"># 307 2</span></span><br><span class="line"><span class="comment"># 307 7</span></span><br><span class="line"><span class="comment"># 307 4</span></span><br><span class="line"><span class="comment"># 307 6</span></span><br><span class="line"><span class="comment"># 307 3</span></span><br><span class="line"><span class="comment"># 307 8</span></span><br></pre></td></tr></tbody></table></figure>
 <p>可以看到输出的序号顺序是不一致的，说明使用gevent并发的发的请求，而不是顺序去执行，从而大大提升了请求的效率。</p>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/jie-kou-ce-shi/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/jie-kou-ce-shi/" class="post-title-link" itemprop="url">接口测试</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-05-01 09:18:37" itemprop="dateModified" datetime="2021-05-01T09:18:37Z">2021-05-01</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%B5%8B%E8%AF%95/" itemprop="url" rel="index"><span itemprop="name">测试</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h2 id="项目的生命周期"><a href="#项目的生命周期" class="headerlink" title="项目的生命周期"></a>项目的生命周期</h2><h4 id="预测型（瀑布式）生命周期"><a href="#预测型（瀑布式）生命周期" class="headerlink" title="预测型（瀑布式）生命周期"></a>预测型（瀑布式）生命周期</h4><p>适用于在早期能够确定范围、时间和成本的项目</p>
-<h4 id="迭代型生命周期"><a href="#迭代型生命周期" class="headerlink" title="迭代型生命周期"></a>迭代型生命周期</h4><ul>
-<li>适用于需要通过一系列重复的循环的活动来渐进地增加产品的质量的项目</li>
-<li>刚才这个大厨突然觉得自己这道糖醋鲤鱼还需要完善改进，所以</li>
-</ul>
-<h4 id="增量型生命周期"><a href="#增量型生命周期" class="headerlink" title="增量型生命周期"></a>增量型生命周期</h4><ul>
-<li>增量型生命周期适用于需要进行拆分，分步实施，已达到最终项目目标的项目</li>
-</ul>
-<h4 id="适应型生命周期"><a href="#适应型生命周期" class="headerlink" title="适应型生命周期"></a>适应型生命周期</h4><ul>
-<li>现在最火最流行的 <code>测试驱动开发（敏捷测试）</code></li>
-<li>更多的是去响应变化，对项目的前途和范围并不十分明确</li>
-<li>这时候就需要将项目划分为若干个短小的迭代周期，在每个周期都产出可验证的交付物，以此去获取用户反馈，从而最终产出用户需要的结果<br>三个步骤：</li>
-</ul>
-<ol>
-<li>为未实现的新功能或者改进编写自动化测试。</li>
-<li>提供通过所有定义的测试的最小代码量。</li>
-<li>重构代码以满足所需的质量标准。</li>
-</ol>
-<p>测试驱动开发的好处在于可以有效的防止软件回归以及提供更有质量的代码。还有就是验收测试应该由客户来进行，客户通过对使用场景来设计验收测试，对应用程序是否满足他们的要求进行客观、公正的确认。能够通过单元测试、甚至是系统测试的功能未必能够通过客户的验收测试。</p>
-<p>软件测试的“定义”</p>
-<ul>
-<li><code>测试</code>是产品最后一道防线，使用人工操作或者软件自动运行的方式来检验它是否满足规定的需求或弄清预期的结果与实际结果之间的差别的过程</li>
-<li><code>软件测试</code>就是为发现软件错误而执行程序的过程</li>
-<li><code>测试工程师</code>的本质意义在于：保护用户和业务的利益，使用户不受糟糕的设计、令人困惑的用户体验、功能 BUG、安全和隐私等问题的困扰</li>
-<li>将测试看做 “用户” 的 “保护者”，是为客户而存在的</li>
-</ul>
-<p>软件测试流程</p>
-<ul>
-<li><p>传统的测试方式也不再适应于当前的环境。</p>
-</li>
-<li><p>所以，测试工作已经开始融入项目的每一个环节。</p>
-</li>
-<li><p>需求阶段</p>
-<ul>
-<li>头脑风暴</li>
-<li>需求分析</li>
-</ul>
-</li>
-<li><p>设计阶段</p>
-<ul>
-<li>测试模块划分</li>
-<li>测试计划和用例设计</li>
-</ul>
-</li>
-<li><p>执行阶段</p>
-<ul>
-<li>冒烟测试</li>
-<li>测试执行</li>
-<li>测试总结</li>
-</ul>
-</li>
-</ul>
-<p>自动化测试<br>“快速回归、自动测试、即时响应、迅速定位” 是当下测试人的十六<br>字方针</p>
-<h2 id="接口测试"><a href="#接口测试" class="headerlink" title="接口测试"></a>接口测试</h2><ul>
-<li>测试系统组件间接口的一种测试</li>
-<li>用于检测外部系统与系统之间以及内部各个子系统之间的交互点。</li>
-<li>测试的重点是要检查数据的交换、传递和控制管理过程，以及系统间的相互逻辑依赖关系等</li>
-</ul>
-<p>为什么要做接口测试? </p>
-<ul>
-<li>不同端的工作进度不同</li>
-<li>需要对最开始出来的接口进行接口测试</li>
-<li>很多系统关联都是基于接口来实现，接口测试可以将复杂的系统关联进行筒化。</li>
-<li>接口功能比较单一，能够比较好的进行测试覆盖，也相对容易实现自动化持续集成。</li>
-<li>接口相对于界面功能，会更底层一些，测试覆盖会更容易。</li>
-</ul>
-<p>接口测试可以<br>①节约时间，缩短项目周期<br>②提高工作效率<br>③提高系统健壮性<br> 及早发现问题<br> 降低测试成本<br> 接口一般较UI相对稳定，利于进行自动化<br> 接口是各种系统功能的基础</p>
-<p>软件开发生命周期<br>接口测试在软件开发生命周期的位置：接口测试在单元测试之后，UI测试之前；<br>接口测试可以获得较高的投资回报。</p>
-<p>接口测试又称为 API 测试</p>
-<p>接口测试是测试系统组件间接口的一种测试。重点关注数据传递。</p>
-<p>接口测试一般会用于多系统间交互开发，或者拥有多个子系统的应用系统开发的测试。</p>
-<p>为什么要设计测试用例</p>
-<p>1、理清思路，避免漏测</p>
-<p>2、提高测试效率</p>
-<p>3、跟进测试进度</p>
-<p>4、告诉领导做过</p>
-<p>5、跟进重复性工作</p>
-<p>用例设计</p>
-<p>1、功能</p>
-<p>2、逻辑业务</p>
-<p>3、异常</p>
-<p>4、安全</p>
-<p>用例设计-功能用例设计</p>
-<p>①功能是否正常</p>
-<p>②功能是否按照接口文档实现;代码接口参数名应该和接口文档统一</p>
-<p>用例设计-逻辑用例设计<br>①是否依赖业务</p>
-<p>用例设计-异常测试用例设计<br>①参数异常：</p>
-<p>.关键字参数java,python,mysql这些，可以用键改为关键字进行测试。<br>.参数为空<br>.参数 多一个或少一个<br>.参数错误</p>
-<p>用例设计-异常测试用例设计<br>①数据异常：关键字数据，数据为空，长度不一致，错误数据</p>
-<p>用例设计-安全测试用例设计<br>①cookie<br>②header，移动端需要特别测试header<br>③唯一识别码</p>
-<h3 id="手动测试"><a href="#手动测试" class="headerlink" title="手动测试"></a>手动测试</h3><p>测试方法：</p>
-<ul>
-<li>借助工具完成</li>
-<li>拼接参数执行请求</li>
-</ul>
-<h3 id="自动化测试"><a href="#自动化测试" class="headerlink" title="自动化测试"></a>自动化测试</h3><p>把人为的测试行为转化为机器执行的一种过程，目标则是节省成本，提高测试效率。<br>通过代码的手段，把部分手动劳动转化为机器操作的方式</p>
-<h5 id="测试方法："><a href="#测试方法：" class="headerlink" title="测试方法："></a>测试方法：</h5><ul>
-<li>编写自动化脚本实现</li>
-<li>一劳永逸，加入回归测试集合</li>
-<li>需要一定编码经验</li>
-</ul>
-<h5 id="“可悲”的自动化测试"><a href="#“可悲”的自动化测试" class="headerlink" title="“可悲”的自动化测试"></a>“可悲”的自动化测试</h5><ul>
-<li>按照功能测试用例用代码实现</li>
-<li>通过eclipse，选好环境</li>
-<li>右键Run As TestNG</li>
-<li>一个人甚至是两个人一起目不转睛的盯着显示器</li>
-<li>步骤执行不成功，回到代码，debug找问题，修改代码</li>
-<li>部分脚本执行过程中卡住了，手动辅助点击，继续执行</li>
-</ul>
-<h5 id="老板心中的“自动化测试”"><a href="#老板心中的“自动化测试”" class="headerlink" title="老板心中的“自动化测试”"></a>老板心中的“自动化测试”</h5><ul>
-<li>自动化测试要覆盖100%功能测试，后续不需要再招聘功能测试人员。</li>
-<li>自动化测试要稳定，不需要太大的维护，他希望未来测试团队只有两到三<br>名自动化人员。</li>
-<li>运行的结果可以自动报BUG，不需要人工介入。</li>
-</ul>
-<p>自动化测试的意义</p>
-<ul>
-<li>谨慎来说是把我们的自动化测试应用到项目中去，在保证质量的前提下，<br>让项目的测试成本低于纯手工测试</li>
-<li>收益 = 手工测试成本(自动化可覆盖部分)-首次编写自动化脚本成本-自动化脚本维护成本</li>
-<li>收益plus = 手工测试成本（自动化可覆盖部分）<em>迭代次数 - 首次编写自动化脚本成本-自动化脚本维护成本</em>迭代次数</li>
-</ul>
-<h3 id="功能测试："><a href="#功能测试：" class="headerlink" title="功能测试："></a>功能测试：</h3><p>测试覆盖：</p>
-<ul>
-<li>业务流程 </li>
-<li>边界值，特殊字符</li>
-<li>参数类型，必选项，可选项等</li>
-</ul>
-<h3 id="性能测试："><a href="#性能测试：" class="headerlink" title="性能测试："></a>性能测试：</h3><p>测试覆盖：</p>
-<ul>
-<li>并发数，同一时间发送请求的用户数量，采用逐步加压的方式来找到系统能够支持的最大</li>
-<li>吞吐量，tps</li>
-<li>出错率等</li>
-</ul>
-<h3 id="安全性测试"><a href="#安全性测试" class="headerlink" title="安全性测试"></a>安全性测试</h3><p>测试覆盖：</p>
-<ul>
-<li>敏感数据加密</li>
-<li>恶意攻击等</li>
-</ul>
-<h3 id="测试步骤"><a href="#测试步骤" class="headerlink" title="测试步骤"></a>测试步骤</h3><p>了解接口格式 –&gt; 编写测试用例 –&gt; 测试用例评审 –&gt; 开始测试 –&gt; 完成测试报告 –&gt; 结束 （在没有达到测试退出之前 ，比如测试报告里 级别高的bug较多，需要让开发修复后，再次进行测试，直到满足退出条件 后 结束）</p>
-<h4 id="业务流程-GET"><a href="#业务流程-GET" class="headerlink" title="业务流程 - GET"></a>业务流程 - GET</h4><ul>
-<li>正向用例：返回所有对象和返回某一个对象</li>
-<li>负向用例：<ul>
-<li>一个不存在的 id</li>
-<li>URL 输入不正确 </li>
-</ul>
-</li>
-</ul>
-<h4 id="业务流程-POST"><a href="#业务流程-POST" class="headerlink" title="业务流程 - POST:"></a>业务流程 - POST:</h4><ul>
-<li>正向用例：输入正确参数新加一个对象（特殊字符，中文等）</li>
-<li>负向用例：<ul>
-<li>参数 name 为空/重复</li>
-<li>参数 age 为 0/-1/100/101/字符串/null/空</li>
-<li>参数 salary 为整数/带小数/负数/null/</li>
-</ul>
-</li>
-</ul>
-<h4 id="业务流程-PUT"><a href="#业务流程-PUT" class="headerlink" title="业务流程 - PUT:"></a>业务流程 - PUT:</h4><ul>
-<li>正向用例：输入正确参数修改一个对象（特殊字符，中文等）</li>
-<li>负向用例：<ul>
-<li>参数 id 为空/无效值</li>
-<li>参数 name 为空/重复</li>
-<li>参数 age 为 0/-1/100/101/字符串/null 空</li>
-<li>参数 salary 为整数/带小数/负数/null 空</li>
-</ul>
-</li>
-</ul>
-<h4 id="业务流程-DELETE"><a href="#业务流程-DELETE" class="headerlink" title="业务流程 - DELETE"></a>业务流程 - DELETE</h4><ul>
-<li>正向用例：删除所有对象和删除某一个对象</li>
-<li>负向用例：<ul>
-<li>一个不存在的 id</li>
-<li>URL 输入不正确</li>
-</ul>
-</li>
-</ul>
-<h3 id="Rest-API实践一个测试实例"><a href="#Rest-API实践一个测试实例" class="headerlink" title="Rest API实践一个测试实例"></a>Rest API实践一个测试实例</h3><h4 id="需求描述"><a href="#需求描述" class="headerlink" title="需求描述"></a>需求描述</h4><ol>
-<li>GET: <a target="_blank" rel="noopener" href="http://localhost:8080/mywebsite/user/">http://localhost:8080/mywebsite/user/</a></li>
-</ol>
-<ul>
-<li>Header: Content-type = application/json</li>
-<li>Body: 空</li>
-<li>Response: 返回所有 User 对象</li>
-<li>Status code: 200</li>
-</ul>
-<ol start="2">
-<li>GET: <a target="_blank" rel="noopener" href="http://localhost:8080/mywebsite/user/%7Bid%7D">http://localhost:8080/mywebsite/user/{id}</a></li>
-</ol>
-<ul>
-<li>Header: Content-type = application/json</li>
-<li>Body: 空</li>
-<li>Response: 返回指定 id 的 User 对象</li>
-<li>Status code: 200</li>
-</ul>
-<ol start="3">
-<li>POST: <a target="_blank" rel="noopener" href="http://localhost:8080/mywebsite/user/">http://localhost:8080/mywebsite/user/</a></li>
-</ol>
-<ul>
-<li>Header: Content-type = application/json</li>
-<li>Body: name (String 类型，不为空不可重复）, age (int 类型，在 0 和 100 之间）, salary (double 类型）</li>
-<li>Response: 新加 User 对象</li>
-<li>Status code: 201</li>
-</ul>
-<ol start="4">
-<li>PUT: <a target="_blank" rel="noopener" href="http://localhost:8080/mywebsite/user/%7Bid%7D">http://localhost:8080/mywebsite/user/{id}</a></li>
-</ol>
-<ul>
-<li>Header: Content-type = application/json</li>
-<li>Body: name (String 类型，不为空不可重复）, age (int 类型，在 0 和 100 之间）, salary (double 类型）</li>
-<li>Response: 修改 User 对象</li>
-<li>Status code: 200</li>
-</ul>
-<ol start="4">
-<li>DELETE: <a target="_blank" rel="noopener" href="http://localhost:8080/mywebsite/user/%7Bid%7D">http://localhost:8080/mywebsite/user/{id}</a></li>
-</ol>
-<ul>
-<li>Header: Content-type = application/json</li>
-<li>Body: 空</li>
-<li>Response: 删除 id 的 User 对象</li>
-<li>Status code: 204</li>
-</ul>
-<ol start="6">
-<li>DELETE: <a target="_blank" rel="noopener" href="http://localhost:8080/mywebsite/user/">http://localhost:8080/mywebsite/user/</a></li>
-</ol>
-<ul>
-<li>Header: Content-type = application/json</li>
-<li>Body: 空</li>
-<li>Response: 删除所有 User 对象</li>
-<li>Status code: 204</li>
-</ul>
-<ol start="7">
-<li>错误返回</li>
-</ol>
-<ul>
-<li>Code: 4 Message：找不到指定 id 对象</li>
-<li>Code: 5 Message：对象已经存在</li>
-<li>Code: 6 Message：参数不匹配</li>
-</ul>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/wo-shou-hui-shou/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/wo-shou-hui-shou/" class="post-title-link" itemprop="url">握手挥手</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-27 02:10:52" itemprop="dateModified" datetime="2021-04-27T02:10:52Z">2021-04-27</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">计算机网络</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>TCP是一种面向连接的单播协议，在发送数据前，通信双方必须在彼此间建立一条连接。所谓的“连接”，其实是客户端和服务器的内存里保存的一份关于对方的信息，如ip地址、端口号等。<br>TCP，提供面向连接的服务，在传送数据之前必须先建立连接，数据传送完成后要释放连接。</p>
-<p>TCP可以看成是一种字节流，它会处理IP层或以下的层的丢包、重复以及错误问题。在连接的建立过程中，双方需要交换一些连接的参数。这些参数可以放在TCP头部。</p>
-<p>TCP提供了一种可靠、面向连接、字节流、传输层的服务，</p>
-<p>TCP服务模型<br>一个TCP连接由一个4元组构成，分别是两个IP地址和两个端口号。<br>一个TCP连接通常分为三个阶段：启动、数据传输、退出（关闭）。</p>
-<p>当TCP接收到另一端的数据时，它会发送一个确认，但这个确认不会立即发送，一般会延迟一会儿。ACK是累积的，一个确认字节号N的ACK表示所有直到N的字节（不包括N）已经成功被接收了。这样的好处是如果一个ACK丢失，很可能后续的ACK就足以确认前面的报文段了。</p>
-<p>一个完整的TCP连接是双向和对称的，数据可以在两个方向上平等地流动。给上层应用程序提供一种双工服务。一旦建立了一个连接，这个连接的一个方向上的每个TCP报文段都包含了相反方向上的报文段的一个ACK。</p>
-<p>序列号的作用是使得一个TCP接收端可丢弃重复的报文段，记录以杂乱次序到达的报文段。<br>因为TCP使用IP来传输报文段，而IP不提供重复消除或者保证次序正确的功能。<br>另一方面，TCP是一个字节流协议，绝不会以杂乱的次序给上层程序发送数据。<br>因此TCP接收端会被迫先保持大序列号的数据不交给应用程序，直到缺失的小序列号的报文段被填满。</p>
-<p>TCP头部<br>源端口和目的端口在TCP层确定双方进程，<br>序列号表示的是报文段数据中的第一个字节号，<br>ACK表示确认号，该确认号的发送方期待接收的下一个序列号，即最后被成功接收的数据字节序列号加1，这个字段只有在ACK位被启用的时候才有效。</p>
-<p>当新建一个连接时，从客户端发送到服务端的第一个报文段的SYN位被启用，这称为SYN报文段，这时序列号字段包含了在本次连接的这个方向上要使用的第一个序列号，即初始序列号ISN，之后发送的数据是ISN加1，因此SYN位字段会消耗一个序列号，这意味着使用重传进行可靠传输。而不消耗序列号的ACK则不是。</p>
-<p>头部长度（图中的数据偏移）以32位字为单位，也就是以4bytes为单位，它只有4位，最大为15，因此头部最大长度为60字节，而其最小为5，也就是头部最小为20字节（可变选项为空）。</p>
-<p>当一个连接被建立或被终止时，交换的报文段只包含TCP头部，而没有数据。</p>
-<p>TCP的三次握手建立一个连接和四次挥手来关闭一个连接<br>第一状态转换，第二就是发包的内容。</p>
-<p>SYN：同步序列编号（Synchronize Sequence Numbers）。同步标志位，用于初如化一个连接的序列号。 是TCP/IP建立连接时使用的握手信号。<br>SYN_SENT 同步已发送状态</p>
-<p>ACK (Acknowledgement Number) 确认标志位，使得确认号有效，<br>SYN_RECV 同步收到状态，</p>
-<p>ESTABLISHED 已建立连接状态<br>CLOSED 关闭状态<br>LISTEH 收听状态<br>RST —— 重置连接（经常看到的reset by peer）就是此字段搞的鬼。<br>FIN —— 该报文段的发送方已经结束向对方发送数据。</p>
-<p>ISN(Initial Sequence Number),三次握手的一个重要功能是客户端和服务端交换isn 以便让对方知道接下来接收数据的时候如何按序列号组装数据。</p>
-<p>如果ISN是固定的，攻击者很容易猜出后续的确认号。<br>ISN = M + F(localhost, localport, remotehost, remoteport)<br>M是一个计时器，每隔4毫秒加1。 F是一个Hash算法，根据源IP、目的IP、源端口、目的端口生成一个随机数值。要保证hash算法不能被外部轻易推算得出。</p>
-<p>TCP连接的建立采用客户服务器方式。<br>主动发起连接建立的应用进程叫做客户( client )。<br>被动等待连接建立的应用进程叫做服务器( server )。<br>最初两端的TCP进程都处于 CLOSED(关闭)状态，<br>client 端主动打开链接，<br>而 server 端被动打开链接。</p>
-<p>服务器端准备接受连接请求后进入到 LISTEN(收听状态)，等待客户端连接请求。<br>客户端需要建立连接时向服务器端发送请求，请求内容包括同步位 SYN=1 和初始序号 seq =J 即ISN(c)，这时客户端进入SYN_SENT(同步已发送)状态。</p>
-<p>服务器接收到请求后作出响应，向客户端发送确认信息，确认信息包括同步位 SYN=1、确认位ACK=1ISN(s)、确认号 ack=J+1 和自己初始序号 seq=K，这时服务端进入 SYN_RECV(同步收到)状态。这样，每发送一个SYN，序列号就会加1. 如果有丢失的情况，则会重传。</p>
-<p>客户端收到服务器端发过来的确认信息后，先进行验证确认号 ack=J + 1，此时还需向服务器端发送确认信息，确认信息包括确认位 ACK=1 和 确认号ack=K+1，这时TCP连接已经建立，客户端进入 ESTABLISHED状态。服务器端接收到确认后，也进入到established状态。</p>
-<p>客户端和服务端通信前要进行连接，“3次握手”的作用就是双方都能明确自己和对方的收、发能力是正常的。</p>
-<p>第一次握手：客户端发送网络包，服务端收到了。这样服务端就能得出结论：客户端的发送能力、服务端的接收能力是正常的。</p>
-<p>第二次握手：服务端发包，客户端收到了。这样客户端就能得出结论：服务端的接收、发送能力，客户端的接收、发送能力是正常的。 从客户端的视角来看，我接到了服务端发送过来的响应数据包，说明服务端接收到了我在第一次握手时发送的网络包，并且成功发送了响应数据包，这就说明，服务端的接收、发送能力正常。而另一方面，我收到了服务端的响应数据包，说明我第一次发送的网络包成功到达服务端，这样，我自己的发送和接收能力也是正常的。</p>
-<p>第三次握手：客户端发包，服务端收到了。这样服务端就能得出结论：客户端的接收、发送能力，服务端的发送、接收能力是正常的。 第一、二次握手后，服务端并不知道客户端的接收能力以及自己的发送能力是否正常。而在第三次握手时，服务端收到了客户端对第二次握手作的回应。从服务端的角度，我在第二次握手时的响应数据发送出去了，客户端接收到了。所以，我的发送能力是正常的。而客户端的接收能力也是正常的。</p>
-<p>经历了上面的三次握手过程，客户端和服务端都确认了自己的接收、发送能力是正常的。之后就可以正常通信了。</p>
-<p>每次都是接收到数据包的一方可以得到一些结论，发送的一方其实没有任何头绪。我虽然有发包的动作，但是我怎么知道我有没有发出去，而对方有没有接收到呢？</p>
-<p>而从上面的过程可以看到，最少是需要三次握手过程的。两次达不到让双方都得出自己、对方的接收、发送能力都正常的结论。其实每次收到网络包的一方至少是可以得到：对方的发送、我方的接收是正常的。而每一步都是有关联的，下一次的“响应”是由于第一次的“请求”触发，因此每次握手其实是可以得到额外的结论的。比如第三次握手时，服务端收到数据包，表明看服务端只能得到客户端的发送能力、服务端的接收能力是正常的，但是结合第二次，说明服务端在第二次发送的响应包，客户端接收到了，并且作出了响应，从而得到额外的结论：客户端的接收、服务端的发送是正常的。</p>
-<p>3次握手就跟早期打电话时的情况一样：1、听得到吗？2、听得到，你呢？3、我也听到了。然后才开始真正对话 4次挥手是：1、老师，下课了。2、好，我知道了，我说完这点。3、好了，说完了，下课吧。4、谢谢老师，老师再见</p>
-<hr>
-<p>TCP四次挥手，状态转换</p>
-<p>主动方可以是服务器端也可以是客户端。</p>
-<p>FIN(FINbit) 终止标志位   |   FIN_WAIT_1 终止等待1状态    |    FIN_WAIT_2 终止等待2状态</p>
-<p>ACK(ACKbit) 确认标志位 |   CLOSE_WAIT 关闭等待状态  |    LAST_ACK 最后确认状态</p>
-<p>ESTABLISHED 已建立连接状态    |    TIME_WAIT 时间等待状态    |    CLOSED 关闭状态</p>
-<p>数据传输结束后，通信的双方都可以释放连接。最初客户端和服务器端都处于extablished状态。例如：客户端主动发起连接释放。</p>
-<p>客户端向服务器端发送连接释放请求，主动关闭TCP连接，请求内容包括终止控制位 FIN=1 和 希望接收者看到的自己当前的序列号 seq=x，这时客户端进入 FIN_WAIT_1(终止等待1)状态，等待服务器端的确认。</p>
-<p>服务器端收到连接释放请求后即发出确认信息，确认信息包括 确认位 ACK=1 和 确认号ack(ACKnum) = x+1，表明收到了上一个包，上层的应用程序会被告知另一端发起了关闭操作，通常这将引起应用程序发起自己的关闭操作进入到CLOSE_WAIT(关闭等待)状态，此时客户端已没有数据发送了，但服务器端还可以向客服端发送数据，服务器端到客户端这个方向的连接并未关闭。客户端收到确认请求后，就进入到 FIN_WAIT_2 ( 终止等待2 )状态。</p>
-<p>当服务器端已经没有向客户端要发送的数据时候，会向客户端发送连接释放请求，请求内容包括 终止控制位 FIN=1 、序号seq=y 和 上次已经发送过的确认号 ack(ACKnum) = x+1，这时服务器进入 LAST_ACK(最后确认)状态，等待客户端的确认。</p>
-<p>客户端收到连接释放请求，必须给服务器端发送确认，确认信息包括 确认位 ACK=1、确认号ack(ACKnum) = y+1，这时客户端进入TIME_WAIT(时间等待)状态，这时TCP连接还没释放掉，必须经过时间等待计时器(TIME-WAIT timer)设置的时间2MSL后，客户端才进入到 CLOSED(关闭)状态。服务器端收到确认后，就进入closed(关闭)状态。</p>
-<p>TCP连接是双向传输的对等的模式，就是说双方都可以同时向对方发送或接收数据。<br>当有一方要关闭连接时，会发送指令告知对方，我要关闭连接了。<br>这时对方会回一个ACK，此时一个方向的连接关闭。<br>但是另一个方向仍然可以继续传输数据，等到发送完了所有的数据后，会发送一个FIN段来关闭此方向上的连接。接收方发送ACK确认关闭连接。<br>注意，接收到FIN报文的一方只能回复一个ACK, 它是无法马上返回对方一个FIN报文段的，<br>因为结束数据传输的“指令”是上层应用层给出的，我只是一个“搬运工”，我无法了解“上层的意志”。</p>
-<p>“三次握手，四次挥手”怎么完成？<br>其实3次握手的目的并不只是让通信双方都了解到一个连接正在建立，还在于利用数据包的选项来传输特殊的信息，交换初始序列号ISN。</p>
-<p>3次握手是指发送了3个报文段，<br>4次挥手是指发送了4个报文段。注意，SYN和FIN段都是会利用重传进行可靠传输的。</p>
-<p>HTTP请求过程<br>一、一个完整的HTTP请求，通常有7个步骤：<br>1、建立TCP连接；<br>2、web浏览器向web服务器发送请求命令；<br>3、浏览器发送请求头信息；<br>4、服务器应答；<br>5、服务器发送应答头信息；<br>6、服务器向浏览器发送数据；<br>7、服务器关闭TCP连接。</p>
-<p>四、readyState属性(返回请求的当前状态)：<br>0：请求未初始化，open还没有调用；<br>1：服务器连接已建立，open已经调用；<br>2：请求已接收，即，接收到头部信息了；<br>3：请求处理中，即，接收到响应体了；<br>4：请求已完成，且响应已就绪，即，响应完成了。</p>
-<p>六、TCP三次握手、四次回收策略（TCP的标志为：SYN/ACK）<br>1、三次握手<br>（1）发送端——-数据包（SYN）————-&gt;接收端<br>（2）接收端————–数据包（SYN/ACK)——&gt;发送端<br>（3）发送端——-数据包（ACK）————-&gt;接收端</p>
-<p>2、四次挥手<br>（1）主动关闭方——TIN（关闭数据传送）—————–&gt;被动关闭方；<br>（2）被动关闭方————ACK（确认序号为收到序号+1）————–&gt;主动关闭方；<br>（3）被动关闭方————FIN（关闭数据传送）———————-&gt;主动关闭方；<br>（4）主动关闭方——ACK（确认序号为收到序号+1）———-&gt;被动关闭方。</p>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/cao-zuo-xi-tong-de-nei-cun-guan-li-ji-zhi-fen-ye-he-fen-duan-ji-fen-ye-he-fen-duan-de-qu-bie/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/cao-zuo-xi-tong-de-nei-cun-guan-li-ji-zhi-fen-ye-he-fen-duan-ji-fen-ye-he-fen-duan-de-qu-bie/" class="post-title-link" itemprop="url">操作系统的内存管理机制--分页和分段 及 分页和分段的区别</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-14 07:31:27" itemprop="dateModified" datetime="2021-04-14T07:31:27Z">2021-04-14</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h2 id="操作系统的内存管理机制"><a href="#操作系统的内存管理机制" class="headerlink" title="操作系统的内存管理机制"></a>操作系统的内存管理机制</h2><h3 id="分页机制"><a href="#分页机制" class="headerlink" title="分页机制"></a>分页机制</h3><p>操作系统为了高效管理内存，减少内存碎片，所以采用分页机制<br>逻辑地址和物理地址分离的内存分配管理方案</p>
-<ul>
-<li>逻辑地址划分为固定大小的页(Page)</li>
-<li>物理地址划分为同样大小的帧(Frame)</li>
-<li>通过页表对应逻辑地址和物理地址</li>
-</ul>
-<p>图解：左边是用户程序，对于用户程序关心的是逻辑地址，通过页表来获取物理地址。页表里面映射了逻辑地址和物理地址的对应关系，通过中间和右边图，可以看出逻辑地址对应的物理地址不一定是连续的。</p>
-<h3 id="分段机制"><a href="#分段机制" class="headerlink" title="分段机制"></a>分段机制</h3><p>分段是为了满足代码的一些逻辑需求</p>
-<ul>
-<li>数据共享，数据保护，动态链接等</li>
-<li>通过段表实现逻辑地址和物理地址的映射关系</li>
-<li>每个段内部是连续内存分配，段和段之间是离散分配的</li>
-</ul>
-<p>图解：段表里面主要保存的是段号、段长和起始地址(基址)，通过这三个就可以确定每个段，它从那个地方开始并且它的长度是多少，段表可以把段号跟内存空间真实的物理地址对应起来。</p>
-<p>3.分页和分段的区别</p>
-<ul>
-<li>页是出于内存利用率的角度提出的离散分配机制</li>
-<li>段是出于用户角度，用于数据保护，数据隔离等用途的管理机制</li>
-<li>页的大小是固定的，操作系统决定；段大小不确定，用户程序决定</li>
-</ul>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/shu-ju-ya-suo/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/shu-ju-ya-suo/" class="post-title-link" itemprop="url">python 数据压缩</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-05-04 15:30:25" itemprop="dateModified" datetime="2021-05-04T15:30:25Z">2021-05-04</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> zlib</span><br><span class="line">s = <span class="string">b'witch which has which witches wrist watch'</span></span><br><span class="line">print(len(s))</span><br><span class="line"><span class="comment"># 41</span></span><br><span class="line">t = zlib.compress(s)</span><br><span class="line">print(len(t))</span><br><span class="line"><span class="comment"># 37</span></span><br><span class="line">print(zlib.decompress(t))</span><br><span class="line"><span class="comment"># b'witch which has which witches wrist watch'</span></span><br><span class="line">print(zlib.crc32(s))</span><br><span class="line"><span class="comment"># 226805979</span></span><br></pre></td></tr></tbody></table></figure><script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/lu-you-wang-xia-dan-zhi-fu-qian-duan-ye-mian/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/lu-you-wang-xia-dan-zhi-fu-qian-duan-ye-mian/" class="post-title-link" itemprop="url">旅游网下单支付前端页面</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-02 12:24:45" itemprop="dateModified" datetime="2021-04-02T12:24:45Z">2021-04-02</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%97%85%E6%B8%B8%E7%BD%91%E9%A1%B9%E7%9B%AE/" itemprop="url" rel="index"><span itemprop="name">旅游网项目</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h3 id="开发步骤"><a href="#开发步骤" class="headerlink" title="开发步骤"></a>开发步骤</h3><ul>
-<li>前端页面开发</li>
-<li>后端接口开发</li>
-<li>接口联调</li>
-<li>代码优化</li>
-</ul>
-<h3 id="提交订单页"><a href="#提交订单页" class="headerlink" title="提交订单页"></a>提交订单页</h3><h4 id="实现步骤"><a href="#实现步骤" class="headerlink" title="实现步骤"></a>实现步骤</h4><ul>
-<li>第一步，配置路由规则，新建组件<br><code>src\router\index.js</code><figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> OrderSubmit <span class="keyword">from</span> <span class="string">'../views/order/Submit.vue'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> routes = [</span><br><span class="line">  <span class="comment">// 提交订单</span></span><br><span class="line">  {</span><br><span class="line">    path: <span class="string">'/order/submit/:id'</span>,</span><br><span class="line">    name: <span class="string">'OrderSubmit'</span>,</span><br><span class="line">    component: OrderSubmit</span><br><span class="line">  }</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure></li>
-<li>第二步，查找Vant中可以使用的组件</li>
-<li>第三步，实现组件模板部分</li>
-</ul>
-<p><code>src\views\order\Submit.vue</code></p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;!-- 填写订单 --&gt;</span><br><span class="line">  &lt;div class="page-order-submit"&gt;</span><br><span class="line">    &lt;!-- 页面导航 --&gt;</span><br><span class="line">    &lt;van-nav-bar title="填写订单"</span><br><span class="line">      left-text="返回"</span><br><span class="line">      left-arrow</span><br><span class="line">      @click-left="goBack"/&gt;</span><br><span class="line">    &lt;!-- 描述信息 --&gt;</span><br><span class="line">    &lt;div class="order-info"&gt;</span><br><span class="line">      &lt;div class="left"&gt;</span><br><span class="line">        &lt;h3&gt;门票标题&lt;/h3&gt;</span><br><span class="line">        &lt;div class="tips"&gt;23:00前可定明日&lt;/div&gt;</span><br><span class="line">        &lt;div class="tags"&gt;</span><br><span class="line">          &lt;span&gt;</span><br><span class="line">            &lt;van-icon name="clock-o" /&gt;明日可定</span><br><span class="line">          &lt;/span&gt;</span><br><span class="line">          &lt;span&gt;</span><br><span class="line">            &lt;van-icon name="clock-o" /&gt;条件退</span><br><span class="line">          &lt;/span&gt;</span><br><span class="line">        &lt;/div&gt;</span><br><span class="line">      &lt;/div&gt;</span><br><span class="line">      &lt;div class="right"&gt;</span><br><span class="line">        &lt;div class="text-warning"&gt;￥{{ price }}/张&lt;/div&gt;</span><br><span class="line">        &lt;van-button plain hairline type="info"</span><br><span class="line">          size="mini"</span><br><span class="line">          @click="showPopup=true"&gt;预订须知&lt;/van-button&gt;</span><br><span class="line">        &lt;van-popup</span><br><span class="line">          v-model="showPopup"</span><br><span class="line">          closeable</span><br><span class="line">          position="bottom"</span><br><span class="line">          :style="{ height: '80%' }"</span><br><span class="line">        /&gt;</span><br><span class="line">      &lt;/div&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;!-- //描述信息 --&gt;</span><br><span class="line">    &lt;!-- 提交表单 --&gt;</span><br><span class="line">    &lt;van-form @submit="onSubmit" class="form-box"&gt;</span><br><span class="line">      &lt;van-cell-group class="form-group"&gt;</span><br><span class="line">        &lt;van-cell title="选择出行日期"</span><br><span class="line">          :value="form.play_date"</span><br><span class="line">          @click="showCalendar = true" /&gt;</span><br><span class="line">        &lt;van-calendar v-model="showCalendar" @confirm="onConfirm" /&gt;</span><br><span class="line">      &lt;/van-cell-group&gt;</span><br><span class="line">      &lt;van-cell-group class="form-group"&gt;</span><br><span class="line">        &lt;van-cell title="购买数量"&gt;</span><br><span class="line">          &lt;van-stepper v-model="form.buy_count" integer min="1"/&gt;</span><br><span class="line">        &lt;/van-cell&gt;</span><br><span class="line">      &lt;/van-cell-group&gt;</span><br><span class="line">      &lt;van-cell-group class="form-group"&gt;</span><br><span class="line">        &lt;van-field</span><br><span class="line">          v-model="form.to_user"</span><br><span class="line">          type="text"</span><br><span class="line">          label="收件人"</span><br><span class="line">          placeholder="输入收件人"</span><br><span class="line">          :rules="[{ required: true, message: '请输入收件人' }]"</span><br><span class="line">        /&gt;</span><br><span class="line">        &lt;van-field</span><br><span class="line">          v-model="form.to_phone"</span><br><span class="line">          type="text"</span><br><span class="line">          label="手机号码"</span><br><span class="line">          placeholder="输入手机号码"</span><br><span class="line">          :rules="[{ required: true, message: '请输入手机号码' }]"</span><br><span class="line">        /&gt;</span><br><span class="line">      &lt;/van-cell-group&gt;</span><br><span class="line">      &lt;van-submit-bar :price="totalPrice" button-text="提交订单" @submit="onSubmit" /&gt;</span><br><span class="line">    &lt;/van-form&gt;</span><br><span class="line">    &lt;!-- //提交表单 --&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">export default {</span><br><span class="line">  data () {</span><br><span class="line">    return {</span><br><span class="line">      // 预订须知弹框显示</span><br><span class="line">      showPopup: false,</span><br><span class="line">      // 日期选择弹框</span><br><span class="line">      showCalendar: false,</span><br><span class="line">      price: 98,</span><br><span class="line">      form: {</span><br><span class="line">        play_date: '',</span><br><span class="line">        buy_count: 1,</span><br><span class="line">        to_user: '',</span><br><span class="line">        to_phone: ''</span><br><span class="line">      }</span><br><span class="line">    }</span><br><span class="line">  },</span><br><span class="line">  computed: {</span><br><span class="line">    /**</span><br><span class="line">     * 计算总价</span><br><span class="line">     */</span><br><span class="line">    totalPrice () {</span><br><span class="line">      return this.price * this.form.buy_count * 100</span><br><span class="line">    }</span><br><span class="line">  },</span><br><span class="line">  methods: {</span><br><span class="line">    onSubmit () {</span><br><span class="line">      console.log('提交表单')</span><br><span class="line">    },</span><br><span class="line">    formatDate (date) {</span><br><span class="line">      return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`</span><br><span class="line">    },</span><br><span class="line">    /**</span><br><span class="line">     * 选择日期</span><br><span class="line">     */</span><br><span class="line">    onConfirm (date) {</span><br><span class="line">      // 隐藏日历弹框</span><br><span class="line">      this.showCalendar = false</span><br><span class="line">      // 保存数据</span><br><span class="line">      this.form.play_date = this.formatDate(date)</span><br><span class="line">    },</span><br><span class="line">    goBack () {</span><br><span class="line">      this.$router.go(-1)</span><br><span class="line">    }</span><br><span class="line">  }</span><br><span class="line">}</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></tbody></table></figure>
-
-<ul>
-<li>第四步，模拟数据，实现效果</li>
-</ul>
-<h3 id="支付页面开发"><a href="#支付页面开发" class="headerlink" title="支付页面开发"></a>支付页面开发</h3><h4 id="实现步骤-1"><a href="#实现步骤-1" class="headerlink" title="实现步骤"></a>实现步骤</h4><ul>
-<li><p>第一步，配置路由规则，新建组件<br><code>src\router\index.js</code></p>
-<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> OrderPay <span class="keyword">from</span> <span class="string">'../views/order/Pay.vue'</span></span><br><span class="line"><span class="keyword">const</span> routes = [</span><br><span class="line">  <span class="comment">// 确认订单并支付</span></span><br><span class="line">  {</span><br><span class="line">    path: <span class="string">'/order/pay/:sn'</span>,</span><br><span class="line">    name: <span class="string">'OrderPay'</span>,</span><br><span class="line">    component: OrderPay</span><br><span class="line">  }</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
-</li>
-<li><p>第二步，查找Vant中可以使用的组件</p>
-</li>
-<li><p>第三步，实现组件模板部分<br><code>src\views\order\Pay.vue</code></p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;!-- 订单确认及支付 --&gt;</span><br><span class="line">  &lt;div class="page-order-pay"&gt;</span><br><span class="line">    &lt;!-- 顶部导航 --&gt;</span><br><span class="line">    &lt;van-nav-bar</span><br><span class="line">      title="订单支付"</span><br><span class="line">      left-text="返回"</span><br><span class="line">      right-text="取消订单"</span><br><span class="line">      left-arrow</span><br><span class="line">      @click-left="goBack"</span><br><span class="line">      @click-right="onCancelOrder"</span><br><span class="line">    /&gt;</span><br><span class="line">    &lt;!-- 订单号 --&gt;</span><br><span class="line">    &lt;van-cell title="订单号" value="订单号的内容"</span><br><span class="line">      :title-style="{'text-align': 'left'}" /&gt;</span><br><span class="line">    &lt;!-- 描述信息 --&gt;</span><br><span class="line">    &lt;div class="order-info"&gt;</span><br><span class="line">      &lt;div class="left"&gt;</span><br><span class="line">        &lt;h3&gt;门票的信息&lt;/h3&gt;</span><br><span class="line">        &lt;div&gt;&lt;van-icon name="clock-o" /&gt; 2020-9-13&lt;/div&gt;</span><br><span class="line">        &lt;div class="tips"&gt;短信接收&lt;/div&gt;</span><br><span class="line">      &lt;/div&gt;</span><br><span class="line">      &lt;div class="right"&gt;</span><br><span class="line">        &lt;van-icon name="arrow" /&gt;</span><br><span class="line">      &lt;/div&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;!-- //描述信息 --&gt;</span><br><span class="line">    &lt;!-- 提交表单 --&gt;</span><br><span class="line">    &lt;van-submit-bar :price="totalPrice" button-text="立即支付" @submit="onSubmit" /&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">export default {</span><br><span class="line">  data () {</span><br><span class="line">    return {</span><br><span class="line">      // 总价格</span><br><span class="line">      totalPrice: 25000</span><br><span class="line">    }</span><br><span class="line">  },</span><br><span class="line">  methods: {</span><br><span class="line">    /**</span><br><span class="line">     * 确认支付</span><br><span class="line">     */</span><br><span class="line">    onSubmit () {</span><br><span class="line">      this.$dialog.confirm({</span><br><span class="line">        title: '温馨提示',</span><br><span class="line">        message: `确认支付${this.totalPrice / 100}吗？`</span><br><span class="line">      }).then(() =&gt; {</span><br><span class="line">        // on confirm</span><br><span class="line">      })</span><br><span class="line">    },</span><br><span class="line">    /**</span><br><span class="line">     * 后退</span><br><span class="line">     */</span><br><span class="line">    goBack () {</span><br><span class="line">      this.$dialog.confirm({</span><br><span class="line">        title: '温馨提示',</span><br><span class="line">        message: '您还没有支付，确认放弃支付吗？'</span><br><span class="line">      }).then(() =&gt; {</span><br><span class="line">        this.$router.go(-1)</span><br><span class="line">        // on confirm</span><br><span class="line">      })</span><br><span class="line">    },</span><br><span class="line">    /**</span><br><span class="line">     * 取消订单</span><br><span class="line">     */</span><br><span class="line">    onCancelOrder () {</span><br><span class="line">      this.$dialog.confirm({</span><br><span class="line">        title: '温馨提示',</span><br><span class="line">        message: '确认取消该订单？'</span><br><span class="line">      }).then(() =&gt; {</span><br><span class="line">        // TODO 调用接口on confirm</span><br><span class="line">        this.$router.go(-1)</span><br><span class="line">      })</span><br><span class="line">    }</span><br><span class="line">  }</span><br><span class="line">}</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></tbody></table></figure></li>
-<li><p>第四步，模拟数据，实现效果</p>
-</li>
-</ul>
-<h3 id="我的订单列表页面开发"><a href="#我的订单列表页面开发" class="headerlink" title="我的订单列表页面开发"></a>我的订单列表页面开发</h3><h4 id="实现步骤-2"><a href="#实现步骤-2" class="headerlink" title="实现步骤"></a>实现步骤</h4><ul>
-<li>第一步，配置路由规则，新建组件<br><code>src\router\index.js</code><figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> OrderList <span class="keyword">from</span> <span class="string">'../views/order/List.vue'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> routes = [</span><br><span class="line">  <span class="comment">// 我的订单列表</span></span><br><span class="line">  {</span><br><span class="line">    path: <span class="string">'/order/list/:status'</span>,</span><br><span class="line">    name: <span class="string">'OrderList'</span>,</span><br><span class="line">    component: OrderList</span><br><span class="line">  }</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
-
-</li>
-</ul>
-<p><code>src\utils\constants.js</code></p>
-<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 订单状态</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> ORDER_STATUS_ALL = <span class="number">0</span></span><br><span class="line"><span class="comment">// 待支付</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> ORDER_STATUS_PAY = <span class="number">11</span></span><br><span class="line"><span class="comment">// 已完成</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> ORDER_STATUS_DONE = <span class="number">12</span></span><br><span class="line"><span class="comment">// 已取消</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> ORDER_STATUS_CANCEL = <span class="number">13</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> ORDER_STATUS = {</span><br><span class="line">  [ORDER_STATUS_ALL]: <span class="string">'全部'</span>,</span><br><span class="line">  [ORDER_STATUS_PAY]: <span class="string">'待支付'</span>,</span><br><span class="line">  [ORDER_STATUS_DONE]: <span class="string">'已完成'</span>,</span><br><span class="line">  [ORDER_STATUS_CANCEL]: <span class="string">'已取消'</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<ul>
-<li><p>第二步，查找Vant中可以使用的组件</p>
-</li>
-<li><p>第三步，实现组件模板部分<br><code>src\views\order\List.vue</code></p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;!-- 我的订单列表页面 --&gt;</span><br><span class="line">  &lt;div class="page-order-list"&gt;</span><br><span class="line">    &lt;!-- 顶部导航 --&gt;</span><br><span class="line">    &lt;van-nav-bar title="我的订单"</span><br><span class="line">      left-text="返回"</span><br><span class="line">      left-arrow</span><br><span class="line">      @click-left="goBack"/&gt;</span><br><span class="line">    &lt;!-- 订单按状态切换 --&gt;</span><br><span class="line">    &lt;van-tabs v-model="status"&gt;</span><br><span class="line">      &lt;van-tab</span><br><span class="line">        v-for="(value, key, index) in constants.ORDER_STATUS"</span><br><span class="line">        :title="value"</span><br><span class="line">        :name="key"</span><br><span class="line">        :key="index"&gt;&lt;/van-tab&gt;</span><br><span class="line">    &lt;/van-tabs&gt;</span><br><span class="line">    &lt;!-- 订单记录 --&gt;</span><br><span class="line">    &lt;div class="order-list"&gt;</span><br><span class="line">      &lt;div class="order-item" v-for="index in 5" :key="index"&gt;</span><br><span class="line">        &lt;div class="order-head"&gt;</span><br><span class="line">          &lt;div class="order-num"&gt;订单号：12312312&lt;/div&gt;</span><br><span class="line">          &lt;div class="order-status text-warning"&gt;已取消&lt;/div&gt;</span><br><span class="line">        &lt;/div&gt;</span><br><span class="line">        &lt;div class="order-body"&gt;</span><br><span class="line">          &lt;div class="left"&gt;</span><br><span class="line">            &lt;van-image width="100" height="100" src="https://img.yzcdn.cn/vant/cat.jpeg" /&gt;</span><br><span class="line">          &lt;/div&gt;</span><br><span class="line">          &lt;div class="right"&gt;</span><br><span class="line">            &lt;div class="title"&gt;门票的标题&lt;/div&gt;</span><br><span class="line">            &lt;div class="remark"&gt;相关的描述&lt;/div&gt;</span><br><span class="line">          &lt;/div&gt;</span><br><span class="line">        &lt;/div&gt;</span><br><span class="line">        &lt;div class="order-footer"&gt;</span><br><span class="line">          &lt;div&gt;总共2件商品 合计 ￥198&lt;/div&gt;</span><br><span class="line">          &lt;van-button round size="small" type="warning"&gt;删除订单&lt;/van-button&gt;</span><br><span class="line">          &lt;van-button round size="small" type="info"&gt;订单详情&lt;/van-button&gt;</span><br><span class="line">        &lt;/div&gt;</span><br><span class="line">      &lt;/div&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import * as constants from '@/utils/constants'</span><br><span class="line">export default {</span><br><span class="line">  data () {</span><br><span class="line">    return {</span><br><span class="line">      status: 0,</span><br><span class="line">      constants</span><br><span class="line">    }</span><br><span class="line">  },</span><br><span class="line">  methods: {</span><br><span class="line">    goBack () {</span><br><span class="line">      this.$router.go(-1)</span><br><span class="line">    }</span><br><span class="line">  }</span><br><span class="line">}</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></tbody></table></figure>
-</li>
-<li><p>第四步，模拟数据，实现效果</p>
-</li>
-</ul>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/lu-you-wang-ge-ren-zhong-xin-ye-mian-kai-fa/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/lu-you-wang-ge-ren-zhong-xin-ye-mian-kai-fa/" class="post-title-link" itemprop="url">个人中心页面开发</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-02 12:24:45" itemprop="dateModified" datetime="2021-04-02T12:24:45Z">2021-04-02</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/vue/" itemprop="url" rel="index"><span itemprop="name">vue</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h3 id="个人中心页面开发"><a href="#个人中心页面开发" class="headerlink" title="个人中心页面开发"></a>个人中心页面开发</h3><h4 id="实现步骤"><a href="#实现步骤" class="headerlink" title="实现步骤"></a>实现步骤</h4><ul>
-<li>第一步，查找Vant中可以使用的组件</li>
-<li>第二步，实现组件模板部分<br><code>src\views\Mine.vue</code><figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;!-- 个人中心 --&gt;</span><br><span class="line">  &lt;div class="page-mine"&gt;</span><br><span class="line">    &lt;!-- 标题 --&gt;</span><br><span class="line">    &lt;van-nav-bar title="个人中心" fixed/&gt;</span><br><span class="line">    &lt;!-- 用户基本信息：头像、昵称 --&gt;</span><br><span class="line">    &lt;div class="user-header"&gt;</span><br><span class="line">      &lt;div class="avatar"&gt;</span><br><span class="line">        &lt;img src="/static/mine/avatar.png" /&gt;</span><br><span class="line">      &lt;/div&gt;</span><br><span class="line">      &lt;div&gt;</span><br><span class="line">        &lt;p&gt;欢迎您，张三&lt;/p&gt;</span><br><span class="line">        &lt;a class="btn-link" href="#"&gt;退出登录&lt;/a&gt;</span><br><span class="line">      &lt;/div&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;!-- 订单的菜单列表 --&gt;</span><br><span class="line">    &lt;van-row class="user-links"&gt;</span><br><span class="line">      &lt;van-col span="6"&gt;</span><br><span class="line">        &lt;router-link to="/"&gt;</span><br><span class="line">          &lt;van-icon name="records" /&gt;</span><br><span class="line">          &lt;span&gt;全部订单&lt;/span&gt;</span><br><span class="line">        &lt;/router-link&gt;</span><br><span class="line">      &lt;/van-col&gt;</span><br><span class="line">      &lt;van-col span="6"&gt;</span><br><span class="line">        &lt;router-link to="/"&gt;</span><br><span class="line">          &lt;van-icon name="pending-payment" /&gt;</span><br><span class="line">          &lt;span&gt;待支付&lt;/span&gt;</span><br><span class="line">        &lt;/router-link&gt;</span><br><span class="line">      &lt;/van-col&gt;</span><br><span class="line">      &lt;van-col span="6"&gt;</span><br><span class="line">        &lt;router-link to="/"&gt;</span><br><span class="line">          &lt;van-icon name="tosend" /&gt;</span><br><span class="line">          &lt;span&gt;已完成&lt;/span&gt;</span><br><span class="line">        &lt;/router-link&gt;</span><br><span class="line">      &lt;/van-col&gt;</span><br><span class="line">      &lt;van-col span="6"&gt;</span><br><span class="line">        &lt;router-link to="/"&gt;</span><br><span class="line">          &lt;van-icon name="logistics" /&gt;</span><br><span class="line">          &lt;span&gt;已取消&lt;/span&gt;</span><br><span class="line">        &lt;/router-link&gt;</span><br><span class="line">      &lt;/van-col&gt;</span><br><span class="line">    &lt;/van-row&gt;</span><br><span class="line">    &lt;!-- 底部导航 --&gt;</span><br><span class="line">    &lt;TripFooter/&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import TripFooter from '@/components/common/Footer'</span><br><span class="line"></span><br><span class="line">export default {</span><br><span class="line">  components: {</span><br><span class="line">    TripFooter</span><br><span class="line">  }</span><br><span class="line">}</span><br><span class="line">&lt;/script&gt;</span><br><span class="line">&lt;style lang="less"&gt;</span><br><span class="line">.page-mine {</span><br><span class="line">  .van-nav-bar--fixed {</span><br><span class="line">    background-color: transparent;</span><br><span class="line">  }</span><br><span class="line">  .van-nav-bar__title {</span><br><span class="line">    color: #fff;</span><br><span class="line">  }</span><br><span class="line">  .user-header {</span><br><span class="line">    background: url(/static/mine/bg.jpg) no-repeat center;</span><br><span class="line">    background-size: 100% auto;</span><br><span class="line">    color: #fff;</span><br><span class="line">    height: 200px;</span><br><span class="line">    display: flex;</span><br><span class="line">    flex-direction: column;</span><br><span class="line">    justify-content: center;</span><br><span class="line">    .avatar img {</span><br><span class="line">      width: 80px;</span><br><span class="line">      height: 80px;</span><br><span class="line">    }</span><br><span class="line">  }</span><br><span class="line">  .user-links {</span><br><span class="line">    padding: 15px 0;</span><br><span class="line">    font-size: 12px;</span><br><span class="line">    text-align: center;</span><br><span class="line">    background-color: #fff;</span><br><span class="line">    .van-icon {</span><br><span class="line">      display: block;</span><br><span class="line">      font-size: 24px;</span><br><span class="line">    }</span><br><span class="line">  }</span><br><span class="line">  .btn-link {</span><br><span class="line">    color: #fff;</span><br><span class="line">  }</span><br><span class="line">}</span><br><span class="line">&lt;/style&gt;</span><br></pre></td></tr></tbody></table></figure>
-
-</li>
-</ul>
-<p><code>src\router\index.js</code></p>
-<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> Mine <span class="keyword">from</span> <span class="string">'../views/Mine.vue'</span></span><br><span class="line"></span><br><span class="line">Vue.use(VueRouter)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> routes = [</span><br><span class="line">  <span class="comment">// 个人中心</span></span><br><span class="line">  {</span><br><span class="line">    path: <span class="string">'/mine'</span>,</span><br><span class="line">    name: <span class="string">'Mine'</span>,</span><br><span class="line">    component: Mine</span><br><span class="line">  },</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>src\components\common\Footer.vue</code></p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;!-- 底部导航（公共组件） --&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;van-tabbar v-model="active" route&gt;</span><br><span class="line">      &lt;van-tabbar-item name="mine" icon="user-o" :to="{name: 'Mine'}"&gt;我的&lt;/van-tabbar-item&gt;</span><br><span class="line">    &lt;/van-tabbar&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br></pre></td></tr></tbody></table></figure>
-<ul>
-<li>第三步，模型层准备数据</li>
-<li>第四步，模拟数据，实现效果</li>
-</ul>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/lu-you-wang-shan-chu-ding-dan-jie-kou-kai-fa/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/lu-you-wang-shan-chu-ding-dan-jie-kou-kai-fa/" class="post-title-link" itemprop="url">旅游网删除订单接口开发</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-05-02 12:31:16" itemprop="dateModified" datetime="2021-05-02T12:31:16Z">2021-05-02</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%97%85%E6%B8%B8%E7%BD%91%E9%A1%B9%E7%9B%AE/" itemprop="url" rel="index"><span itemprop="name">旅游网项目</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="删除订单接口开发"><a href="#删除订单接口开发" class="headerlink" title="删除订单接口开发"></a>删除订单接口开发</h1><p>开发步骤</p>
-<ul>
-<li><p>第一步，设计接口返回内容及字段<br><code>order\views.py</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@method_decorator(login_required, name='dispatch')</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">OrderDetail</span>(<span class="params">BaseDetailView</span>):</span></span><br><span class="line">    slug_field = <span class="string">'sn'</span></span><br><span class="line">    slug_url_kwarg = <span class="string">'sn'</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_queryset</span>(<span class="params">self</span>):</span></span><br><span class="line">        user = self.request.user</span><br><span class="line">        <span class="keyword">return</span> Order.objects.filter(user=user, is_valid=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span>(<span class="params">self, request, *args, **kwargs</span>):</span></span><br><span class="line">        <span class="string">""" GET: 订单详情 """</span></span><br><span class="line">        order_obj = self.get_object()</span><br><span class="line">        data = serializers.OrderDetailSerializer(order_obj).to_dict()</span><br><span class="line">        <span class="keyword">return</span> http.JsonResponse(data)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">delete</span>(<span class="params">self, request, *args, **kwargs</span>):</span></span><br><span class="line">        <span class="string">""" DELETE: 订单删除 """</span></span><br><span class="line">        <span class="comment"># 1. 获取订单对象</span></span><br><span class="line">        order_obj = self.get_object()</span><br><span class="line">        <span class="comment"># 2. 验证数据（已支付、已取消才可删除订单）</span></span><br><span class="line">        <span class="keyword">if</span> order_obj.status == OrderStatus.CANCELED <span class="keyword">or</span> order_obj.status == OrderStatus.PAID:</span><br><span class="line">            <span class="comment"># 3. 是否已经删除过了</span></span><br><span class="line">            <span class="keyword">if</span> order_obj.is_valid:</span><br><span class="line">                order_obj.is_valid = <span class="literal">False</span></span><br><span class="line">                order_obj.save()</span><br><span class="line">                <span class="keyword">return</span> http.HttpResponse(<span class="string">''</span>, status=<span class="number">201</span>)</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="comment"># 此处不用写，因为get_object已经触发了404</span></span><br><span class="line">                <span class="keyword">pass</span></span><br><span class="line">        <span class="keyword">return</span> http.HttpResponse(<span class="string">''</span>, status=<span class="number">200</span>)</span><br></pre></td></tr></tbody></table></figure>
-</li>
-<li><p>第二步，编写接口代码</p>
-</li>
-<li><p>第三步，模拟HTTP请求，测试验证接口</p>
-</li>
-</ul>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {

@@ -30,7 +30,7 @@
 <meta property="og:image" content="https://bubbleboy11.github.io/2020/08/21/drf-ren-zheng-he-quan-xian/1.png">
 <meta property="og:image" content="https://bubbleboy11.github.io/2020/08/21/drf-ren-zheng-he-quan-xian/2.png">
 <meta property="article:published_time" content="2020-08-20T16:21:41.000Z">
-<meta property="article:modified_time" content="2021-05-28T13:10:29.796Z">
+<meta property="article:modified_time" content="2021-06-01T07:48:35.101Z">
 <meta property="article:author" content="外心人D">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://bubbleboy11.github.io/2020/08/21/drf-ren-zheng-he-quan-xian/1.png">
@@ -124,13 +124,13 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">254</span>
+          <span class="site-state-item-count">260</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
-        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-count">24</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -205,7 +205,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-05-28 13:10:29" itemprop="dateModified" datetime="2021-05-28T13:10:29Z">2021-05-28</time>
+        <time title="修改时间：2021-06-01 07:48:35" itemprop="dateModified" datetime="2021-06-01T07:48:35Z">2021-06-01</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -264,9 +264,10 @@
 <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">INSTALLED_APPS = [</span><br><span class="line">    <span class="string">"rest_framework.authtoken"</span>,  <span class="comment"># DRF自带的token认证</span></span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"><span class="comment"># DRF 全局配置</span></span><br><span class="line">REST_FRAMEWORK = {</span><br><span class="line">    <span class="comment"># 配置默认认证类 authentication: 对用户登录的身份进行校验</span></span><br><span class="line">    <span class="string">"DEFAULT_AUTHENTICATION_CLASSES"</span>: [</span><br><span class="line">        <span class="string">"rest_framework.authentication.TokenAuthentication"</span>,</span><br><span class="line">    ]</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
 
 <figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 或者pycharm Tools - Run manage.py Task</span></span><br><span class="line">migrations</span><br><span class="line">migrate</span><br></pre></td></tr></tbody></table></figure>
-<p>生成数据表<code>authtoken_token</code>，<br><code>user_id</code>是一个外键，指向<code>users_userprofile</code>表，<br>表中的<code>key</code>（即token）和user之间具有一对一的关系。<br>创建用户默认会生成一个对应的token值会保存到数据中，跟这个用户相关联。<br>其表结构如下：</p>
+<p>生成数据表<code>authtoken_token</code>，这个表和用户表是一一对应的。<br><code>user_id</code>是一个外键，指向<code>users_userprofile</code>表，<br>表中的<code>key</code>（即token）和user之间具有一对一的关系。</p>
+<p>如果之前已经创建了用户，在这个token表是没有记录的。<br>创建用户表后需要手动创建token表。<br>当用户注册时，需要调用<code>token = Token.objects.create(user=...)</code>来生成token。</p>
+<p>创建用户默认会生成一个对应的token值会保存到数据中，跟这个用户相关联。<br>其表结构如下：</p>
 <figure class="highlight sql"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">+<span class="comment">---------+-------------+------+-----+---------+-------+</span></span><br><span class="line">| Field   | Type        | Null | Key | Default | Extra |</span><br><span class="line">+<span class="comment">---------+-------------+------+-----+---------+-------+</span></span><br><span class="line">| key     | varchar(40) | NO   | PRI | NULL    |       |</span><br><span class="line">| created | datetime(6) | NO   |     | NULL    |       |</span><br><span class="line">| user_id | int(11)     | NO   | UNI | NULL    |       |</span><br><span class="line">+<span class="comment">---------+-------------+------+-----+---------+-------+</span></span><br><span class="line">3 rows in <span class="keyword">set</span> (<span class="number">0.01</span> sec)</span><br></pre></td></tr></tbody></table></figure>
-
 
 <h4 id="方式一-manage-py-生成Token"><a href="#方式一-manage-py-生成Token" class="headerlink" title="方式一 manage.py 生成Token"></a>方式一 <code>manage.py</code> 生成Token</h4><figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python manage.py drf_create_token admin  <span class="comment"># admin是用户名</span></span><br></pre></td></tr></tbody></table></figure>
 
@@ -279,7 +280,7 @@
 <p><code>drf_tutorial\urls.py</code></p>
 <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework.authtoken <span class="keyword">import</span> views</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    <span class="comment"># drf 自带的获取Token的接口，没有设置过期刷新之类的功能</span></span><br><span class="line">    path(<span class="string">"api-token-auth/"</span>, views.obtain_auth_token),</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
 
-<p>已经创建的用户并不会自动创建token，而是需要自己创建，<br>可以使用HTTP请求模拟发送工具进行发送参数创建，通过携带数据访问<a target="_blank" rel="noopener" href="http://127.0.0.1:8000/api-token-auth/%EF%BC%8C">http://127.0.0.1:8000/api-token-auth/，</a><br>生成了当前用户的token并获取到，同时将生成的token和当前用户存入表authtoken_token中</p>
+<p>可以使用HTTP请求模拟发送工具进行发送参数创建，通过携带数据访问<a target="_blank" rel="noopener" href="http://127.0.0.1:8000/api-token-auth/">http://127.0.0.1:8000/api-token-auth/</a>，<br>生成了当前用户的token并获取到，同时将生成的token和当前用户存入表authtoken_token中</p>
 <p><img src="/2020/08/21/drf-ren-zheng-he-quan-xian/1.png" alt="description"></p>
 <p>登录后台，新建用户，激活员工，数据表<code>authtoken_token</code>的key值会增加一个</p>
 <p>获取token需要用户名密码认证<br>用POST方法在客户端身份验证 postman获取，选择no-auth<br>body</p>
@@ -288,8 +289,8 @@
 <p>body设为none ,Auth设为API Key</p>
 <figure class="highlight apache"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Key</span>: Authorization</span><br><span class="line"><span class="attribute">Value</span>: <span class="number">69</span>d<span class="number">53</span>cdb<span class="number">0</span>b<span class="number">395</span>d<span class="number">638</span>b<span class="number">50</span>b<span class="number">51</span>d<span class="number">5</span>f<span class="number">3008</span>f<span class="number">66499</span>b<span class="number">4</span>b<span class="number">8</span></span><br></pre></td></tr></tbody></table></figure>
 
-<p>对于客户端进行身份验证，在 Authorization HTTP header 中。<br>密钥关键字应以字符串文字 <code>Token</code> 为前缀，用空格分隔两个字符串。例如：</p>
-<p><code>Authorization</code>: <code>Token 9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b</code><br>注意： 如果您想在 header 中使用不同的关键字（例如 Bearer），只需子类化 TokenAuthentication 并设置 keyword 类变量。</p>
+<p>对于客户端进行身份验证，在 Authorization HTTP header 中。<br>密钥关键字应以字符串文字 <code>Token</code> 为前缀，用空格分隔两个字符串。例如：<br><code>Authorization</code>: <code>Token 9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b</code></p>
+<p>注意： 如果您想在 header 中使用不同的关键字（例如 Bearer），只需子类化 TokenAuthentication 并设置 keyword 类变量。</p>
 <p>此时再使用获取到的Token请求商品数据如下：<br><img src="/2020/08/21/drf-ren-zheng-he-quan-xian/2.png" alt="description"></p>
 <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get</span>(<span class="params">self, request</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    :param request:</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    queryset = Course.objects.all()</span><br><span class="line">    s = CourseSerializer(instance=queryset,</span><br><span class="line">                         many=<span class="literal">True</span>)  <span class="comment"># 这里是instance = xx 查询集</span></span><br><span class="line">    print(type(request), type(request.data), type(s), type(s.data))</span><br><span class="line">    <span class="comment"># &lt;class 'rest_framework.request.Request'&gt; &lt;class 'dict'&gt; &lt;class 'rest_framework.serializers.ListSerializer'&gt; &lt;class 'rest_framework.utils.serializer_helpers.ReturnList'&gt;</span></span><br><span class="line">    print(self.request.user, self.request.auth)  <span class="comment"># admin None 默认模式</span></span><br><span class="line">    print(type(self.request.user), type(self.request.auth))</span><br><span class="line">    <span class="comment"># &lt;class 'django.contrib.auth.models.User'&gt; &lt;class 'NoneType'&gt; 默认模式</span></span><br><span class="line">    <span class="comment"># user01 69d53cdb0b395d638b50b51d5f3008f66499b4b8 token模式</span></span><br><span class="line">    <span class="comment"># &lt;class 'django.contrib.auth.models.User'&gt; &lt;class 'rest_framework.authtoken.models.Token'&gt;  token模式</span></span><br><span class="line">    <span class="keyword">return</span> Response(s.data, status=status.HTTP_200_OK)</span><br></pre></td></tr></tbody></table></figure>
 
@@ -299,12 +300,13 @@
 <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework.authentication <span class="keyword">import</span> TokenAuthentication</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    authentication_classes = (TokenAuthentication, )</span><br></pre></td></tr></tbody></table></figure>
 
 <p>此时再请求<a target="_blank" rel="noopener" href="http://127.0.0.1:8000/mine/%EF%BC%8Crequest.user%E5%8D%B3%E4%B8%BA%E5%BD%93%E5%89%8D%E7%94%A8%E6%88%B7admin%E3%80%82">http://127.0.0.1:8000/mine/，request.user即为当前用户admin。</a></p>
-<h2 id="drf权限"><a href="#drf权限" class="headerlink" title="drf权限"></a>drf权限</h2><p>常用的权限类设置权限策略<br>如何自定义对象级别权限</p>
-<p>权限检测后的处理，认证URL设置，全局权限控制与ViewSet的权限。</p>
+<h2 id="drf权限"><a href="#drf权限" class="headerlink" title="drf权限"></a>drf权限</h2><p>仅进行身份验证或标识不足以获取信息或代码。为此，请求访问的实体必须具有<strong>授权</strong>。<strong>权限与身份验证和限制</strong>一起，确定是否应准予请求访问或拒绝访问。权限检查始终在视图的开始处运行，然后再允许执行其他任何代码，通常会使用<code>request.user</code>和<code>request.auth</code>属性中的身份验证信息来确定是否应允许传入请求。</p>
+<p>权限用于授予或拒绝不同类别的用户对API不同部分的访问，最简单的许可方式是允许访问任何经过身份验证的用户，并拒绝访问任何未经身份验证的用户。</p>
+<p>常见的权限<br><code>from rest_framework.permissions import IsAuthenticated</code> 判断是否已经登录的，<br><code>from rest_framework.permissions import AllowAny</code><br><code>from rest_framework.permissions import IsAdminUser</code> 是不是管理员<code>request.user.is_staff</code>员工<br><code>from rest_framework.permissions import IsAuthenticatedOrReadOnly</code></p>
+<p>常用的权限类设置权限策略<br>如何自定义对象级别权限<br>权限检测后的处理，认证URL设置，全局权限控制与ViewSet的权限。</p>
 <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># DRF 全局配置</span></span><br><span class="line">REST_FRAMEWORK = {</span><br><span class="line">    <span class="comment"># 配置默认授权类 权限permisson: 对登录验证通过的用户能访问的api和对api能取得的对应级别数据</span></span><br><span class="line">    <span class="string">"DEFAULT_PERMISSION_CLASSES"</span>: [</span><br><span class="line">        <span class="comment"># "rest_framework.permissions.AllowAny",  # 默认，允许所有请求，不需要认证</span></span><br><span class="line">        <span class="string">"rest_framework.permissions.IsAuthenticated"</span>  <span class="comment"># 只有登录才能进行操作，不登录不能进行任何操作</span></span><br><span class="line">    ]</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
 
-<p><code>from rest_framework.permissions import IsAuthenticated</code><br><code>from rest_framework.permissions import AllowAny</code><br><code>from rest_framework.permissions import IsAdminUser</code> 是不是管理员<code>request.user.is_staff</code>员工<br><code>from rest_framework.permissions import IsAuthenticatedOrReadOnly</code></p>
-<p>设置登录的用户能修改自己的信息，不能修改别人的信息</p>
+<p>设置登录的用户能修改自己的信息、收藏等数据，不能修改别人的信息</p>
 <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SAFE_METHODS = (<span class="string">'GET'</span>, <span class="string">'HEAD'</span>, <span class="string">'OPTIONS'</span>)  <span class="comment"># 源码规定</span></span><br></pre></td></tr></tbody></table></figure>
 
 <p><code>course\permissions.py</code></p>

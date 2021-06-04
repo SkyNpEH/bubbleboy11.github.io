@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<meta name="hexo-config" content="{&quot;hostname&quot;:&quot;bubbleboy11.github.io&quot;,&quot;root&quot;:&quot;/&quot;,&quot;images&quot;:&quot;/images&quot;,&quot;scheme&quot;:&quot;Muse&quot;,&quot;version&quot;:&quot;8.3.0&quot;,&quot;exturl&quot;:false,&quot;sidebar&quot;:{&quot;position&quot;:&quot;left&quot;,&quot;display&quot;:&quot;post&quot;,&quot;padding&quot;:18,&quot;offset&quot;:12},&quot;copycode&quot;:true,&quot;bookmark&quot;:{&quot;enable&quot;:false,&quot;color&quot;:&quot;#222&quot;,&quot;save&quot;:&quot;auto&quot;},&quot;fancybox&quot;:false,&quot;mediumzoom&quot;:false,&quot;lazyload&quot;:false,&quot;pangu&quot;:false,&quot;comments&quot;:{&quot;style&quot;:&quot;tabs&quot;,&quot;active&quot;:null,&quot;storage&quot;:true,&quot;lazyload&quot;:false,&quot;nav&quot;:null},&quot;motion&quot;:{&quot;enable&quot;:true,&quot;async&quot;:false,&quot;transition&quot;:{&quot;post_block&quot;:&quot;fadeIn&quot;,&quot;post_header&quot;:&quot;fadeInDown&quot;,&quot;post_body&quot;:&quot;fadeInDown&quot;,&quot;coll_header&quot;:&quot;fadeInLeft&quot;,&quot;sidebar&quot;:&quot;fadeInUp&quot;}},&quot;prism&quot;:false,&quot;i18n&quot;:{&quot;placeholder&quot;:&quot;搜索...&quot;,&quot;empty&quot;:&quot;没有找到任何搜索结果：${query}&quot;,&quot;hits_time&quot;:&quot;找到 ${hits} 个搜索结果（用时 ${time} 毫秒）&quot;,&quot;hits&quot;:&quot;找到 ${hits} 个搜索结果&quot;}}">
+<meta name="description" content="注册接口成功  正常返回，能浏览器代开对应路由，点击注册，弹框提示注册成功不点击确定，F12开发者调试模式-localstore 有本地存储username token cart_count数据，或者通过postman查看有没有生成token  服务器数据库生成数据   登录返回token12345678910111213from rest_framework_simplejwt.views im">
+<meta property="og:type" content="article">
+<meta property="og:title" content="drf用户注册和表单登录token">
+<meta property="og:url" content="https://bubbleboy11.github.io/2021/05/31/drf-yong-hu-zhu-ce-he-biao-dan-deng-lu-token/index.html">
+<meta property="og:site_name" content="外心人D的博客">
+<meta property="og:description" content="注册接口成功  正常返回，能浏览器代开对应路由，点击注册，弹框提示注册成功不点击确定，F12开发者调试模式-localstore 有本地存储username token cart_count数据，或者通过postman查看有没有生成token  服务器数据库生成数据   登录返回token12345678910111213from rest_framework_simplejwt.views im">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://bubbleboy11.github.io/2021/05/31/drf-yong-hu-zhu-ce-he-biao-dan-deng-lu-token/1.png">
+<meta property="og:image" content="https://bubbleboy11.github.io/2021/05/31/drf-yong-hu-zhu-ce-he-biao-dan-deng-lu-token/2.png">
+<meta property="og:image" content="https://bubbleboy11.github.io/2021/05/31/drf-yong-hu-zhu-ce-he-biao-dan-deng-lu-token/3.png">
+<meta property="og:image" content="https://bubbleboy11.github.io/2021/05/31/drf-yong-hu-zhu-ce-he-biao-dan-deng-lu-token/10.png">
+<meta property="og:image" content="https://bubbleboy11.github.io/2021/05/31/drf-yong-hu-zhu-ce-he-biao-dan-deng-lu-token/4.png">
+<meta property="og:image" content="https://bubbleboy11.github.io/2021/05/31/drf-yong-hu-zhu-ce-he-biao-dan-deng-lu-token/5.png">
+<meta property="og:image" content="https://bubbleboy11.github.io/2021/05/31/drf-yong-hu-zhu-ce-he-biao-dan-deng-lu-token/6.png">
+<meta property="og:image" content="https://bubbleboy11.github.io/2021/05/31/drf-yong-hu-zhu-ce-he-biao-dan-deng-lu-token/7.png">
+<meta property="og:image" content="https://bubbleboy11.github.io/2021/05/31/drf-yong-hu-zhu-ce-he-biao-dan-deng-lu-token/8.png">
+<meta property="og:image" content="https://bubbleboy11.github.io/2021/05/31/drf-yong-hu-zhu-ce-he-biao-dan-deng-lu-token/11.png">
+<meta property="og:image" content="https://bubbleboy11.github.io/2021/05/31/drf-yong-hu-zhu-ce-he-biao-dan-deng-lu-token/9.png">
+<meta property="og:image" content="https://bubbleboy11.github.io/2021/05/31/drf-yong-hu-zhu-ce-he-biao-dan-deng-lu-token/12.png">
+<meta property="article:published_time" content="2021-05-30T16:21:41.000Z">
+<meta property="article:modified_time" content="2021-06-04T08:07:20.302Z">
+<meta property="article:author" content="外心人D">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://bubbleboy11.github.io/2021/05/31/drf-yong-hu-zhu-ce-he-biao-dan-deng-lu-token/1.png">
+
+
+<link rel="canonical" href="https://bubbleboy11.github.io/2021/05/31/drf-yong-hu-zhu-ce-he-biao-dan-deng-lu-token/">
+
+
+
+<meta name="hexo-config-page" content="{&quot;sidebar&quot;:&quot;&quot;,&quot;isHome&quot;:false,&quot;isPost&quot;:true,&quot;lang&quot;:&quot;zh-CN&quot;}">
+<meta name="hexo-config-calendar" content="">
+<script data-pjax src="/js/load-config.js"></script>
+  <title>drf用户注册和表单登录token | 外心人D的博客</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="外心人D的博客" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">外心人D的博客</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%99%BB%E5%BD%95%E8%BF%94%E5%9B%9Etoken"><span class="nav-text">登录返回token</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A2%9E%E5%8A%A0%E6%89%8B%E6%9C%BA%E5%8F%B7%E7%99%BB%E5%BD%95%E5%8A%9F%E8%83%BD"><span class="nav-text">增加手机号登录功能</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%A8%E6%88%B7%E5%BA%8F%E5%88%97%E5%8C%96user-serializer%E5%92%8C%E9%AA%8C%E8%AF%81%E5%99%A8validator"><span class="nav-text">用户序列化user serializer和验证器validator</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B0%E5%BB%BA%E7%94%A8%E6%88%B7%EF%BC%8C%E5%AF%86%E7%A0%81%E5%9C%A8%E6%95%B0%E6%8D%AE%E5%BA%93%E5%8A%A0%E5%AF%86%E4%BF%9D%E5%AD%98%E8%80%8C%E4%B8%8D%E6%98%AF%E6%98%8E%E6%96%87%E5%AD%98%E5%82%A8"><span class="nav-text">新建用户，密码在数据库加密保存而不是明文存储</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">外心人D</p>
+  <div class="site-description" itemprop="description">本博客大多内容为慕课和网上博客，并非原创</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">260</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">40</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/05/31/drf-yong-hu-zhu-ce-he-biao-dan-deng-lu-token/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          drf用户注册和表单登录token
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-05-30 16:21:41" itemprop="dateCreated datePublished" datetime="2021-05-30T16:21:41Z">2021-05-30</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-06-04 08:07:20" itemprop="dateModified" datetime="2021-06-04T08:07:20Z">2021-06-04</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>注册接口成功</p>
+<ol>
+<li><p>正常返回，能浏览器代开对应路由，点击注册，弹框提示注册成功不点击确定，<br>F12开发者调试模式-localstore 有本地存储username token cart_count数据，<br>或者通过postman查看有没有生成token</p>
+</li>
+<li><p>服务器数据库生成数据</p>
+</li>
+</ol>
+<h2 id="登录返回token"><a href="#登录返回token" class="headerlink" title="登录返回token"></a>登录返回token</h2><figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework_simplejwt.views <span class="keyword">import</span> (</span><br><span class="line">    TokenObtainPairView,</span><br><span class="line">    TokenRefreshView,</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    <span class="comment"># simple jwt 认证接口</span></span><br><span class="line">    <span class="comment"># TokenObtainPairView是simple jwt的内置类</span></span><br><span class="line">    path(<span class="string">'api/token/'</span>, TokenObtainPairView.as_view(), name=<span class="string">'token_obtain_pair'</span>),</span><br><span class="line">    path(<span class="string">'api/token/refresh/'</span>, TokenRefreshView.as_view(), name=<span class="string">'token_refresh'</span>),</span><br><span class="line">    path(<span class="string">'login/'</span>, TokenObtainPairView.as_view(), name=<span class="string">'token_obtain_pair'</span>),</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>现在就可以登录了<br><img src="/2021/05/31/drf-yong-hu-zhu-ce-he-biao-dan-deng-lu-token/1.png" alt="description"><br><img src="/2021/05/31/drf-yong-hu-zhu-ce-he-biao-dan-deng-lu-token/2.png" alt="description"></p>
+<p><img src="/2021/05/31/drf-yong-hu-zhu-ce-he-biao-dan-deng-lu-token/3.png" alt="description"><br><img src="/2021/05/31/drf-yong-hu-zhu-ce-he-biao-dan-deng-lu-token/10.png" alt="description"><br><img src="/2021/05/31/drf-yong-hu-zhu-ce-he-biao-dan-deng-lu-token/4.png" alt="description"></p>
+<p><code>token</code> 和 <code>access</code> 是一样的，这里是为了前端获取方便换了个名字<br>返回了三个值：</p>
+<p>refresh：刷新token，当前端token过期需要刷新token的时候就可以访问前边说的<code>api/token/refresh</code>url，<br>参数是原来的<code>refresh</code>的值。</p>
+<p>access：这个就是<code>token</code>但是框架里叫做<code>access</code>。</p>
+<p>因为接口请求需要用POST方法，因此开始直接使用输入网址的GET方法会失败，<br>DRF提供了在页面HTML form 用POST方法发送数据的功能，返回格式和Django Form中是一样的，<br>对于多个字段的验证，如果某一个字段验证失败，则提示该字段的错误信息数组，<br>如果多个字段验证失败，则将这些字段的错误信息都显示出来。<br>包含HTTP状态码和具体信息，如果是返回的错误信息可以用于对前端的有误区域进行标亮显示，以便于用户重新输入。</p>
+<figure class="highlight prolog"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">http_code</span><br><span class="line">{</span><br><span class="line">    field1: [<span class="string">''</span>, <span class="string">''</span>],</span><br><span class="line">    field2: [],</span><br><span class="line">    ...</span><br><span class="line">    <span class="string">'non_fields_error'</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>apps\users\serializers.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyTokenObtainPairSerializer</span>(<span class="params">TokenObtainPairSerializer</span>):</span></span><br><span class="line"><span class="meta">    @classmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_token</span>(<span class="params">cls, user</span>):</span></span><br><span class="line">        token = super().get_token(user)</span><br><span class="line">        token[<span class="string">'name'</span>] = user.username  <span class="comment"># 因为程序可能运行在集群上，这里不写也可以</span></span><br><span class="line">        <span class="keyword">return</span> token</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">validate</span>(<span class="params">self, attrs</span>):</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        登录返回token和refresh</span></span><br><span class="line"><span class="string">        :param attrs:</span></span><br><span class="line"><span class="string">        :return:</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        data = super().validate(attrs)</span><br><span class="line">        <span class="comment"># access：这个就是`token`但是框架里叫做`access`</span></span><br><span class="line">        data[<span class="string">'token'</span>] = str(data[<span class="string">"access"</span>])  <span class="comment"># 给access新命名了一个值，方便前端获取：</span></span><br><span class="line">        <span class="keyword">return</span> data</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>apps\users\views.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyTokenObtainPairView</span>(<span class="params">TokenObtainPairView</span>):</span></span><br><span class="line">    serializer_class = MyTokenObtainPairSerializer</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework_simplejwt.views <span class="keyword">import</span> (</span><br><span class="line">    TokenObtainPairView,</span><br><span class="line">    TokenRefreshView,</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    <span class="comment"># simple jwt 认证接口</span></span><br><span class="line">    <span class="comment"># path('login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),</span></span><br><span class="line">    path(<span class="string">'login/'</span>, MyTokenObtainPairView.as_view(), name=<span class="string">'token_obtain_pair'</span>),</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="增加手机号登录功能"><a href="#增加手机号登录功能" class="headerlink" title="增加手机号登录功能"></a>增加手机号登录功能</h3><p><code>apps\users\views.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.contrib.auth <span class="keyword">import</span> get_user_model</span><br><span class="line"><span class="keyword">from</span> django.db.models <span class="keyword">import</span> Q</span><br><span class="line"><span class="keyword">from</span> django.contrib.auth.backends <span class="keyword">import</span> ModelBackend</span><br><span class="line"></span><br><span class="line">User = get_user_model()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CustomBackend</span>(<span class="params">ModelBackend</span>):</span></span><br><span class="line">    <span class="string">"""自定义用户登录，可以使用用户名和手机登录，重写authenticate方法"""</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">authenticate</span>(<span class="params">self, request, username=None, password=None, **kwargs</span>):</span></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            <span class="comment"># 用户名和手机都能登录，没有做邮箱验证功能</span></span><br><span class="line">            user = User.objects.get(</span><br><span class="line">                Q(username=username) | Q(mobile=username))</span><br><span class="line">            <span class="keyword">if</span> user.check_password(password) <span class="keyword">and</span> user.is_delete != <span class="literal">True</span>:</span><br><span class="line">                <span class="keyword">return</span> user</span><br><span class="line">        <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">None</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>settings.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">AUTHENTICATION_BACKENDS = (<span class="string">'users.views.CustomBackend'</span>,)  <span class="comment"># 指定认证后台</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="用户序列化user-serializer和验证器validator"><a href="#用户序列化user-serializer和验证器validator" class="headerlink" title="用户序列化user serializer和验证器validator"></a>用户序列化user serializer和验证器validator</h2><p><strong>注册就是将用户的数据POST到用户数据库，所以继承<code>CreateModelMixin</code></strong></p>
+<p>用户注册需要填写手机号，验证码和密码，对应3个字段，需要定义视图并验证。<br>在Django中username字段为必填字段，DRF序列化只需要验证username满足即可，<br>将 UserProfile 中mobile字段作为username 使得username的手机号验证通过后，将手机号填入mobile中<br>设置可为空<code>blank=True, null=True</code>，如果不这样设置，后端做验证的时候就会提示mobile这个字段必填。</p>
+<p>之前创建的admin用户没有设置mobile字段，现在设定一个手机号也可以登录<br>将传入的username字段的内容直接填充到mobile中<br>这个Serializer中直接继承<code>ModelSerializer</code>，</p>
+<p>模型<code>UserProfile</code>中没有<code>code</code>字段，<br>在验证时为了判断验证码的正误而加入<code>code</code>这个字段，用于验证验证码是否正确，更新或创建实例反序列化包含自定义<code>code</code>字段，序列化时找不到<code>code</code>字段会出错，需要将字段的<code>write_only</code>设置<code>True</code>确保序列化表示形式时不包括该字段</p>
+<p><code>users/serializers.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework.validators <span class="keyword">import</span> UniqueValidator</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserRegisterSerializer</span>(<span class="params">serializers.ModelSerializer</span>):</span></span><br><span class="line">    <span class="string">'''用户注册序列化'''</span></span><br><span class="line">    code = serializers.CharField(required=<span class="literal">True</span>, write_only=<span class="literal">True</span>, max_length=<span class="number">4</span>, min_length=<span class="number">4</span>, label=<span class="string">'验证码'</span>,</span><br><span class="line">                                 error_messages={</span><br><span class="line">                                     <span class="string">"blank"</span>: <span class="string">"请输入验证码"</span>,</span><br><span class="line">                                     <span class="string">"required"</span>: <span class="string">"请输入验证码"</span>,</span><br><span class="line">                                     <span class="string">"max_length"</span>: <span class="string">"请输入4位验证码"</span>,</span><br><span class="line">                                     <span class="string">"min_length"</span>: <span class="string">"请输入4位验证码"</span></span><br><span class="line">                                 },</span><br><span class="line">                                 help_text=<span class="string">"验证码"</span>)</span><br><span class="line">    <span class="comment"># 验证用户名是否存在，如果已存在，则提示message中的内容</span></span><br><span class="line">    username = serializers.CharField(label=<span class="string">"用户名"</span>, help_text=<span class="string">"用户名"</span>, required=<span class="literal">True</span>, allow_blank=<span class="literal">False</span>,</span><br><span class="line">                                     validators=[</span><br><span class="line">                                         UniqueValidator(queryset=User.objects.filter(is_delete=<span class="literal">False</span>), message=<span class="string">"用户已经存在"</span>)])</span><br><span class="line">    <span class="comment"># 输入密码的时候不显示明文，注册成功不返回让password字段，也就是序列化时不包含该字段</span></span><br><span class="line">    password = serializers.CharField(</span><br><span class="line">        style={<span class="string">'input_type'</span>: <span class="string">'password'</span>}, label=<span class="string">"密码"</span>, write_only=<span class="literal">True</span></span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">validate_code</span>(<span class="params">self, code</span>):</span></span><br><span class="line">        <span class="comment"># 验证验证码</span></span><br><span class="line">        <span class="comment"># 用户以post方式提交注册信息，前端post的数据都保存在initial_data里面</span></span><br><span class="line">        <span class="comment"># username就是用户注册的手机号，</span></span><br><span class="line">        <span class="comment"># 验证码按添加时间倒序排序，为了后面验证过期，错误等</span></span><br><span class="line">        verify_records = VerifyCode.objects.filter(mobile=self.initial_data[<span class="string">"username"</span>]).order_by(<span class="string">"-add_time"</span>)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> verify_records:  <span class="comment"># 验证验证码是否存在</span></span><br><span class="line">            <span class="comment"># 最近的一个验证码</span></span><br><span class="line">            last_record = verify_records[<span class="number">0</span>]</span><br><span class="line">            <span class="comment"># 获取5分钟以前的时间</span></span><br><span class="line">            five_mintes_ago = datetime.now() - timedelta(hours=<span class="number">0</span>, minutes=<span class="number">5</span>, seconds=<span class="number">0</span>)</span><br><span class="line">            <span class="keyword">if</span> five_mintes_ago &gt; last_record.add_time:</span><br><span class="line">                <span class="keyword">raise</span> serializers.ValidationError(<span class="string">"验证码过期"</span>)</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> last_record.code != code:</span><br><span class="line">                <span class="keyword">raise</span> serializers.ValidationError(<span class="string">"验证码错误"</span>)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">raise</span> serializers.ValidationError(<span class="string">"验证码错误"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">validate</span>(<span class="params">self, attrs</span>):</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        作用于所有的字段</span></span><br><span class="line"><span class="string">        :param attrs: 所有字段验证合法之后返回的所有字段的dict</span></span><br><span class="line"><span class="string">        :return:</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="comment"># 人为设定前端传递到后端的手机号数据变量名为username而非mobile</span></span><br><span class="line">        <span class="comment"># 把`username`的值赋值给`mobile`的值。</span></span><br><span class="line">        attrs[<span class="string">"mobile"</span>] = attrs[<span class="string">"username"</span>]</span><br><span class="line">        <span class="comment"># code字段只是为了验证临时生成的、不需要保存到用户数据表中，因此在验证之后需要删除</span></span><br><span class="line">        <span class="keyword">del</span> attrs[<span class="string">"code"</span>]</span><br><span class="line">        <span class="keyword">return</span> attrs</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        model = User</span><br><span class="line">        fields = (<span class="string">'username'</span>, <span class="string">'code'</span>, <span class="string">'mobile'</span>, <span class="string">'password'</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>users/views.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserViewSet</span>(<span class="params">CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, viewsets.GenericViewSet</span>):</span></span><br><span class="line">    <span class="string">'''用户注册成功携带token登录'''</span></span><br><span class="line">    serializer_class = UserRegisterSerializer</span><br><span class="line">    queryset = User.objects.filter(is_delete=<span class="literal">False</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">create</span>(<span class="params">self, request, *args, **kwargs</span>):</span></span><br><span class="line">        <span class="string">"""注册后自动登录需要携带token"""</span></span><br><span class="line">        serializer = self.get_serializer(data=request.data)</span><br><span class="line">        serializer.is_valid(raise_exception=<span class="literal">True</span>)</span><br><span class="line">        user = self.perform_create(serializer)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 添加自己的逻辑，手动生成token</span></span><br><span class="line">        refresh = RefreshToken.for_user(user)</span><br><span class="line"></span><br><span class="line">        tokens_for_user = {</span><br><span class="line">            <span class="string">'refresh'</span>: str(refresh),</span><br><span class="line">            <span class="comment"># 'access': str(refresh.access_token),  # 默认是</span></span><br><span class="line">            <span class="comment"># 数据定制化</span></span><br><span class="line">            <span class="string">'token'</span>: str(refresh.access_token),  <span class="comment"># 前端是token</span></span><br><span class="line">            <span class="string">'username'</span>: user.username,  <span class="comment"># 由于前端也需要传入username，需要将其加上。cookie.setCookie('name', response.data.username, 7);</span></span><br><span class="line">        }</span><br><span class="line"></span><br><span class="line">        headers = self.get_success_headers(serializer.data)</span><br><span class="line">        <span class="keyword">return</span> Response(tokens_for_user, status=status.HTTP_201_CREATED, headers=headers)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">perform_create</span>(<span class="params">self, serializer</span>):</span></span><br><span class="line">        <span class="keyword">return</span> serializer.save()</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>CreateModelMixin</code>源码</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CreateModelMixin</span>(<span class="params">object</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    Create a model instance.</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">create</span>(<span class="params">self, request, *args, **kwargs</span>):</span></span><br><span class="line">        serializer = self.get_serializer(data=request.data)</span><br><span class="line">        serializer.is_valid(raise_exception=<span class="literal">True</span>)</span><br><span class="line">        self.perform_create(serializer)</span><br><span class="line">        headers = self.get_success_headers(serializer.data)</span><br><span class="line">        <span class="keyword">return</span> Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">perform_create</span>(<span class="params">self, serializer</span>):</span></span><br><span class="line">        serializer.save()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_success_headers</span>(<span class="params">self, data</span>):</span></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            <span class="keyword">return</span> {<span class="string">'Location'</span>: str(data[api_settings.URL_FIELD_NAME])}</span><br><span class="line">        <span class="keyword">except</span> (TypeError, KeyError):</span><br><span class="line">            <span class="keyword">return</span> {}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>在生成<code>token</code>之前，<code>self.perform_create(serializer)</code>这个函数，他只是调用了<code>serializer.save()</code>，<br>因为要生成用户的token之前，必须要拿到user，所以这个函数也需要被重载。<br>原函数中只是调用<code>.save()</code>，并没有返回。实际上<code>serializer.save()</code>中的<code>serializer</code>就是<code>UserSerializer(serializers.ModelSerializer)</code>中<code>model</code>的对象。<br>重载它，把它返回，才能得到user对象。</p>
+<h3 id="新建用户，密码在数据库加密保存而不是明文存储"><a href="#新建用户，密码在数据库加密保存而不是明文存储" class="headerlink" title="新建用户，密码在数据库加密保存而不是明文存储"></a>新建用户，密码在数据库加密保存而不是明文存储</h3><p>法一：重载Create方法</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserRegisterSerializer</span>(<span class="params">serializers.ModelSerializer</span>):</span></span><br><span class="line">    <span class="string">'''用户注册序列化'''</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">create</span>(<span class="params">self, validated_data</span>):</span></span><br><span class="line">        <span class="string">"""密码在数据库加密保存而不是明文存储"""</span></span><br><span class="line">        user = super(UserRegisterSerializer, self).create(validated_data=validated_data)</span><br><span class="line">        <span class="comment"># # UserProfile--&gt;AbstractUser--&gt;AbstractBaseUser中有个set_password(self, raw_password)方法</span></span><br><span class="line">        user.set_password(validated_data[<span class="string">"password"</span>])  <span class="comment"># user.set_password(validated_data['password'])  # 取出password密码，进行加密后保存</span></span><br><span class="line">        user.save()</span><br><span class="line">        <span class="keyword">return</span> user</span><br></pre></td></tr></tbody></table></figure>
+
+<p>法二：同时创建Token<br>信号<br>[<a target="_blank" rel="noopener" href="https://docs.djangoproject.com/en/3.2/ref/signals/]">https://docs.djangoproject.com/en/3.2/ref/signals/]</a><br>其中一类信号是模型信号，django.db.models.signals模块定义了模型系统发送的一组信号，对模型进行操作后，Django会发出全局信号，捕捉到之后可以加入需要的业务逻辑，具体包括pre_init、post_init、pre_save和post_save等，这里我们使用post_save信号实现密码设置。</p>
+<p><code>apps/users/signals.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.contrib.auth <span class="keyword">import</span> get_user_model</span><br><span class="line"><span class="keyword">from</span> django.db.models.signals <span class="keyword">import</span> post_save</span><br><span class="line"><span class="keyword">from</span> django.dispatch <span class="keyword">import</span> receiver</span><br><span class="line"><span class="keyword">from</span> rest_framework.authtoken.models <span class="keyword">import</span> Token</span><br><span class="line"></span><br><span class="line">User = get_user_model()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@receiver(post_save, sender=User)</span></span><br><span class="line"><span class="comment"># post_save:接收信号的方式</span></span><br><span class="line"><span class="comment"># sender: 接收User这个Model传递过来的信号</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">create_user</span>(<span class="params">sender, instance=None, created=False, **kwargs</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    在传过来后，它需要确认是否是created新建数据，</span></span><br><span class="line"><span class="string">    如果是新建数据，才进行密码加密。</span></span><br><span class="line"><span class="string">    因为如果是update更新的时候也会传递post_save信号。</span></span><br><span class="line"><span class="string">    使用信号，代码分离性较强。</span></span><br><span class="line"><span class="string">    :param sender:</span></span><br><span class="line"><span class="string">    :param instance: 相当于user</span></span><br><span class="line"><span class="string">    :param created:是否新建，因为update的时候也会进行post_save</span></span><br><span class="line"><span class="string">    :param kwargs:</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="keyword">if</span> created:</span><br><span class="line">        password = instance.password  <span class="comment"># instance指的就是创建的用户对象</span></span><br><span class="line">        instance.set_password(password)</span><br><span class="line">        instance.save()</span><br><span class="line">        <span class="comment"># Token.objects.create(user=instance)  # 用jwt而不是token</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>users/apps.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.apps <span class="keyword">import</span> AppConfig</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UsersConfig</span>(<span class="params">AppConfig</span>):</span></span><br><span class="line">    default_auto_field = <span class="string">'django.db.models.BigAutoField'</span></span><br><span class="line">    name = <span class="string">'users'</span></span><br><span class="line">    verbose_name = <span class="string">"用户管理"</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">ready</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">import</span> users.signals</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>url.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> users.views <span class="keyword">import</span> UserViewSet</span><br><span class="line"></span><br><span class="line">router.register(<span class="string">'users'</span>, UserViewset)</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="/2021/05/31/drf-yong-hu-zhu-ce-he-biao-dan-deng-lu-token/5.png" alt="description"><br><img src="/2021/05/31/drf-yong-hu-zhu-ce-he-biao-dan-deng-lu-token/6.png" alt="description"></p>
+<p>token：这个是在序列化文件中给access新命名了一个值，<code>token</code> 和 <code>access</code> 是一样的，这里是为了前端获取方便换了个名字</p>
+<p>测试接口</p>
+<ul>
+<li>输入已经存在的用户名</li>
+<li>不输入验证码<br><img src="/2021/05/31/drf-yong-hu-zhu-ce-he-biao-dan-deng-lu-token/7.png" alt="description"></li>
+</ul>
+<p><img src="/2021/05/31/drf-yong-hu-zhu-ce-he-biao-dan-deng-lu-token/8.png" alt="description"><br><img src="/2021/05/31/drf-yong-hu-zhu-ce-he-biao-dan-deng-lu-token/11.png" alt="description"></p>
+<ul>
+<li>注册成功，返回注册信息，前端跳转到首页<br><img src="/2021/05/31/drf-yong-hu-zhu-ce-he-biao-dan-deng-lu-token/9.png" alt="description"><br><img src="/2021/05/31/drf-yong-hu-zhu-ce-he-biao-dan-deng-lu-token/12.png" alt="description"></li>
+</ul>
+<p>simple jwt获取token源码</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TokenObtainPairSerializer</span>(<span class="params">TokenObtainSerializer</span>):</span></span><br><span class="line"><span class="meta">    @classmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_token</span>(<span class="params">cls, user</span>):</span></span><br><span class="line">        <span class="keyword">return</span> RefreshToken.for_user(user)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">validate</span>(<span class="params">self, attrs</span>):</span></span><br><span class="line">        data = super().validate(attrs)</span><br><span class="line"></span><br><span class="line">        refresh = self.get_token(self.user)</span><br><span class="line"></span><br><span class="line">        data[<span class="string">'refresh'</span>] = str(refresh)</span><br><span class="line">        data[<span class="string">'access'</span>] = str(refresh.access_token)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> api_settings.UPDATE_LAST_LOGIN:</span><br><span class="line">            update_last_login(<span class="literal">None</span>, self.user)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> data</span><br></pre></td></tr></tbody></table></figure>
+
+<hr>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> hashlib</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">from</span> django.conf <span class="keyword">import</span> settings  <span class="comment"># 不要用相对导入的方式导入配置文件</span></span><br><span class="line"><span class="keyword">from</span> django.http <span class="keyword">import</span> JsonResponse</span><br><span class="line"><span class="keyword">from</span> .model <span class="keyword">import</span> UserProfile</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">generate_token</span>(<span class="params">username, expire=<span class="number">60</span> * <span class="number">60</span> * <span class="number">24</span></span>):</span></span><br><span class="line">    <span class="string">"""生成 token，有效期一天"""</span></span><br><span class="line">    <span class="keyword">import</span> jwt</span><br><span class="line">    now = time.time()</span><br><span class="line">    key = settings.SECRET_KEY</span><br><span class="line">    payload = {<span class="string">'username'</span>: username, <span class="string">'exp'</span>: int(now + expire)}</span><br><span class="line">    token = jwt.encode(payload, key, algorithm=<span class="string">'HS256'</span>)  <span class="comment"># 生成str类型</span></span><br><span class="line">    <span class="keyword">return</span> token</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">register</span>(<span class="params">request</span>):</span></span><br><span class="line">    <span class="keyword">if</span> request.method == <span class="string">'POST'</span>:</span><br><span class="line">        <span class="comment"># 注册用户</span></span><br><span class="line">        data = request.body</span><br><span class="line">        json_obj = json.loads(data)</span><br><span class="line">        username = json_obj[<span class="string">'username'</span>]</span><br><span class="line">        email = json_obj[<span class="string">'email'</span>]</span><br><span class="line">        password = json_obj[<span class="string">'password'</span>]</span><br><span class="line">        phone = json_obj[<span class="string">'phone'</span>]</span><br><span class="line">        <span class="keyword">if</span> len(password) &lt; <span class="number">6</span>:</span><br><span class="line">            result = {<span class="string">'code'</span>: <span class="number">10100</span>, <span class="string">'error'</span>: <span class="string">'Password lenth is wrong'</span>}</span><br><span class="line">            <span class="keyword">return</span> JsonResponse(result)</span><br><span class="line">        <span class="comment"># 用户名是否可用；已注册的话给个错误返回</span></span><br><span class="line">        old_user = UserProfile.objects.filter()</span><br><span class="line">        <span class="keyword">if</span> old_user:</span><br><span class="line">            result = {<span class="string">'code'</span>: <span class="number">10101</span>, <span class="string">'error'</span>: <span class="string">'Your name is already existed'</span>}</span><br><span class="line">            <span class="keyword">return</span> JsonResponse(result)</span><br><span class="line">        <span class="comment"># 创建用户也避免同时注册相同名字，密码用md5</span></span><br><span class="line">        m = hashlib.md5()</span><br><span class="line">        m.update(password.encode())  <span class="comment"># 参数为bytes</span></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            user = UserProfile.objects.create(username=username, password=m.hexdigest(), email=email, phone=phone)</span><br><span class="line">        <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">            result = {<span class="string">'code'</span>: <span class="number">10102</span>, <span class="string">'error'</span>: <span class="string">'Your name is used'</span>}</span><br><span class="line">            <span class="keyword">return</span> JsonResponse(result)</span><br><span class="line">        <span class="comment"># 用jwt签发token有效期1天, token里面存放username: xxxx</span></span><br><span class="line">        token = generate_token(username)</span><br><span class="line">        <span class="keyword">return</span> JsonResponse({<span class="string">'code'</span>: <span class="number">200</span>, <span class="string">'username'</span>: username, <span class="string">'data'</span>: {<span class="string">'token'</span>: token}, <span class="string">'cart_count'</span>: <span class="number">0</span>})</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">login</span>(<span class="params">request</span>):</span></span><br><span class="line">    <span class="comment"># 登录验证</span></span><br><span class="line">    <span class="keyword">if</span> request.method != <span class="string">'POST'</span>:</span><br><span class="line">        result = {<span class="string">'code'</span>: <span class="number">10200</span>, <span class="string">'error'</span>: <span class="string">'Please send POST`s request'</span>}</span><br><span class="line">        <span class="keyword">return</span> JsonResponse(result)</span><br><span class="line"></span><br><span class="line">    json_str = request.body</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> json_str:</span><br><span class="line">        result = {<span class="string">'code'</span>: <span class="number">10201</span>, <span class="string">'error'</span>: <span class="string">'Please give me data'</span>}</span><br><span class="line">        <span class="keyword">return</span> JsonResponse(result)</span><br><span class="line"></span><br><span class="line">    json_obj = json.loads(json_str)  <span class="comment"># 转换为dict</span></span><br><span class="line"></span><br><span class="line">    username = json_obj.get(<span class="string">'username'</span>)</span><br><span class="line">    password = json_obj.get(<span class="string">'password'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> username:  <span class="comment"># 没有输入用户名提交</span></span><br><span class="line">        result = {<span class="string">'code'</span>: <span class="number">10202</span>, <span class="string">'error'</span>: <span class="string">'Please give me username'</span>}</span><br><span class="line">        <span class="keyword">return</span> JsonResponse(result)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> password:  <span class="comment"># 没有输入密码提交</span></span><br><span class="line">        result = {<span class="string">'code'</span>: <span class="number">10203</span>, <span class="string">'error'</span>: <span class="string">'Please give me password'</span>}</span><br><span class="line">        <span class="keyword">return</span> JsonResponse(result)</span><br><span class="line"></span><br><span class="line">    user = UserProfile.objects.filter(username=username)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> user:  <span class="comment"># 不存在的用户名提交</span></span><br><span class="line">        result = {<span class="string">'code'</span>: <span class="number">10204</span>, <span class="string">'error'</span>: <span class="string">'The username or password is wrong'</span>}</span><br><span class="line">        <span class="keyword">return</span> JsonResponse(result)</span><br><span class="line"></span><br><span class="line">    user = user[<span class="number">0</span>]  <span class="comment"># user存在只有一个，因为加了unique唯一约束</span></span><br><span class="line">    <span class="comment"># 对比密码</span></span><br><span class="line">    p_m = hashlib.md5()  <span class="comment"># 生成md5对象</span></span><br><span class="line">    p_m.update(password.encode())</span><br><span class="line">    <span class="keyword">if</span> p_m.hexdigest() != user.password:</span><br><span class="line">        result = {<span class="string">'code'</span>: <span class="number">10205</span>, <span class="string">'error'</span>: <span class="string">'The username or password is wrong'</span>}</span><br><span class="line">        <span class="keyword">return</span> JsonResponse(result)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 生成token</span></span><br><span class="line">    token = generate_token(username)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> JsonResponse({<span class="string">'code'</span>: <span class="number">200</span>, <span class="string">'username'</span>: username, <span class="string">'data'</span>: {<span class="string">'token'</span>: token}, <span class="string">'cart_count'</span>: <span class="number">0</span>})</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></tbody></table></figure><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/05/29/django-jie-ru-pian-yun-wang-duan-xin-yan-zheng-dan-tiao-fa-song/" rel="prev" title="">
+                  <i class="fa fa-chevron-left"></i> 
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/05/31/drf-yong-hu-shou-cang-jie-kou-shi-xian/" rel="next" title="drf用户收藏接口实现">
+                  drf用户收藏接口实现 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+<script src="/js/comments.js"></script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">外心人D</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
