@@ -118,7 +118,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">267</span>
+          <span class="site-state-item-count">275</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -158,6 +158,641 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/docker/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/docker/" class="post-title-link" itemprop="url">docker</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-06-07 03:06:01" itemprop="dateModified" datetime="2021-06-07T03:06:01Z">2021-06-07</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/docker/" itemprop="url" rel="index"><span itemprop="name">docker</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>Docker<br>Docker是一个容器化的平台，他将应用程序和所需要的依赖打包在一个容器里面，在其他的环境下 ，拿上镜像就可以运行，<br>学习docker就是，学习在docker中安装依赖和将项目部署到docker中。</p>
+<p>Docker架构是什么<br>Docker deamon  ： docker的守护进程<br>Client  ：         docker的客户端<br>Images ：   docker的镜像<br>Container   ：  docker的容器<br>Registry：      docker的仓库</p>
+<p>linux安装</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun</span><br></pre></td></tr></tbody></table></figure>
+
+
+<p>设置开机启动docker</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">systemctl <span class="built_in">enable</span> docker</span><br><span class="line">[root@VM-0-9-centos ~]<span class="comment"># systemctl start docker</span></span><br><span class="line">[root@VM-0-9-centos ~]<span class="comment"># ps -ef |grep docker</span></span><br><span class="line">root      3699     1  2 23:17 ?        00:00:00 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock</span><br><span class="line">root      3840  1544  0 23:17 pts/5    00:00:00 grep --color=auto docker</span><br><span class="line">[root@VM-0-9-centos ~]<span class="comment"># docker ps -a</span></span><br><span class="line">CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES</span><br></pre></td></tr></tbody></table></figure>
+
+<p>docker ps [options]  查看docker容器进程信息：</p>
+<p><a target="_blank" rel="noopener" href="https://cloud.tencent.com/document/product/1207/45596">使用腾讯云 Docker 镜像源加速镜像下载</a></p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">curl -L https://get.daocloud.io/docker/compose/releases/download/1.29.2/docker-compose-`uname -s`-`uname -m` &gt; /usr/<span class="built_in">local</span>/bin/docker-compose</span><br><span class="line">chmod +x /usr/<span class="built_in">local</span>/bin/docker-compose</span><br><span class="line">[root@VM-0-9-centos ~]<span class="comment"># docker-compose -v</span></span><br><span class="line">docker-compose version 1.29.2, build 5becea4c</span><br></pre></td></tr></tbody></table></figure>
+
+<p>如果本机linux的mysql启动会占用3306，先关掉，才能启动docker mysql</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[root@VM-0-9-centos ~]<span class="comment"># netstat -tanlp</span></span><br><span class="line">    ESTABLISHED 1097/YDService      </span><br><span class="line">tcp6       0      0 :::33060                :::*                    LISTEN      25791/mysqld        </span><br><span class="line">tcp6       0      0 :::3306                 :::*                    LISTEN      25791/mysqld        </span><br><span class="line">[root@VM-0-9-centos ~]<span class="comment"># kill 25791</span></span><br><span class="line">[root@VM-0-9-centos ~]<span class="comment"># netstat -tanlp</span></span><br><span class="line">[root@VM-0-9-centos ~]<span class="comment"># docker run -p 3306:3306 --name mymysql -v $PWD/conf:/etc/mysql/conf.d -v $PWD/logs:/logs -v $PWD/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 -d mysql:5.7</span></span><br><span class="line">a7df53a51485060228adcf9b7b307f1c63aa1f6de8266ee798b3b3a376af0fc6</span><br><span class="line">[root@VM-0-9-centos ~]<span class="comment"># docker ps -aCONTAINER ID   IMAGE       COMMAND                  CREATED          STATUS          PORTS                                                  NAMES</span></span><br><span class="line">a7df53a51485   mysql:5.7   <span class="string">"docker-entrypoint.s…"</span>   35 seconds ago   Up 35 seconds   0.0.0.0:3306-&gt;3306/tcp, :::3306-&gt;3306/tcp, 33060/tcp   mymysql</span><br></pre></td></tr></tbody></table></figure>
+
+<p>-p 3306:3306：将容器的 3306 端口映射到主机的 3306 端口。</p>
+<p>-v -v $PWD/conf:/etc/mysql/conf.d：将主机当前目录下的 conf/my.cnf 挂载到容器的 /etc/mysql/my.cnf。</p>
+<p>-v $PWD/logs:/logs：将主机当前目录下的 logs 目录挂载到容器的 /logs。</p>
+<p>-v $PWD/data:/var/lib/mysql ：将主机当前目录下的data目录挂载到容器的 /var/lib/mysql 。</p>
+<p>-e MYSQL_ROOT_PASSWORD=123456：初始化 root 用户的密码。</p>
+<h3 id="容器配置"><a href="#容器配置" class="headerlink" title="容器配置"></a>容器配置</h3><p>由于mysql的安全策略，现在还不能使用root/123456来访问数据库</p>
+<ol>
+<li>进入容器<br>通过<code>docker ps -a</code>来查看mysql的容器id，status 为 up</li>
+</ol>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">exec</span> -it a7df53a51485 /bin/bash</span><br></pre></td></tr></tbody></table></figure>
+<p> 进入mysql</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql -uroot -p123456</span><br></pre></td></tr></tbody></table></figure>
+
+<p>建立用户并授权</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">GRANT ALL PRIVILEGES ON *.* TO <span class="string">'root'</span>@<span class="string">'%'</span> IDENTIFIED BY <span class="string">'root'</span> WITH GRANT OPTION;</span><br><span class="line">GRANT ALL PRIVILEGES ON *.* TO <span class="string">'root'</span>@<span class="string">'127.0.0.1'</span> IDENTIFIED BY <span class="string">'root'</span> WITH GRANT OPTION;</span><br><span class="line">GRANT ALL PRIVILEGES ON *.* TO <span class="string">'root'</span>@<span class="string">'localhost'</span> IDENTIFIED BY <span class="string">'root'</span> WITH GRANT OPTION;</span><br><span class="line">FLUSH PRIVILEGES;</span><br></pre></td></tr></tbody></table></figure>
+
+<p>密码为root</p>
+<p>Docker镜像的常用的命令：<br>docker images：  列出已经下载的镜像<br>docker  search 镜像名字：tag     ：  搜索这个镜像<br>docker  pull  镜像名称:tag        拉取镜像<br>docker  rmi   镜像名称:tag         删除镜像<br>docker 容器常用的命令：<br>创建容器<br>docker create -p 3306:3306 –name suiyi -e MYSQL_ROOT_PASSWORD=smallming mysql:5.7<br>新建并且启动<br>docker run -p 3306:3306 –name mysql -e MYSQL_ROOT_PASSWORD=root -d mysql:5.7 </p>
+<p>列出正在运行的容器： docker container ls</p>
+<p>docker exec [options] 容器ID [command]<br>docker exec -it mysql /bin/bash<br>5    停止容器<br>docker stop 容器ID<br>docker stop mysql<br>6    启动容器<br>docker start 容器ID<br>docker start mysql<br>7    强制停止容器<br>不推荐使用，容易造成容器服务不正常关闭，影响后续使用。<br>docker kill 容器ID<br>docker kill mysql<br>8    删除容器<br>要删除的容器，必须是关闭状态的。<br>docker rm 容器ID<br>docker rm mysql<br>9    查看容器日志<br>docker logs -f -t –tail 行数 容器ID<br>docker logs -f -t –tail 5 mysql<br>10    查看容器中运行的进程<br>可以知道容器中到底运行的是哪个应用程序。<br>docker top 容器ID<br>docker top mysql<br>11    查看容器内部详情<br>docker inspect 容器ID<br>docker inspect mysql<br>12    复制容器数据到宿主机<br>docker cp 容器ID:容器内路径 宿主机路径<br>复制MySQL配置到宿主机：  docker cp mysql:/etc/mysql ~/tmp/conf    </p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/doctest-mo-kuai/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/doctest-mo-kuai/" class="post-title-link" itemprop="url">doctest模块</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-04-14 07:34:57" itemprop="dateModified" datetime="2021-04-14T07:34:57Z">2021-04-14</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>doctest模块<br>扫描模块并根据程序中内嵌的文档字符串执行测试。<br>测试构造如同简单的将它的输出结果剪切并粘贴到文档字符串中。</p>
+<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">```doctest.test_mod```函数从一个模块中读取所有文档字符串，找出所有看起来像是在交互式解释器中输入的例子的文本，之后检查例子是否符合实际要求。</span><br><span class="line">在python代码中寻找类似交互解释器里执行的命令，执行它们并且和这些命令的期望值进行比较。通过用户提供的例子，它强化了文档，允许 doctest 模块确认代码的结果是否与文档一致:</span><br><span class="line">用来验证docstring中的注释和代码实际的作用是一致的</span><br><span class="line">可以作为回归测试来验证代码能够正确执行</span><br><span class="line">可以用来编写模块的文档演示这些模块是如何处理输入得到输出的。</span><br><span class="line"></span><br><span class="line">一般写在函数的docstring里面，较为标准的文档字符串格式，</span><br><span class="line">用```&gt;&gt;&gt;```表示一个用例的开始，&gt;&gt;&gt;后有一个空格，直到遇到```空行```或者下一个```&gt;&gt;&gt;```</span><br><span class="line">```’’’```后的英文文档后有一个空行。</span><br><span class="line"></span><br><span class="line">使用```#doctest: +ELLIPSIS（中文含义省略）```来表示下面的省略号匹配任意内容</span><br><span class="line"></span><br><span class="line">```python sample.py```只打印出错的用例结果</span><br><span class="line">```python sample.py -v``` 将会打印所有测试用例的结果。</span><br><span class="line">pychamr右键 run doctest</span><br><span class="line"></span><br><span class="line">定义如下函数代码square，求一个数的平方，并且在它的文档字符串中添加两个例子，文件名为my_math.py</span><br><span class="line"></span><br><span class="line">```py</span><br><span class="line"># my_math.py</span><br><span class="line">import doctest</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def square(x):</span><br><span class="line">    '''</span><br><span class="line">    Squares a number and returns the result</span><br><span class="line">    </span><br><span class="line">    &gt;&gt;&gt; square(2)</span><br><span class="line">    4</span><br><span class="line">    &gt;&gt;&gt; square(3)</span><br><span class="line">    9</span><br><span class="line">    '''</span><br><span class="line">    return x * x</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">if __name__ == '__main__':</span><br><span class="line">    import my_math</span><br><span class="line">    doctest.testmod(my_math)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>在 win或 Linux终端命令行中运行查看测试结果。</p>
+<figure class="highlight shell"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">[root@centos ~]# python my_math.py</span><br><span class="line"><span class="meta">#</span><span class="bash"> 没反应，因为符合预期结果，默认只打印出错的用例结果</span></span><br><span class="line">[root@centos ~]# python my_math.py -v</span><br><span class="line">Trying:</span><br><span class="line">    square(2)</span><br><span class="line">Expecting:</span><br><span class="line">    4</span><br><span class="line">ok</span><br><span class="line">Trying:</span><br><span class="line">    square(3)</span><br><span class="line">Expecting:</span><br><span class="line">    9</span><br><span class="line">ok</span><br><span class="line">1 items had no tests:</span><br><span class="line">    my_math</span><br><span class="line">1 items passed all tests:</span><br><span class="line">   2 tests in my_math.square</span><br><span class="line">2 tests in 2 items.</span><br><span class="line">2 passed and 0 failed.</span><br><span class="line">Test passed.</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight sh"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[root@centos ~]<span class="comment"># python my_math.py</span></span><br><span class="line">**********************************************************************</span><br><span class="line">File <span class="string">"my_math.py"</span>, line 9, <span class="keyword">in</span> __main__.average</span><br><span class="line">Failed example:</span><br><span class="line">    <span class="built_in">print</span>(average([20, 30, 70]))</span><br><span class="line">Expected:</span><br><span class="line">    50.0</span><br><span class="line">Got:</span><br><span class="line">    40.0</span><br><span class="line">**********************************************************************</span><br><span class="line">1 items had failures:</span><br><span class="line">   1 of   2 <span class="keyword">in</span> __main__.average</span><br><span class="line">***Test Failed*** 1 failures.</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight sh"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">[root@centos ~]<span class="comment"># python my_math.py -v</span></span><br><span class="line">Trying:</span><br><span class="line">    <span class="built_in">print</span>(average([20, 30, 70]))</span><br><span class="line">Expecting:</span><br><span class="line">    40.0</span><br><span class="line">ok</span><br><span class="line">Trying:</span><br><span class="line">    <span class="built_in">print</span>(average([20, 30, 70]))</span><br><span class="line">Expecting:</span><br><span class="line">    50.0</span><br><span class="line">**********************************************************************</span><br><span class="line">File <span class="string">"my_math.py"</span>, line 9, <span class="keyword">in</span> __main__.average</span><br><span class="line">Failed example:</span><br><span class="line">    <span class="built_in">print</span>(average([20, 30, 70]))</span><br><span class="line">Expected:</span><br><span class="line">    50.0</span><br><span class="line">Got:</span><br><span class="line">    40.0</span><br><span class="line">1 items had no tests:</span><br><span class="line">    __main__</span><br><span class="line">**********************************************************************</span><br><span class="line">1 items had failures:</span><br><span class="line">   1 of   2 <span class="keyword">in</span> __main__.average</span><br><span class="line">2 tests <span class="keyword">in</span> 2 items.</span><br><span class="line">1 passed and 1 failed.</span><br><span class="line">***Test Failed*** 1 failures.</span><br></pre></td></tr></tbody></table></figure>
+
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add</span>(<span class="params">x, y</span>):</span></span><br><span class="line">    <span class="string">""" add two number or string</span></span><br><span class="line"><span class="string">    &gt;&gt;&gt; add(1, 2)</span></span><br><span class="line"><span class="string">    3</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    &gt;&gt;&gt; add("hello", " world")</span></span><br><span class="line"><span class="string">    'hello world'</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    &gt;&gt;&gt; add(1, 2.0)</span></span><br><span class="line"><span class="string">    3</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    &gt;&gt;&gt; add("hello", " python")  # doctest: +ELLIPSIS</span></span><br><span class="line"><span class="string">    'hello ...'</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="keyword">return</span> x+y</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    <span class="keyword">import</span> doctest</span><br><span class="line">    doctest.testmod()</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight markdown"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">[root@centos ~]# python my<span class="emphasis">_math.py -v</span></span><br><span class="line"><span class="emphasis">Trying:</span></span><br><span class="line"><span class="emphasis">    add(1, 2)</span></span><br><span class="line"><span class="emphasis">Expecting:</span></span><br><span class="line"><span class="emphasis">    3</span></span><br><span class="line"><span class="emphasis">ok</span></span><br><span class="line"><span class="emphasis">Trying:</span></span><br><span class="line"><span class="emphasis">    add("hello", " world")</span></span><br><span class="line"><span class="emphasis">Expecting:</span></span><br><span class="line"><span class="emphasis">    'hello world'</span></span><br><span class="line"><span class="emphasis">ok</span></span><br><span class="line"><span class="emphasis">Trying:</span></span><br><span class="line"><span class="emphasis">    add(1, 2.0)</span></span><br><span class="line"><span class="emphasis">Expecting:</span></span><br><span class="line"><span class="emphasis">    3</span></span><br><span class="line"><span class="emphasis"><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">**</span></span></span><br><span class="line"><span class="emphasis"><span class="strong">File "my<span class="emphasis">_math.py", line 9, in <span class="strong">__main__</span>.add  </span></span></span></span><br><span class="line"><span class="emphasis"><span class="strong"><span class="emphasis">Failed example:</span></span></span></span><br><span class="line"><span class="emphasis"><span class="strong"><span class="emphasis">    add(1, 2.0)</span></span></span></span><br><span class="line"><span class="emphasis"><span class="strong"><span class="emphasis">Expected:</span></span></span></span><br><span class="line"><span class="emphasis"><span class="strong"><span class="emphasis">    3</span></span></span></span><br><span class="line"><span class="emphasis"><span class="strong"><span class="emphasis">Got:</span></span></span></span><br><span class="line"><span class="emphasis"><span class="strong"><span class="emphasis">    3.0</span></span></span></span><br><span class="line"><span class="emphasis"><span class="strong"><span class="emphasis">Trying:</span></span></span></span><br><span class="line"><span class="emphasis"><span class="strong"><span class="emphasis">    add("hello", " python")  # doctest: +ELLIPSIS</span></span></span></span><br><span class="line"><span class="emphasis"><span class="strong"><span class="emphasis">Expecting:</span></span></span></span><br><span class="line"><span class="emphasis"><span class="strong"><span class="emphasis">    'hello ...'</span></span></span></span><br><span class="line"><span class="emphasis"><span class="strong"><span class="emphasis">ok</span></span></span></span><br><span class="line"><span class="emphasis"><span class="strong"><span class="emphasis">1 items had no tests:</span></span></span></span><br><span class="line"><span class="emphasis"><span class="strong"><span class="emphasis">    <span class="strong">__main__</span></span></span></span></span><br><span class="line"><span class="emphasis"><span class="strong"><span class="emphasis"><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">**</span></span></span></span></span><br><span class="line"><span class="emphasis"><span class="strong"><span class="emphasis"><span class="strong">1 items had failures:</span></span></span></span></span><br><span class="line"><span class="emphasis"><span class="strong"><span class="emphasis"><span class="strong">   1 of   4 in _<span class="emphasis">_main<span class="strong">__.add</span></span></span></span></span></span></span><br><span class="line"><span class="emphasis"><span class="strong"><span class="emphasis"><span class="strong"><span class="emphasis"><span class="strong">4 tests in 2 items.</span></span></span></span></span></span></span><br><span class="line"><span class="emphasis"><span class="strong"><span class="emphasis"><span class="strong"><span class="emphasis"><span class="strong">3 passed and 1 failed.</span></span></span></span></span></span></span><br><span class="line"><span class="emphasis"><span class="strong"><span class="emphasis"><span class="strong"><span class="emphasis"><span class="strong">**<span class="emphasis">*Test Failed<span class="strong">**<span class="emphasis">* 1 failures.</span></span></span></span></span></span></span></span></span></span><br></pre></td></tr></tbody></table></figure><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/drf-ren-zheng-he-quan-xian/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/drf-ren-zheng-he-quan-xian/" class="post-title-link" itemprop="url">drf认证和权限</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-06-12 04:46:05" itemprop="dateModified" datetime="2021-06-12T04:46:05Z">2021-06-12</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="drf认证"><a href="#drf认证" class="headerlink" title="drf认证"></a>drf认证</h2><p>认证:<br>认证可以简单的理解为登录和访问需要登录的接口的认证。<br>只要认证通过了,那么在 request对象(是drf的 request对象)上便有两个属性,<br>一个是 <code>request.user</code>,一个是 <code>request,auth</code>,前者就<br>是 django中的User对象,后者根据不同的认证机制有不同的对象,</p>
+<p>DRF的token登录原理<br>基于DRF的前后端分离登录与单独使用Django登录的原理不同，不再需要CSRF验证，<br>DRF提供了许多开箱即用的身份验证方案，并且还允许实现自定义方案。<br>身份验证始终在视图的最开始处，在进行权限和限制检查之前以及在允许任何其他代码进行之前运行。<br>身份验证方案始终定义为类列表，依赖的是<code>django.contrib</code>的<code>auth</code>，<br>对列表的多个内置认证类，drf会按照从上到下的顺序对对列表中的每个类进行身份认证验证，<br>并使用第一个成功通过的验证类的返回值来设置<code>request.user</code>和<code>request.auth</code></p>
+<p><code>setting.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># DRF 全局配置</span></span><br><span class="line">REST_FRAMEWORK = {</span><br><span class="line">    <span class="comment"># 配置默认认证类 authentication: 对用户登录的身份进行校验</span></span><br><span class="line">    <span class="string">"DEFAULT_AUTHENTICATION_CLASSES"</span>: [</span><br><span class="line">        <span class="comment"># 弹出输入用户名密码</span></span><br><span class="line">        <span class="string">"rest_framework.authentication.BasicAuthentication"</span>,</span><br><span class="line">        <span class="string">"rest_framework.authentication.SessionAuthentication"</span>  <span class="comment"># Session用于方便在DRF中调试使用</span></span><br><span class="line">        <span class="comment"># 'rest_framework.authentication.TokenAuthentication',  # TokenAuthentication，取消全局token，放在视图中进行</span></span><br><span class="line">        <span class="comment"># 'rest_framework_simplejwt.authentication.JWTAuthentication',  # djangorestframework_simplejwt 认证 用于前端登录认证</span></span><br><span class="line">    ]</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">MIDDLEWARE = [</span><br><span class="line">    <span class="string">'django.contrib.sessions.middleware.SessionMiddleware'</span>,</span><br><span class="line">    <span class="string">'django.contrib.auth.middleware.AuthenticationMiddleware'</span>,</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>每当一个request进来的时候，上面代码会将request里面的cookie里面的session id转换成request.user</p>
+<p>DRF提供4种认证类，包括</p>
+<ul>
+<li><code>BasicAuthentication</code>是通过base64对用户名和密码加密成字符串，<br>使用HTTP基本身份验证，该身份针对用户的用户名和密码进行了签名，但是易破解<br>在实际开发中一般仅适用于测试环境而不是生成环境<br>认证成功会把<code>request.user</code>设置<code>User</code>类的实例，<code>request.auth</code>设置为<code>None</code>，失败会在header添加www-Authentication</li>
+</ul>
+<p>源码</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_authorization_header</span>(<span class="params">request</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    Return request's 'Authorization:' header, as a bytestring.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    Hide some test client ickyness where the header can be unicode.</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    auth = request.META.get(<span class="string">'HTTP_AUTHORIZATION'</span>, <span class="string">b''</span>)</span><br><span class="line">    <span class="keyword">if</span> isinstance(auth, str):</span><br><span class="line">        <span class="comment"># Work around django test client oddness</span></span><br><span class="line">        auth = auth.encode(HTTP_HEADER_ENCODING)</span><br><span class="line">    <span class="keyword">return</span> auth</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BasicAuthentication</span>(<span class="params">BaseAuthentication</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    HTTP Basic authentication against username/password.</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    www_authenticate_realm = <span class="string">'api'</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">authenticate</span>(<span class="params">self, request</span>):</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        Returns a `User` if a correct username and password have been supplied</span></span><br><span class="line"><span class="string">        using HTTP Basic authentication.  Otherwise returns `None`.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        auth = get_authorization_header(request).split()</span><br><span class="line">        <span class="comment"># ['Basic', 'YWRtaW46YWRtaW4xMjM0NTY=']类似这样的格式</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> auth <span class="keyword">or</span> auth[<span class="number">0</span>].lower() != <span class="string">b'basic'</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> len(auth) == <span class="number">1</span>:</span><br><span class="line">            msg = _(<span class="string">'Invalid basic header. No credentials provided.'</span>)</span><br><span class="line">            <span class="keyword">raise</span> exceptions.AuthenticationFailed(msg)</span><br><span class="line">        <span class="keyword">elif</span> len(auth) &gt; <span class="number">2</span>:</span><br><span class="line">            msg = _(<span class="string">'Invalid basic header. Credentials string should not contain spaces.'</span>)</span><br><span class="line">            <span class="keyword">raise</span> exceptions.AuthenticationFailed(msg)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            <span class="keyword">try</span>:</span><br><span class="line">                auth_decoded = base64.b64decode(auth[<span class="number">1</span>]).decode(<span class="string">'utf-8'</span>)</span><br><span class="line">            <span class="keyword">except</span> UnicodeDecodeError:</span><br><span class="line">                auth_decoded = base64.b64decode(auth[<span class="number">1</span>]).decode(<span class="string">'latin-1'</span>)</span><br><span class="line">            auth_parts = auth_decoded.partition(<span class="string">':'</span>)</span><br><span class="line">            <span class="comment"># ('admin', ':', 'admin123456')`</span></span><br><span class="line">        <span class="keyword">except</span> (TypeError, UnicodeDecodeError, binascii.Error):</span><br><span class="line">            msg = _(<span class="string">'Invalid basic header. Credentials not correctly base64 encoded.'</span>)</span><br><span class="line">            <span class="keyword">raise</span> exceptions.AuthenticationFailed(msg)</span><br><span class="line"></span><br><span class="line">        userid, password = auth_parts[<span class="number">0</span>], auth_parts[<span class="number">2</span>]</span><br><span class="line">        <span class="keyword">return</span> self.authenticate_credentials(userid, password, request)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">authenticate_credentials</span>(<span class="params">self, userid, password, request=None</span>):</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        Authenticate the userid and password against username and password</span></span><br><span class="line"><span class="string">        with optional request for context.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        credentials = {</span><br><span class="line">            get_user_model().USERNAME_FIELD: userid,</span><br><span class="line">            <span class="string">'password'</span>: password</span><br><span class="line">        }</span><br><span class="line">        <span class="comment"># 调用 django 的 authenticate</span></span><br><span class="line">        user = authenticate(request=request, **credentials)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> user <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">            <span class="keyword">raise</span> exceptions.AuthenticationFailed(_(<span class="string">'Invalid username/password.'</span>))</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> user.is_active:</span><br><span class="line">            <span class="keyword">raise</span> exceptions.AuthenticationFailed(_(<span class="string">'User inactive or deleted.'</span>))</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> (user, <span class="literal">None</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">authenticate_header</span>(<span class="params">self, request</span>):</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">'Basic realm="%s"'</span> % self.www_authenticate_realm</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>request.META</code> 是一个 Python 字典， 包含了所有本次 HTTP 请求的 Header 信息， 比如用户认证、 IP 地址和用户 Agent（通常是浏览器的名称和版本号） 等。<br><code>HTTP_AUTHORIZATION</code> 用于获取 <code>HTTP authorization</code>。如果为空，将得到一个空的bytes对象。<br>当客户端传输的认证数据为:admin/admin123456,这里得到的数据是:<br><code>Basic YWRtaW46YWRtaW4xMjM0NTY=</code><br>通过 <code>split()</code>方法将通过空格其拆分成 <code>list</code>。 拆分后的数据是这样的： <code>['Basic', 'YWRtaW46YWRtaW4xMjM0NTY=']</code><br><code>auth_parts = base64.b64decode(auth[1]).decode('iso-8859-1').partition(':')</code><br>取出 list 中的加密串， 通过 base64 对加密串进行解码。 通过<code>decode()</code>方法以UTF-8编码对字符串进行解码。<code>partition()</code>方法以冒号<code>":"</code>为分隔符对字符串进行分割,得到的数据是： <code>('admin', ':', 'admin123456')</code><br>执行到这一行， 如果获取不到 Auth 信息， 将会抛 <code>(TypeError, UnicodeDecodeError, binascii.Error)</code> 异常， 通过 <code>try...except..</code>.进行异常捕捉， 如<br>果捕捉到异常将返回<code>AuthenticationFailed</code> 。<br><code>userid, password = auth_parts[0], auth_parts[2]</code><br>最后， 取出元组中对应的用户 id 和密码。 最终于数据： admin admin123456<br>再接来的处理过程我们就很熟悉了。 调用 Django 的认证模块， 对得到 Auth 信息进行认证。<br><code>return (user, None)</code>认证成功返回<code>user</code>，认证失败返回<code>None</code></p>
+<p>自定义用户认证功能需要继承重写<code>authenticate</code>在视图接口中调用刚开发的用户认证功能。</p>
+<ul>
+<li><p><code>SessionAuthentication</code>依赖django的会话，通常在前端js里面使用http ajax请求的时候用，需要给后端提供CSRF令牌<br>认证成功会把<code>request.user</code>设置<code>User</code>类的实例，<code>request.auth</code>设置为<code>None</code>，失败会返回403 forbidden。常见于浏览器，因为浏览器可以自动设置cookie，并将session和cookie传到浏览器，在后端分离项目中较少见；</p>
+</li>
+<li><p><code>TokenAuthentication</code>身份验证方案使用基于令牌的简单HTTP身份验证方案，适用于客户端-服务器设置，例如本地台式机和移动客户端，适用于前后端分离项目，也是本项目中身份验证的重点；<br>缺点</p>
+</li>
+<li><p>请求服务器生成的token只存在于一台被请求的服务器中，如果是分布式系统，为了数据一致，则需要将该服务器的数据同步到其他服务器，增加了操作和维护难度；</p>
+</li>
+<li><p>token没有过期时间，一旦登求完成后，这个 token是水久有效的,这是不安全的<br>基于 token的认证机制。只要登完成后便会返回一个 token,以后请求一些需要登录的api,就通<br>过传递这个 token就可以了,并且这个 token是存储在服务器的数据库中的</p>
+</li>
+</ul>
+<p>成功，<code>request.user</code> 是一个<code>User</code>类的实例，<code>request.auth</code> 是一个 <code>rest_framework.authtoken.models.Token</code> 实例。<br>未经身份验证的响应被拒绝将导致 HTTP 401 Unauthorized 的响应和相应的 WWW-Authenticate header。</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TokenAuthentication</span>(<span class="params">BaseAuthentication</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    Simple token based authentication.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    Clients should authenticate by passing the token key in the "Authorization"</span></span><br><span class="line"><span class="string">    HTTP header, prepended with the string "Token ".  For example:</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">        Authorization: Token 401f7ac837da42b97f613d789819ff93537bee6a</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line"></span><br><span class="line">    keyword = <span class="string">'Token'</span></span><br><span class="line">    model = <span class="literal">None</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_model</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">if</span> self.model <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">            <span class="keyword">return</span> self.model</span><br><span class="line">        <span class="keyword">from</span> rest_framework.authtoken.models <span class="keyword">import</span> Token</span><br><span class="line">        <span class="keyword">return</span> Token</span><br><span class="line"></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    A custom token model may be used, but must have the following properties.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    * key -- The string identifying the token</span></span><br><span class="line"><span class="string">    * user -- The user to which the token belongs</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">authenticate</span>(<span class="params">self, request</span>):</span></span><br><span class="line">        auth = get_authorization_header(request).split()</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> auth <span class="keyword">or</span> auth[<span class="number">0</span>].lower() != self.keyword.lower().encode():</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> len(auth) == <span class="number">1</span>:</span><br><span class="line">            msg = _(<span class="string">'Invalid token header. No credentials provided.'</span>)</span><br><span class="line">            <span class="keyword">raise</span> exceptions.AuthenticationFailed(msg)</span><br><span class="line">        <span class="keyword">elif</span> len(auth) &gt; <span class="number">2</span>:</span><br><span class="line">            msg = _(<span class="string">'Invalid token header. Token string should not contain spaces.'</span>)</span><br><span class="line">            <span class="keyword">raise</span> exceptions.AuthenticationFailed(msg)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            token = auth[<span class="number">1</span>].decode()</span><br><span class="line">        <span class="keyword">except</span> UnicodeError:</span><br><span class="line">            msg = _(<span class="string">'Invalid token header. Token string should not contain invalid characters.'</span>)</span><br><span class="line">            <span class="keyword">raise</span> exceptions.AuthenticationFailed(msg)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> self.authenticate_credentials(token)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">authenticate_credentials</span>(<span class="params">self, key</span>):</span></span><br><span class="line">        model = self.get_model()</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            token = model.objects.select_related(<span class="string">'user'</span>).get(key=key)</span><br><span class="line">        <span class="keyword">except</span> model.DoesNotExist:</span><br><span class="line">            <span class="keyword">raise</span> exceptions.AuthenticationFailed(_(<span class="string">'Invalid token.'</span>))</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> token.user.is_active:</span><br><span class="line">            <span class="keyword">raise</span> exceptions.AuthenticationFailed(_(<span class="string">'User inactive or deleted.'</span>))</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> (token.user, token)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">authenticate_header</span>(<span class="params">self, request</span>):</span></span><br><span class="line">        <span class="keyword">return</span> self.keyword</span><br></pre></td></tr></tbody></table></figure>
+
+<ul>
+<li><code>RemoteUserAuthentication</code> 通过此身份验证方案，可以将身份验证委派给Web服务器，要求服务器设置REMOTE_USER环境变量。</li>
+</ul>
+<h3 id="drf生成Token"><a href="#drf生成Token" class="headerlink" title="drf生成Token"></a>drf生成Token</h3><p><code>setting.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">INSTALLED_APPS = [</span><br><span class="line">    <span class="string">"rest_framework.authtoken"</span>,  <span class="comment"># DRF自带的token认证</span></span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"><span class="comment"># DRF 全局配置</span></span><br><span class="line">REST_FRAMEWORK = {</span><br><span class="line">    <span class="comment"># 配置默认认证类 authentication: 对用户登录的身份进行校验</span></span><br><span class="line">    <span class="string">"DEFAULT_AUTHENTICATION_CLASSES"</span>: [</span><br><span class="line">        <span class="string">"rest_framework.authentication.TokenAuthentication"</span>,</span><br><span class="line">    ]</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 或者pycharm Tools - Run manage.py Task</span></span><br><span class="line">migrations</span><br><span class="line">migrate</span><br></pre></td></tr></tbody></table></figure>
+<p>生成数据表<code>authtoken_token</code>，这个表和用户表是一一对应的。<br><code>user_id</code>是一个外键，指向<code>users_userprofile</code>表，<br>表中的<code>key</code>（即token）和user之间具有一对一的关系。</p>
+<p>如果之前已经创建了用户，在这个token表是没有记录的。<br>创建用户表后需要手动创建token表。<br>当用户注册时，需要调用<code>token = Token.objects.create(user=...)</code>来生成token。</p>
+<p>创建用户默认会生成一个对应的token值会保存到数据中，跟这个用户相关联。<br>其表结构如下：</p>
+<figure class="highlight sql"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">+<span class="comment">---------+-------------+------+-----+---------+-------+</span></span><br><span class="line">| Field   | Type        | Null | Key | Default | Extra |</span><br><span class="line">+<span class="comment">---------+-------------+------+-----+---------+-------+</span></span><br><span class="line">| key     | varchar(40) | NO   | PRI | NULL    |       |</span><br><span class="line">| created | datetime(6) | NO   |     | NULL    |       |</span><br><span class="line">| user_id | int(11)     | NO   | UNI | NULL    |       |</span><br><span class="line">+<span class="comment">---------+-------------+------+-----+---------+-------+</span></span><br><span class="line">3 rows in <span class="keyword">set</span> (<span class="number">0.01</span> sec)</span><br></pre></td></tr></tbody></table></figure>
+
+<h4 id="方式一-manage-py-生成Token"><a href="#方式一-manage-py-生成Token" class="headerlink" title="方式一 manage.py 生成Token"></a>方式一 <code>manage.py</code> 生成Token</h4><figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python manage.py drf_create_token admin  <span class="comment"># admin是用户名</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>只能供管理员测试，每新增一个用户就要手动输入一条命令太麻烦</p>
+<figure class="highlight sql"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">+<span class="comment">------------------------------------------+----------------------------+---------+</span></span><br><span class="line">| key                                      | created                    | user_id |</span><br><span class="line">+<span class="comment">------------------------------------------+----------------------------+---------+</span></span><br><span class="line">| 236de0331b3e5a89665771f9aaff9be720cbba04 | 2021-05-27 08:29:47.306382 |       1 |</span><br><span class="line">+<span class="comment">------------------------------------------+----------------------------+---------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.01</span> sec)</span><br></pre></td></tr></tbody></table></figure>
+
+<h4 id="方式二-Django信号机制自动生成Token"><a href="#方式二-Django信号机制自动生成Token" class="headerlink" title="方式二 Django信号机制自动生成Token"></a>方式二 Django信号机制自动生成Token</h4><p>在新建用户的时候触发一个信号，执行一个函数能生成Token<br>提供获取Token的API接口给每个用户</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.conf <span class="keyword">import</span> settings  <span class="comment"># 不要用相对导入的方式导入配置文件</span></span><br><span class="line"><span class="keyword">from</span> django.db.models.signals <span class="keyword">import</span> post_save</span><br><span class="line"><span class="keyword">from</span> django.dispatch <span class="keyword">import</span> receiver</span><br><span class="line"><span class="keyword">from</span> rest_framework.authtoken.models <span class="keyword">import</span> Token</span><br><span class="line"></span><br><span class="line"><span class="meta">@receiver(post_save, sender=settings.AUTH_USER_MODEL)  # Django的信号机制</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">generate_token</span>(<span class="params">sender, instance=None, created=False, **kwargs</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    当User模型类创建用户实例并保存的时候，调用safe方法传递信号给receiver自动生成Token</span></span><br><span class="line"><span class="string">    :param sender:</span></span><br><span class="line"><span class="string">    :param instance:新建的用户实例</span></span><br><span class="line"><span class="string">    :param created:</span></span><br><span class="line"><span class="string">    :param kwargs:</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="keyword">if</span> created:</span><br><span class="line">        Token.objects.create(user=instance)</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>drf_tutorial\urls.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework.authtoken <span class="keyword">import</span> views</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    <span class="comment"># drf 自带的获取Token的接口，没有设置过期刷新之类的功能</span></span><br><span class="line">    path(<span class="string">"api-token-auth/"</span>, views.obtain_auth_token),</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>可以使用HTTP请求模拟发送工具进行发送参数创建，通过携带数据访问<a target="_blank" rel="noopener" href="http://127.0.0.1:8000/api-token-auth/">http://127.0.0.1:8000/api-token-auth/</a>，<br>生成了当前用户的token并获取到，同时将生成的token和当前用户存入表authtoken_token中</p>
+<p><img src="/2020/08/21/drf-ren-zheng-he-quan-xian/1.png" alt="description"></p>
+<p>登录后台，新建用户，激活员工，数据表<code>authtoken_token</code>的key值会增加一个</p>
+<p>获取token需要用户名密码认证<br>用POST方法在客户端身份验证 postman获取，选择no-auth<br>body</p>
+<figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">{</span><br><span class="line">    <span class="attr">"username"</span>: <span class="string">"user01"</span>,</span><br><span class="line">    <span class="attr">"password"</span>: <span class="string">"my123password"</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>body设为none ,Auth设为API Key</p>
+<figure class="highlight apache"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Key</span>: Authorization</span><br><span class="line"><span class="attribute">Value</span>: <span class="number">69</span>d<span class="number">53</span>cdb<span class="number">0</span>b<span class="number">395</span>d<span class="number">638</span>b<span class="number">50</span>b<span class="number">51</span>d<span class="number">5</span>f<span class="number">3008</span>f<span class="number">66499</span>b<span class="number">4</span>b<span class="number">8</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>对于客户端进行身份验证，在 Authorization HTTP header 中。<br>密钥关键字应以字符串文字 <code>Token</code> 为前缀，用空格分隔两个字符串。例如：<br><code>Authorization</code>: <code>Token 9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b</code></p>
+<p>注意： 如果您想在 header 中使用不同的关键字（例如 Bearer），只需子类化 TokenAuthentication 并设置 keyword 类变量。</p>
+<p>此时再使用获取到的Token请求商品数据如下：<br><img src="/2020/08/21/drf-ren-zheng-he-quan-xian/2.png" alt="description"></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get</span>(<span class="params">self, request</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    :param request:</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    queryset = Course.objects.all()</span><br><span class="line">    s = CourseSerializer(instance=queryset,</span><br><span class="line">                         many=<span class="literal">True</span>)  <span class="comment"># 这里是instance = xx 查询集</span></span><br><span class="line">    print(type(request), type(request.data), type(s), type(s.data))</span><br><span class="line">    <span class="comment"># &lt;class 'rest_framework.request.Request'&gt; &lt;class 'dict'&gt; &lt;class 'rest_framework.serializers.ListSerializer'&gt; &lt;class 'rest_framework.utils.serializer_helpers.ReturnList'&gt;</span></span><br><span class="line">    print(self.request.user, self.request.auth)  <span class="comment"># admin None 默认模式</span></span><br><span class="line">    print(type(self.request.user), type(self.request.auth))</span><br><span class="line">    <span class="comment"># &lt;class 'django.contrib.auth.models.User'&gt; &lt;class 'NoneType'&gt; 默认模式</span></span><br><span class="line">    <span class="comment"># user01 69d53cdb0b395d638b50b51d5f3008f66499b4b8 token模式</span></span><br><span class="line">    <span class="comment"># &lt;class 'django.contrib.auth.models.User'&gt; &lt;class 'rest_framework.authtoken.models.Token'&gt;  token模式</span></span><br><span class="line">    <span class="keyword">return</span> Response(s.data, status=status.HTTP_200_OK)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>认证成功会把<code>request.user</code>设置<code>User</code>类的实例，<code>request.auth</code>设置为数据表<code>authtoken_token</code>的key值<code>69d53cdb0b395d638b50b51d5f3008f66499b4b8</code>，失败会在header添加www-Authentication</p>
+<p>viewsets设置认证类<br>在使用token认证时，如果token不正确，则会抛出异常，<br>并且如果对于本来不需要认证即可访问的公开数据要是再需要正确的token才能访问的话，就会降低项目的友好性，<br>此时可以对token不采用全局设置，在需要配置认证的视图接口中进行<code>authentication_classes</code>认证判断</p>
+<p>分接口配置认证。解决某些接口需要认证才可以访问，某些接口不需要认证就可以访问</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework.authentication <span class="keyword">import</span> TokenAuthentication</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 没有登录打开对应url不会弹出帐密输入框了，因为自定义了认证类不再继承BasicAuthentication</span></span><br><span class="line">    authentication_classes = [TokenAuthentication]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>此时再请求<a target="_blank" rel="noopener" href="http://127.0.0.1:8000/mine/">http://127.0.0.1:8000/mine/</a>，request.user即为当前用户admin。</p>
+<h2 id="drf权限"><a href="#drf权限" class="headerlink" title="drf权限"></a>drf权限</h2><p>仅进行身份验证或标识不足以获取信息或代码。为此，请求访问的实体必须具有<strong>授权</strong>。<strong>权限与身份验证和限制</strong>一起，确定是否应准予请求访问或拒绝访问。权限检查始终在视图的开始处运行，然后再允许执行其他任何代码，通常会使用<code>request.user</code>和<code>request.auth</code>属性中的身份验证信息来确定是否应允许传入请求。</p>
+<p>权限用于授予或拒绝不同类别的用户对API不同部分的访问，最简单的许可方式是允许访问任何经过身份验证的用户，并拒绝访问任何未经身份验证的用户。</p>
+<p>常见的权限<br><code>from rest_framework.permissions import IsAuthenticated</code> 只有登录才能进行操作，不登录不能进行任何操作 将拒绝任何未经身份验证的用户的权限，否则将允许权限。<br><code>from rest_framework.permissions import AllowAny</code><br><code>from rest_framework.permissions import IsAdminUser</code> 是不是管理员<code>request.user.is_staff</code>员工<br><code>from rest_framework.permissions import IsAuthenticatedOrReadOnly</code></p>
+<p>常用的权限类设置权限策略<br>如何自定义对象级别权限<br>权限检测后的处理，认证URL设置，全局权限控制与ViewSet的权限。</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># DRF 全局配置</span></span><br><span class="line">REST_FRAMEWORK = {</span><br><span class="line">    <span class="comment"># 配置默认授权类 权限permisson: 对登录验证通过的用户能访问的api和对api能取得的对应级别数据</span></span><br><span class="line">    <span class="string">"DEFAULT_PERMISSION_CLASSES"</span>: [</span><br><span class="line">        <span class="comment"># "rest_framework.permissions.AllowAny",  # 默认，允许所有请求，不需要认证</span></span><br><span class="line">        <span class="string">"rest_framework.permissions.IsAuthenticated"</span></span><br><span class="line">    ]</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="DRF自定义BasePermission验证所有者"><a href="#DRF自定义BasePermission验证所有者" class="headerlink" title="DRF自定义BasePermission验证所有者"></a>DRF自定义BasePermission验证所有者</h3><p>DRF也提供了自定义权限功能，要实现自定义权限，覆盖<code>BasePermission</code>并实现以下方法之一或两者都实现：<br><code>.has_permission(self, request, view)</code><br><code>.has_object_permission(self, request, view, obj)</code></p>
+<p>如果应该授予请求访问权，则方法应该返回True，否则返回False。</p>
+<p>如果鉴权失败，自定义权限将引发一个PermissionDenied异常。要更改与异常关联的错误消息，直接在自定义权限上实现message属性。否则，将使用PermissionDenied中的default_detail属性。</p>
+<h3 id="设置登录的用户能查看修改自己的信息、收藏等数据，不能修改别人的信息"><a href="#设置登录的用户能查看修改自己的信息、收藏等数据，不能修改别人的信息" class="headerlink" title="设置登录的用户能查看修改自己的信息、收藏等数据，不能修改别人的信息"></a>设置登录的用户能查看修改自己的信息、收藏等数据，不能修改别人的信息</h3><p><a target="_blank" rel="noopener" href="https://www.django-rest-framework.org/tutorial/4-authentication-and-permissions/#object-level-permissions">https://www.django-rest-framework.org/tutorial/4-authentication-and-permissions/#object-level-permissions</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.django-rest-framework.org/api-guide/permissions/#custom-permissions">https://www.django-rest-framework.org/api-guide/permissions/#custom-permissions</a></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SAFE_METHODS = (<span class="string">'GET'</span>, <span class="string">'HEAD'</span>, <span class="string">'OPTIONS'</span>)  <span class="comment"># 源码规定</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>Really we’d like all code courses to be visible to anyone, but also make sure that only the user that created a code course is able to update or delete it.</p>
+<p>To do that we’re going to need to create a custom permission.</p>
+<p>In the course app, create a new file,</p>
+<p>把官网的实例，直接复制过来就可以了，把<code>object.owner</code>其中的<code>owner</code>改为<code>user</code><br>同时需要自定义权限来判断要删除的收藏记录是否是当前的用户。</p>
+<p><code>utils/permissions.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework <span class="keyword">import</span> permissions</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">IsOwnerOrReadOnly</span>(<span class="params">permissions.BasePermission</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    Custom permission to only allow owners of an object to edit it.</span></span><br><span class="line"><span class="string">    自定义所有者权限：只允许对象的所有者能够编辑</span></span><br><span class="line"><span class="string">    Object-level permission to only allow owners of an object to edit it.</span></span><br><span class="line"><span class="string">    Assumes the model instance has an `user` attribute.</span></span><br><span class="line"><span class="string">    对象级别的权限，仅允许对象的所有者对其进行编辑</span></span><br><span class="line"><span class="string">    模型实例有一个 user 属性，指向用户的外键。</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">has_object_permission</span>(<span class="params">self, request, view, obj</span>):</span></span><br><span class="line">        <span class="comment"># Read permissions are allowed to any request,所有的请求都有读权限，</span></span><br><span class="line">        <span class="comment"># so we'll always allow GET, HEAD or OPTIONS requests.，所以我们总是允许GET、HEAD或OPTIONS请求。</span></span><br><span class="line">        <span class="keyword">if</span> request.method <span class="keyword">in</span> permissions.SAFE_METHODS:</span><br><span class="line">            <span class="comment"># SAFE_METHODS = ("GET", "HEAD", "OPTIONS")</span></span><br><span class="line">            <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># Instance must have an attribute named `owner`.</span></span><br><span class="line">        <span class="comment"># 实例必须有一个名为user的属性。</span></span><br><span class="line">        <span class="comment"># 只有当对象的user和当前登录user一样，才返回True，对象的所有者才有权限</span></span><br><span class="line">        <span class="comment"># obj = queryset = Course.objects.all()</span></span><br><span class="line">        <span class="comment"># 这里要把owner改为我们数据库中的user</span></span><br><span class="line">        <span class="keyword">return</span> obj.user == request.user</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> utils.permissions <span class="keyword">import</span> IsOwnerOrReadOnly</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment"># IsAuthenticated：必须登录用户；IsOwnerOrReadOnly：必须是当前登录的用户</span></span><br><span class="line">    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]</span><br></pre></td></tr></tbody></table></figure>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/enumerate-mei-ju/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/enumerate-mei-ju/" class="post-title-link" itemprop="url">python enumerate枚举</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-06-08 10:55:41" itemprop="dateModified" datetime="2021-06-08T10:55:41Z">2021-06-08</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>将一个可遍历的数据对象(如列表、元组或字符串)组合为一个索引序列，<br>同时列出数据和数据下标</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">seasons = [<span class="string">'Spring'</span>, <span class="string">'Summer'</span>, <span class="string">'Fall'</span>, <span class="string">'Winter'</span>]</span><br><span class="line">print(enumerate(seasons))  <span class="comment"># &lt;enumerate object at 0x00000217ADAB6F40&gt;</span></span><br><span class="line">print(list(enumerate(seasons)))  <span class="comment"># 下标从 0 开始</span></span><br><span class="line"><span class="comment"># [(0, 'Spring'), (1, 'Summer'), (2, 'Fall'), (3, 'Winter')]</span></span><br><span class="line">print(list(enumerate(seasons, start=<span class="number">1</span>)))  <span class="comment"># 下标从 1 开始</span></span><br><span class="line"><span class="comment"># [(1, 'Spring'), (2, 'Summer'), (3, 'Fall'), (4, 'Winter')]</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># for 循环使用 enumerate的对象</span></span><br><span class="line"><span class="keyword">for</span> i, val <span class="keyword">in</span> enumerate(seasons):</span><br><span class="line">    print(i, seasons[i])</span><br><span class="line"><span class="comment"># 0 Spring</span></span><br><span class="line"><span class="comment"># 1 Summer</span></span><br><span class="line"><span class="comment"># 2 Fall</span></span><br><span class="line"><span class="comment"># 3 Winter</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># for 循环使用 enumerate对象的列表</span></span><br><span class="line">print(<span class="string">'------'</span>)</span><br><span class="line"><span class="keyword">for</span> i, val <span class="keyword">in</span> list(enumerate(seasons)):</span><br><span class="line">    print(i, seasons[i])</span><br><span class="line"><span class="comment"># 0 Spring</span></span><br><span class="line"><span class="comment"># 1 Summer</span></span><br><span class="line"><span class="comment"># 2 Fall</span></span><br><span class="line"><span class="comment"># 3 Winter</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># for 循环使用 enumerate对象的列表</span></span><br><span class="line">print(<span class="string">'------'</span>)</span><br><span class="line"><span class="keyword">for</span> i, val <span class="keyword">in</span> list(enumerate(seasons)):</span><br><span class="line">    print(i, seasons[i])</span><br><span class="line"><span class="comment"># 0 Spring</span></span><br><span class="line"><span class="comment"># 1 Summer</span></span><br><span class="line"><span class="comment"># 2 Fall</span></span><br><span class="line"><span class="comment"># 3 Winter</span></span><br><span class="line"></span><br><span class="line">i = <span class="number">0</span></span><br><span class="line">print(<span class="string">'------'</span>)</span><br><span class="line"><span class="keyword">for</span> val <span class="keyword">in</span> seasons:  <span class="comment"># 普通的 for 循环，不使用 enumerate</span></span><br><span class="line">    print(i, seasons[i])</span><br><span class="line">    i += <span class="number">1</span></span><br><span class="line"><span class="comment"># 0 Spring</span></span><br><span class="line"><span class="comment"># 1 Summer</span></span><br><span class="line"><span class="comment"># 2 Fall</span></span><br><span class="line"><span class="comment"># 3 Winter</span></span><br><span class="line"></span><br><span class="line">seasons = [<span class="string">'Spring'</span>, <span class="string">'Summer'</span>, <span class="string">'Fall'</span>, <span class="string">'Winter'</span>]</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i, val <span class="keyword">in</span> list(enumerate(seasons)):</span><br><span class="line">    print(val)</span><br><span class="line"><span class="comment"># Spring</span></span><br><span class="line"><span class="comment"># Summer</span></span><br><span class="line"><span class="comment"># Fall</span></span><br><span class="line"><span class="comment"># Winter</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>上面的第5行并没有打印index，实际上有些情况下，我们并不会使用index这个变量。<br>但是这个时候index的变量不使用但是index这个名称却被占用了，所以这个时候我们就可以使用匿名变量。将上面的index改为下划线 <code>_</code>，表示这个地方的变量是一个匿名变量。这样既不用占用变量名又可以多一个占位符。<br>将上面的代码改成：</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">seasons = [<span class="string">'Spring'</span>, <span class="string">'Summer'</span>, <span class="string">'Fall'</span>, <span class="string">'Winter'</span>]</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> _, val <span class="keyword">in</span> list(enumerate(seasons)):</span><br><span class="line">    print(val)</span><br><span class="line"><span class="comment"># Spring</span></span><br><span class="line"><span class="comment"># Summer</span></span><br><span class="line"><span class="comment"># Fall</span></span><br><span class="line"><span class="comment"># Winter</span></span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">print_multiple_args</span>(<span class="params">*args</span>):</span></span><br><span class="line">    print(type(args), args)</span><br><span class="line">    <span class="keyword">for</span> k, val <span class="keyword">in</span> enumerate(args):</span><br><span class="line">        print(k, val)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">print(<span class="string">'======'</span>)</span><br><span class="line">print_multiple_args(<span class="string">'a'</span>, <span class="string">'b'</span>, <span class="string">'c'</span>)  <span class="comment"># 法一</span></span><br><span class="line">print(<span class="string">'======'</span>)</span><br><span class="line">print_multiple_args(*[<span class="string">'a'</span>, <span class="string">'b'</span>, <span class="string">'c'</span>])  <span class="comment"># 法二 列表打包成关键字参数</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 给定一个整数数组和一个目标值，找出数组中和为目标值的两个整数，并返回它们的数组下标</span></span><br><span class="line">nums = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">4</span>, <span class="number">3</span>]</span><br><span class="line">target = <span class="number">8</span></span><br><span class="line">print(<span class="string">'-----'</span>)</span><br><span class="line"><span class="keyword">for</span> i, j <span class="keyword">in</span> enumerate(nums):</span><br><span class="line">    <span class="keyword">if</span> target - j <span class="keyword">in</span> nums[i + <span class="number">1</span>:]:</span><br><span class="line">        <span class="comment"># 字符串.index(子串,起始位置,结束位置)    返回开始的索引值，没找到则抛出异常。</span></span><br><span class="line">        print([i, nums[i + <span class="number">1</span>:].index(target - j) + i + <span class="number">1</span>])</span><br><span class="line"></span><br><span class="line">print(<span class="string">'******'</span>)</span><br><span class="line"><span class="comment"># .items 处理可遍历的字典，返回元组数组。</span></span><br><span class="line">dictionary = {<span class="string">'Name'</span>: <span class="string">'Runoob'</span>, <span class="string">'Age'</span>: <span class="number">7</span>}</span><br><span class="line"></span><br><span class="line">print(<span class="string">"Value : %s"</span> % dictionary.items())</span><br><span class="line"><span class="comment"># Value : dict_items([('Name', 'Runoob'), ('Age', 7)])</span></span><br><span class="line">print(type(dictionary.items()), dictionary.items())</span><br><span class="line"><span class="comment"># &lt;class 'dict_items'&gt; dict_items([('Name', 'Runoob'), ('Age', 7)])</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">print_kwargs</span>(<span class="params">**kwargs</span>):</span></span><br><span class="line">    print(type(kwargs), kwargs)</span><br><span class="line">    <span class="keyword">for</span> key, val <span class="keyword">in</span> kwargs.items():</span><br><span class="line">        print(<span class="string">'{}：{}'</span>.format(key, val))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">print(<span class="string">'---------'</span>)</span><br><span class="line">print_kwargs(a=<span class="number">1</span>, b=<span class="number">2</span>)  <span class="comment"># 法一</span></span><br><span class="line"><span class="comment"># &lt;class 'dict'&gt; {'a': 1, 'b': 2}</span></span><br><span class="line"><span class="comment"># a：1</span></span><br><span class="line"><span class="comment"># b：2</span></span><br><span class="line">print(<span class="string">'---------'</span>)</span><br><span class="line">print_kwargs(**dict(a=<span class="number">1</span>, b=<span class="number">2</span>))  <span class="comment"># 法二 字典打包成关键字参数</span></span><br><span class="line"><span class="comment"># &lt;class 'dict'&gt; {'a': 1, 'b': 2}</span></span><br><span class="line"><span class="comment"># a：1</span></span><br><span class="line"><span class="comment"># b：2</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">print_all</span>(<span class="params">a, *args, **kwargs</span>):</span></span><br><span class="line">    print(a)</span><br><span class="line">    <span class="keyword">if</span> args:</span><br><span class="line">        print(args)</span><br><span class="line">    <span class="keyword">if</span> kwargs:</span><br><span class="line">        print(kwargs)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">print(<span class="string">'--------'</span>)</span><br><span class="line">print_all(<span class="string">'hello'</span>, <span class="string">'world'</span>, name=<span class="string">'cyf'</span>)</span><br><span class="line"><span class="comment"># hello</span></span><br><span class="line"><span class="comment"># ('world',)</span></span><br><span class="line"><span class="comment"># {'name': 'cyf'}</span></span><br></pre></td></tr></tbody></table></figure><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/flask-restful-xiang-mu/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/flask-restful-xiang-mu/" class="post-title-link" itemprop="url">flask restful项目</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-04-22 13:05:52" itemprop="dateModified" datetime="2021-04-22T13:05:52Z">2021-04-22</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>setting.通用的配置</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -887,930 +1522,8 @@ type="text"是⽤来设置⽂本域的，size属性表示⽂本域的宽 度为�
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/java-ji-chu/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/java-ji-chu/" class="post-title-link" itemprop="url">java基础</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-18 12:30:06" itemprop="dateModified" datetime="2021-04-18T12:30:06Z">2021-04-18</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>JVM Java Virtual Machine java虚拟机<br>JVM是java平台无关性实现的关键</p>
-<h3 id="Java程序执行过程"><a href="#Java程序执行过程" class="headerlink" title="Java程序执行过程"></a>Java程序执行过程</h3><p>源文件.java 编译器compiler 字节码文件.class 解释器interpreter 程序</p>
-<p>JDK Java Development Kit 软件开发工具包<br>两个主要主键</p>
-<ul>
-<li>javac 编译器，将源程序转化为字节码</li>
-<li>java 运气编译后的java程序 (.class后缀的)</li>
-</ul>
-<h3 id="JRE-Java-Runtime-Environment"><a href="#JRE-Java-Runtime-Environment" class="headerlink" title="JRE Java Runtime Environment"></a>JRE Java Runtime Environment</h3><p>包括Java虛拟机(JVM)、Java核心类库和支持文件<br>如果只需要运行Java程序,下载并安装JRE即可<br>如果要开发Java软件，需要下载JDK<br>在JDK中附带有JRE</p>
-<p>JRE = JVM+ Javase标准类库<br>JDK = JRE+开发工具集(例如 Javac编译工具等)</p>
-<p>Java se Java标准版 桌面程序<br>Java ee Java企业版 Web程序<br>Java me Java微型版 为移动设备提供了基于Java环境的开发与应用平台</p>
-<h3 id="编码流程："><a href="#编码流程：" class="headerlink" title="编码流程："></a>编码流程：</h3><p>创建java项目：java project （src 是存放源文件）<br>创建程序包：src目录下右击建（package程序包）<br>编写java源程序：package目录下右击建（class源代码文件）<br>运行java程序：源文件空白处右击选择run as -&gt;java anclication 运行成功<br>（1）创建一个java Project<br>（2）src——创建包java package （Eclipse中的src是用来放置我们的源代码文件；关于Package<br>包名：域名的反向<br>例如：com.imooc<br>class命名：文件开头大写）<br>（3）在包下创建类Java class<br>（4）编写Java源程序： </p>
-<figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HelloWord</span></span>{</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span></span>{\</span><br><span class="line">System.out.println(<span class="string">"I Love Imooc"</span>);</span><br><span class="line">} </span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.imooc;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HelloImooc</span> </span>{</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>{</span><br><span class="line">        System.out.println(<span class="string">"Hello,imooc!"</span>);</span><br><span class="line">        System.out.println(<span class="string">"我爱学Java!"</span>);</span><br><span class="line">            String a =<span class="string">"hello"</span>;</span><br><span class="line">       String b =<span class="string">"www.imooc.com"</span>;</span><br><span class="line">    System.out.println(a+<span class="string">"\n"</span>+b);</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">}</span><br><span class="line"><span class="comment">// cd C:\python代码\步骤4 Flask基础及项目实战\Java初识-src\ImoocProj\src</span></span><br><span class="line"><span class="comment">// 编译:C:\code&gt;javac com/imooc/HelloImooc.java</span></span><br><span class="line"><span class="comment">// 运行:C:\code&gt;java com.imooc.HelloImooc</span></span><br></pre></td></tr></tbody></table></figure>
-
-<blockquote>
-<p>Java中的关键字是有对编译器有特殊意义的词，区分大小写</p>
-</blockquote>
-<ul>
-<li><code>class</code>是用来定义类的关键字，编译器遇到class就知道这是创建定义了一个类。</li>
-<li><code>public</code>可以删掉，公共的</li>
-<li><code>static</code> 定义静态成员的关键字</li>
-<li><code>main</code> 主方法定义，程序的入口</li>
-<li><code>void</code> 方法返回值的关键字，但 Void 就不是了</li>
-<li><code>System</code>首字母大写</li>
-</ul>
-<p>保留字是Java预留的关键字，虽然现在还没有作为关键字，但是以后的升级版本中会成为关键字<br>保留字包括：goto、const</p>
-<p>程序的移植<br>导出：找到项目右击-&gt;properties-&gt;location处显示的就是文件位置-&gt;拷贝-&gt;删除源程序（可略）<br>导入：右侧空白处-&gt;import-&gt;General-&gt;exiting Projects into workspace-&gt;找到导入的项目-&gt;导入</p>
-<h3 id="使用标识符identifier-时，需要遵守几条规则："><a href="#使用标识符identifier-时，需要遵守几条规则：" class="headerlink" title="使用标识符identifier 时，需要遵守几条规则："></a>使用标识符identifier 时，需要遵守几条规则：</h3><ol>
-<li><p>&nbsp;标识符首字母可以是字母、下划线（_）、美元符（$），加上任意多的数字字母、下划线（_）、美元符（$）组成<br>但不能包含下划线（_）、美元符（$）以外的其它特殊字符开头， @、%、空格等<br>不能以数字开头。譬如：123name&nbsp;就是不合法滴</p>
-</li>
-<li><p>&nbsp;标识符不能是 Java 关键字和保留字，但可以包含关键字和保留字。<br>如：不可以使用&nbsp;void&nbsp;作为标识符，但是&nbsp;Myvoid&nbsp;可以</p>
-</li>
-<li><p>变量名由多单词组成时，第一个单词的首字母小写，其后单词的首字母大写，<br>称驼峰命名法），如 myAge</p>
-</li>
-<li><p>变量命名时，尽量简短且能清楚的表达变量的作用，做到见名知意。<br>如：定义变量名 stuName&nbsp;保存“学生姓名”信息</p>
-</li>
-</ol>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">```print(x + '\n')```输出后不换行</span><br><span class="line">```println()```换行</span><br><span class="line">```println(x)```输出后换行</span><br><span class="line"></span><br><span class="line">### 常量：指程序里持续不变的值</span><br><span class="line">在整个程序运行过程中它是不可改变的。</span><br><span class="line">在声明数定量或变量时，必须制定数据类型。</span><br><span class="line">```final```关键字修饰的常量无法再次赋值</span><br><span class="line"></span><br><span class="line">### 常量名的命名规则 </span><br><span class="line">变量名用大写</span><br><span class="line">```java</span><br><span class="line">        final int N = 6;</span><br><span class="line">        final double PI = 3.14159;</span><br><span class="line">        final double MIN_VALUE = 0;</span><br></pre></td></tr></tbody></table></figure>
-
-<h3 id="变量：在程序运行过程中随时发生变化的来量，程序中数据的临时存放场所"><a href="#变量：在程序运行过程中随时发生变化的来量，程序中数据的临时存放场所" class="headerlink" title="变量：在程序运行过程中随时发生变化的来量，程序中数据的临时存放场所"></a>变量：在程序运行过程中随时发生变化的来量，程序中数据的临时存放场所</h3><p>申请内存来存储值。也就是说，当创建变量的时候，需要在内存中申请空间。<br>内存管理系统根据变量的类型为变量分配存储空间，分配的空间只能用来储存该类型数据。<br>java变量先定义后使用</p>
-<p>变量的三个元素：变量类型、变量名和变量值。<br>通过定义不同类型的变量，可以在内存中储存整数、小数或者字符<br>变量 存的是数据值，直接放在抽屉里的东西 入住的客人<br>变量名，抽屉名字 房间名<br>变量类型 房价类型</p>
-<h3 id="变量名的命名规则"><a href="#变量名的命名规则" class="headerlink" title="变量名的命名规则"></a>变量名的命名规则</h3><ul>
-<li>满足标识符命名规则</li>
-<li>符合驼峰法命名规范，一个单词所有字母小写，多个单词第一个单词全部小写，后面的单词首字母大写，age,stuName</li>
-<li>尽量简单，做到见名知意</li>
-<li>变量名的长度没有限制</li>
-</ul>
-<h3 id="类的命名规则"><a href="#类的命名规则" class="headerlink" title="类的命名规则"></a>类的命名规则</h3><ul>
-<li>满足Pascal命名法规范<br>当类名是一个单词，首字母大写，多个单词组成，每一个首字母大写</li>
-</ul>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/jenkins/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/jenkins/" class="post-title-link" itemprop="url">持续集成 jenkins</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-05-02 11:02:19" itemprop="dateModified" datetime="2021-05-02T11:02:19Z">2021-05-02</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%B5%8B%E8%AF%95/" itemprop="url" rel="index"><span itemprop="name">测试</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>整个产品的研发到测试到发布的生命周期自动化</p>
-<p>互联网软件的开发和发布，已经形成了一套标准流程，最重要的组成部分就是持续集成( Continuous<br>Integration,简称C|)。</p>
-<p>持续集成指的是频繁的将代码集成到主干。它的好处主要有两个：</p>
-<ul>
-<li>快速发现错误。每完成一点更新，就集成到主干，可以快速发现错误，定位错误也比较容易。</li>
-<li>防止分支大幅偏离主干。如果不是经常集成，主干又在不断更新，会导致以后集成的难度变大，甚至难以集成。</li>
-</ul>
-<p>持续集成的目的，就是让产品可以快速迭代，同时还能保持高质量。<br>它的核心措施是代码集成到主干之前，必须通过自动化测试，只要有一个测试用例失败，就不能集成。<br>编程大师Martin Fowler曾经说过：“持续集成并不能消除Bug，而是让它们非常容易发现和改正。”<br>它的前提是能够做到完善的自动化测试，自动的构建部署</p>
-<p>持续集成思想</p>
-<ul>
-<li>持续集成是一种软件开发实践，即团队开发成员经常集成他们的工作，通过每个成员每天至少集成一次，也就意味着每天可能会发生多次集成。</li>
-<li>每次集成都通过自动化的构建（包括编译，发布，自动化测试）来验证，从而尽早地发现集成错误。</li>
-</ul>
-<p>接口测试的持续集成</p>
-<p>为了快速的产出高质量的软件，在团队开发中持续集成（CI）是一个非常重要的环节。所谓CI，就是一种让计算机自动任意次重复编译、测试、汇报等工作的方法，通过CI可以帮助开发者提早发现问题，降低各种人为失误给项目带来的风险。按照经典的软件过程模型（瀑布模型），集成的工作一般要等到所有的开发工作都结束后才能开始，但这个时候如果发现了问题，修复问题的代价是非常具体的。基本上，集成实施得越晚，代码量越大，解决问题就越困难。持续集成将版本控制、自动化构建、代码测试融入到一起，让这些工作变得自动化和可协作。由于其频繁重复整个开发流程（在指定时间内多次pull源代码并运行测试代码），所以能帮助开发者提早发现问题。</p>
-<p>自动化持续集成分为两种方向，一种是针对代码，开发人员每次提交代码，会自动开始进行部署自动化测试，自动化测试代码也是一样的，当每次进行提交，可以让它自动执行自动化测试，自动跑一遍，验证代码，目的是第二种，当有开发代码进行部署之后，用最新版本的自动化测试代码来验证有没有问题</p>
-<p>持续集成核心要素</p>
-<ol>
-<li>统一的代码库</li>
-<li>自动构建</li>
-<li>自动测试</li>
-<li>每个人每天都要向代码库主干提交代码</li>
-<li>每次代码递交后都会在持续集成服务器上触发一次构建</li>
-<li>保证快速构建</li>
-<li>模拟生产环境的自动测试</li>
-<li>每个人都可以很容易的获取最新可执行的应用程序</li>
-<li>每个人都清楚正在发生的状况</li>
-<li>自动化的部署</li>
-</ol>
-<p>持续集成对于编译型语言的意义更大，对于Python这样的解释型语言，更多的时候是用于对接版本控制系统触发自动化测试并产生相应的报告，类似的功能也可以通过配置<strong>Webhook</strong>来完成。如果要通过Docker这样的虚拟化容器进行项目打包部署或者通过K8S进行容器管理，可以在持续集成平台安装对应的插件来支持这些功能。码云甚至可以直接对接<a target="_blank" rel="noopener" href="https://ding-doc.dingtalk.com/">钉钉开放平台</a>使用钉钉机器人来向项目相关人员发送即时消息。GitLab也对CI和CD（持续交付）提供了支持，具体内容请大家参考<a target="_blank" rel="noopener" href="https://blog.stdioa.com/2018/06/gitlab-cicd-fundmental/">《GitLab CI/CD基础教程》</a>。</p>
-<p>Jenkins介绍</p>
-<ul>
-<li> Jenkins 是一个可扩展的持续集成引擎</li>
-<li> 是所有CI产品中在安装和配置上最简单的</li>
-<li> 基于Web访问，用户界面非常友好、直观和灵活</li>
-</ul>
-<p>主要用于：</p>
-<ol>
-<li>持续、自动地构建/测试软件项目</li>
-<li>监控一些定时执行的任务</li>
-</ol>
-<p>Jenkins特点</p>
-<ul>
-<li>Jenkins是基于Java开发的</li>
-<li>但它不仅限于构建基于Java的软件</li>
-<li>Jenkins拥有大量的插件，这些插件极大的扩展了Jenkins的功能，可以直接通过web界面来进行安装与管理</li>
-<li>可以快捷的与代码库、ant、maven集成，执行自动化测试</li>
-</ul>
-<p>下载可以下 windows或者 war</p>
-<p>启动</p>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> C:\\Users\\rose\\Downloads\</span><br><span class="line">java -jar Jenkins.war</span><br><span class="line">1d6da203f2d64c2dba7eedb6a127e2f8  // 初始密码</span><br></pre></td></tr></tbody></table></figure>
-
-<p>浏览器地址栏输入 <a href="localhost:8080">localhost:8080</a> 打开界面<br>浏览器地址栏输入 <a href="localhost:8080/restart">localhost:8080/restart</a> 等于在win10管理中找到jenkins右键重启</p>
-<p>可以在Jenkins中安装“Seleniumhq Plugin”插件，这样就可以将Selenium IDE制作的测试用例保存为HTML格式并提供给Jenkins来使用，基本步骤是：</p>
-<ul>
-<li><p>在执行测试的机器上，从版本控制系统中下载测试套件和测试用例。</p>
-</li>
-<li><p>在执行测试的机器上下载Selenium Server。</p>
-</li>
-<li><p>从Jenkins的“系统管理”中选择“插件管理”来安装“Seleniumhq Plugin”。</p>
-</li>
-<li><p>在Jenkins的“系统管理”中选择“系统设置”并配置“Selenium Remote Control”下的“HTMLSuite Runner”。</p>
-</li>
-<li><p>新建测试用的Jenkins任务并进行配置，配置的内容包括：浏览器、起始URL、测试套件和测试结果输出文件。</p>
-</li>
-</ul>
-<p>配置完成后，就可以执行Jenkins的“立即构建”了。  </p>
-<p>Build periodically 定时执行任务</p>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/json-he-pickle/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/json-he-pickle/" class="post-title-link" itemprop="url">json 和 pickle</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-05-29 03:09:54" itemprop="dateModified" datetime="2021-05-29T03:09:54Z">2021-05-29</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>序列化（serialization）在计算机科学的数据处理中，<br>是指将数据结构或对象状态转换为可以存储或传输的形式，<br>这样在需要的时候能够恢复到原先的状态，<br>而且通过序列化的数据重新获取字节时，<br>可以利用这些字节来产生原始对象的副本（拷贝）。<br>与这个过程相反的动作，即从一系列字节中提取数据结构的操作，就是反序列化（deserialization</p>
-<p>实现内存中的不可持久化对象与方便持久化在磁盘中或在网络中进行交互的数据格式字节序列(bytes)或者字符序列(str)之间的相互转换：<br>序列化 - 将对象变成字节序列(bytes)或者字符序列(str) - 串行化/腌咸菜<br>反序列化 - 把字节序列或者字符序列还原成对象</p>
-<p>　（1）序列化与反序列化是为了解决内存中对象的持久化与传输问题；<br>　　（2）Python中提供了pickle和json两个模块进行序列化与反序列化；<br>　　（3）dumps()和dump()用于序列化，loads()和load()用于反序列化；<br>　　（4）pickle模块能序列化任何对象，序列化结果为bites类型，只适合于Python机器之间交互；<br>　　json模块只能序列化Python基本类型，序列化结果为json格式字符串，适合不同开发语言之间交互</p>
-<p>Python标准库对序列化的支持：<br>json - 字符形式的序列化，序列化结果为str类型，能够被多种语言识别，可用于与其他程序设计语言交互。</p>
-<p>pickle - 字节形式的序列化，序列化结果为bytes类型，只适合于Python机器之间的交互。</p>
-<p><code>dumps()</code>、<code>dump()</code>用于实现序列化，<br><code>loads()</code>、<code>load()</code>用于实现反序列化</p>
-<p>JSON JavaScript Object Notation, JavaScript 对象标记/表示法<br>它基于 ECMAScript (欧洲计算机协会制定的js规范)的一个子集，采用完全独立于编程语言的文本格式来存储和表示数据。<br>JSON 语法是 JavaScript 对象表示法语法的子集。JSON 是存储和交换文本信息的语法，类似 XML。</p>
-<ul>
-<li>是轻量级的文本数据交换格式。</li>
-</ul>
-<p>JSON载体/表现形式：JSON字符串，是指符合JSON格式的字符串</p>
-<p>JSON优势：</p>
-<ul>
-<li>比 XML 更小、更快</li>
-<li>网络传输效率高</li>
-<li>有自我描述性， 更易理解,简洁和清晰的层次结构</li>
-<li>JSON 使用 JavaScript 语法来描述数据对象， 但是 JSON 仍然独立于语言和平台。JSON 解析器和 JSON 库支持不同的编程语言。适合跨语言交换数据</li>
-<li>易于人阅读和编写</li>
-<li>易于机器解析和生成</li>
-<li>在web后台开发中通常用json模块来序列化而不是pickle模块。</li>
-</ul>
-<p>JSON 数据格式</p>
-<figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">{</span><br><span class="line">    <span class="attr">"employees"</span>: [</span><br><span class="line">        { <span class="attr">"firstName"</span>:<span class="string">"Bill"</span> , <span class="attr">"lastName"</span>:<span class="string">"Gates"</span> },</span><br><span class="line">        { <span class="attr">"firstName"</span>:<span class="string">"George"</span> , <span class="attr">"lastName"</span>:<span class="string">"Bush"</span> },</span><br><span class="line">        { <span class="attr">"firstName"</span>:<span class="string">"Thomas"</span> , <span class="attr">"lastName"</span>:<span class="string">"Carter"</span> }</span><br><span class="line">    ]</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-<p>JSON中只能使用双引号<code>""</code>，不能用单引号<code>''</code><br>数据在名称/值对中。<br>数据由逗号分隔。<br>花括号保存对象。<br>方括号保存数组。</p>
-<p>Python中内置了json这个库<br>JSON和Python内置的数据类型对应如下：</p>
-<table>
-<thead>
-<tr>
-<th>Json类型</th>
-<th>Python类型</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>{}</code></td>
-<td><code>dict</code></td>
-</tr>
-<tr>
-<td><code>[]</code></td>
-<td><code>list</code></td>
-</tr>
-<tr>
-<td><code>"string"</code></td>
-<td><code>'str'</code> 或 <code>u'unicode'</code></td>
-</tr>
-<tr>
-<td><code>1234.56</code></td>
-<td>存储<code>int</code>或<code>float</code></td>
-</tr>
-<tr>
-<td><code>true</code>/<code>false</code></td>
-<td><code>True</code>/<code>False</code></td>
-</tr>
-<tr>
-<td><code>null</code></td>
-<td><code>None</code></td>
-</tr>
-</tbody></table>
-<p><code>json.dumps(obj, fp, *, skipkeys=False, ensure_ascii=True, check_circular=True, allow_nan=True, cls=None, indent=None, separators=None, default=None, sort_keys=False, **kw)</code>对象序列化<br>Python 数据结构对象解码转换为JSON字符，会自动添加上逗号空格和冒号空格<br><code>indent</code>参数表示转换后缩进单位</p>
-<p><code>separators(item_separator, dict_separator)</code><br>元组的第一个字符参数表示dictionary内keys/每个json键值对直接直接用什么分割连接符号<br>元组的第二个字符参数表示每一个键值对中key键和value值直接用什么分割</p>
-<p><code>json.dumps(obj, separators=(', ', ' : '))</code> 默认编码，字典无序，dumps默认无序<br><code>separators</code>元组的第一个<code>, </code>表示每个json键值对直接用<code>, </code>分割</p>
-<p>而KEY和value之间用“：”隔开。<br><code>json.dumps(obj, separators=(',', ':'))</code>紧凑编码，去除空格<br><code>separators</code>元组的第一个<code>,</code>表示每个json键值对直接用<code>,</code>分割，<code>,</code>前后都没有空格<br><code>separators</code>元组的第二个<code>:</code>表示每个key和value直接用<code>:</code>分割，<code>,</code>前后都没有空格</p>
-<p><code>json.dumps(obj, separators=(',', ':'), sort_keys=True)</code>紧凑编码，去除空格，<br> <code>sort_keys</code>是告诉编码器将序列化后的字符串按照字典key排序(a到z)输出。</p>
-<p>有非ascii码字符，比如中文，默认就用该字符的unicode数字来表示。<br>想输出真正的中文需要用Unicode字符串，禁用ascii编码<code>ensure_ascii = False</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">print(json.dumps(<span class="string">'中文'</span>))</span><br><span class="line"><span class="comment"># "\u4e2d\u6587"  对应的ascii 字符码</span></span><br><span class="line">print(json.dumps(<span class="string">'中文'</span>, ensure_ascii=<span class="literal">False</span>))</span><br><span class="line"><span class="comment"># "中文"</span></span><br><span class="line">print(<span class="string">'中文'</span>.encode(<span class="string">'unicode_escape'</span>))</span><br><span class="line"><span class="comment"># b'\\u4e2d\\u6587'</span></span><br><span class="line">print(<span class="string">'中文'</span>.encode(<span class="string">'unicode-escape'</span>))</span><br><span class="line"><span class="comment"># b'\\u4e2d\\u6587'</span></span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> json</span><br><span class="line">historyTransactions = [</span><br><span class="line">    {</span><br><span class="line">        <span class="string">'time'</span>: <span class="string">'20170101070311'</span>,  <span class="comment"># 交易时间</span></span><br><span class="line">        <span class="string">'amount'</span>: <span class="string">'3088'</span>,  <span class="comment"># 交易金额</span></span><br><span class="line">        <span class="string">'productid'</span>: <span class="string">'45454455555'</span>,  <span class="comment"># 货号</span></span><br><span class="line">        <span class="string">'productname'</span>: <span class="string">'iphone7'</span>  <span class="comment"># 货名</span></span><br><span class="line">    },</span><br><span class="line">    {</span><br><span class="line">        <span class="string">'time'</span>: <span class="string">'20170101050311'</span>,  <span class="comment"># 交易时间</span></span><br><span class="line">        <span class="string">'amount'</span>: <span class="string">'18'</span>,  <span class="comment"># 交易金额</span></span><br><span class="line">        <span class="string">'productid'</span>: <span class="string">'453455772955'</span>,  <span class="comment"># 货号</span></span><br><span class="line">        <span class="string">'productname'</span>: <span class="string">'奥妙洗衣液'</span>  <span class="comment"># 货名</span></span><br><span class="line">    }</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">json_str = json.dumps(historyTransactions)</span><br><span class="line">print(type(json_str))  <span class="comment"># &lt;class 'str'&gt;</span></span><br><span class="line">print(json_str)</span><br><span class="line"><span class="comment"># [{"time": "20170101070311", "amount": "3088", "productid": "45454455555", "productname": "iphone7"}, {"time": "20170101050311", "amount": "18", "productid": "453455772955", "productname": "\u5965\u5999\u6d17\u8863\u6db2"}]</span></span><br><span class="line"></span><br><span class="line">json_str = json.dumps(historyTransactions, ensure_ascii=<span class="literal">False</span>, indent=<span class="number">4</span>)</span><br><span class="line">print(type(json_str))  <span class="comment"># &lt;class 'str'&gt;</span></span><br><span class="line">print(json_str)</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[</span><br><span class="line">    {</span><br><span class="line">        <span class="attr">"time"</span>: <span class="string">"20170101070311"</span>,       </span><br><span class="line">        <span class="attr">"amount"</span>: <span class="string">"3088"</span>,</span><br><span class="line">        <span class="attr">"productid"</span>: <span class="string">"45454455555"</span>,     </span><br><span class="line">        <span class="attr">"productname"</span>: <span class="string">"iphone7"</span>        </span><br><span class="line">    },</span><br><span class="line">    {</span><br><span class="line">        <span class="attr">"time"</span>: <span class="string">"20170101050311"</span>,       </span><br><span class="line">        <span class="attr">"amount"</span>: <span class="string">"18"</span>,</span><br><span class="line">        <span class="attr">"productid"</span>: <span class="string">"453455772955"</span>,    </span><br><span class="line">        <span class="attr">"productname"</span>: <span class="string">"奥妙洗衣液"</span>     </span><br><span class="line">    }</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>json.loads(s[, encoding[, cls[, object_hook[, parse_float[, parse_int[, parse_constant[, object_pairs_hook[, **kw]]]]]]]])</code><br>反序列化，JSON编码的字符串解码转换回一个Python数据结构对象</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> json</span><br><span class="line">jsonstr = <span class="string">'[{"time": "20170101070311", "amount": "3088", "productid": "45454455555", "productname": "iphone7"}, {"time": "20170101050311", "amount": "18", "productid": "453455772955", "productname": "\u5965\u5999\u6d17\u8863\u6db2"}]'</span></span><br><span class="line"></span><br><span class="line">translist = json.loads(jsonstr)</span><br><span class="line">print(type(translist))  <span class="comment"># &lt;class 'list'&gt;</span></span><br><span class="line">print(translist)</span><br><span class="line"><span class="comment"># [{'time': '20170101070311', 'amount': '3088', 'productid': '45454455555', 'productname': 'iphone7'}, {'time': '20170101050311', 'amount': '18', 'productid': '453455772955', 'productname': '奥妙洗衣液'}]</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>repr(object)</code>将对象转化为供解释器读取的形式。<br>object – 对象。<br>返回一个对象的 string 格式。<br><code>__repr__</code>返回字符串的字面值，<br><code>'\'</code>变成<code>'\\'</code>的转义字符串。</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> json</span><br><span class="line"></span><br><span class="line">print(json.dumps([<span class="string">'foo'</span>, {<span class="string">'bar'</span>: (<span class="string">'baz'</span>, <span class="literal">None</span>, <span class="number">1.0</span>, <span class="number">2</span>)}]))</span><br><span class="line"><span class="comment"># ["foo", {"bar": ["baz", null, 1.0, 2]}]</span></span><br><span class="line"></span><br><span class="line">print(json.dumps(<span class="string">"\"foo\bar"</span>))</span><br><span class="line"><span class="comment"># "\"foo\bar"</span></span><br><span class="line"></span><br><span class="line">print(json.dumps(<span class="string">'\u1234'</span>))</span><br><span class="line"><span class="comment"># "\u1234"</span></span><br><span class="line">print(type(json.dumps(<span class="string">'\u1234'</span>)))</span><br><span class="line"><span class="comment"># &lt;class 'str'&gt;</span></span><br><span class="line">print(repr(json.dumps(<span class="string">'\u1234'</span>)))</span><br><span class="line"><span class="comment"># '"\\u1234"'</span></span><br><span class="line">print(type(repr(json.dumps(<span class="string">'\u1234'</span>))))</span><br><span class="line"><span class="comment"># &lt;class 'str'&gt;</span></span><br><span class="line"></span><br><span class="line">print(json.dumps(<span class="string">'\\'</span>))</span><br><span class="line"><span class="comment"># "\\"</span></span><br><span class="line">print(repr(json.dumps(<span class="string">'\\'</span>)))</span><br><span class="line"><span class="comment"># '\\\\'</span></span><br><span class="line">print(type(repr(json.dumps(<span class="string">'\\'</span>))))</span><br><span class="line"><span class="comment"># &lt;class 'str'&gt;</span></span><br><span class="line"></span><br><span class="line">print(json.dumps({<span class="string">"c"</span>: <span class="number">0</span>, <span class="string">"b"</span>: <span class="number">0</span>, <span class="string">"a"</span>: <span class="number">0</span>}, sort_keys=<span class="literal">True</span>))</span><br><span class="line"><span class="comment"># {"a": 0, "b": 0, "c": 0}</span></span><br><span class="line"></span><br><span class="line">data1 = {<span class="string">'no'</span>: <span class="number">1</span>, <span class="string">'name'</span>: <span class="string">'Runoob'</span>, <span class="string">'url'</span>: <span class="string">'http://www.runoob.com'</span>}</span><br><span class="line">print(<span class="string">"Python 原始数据："</span>, repr(data1))</span><br><span class="line"><span class="comment"># Python 原始数据： {'no': 1, 'name': 'Runoob', 'url': 'http://www.runoob.com'}</span></span><br><span class="line">print(type(repr(data1)))  <span class="comment"># &lt;class 'str'&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Python 字典类型转换为 JSON 对象</span></span><br><span class="line">json_str = json.dumps(data1)</span><br><span class="line">print(<span class="string">"JSON 对象："</span>, json_str)</span><br><span class="line"><span class="comment"># JSON 对象： {"no": 1, "name": "Runoob", "url": "http://www.runoob.com"}</span></span><br><span class="line">print(type(json_str))  <span class="comment"># &lt;class 'str'&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 将 JSON 对象转换为 Python 字典</span></span><br><span class="line">data2 = json.loads(json_str)</span><br><span class="line">print(data2)</span><br><span class="line"><span class="comment"># {'no': 1, 'name': 'Runoob', 'url': 'http://www.runoob.com'}</span></span><br><span class="line">print(type(data2))  <span class="comment"># &lt;class 'dict'&gt;</span></span><br><span class="line"></span><br><span class="line">print(<span class="string">"data2['name']: "</span>, data2[<span class="string">'name'</span>])</span><br><span class="line"><span class="comment"># data2['name']:  Runoob</span></span><br><span class="line"></span><br><span class="line">print(<span class="string">"data2['url']: "</span>, data2[<span class="string">'url'</span>])</span><br><span class="line"><span class="comment"># data2['url']:  http://www.runoob.com</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 紧凑编码，去除json.dumps()生成的空格</span></span><br><span class="line">print(json.dumps([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, {<span class="string">'4'</span>: <span class="number">5</span>, <span class="string">'6'</span>: <span class="number">7</span>}], separators=(<span class="string">','</span>, <span class="string">':'</span>)))</span><br><span class="line"><span class="comment"># [1,2,3,{"4":5,"6":7}]</span></span><br><span class="line"></span><br><span class="line">data2 = json.dumps({<span class="string">'a'</span>: <span class="string">'Ashe'</span>, <span class="string">'b'</span>: <span class="number">7</span>}, sort_keys=<span class="literal">True</span>, indent=<span class="number">4</span>, separators=(<span class="string">','</span>, <span class="string">': '</span>))</span><br><span class="line">print(data2)</span><br><span class="line"><span class="comment"># {</span></span><br><span class="line"><span class="comment">#     "a": "Ashe",</span></span><br><span class="line"><span class="comment">#     "b": 7</span></span><br><span class="line"><span class="comment"># }</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p>加上ensure_ascii这一参数，并将其值设置为False，这样你打开mydump.txt文件里面的中文就能正常显示。（执行完代码之后，本地会有一个mydump.txt文件，诸位可以验证该内容）</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> json</span><br><span class="line"></span><br><span class="line">p_dict = {<span class="string">'name'</span>: <span class="string">'张三'</span>, <span class="string">'age'</span>: <span class="number">30</span>, <span class="string">'isMarried'</span>: <span class="literal">False</span>}  <span class="comment"># 定义一个字典</span></span><br><span class="line">file = open(<span class="string">'d:/mydump.txt'</span>, <span class="string">'w'</span>)</span><br><span class="line">json.dump(p_dict, file, ensure_ascii=<span class="literal">False</span>)</span><br><span class="line">file.close()</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">file = open(<span class="string">'d:/mydump.txt'</span> , <span class="string">'r'</span>)</span><br><span class="line">p = json.load(file)</span><br><span class="line">file.close()</span><br><span class="line">print(type(p))  <span class="comment"># &lt;class 'dict'&gt;</span></span><br><span class="line">print(p)</span><br><span class="line"><span class="comment"># {'name': '张三', 'age': 30, 'isMarried': False}</span></span><br></pre></td></tr></tbody></table></figure>
-
-
-<p>json模块用于字符串和python数据类型间进行转换。<br>如下所示，我们自定义一个Person类，<br>分别用pickle和json进行序列化：</p>
-<p>如果用<code>json</code>对Person实例对象进行序列化，就会报错：</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, name, age, isMarried</span>):</span></span><br><span class="line">        self.name = name</span><br><span class="line">        self.age = age</span><br><span class="line">        self.isMarried = isMarried</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">p = Person(<span class="string">'Ashe'</span>, <span class="number">30</span>, <span class="literal">False</span>)</span><br><span class="line">p = Person(<span class="string">'Ashe'</span>, <span class="number">30</span>, <span class="literal">False</span>)</span><br><span class="line">print(Person)  <span class="comment"># &lt;class '__main__.Person'&gt;</span></span><br><span class="line">print(type(Person))  <span class="comment"># &lt;class 'type'&gt;</span></span><br><span class="line">print(p)  <span class="comment"># &lt;__main__.Person object at 0x0000017116500BE0&gt;</span></span><br><span class="line">print(type(p))  <span class="comment"># &lt;class '__main__.Person'&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># json对Person实例对象进行序列化，就会报错</span></span><br><span class="line"><span class="keyword">import</span> json</span><br><span class="line"></span><br><span class="line">p = Person(<span class="string">'张三'</span>, <span class="number">30</span>, <span class="literal">False</span>)</span><br><span class="line">json.dumps(p)</span><br><span class="line"><span class="comment"># Traceback (most recent call last):</span></span><br><span class="line"><span class="comment"># File "&lt;pyshell#49&gt;", line 1, in &lt;module&gt;</span></span><br><span class="line"><span class="comment"># json.dumps(p)</span></span><br><span class="line"><span class="comment"># ……</span></span><br><span class="line"><span class="comment"># TypeError: Object of type 'Person' is not JSON serializable</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p><strong>如果非要用<code>json</code>对Person实例对象进行序列化，必须先定义一个将Person实例对象转化为字典（dict)的方法：</strong></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, name, age, isMarried</span>):</span></span><br><span class="line">        self.name = name</span><br><span class="line">        self.age = age</span><br><span class="line">        self.isMarried = isMarried</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">p = Person(<span class="string">'Ashe'</span>, <span class="number">30</span>, <span class="literal">False</span>)</span><br><span class="line">p = Person(<span class="string">'Ashe'</span>, <span class="number">30</span>, <span class="literal">False</span>)</span><br><span class="line">print(Person)  <span class="comment"># &lt;class '__main__.Person'&gt;</span></span><br><span class="line">print(type(Person))  <span class="comment"># &lt;class 'type'&gt;</span></span><br><span class="line">print(p)  <span class="comment"># &lt;__main__.Person object at 0x0000017116500BE0&gt;</span></span><br><span class="line">print(type(p))  <span class="comment"># &lt;class '__main__.Person'&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> json</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">person2dict</span>(<span class="params">per</span>):</span></span><br><span class="line">    <span class="keyword">return</span> {<span class="string">'name'</span>: per.name, <span class="string">'age'</span>: per.age, <span class="string">'isMarried'</span>: per.isMarried}</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">p3 = json.dumps(p, default=person2dict)</span><br><span class="line">print(type(p3))  <span class="comment"># &lt;class 'str'&gt;</span></span><br><span class="line">print(p3)</span><br><span class="line"><span class="comment"># '{"name": "\\u5f20\\u4e09", "age": 30, "isMarried": false}'</span></span><br><span class="line">p3 = json.dumps(p, default=person2dict, ensure_ascii=<span class="literal">False</span>)</span><br><span class="line">type(p3)  <span class="comment"># &lt;class 'str'&gt;</span></span><br><span class="line">print(p3)</span><br><span class="line"><span class="comment"># '{"name": "Ashe", "age": 30, "isMarried": false}'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 也直接进行反序列化得到一个字典而不是Person类实例</span></span><br><span class="line">p4 = json.loads(p3)</span><br><span class="line">print(type(p4))  <span class="comment"># &lt;class 'dict'&gt;</span></span><br><span class="line">print(p4)</span><br><span class="line"><span class="comment"># {'name': 'Ashe', 'age': 30, 'isMarried': False}</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p>此时，也要定义一个将字典转换为Person类实例的方法，再进行反序列化：</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, name, age, isMarried</span>):</span></span><br><span class="line">        self.name = name</span><br><span class="line">        self.age = age</span><br><span class="line">        self.isMarried = isMarried</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">p = Person(<span class="string">'Ashe'</span>, <span class="number">30</span>, <span class="literal">False</span>)</span><br><span class="line">p = Person(<span class="string">'Ashe'</span>, <span class="number">30</span>, <span class="literal">False</span>)</span><br><span class="line">print(Person)  <span class="comment"># &lt;class '__main__.Person'&gt;</span></span><br><span class="line">print(type(Person))  <span class="comment"># &lt;class 'type'&gt;</span></span><br><span class="line">print(p)  <span class="comment"># &lt;__main__.Person object at 0x0000017116500BE0&gt;</span></span><br><span class="line">print(type(p))  <span class="comment"># &lt;class '__main__.Person'&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> json</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">person2dict</span>(<span class="params">per</span>):</span></span><br><span class="line">    <span class="keyword">return</span> {<span class="string">'name'</span>: per.name, <span class="string">'age'</span>: per.age, <span class="string">'isMarried'</span>: per.isMarried}</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">p3 = json.dumps(p, default=person2dict)</span><br><span class="line">print(type(p3))  <span class="comment"># &lt;class 'str'&gt;</span></span><br><span class="line">print(p3)</span><br><span class="line"><span class="comment"># '{"name": "\\u5f20\\u4e09", "age": 30, "isMarried": false}'</span></span><br><span class="line">p3 = json.dumps(p, default=person2dict, ensure_ascii=<span class="literal">False</span>)</span><br><span class="line">print(type(p3))  <span class="comment"># &lt;class 'str'&gt;</span></span><br><span class="line">print(p3)</span><br><span class="line"><span class="comment"># '{"name": "Ashe", "age": 30, "isMarried": false}'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dict2person</span>(<span class="params">d</span>):</span></span><br><span class="line">    <span class="keyword">return</span> Person(d[<span class="string">'name'</span>], d[<span class="string">'age'</span>], d[<span class="string">'isMarried'</span>])</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">p5 = json.loads(p3, object_hook=dict2person)</span><br><span class="line">print(type(p5))</span><br><span class="line"><span class="comment"># &lt;class '__main__.Person'&gt;</span></span><br><span class="line">print(p5)  <span class="comment"># &lt;__main__.Person object at 0x000001645D670C40&gt;</span></span><br><span class="line">print(p5.name)</span><br><span class="line"><span class="comment"># Ashe</span></span><br></pre></td></tr></tbody></table></figure>
-
-<h2 id="pickle"><a href="#pickle" class="headerlink" title="pickle"></a>pickle</h2><p>序列化：dumps()、dump()<br>dumps()与dump()的区别是<code>dumps()</code>只是单纯得将对象序列化，而<code>dump()</code>会在序列化之后将结果写入到文件当中；<br>与之对应，loads()与load()区别至于<code>loads()</code>是对<code>dumps</code>的序列化结果进行反序列化，<br>而<code>load()</code>会从文件中读取内容进行反序列化。</p>
-<p>反序列化：loads()、load()</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pickle</span><br><span class="line">p_dict = {<span class="string">'name'</span>:<span class="string">'张三'</span> , <span class="string">'age'</span>:<span class="number">30</span> , <span class="string">'isMarried'</span>:<span class="literal">False</span>} <span class="comment"># 定义一个字典</span></span><br><span class="line">print(type(p_dict))  <span class="comment"># &lt;class 'dict'&gt;</span></span><br><span class="line">p_str = pickle.dumps(p_dict) <span class="comment"># 序列化</span></span><br><span class="line">print(type(p_str))  <span class="comment"># &lt;class 'bytes'&gt;</span></span><br><span class="line">print(p_str)</span><br><span class="line"><span class="comment"># b'\x80\x04\x95*\x00\x00\x00\x00\x00\x00\x00}\x94(\x8c\x04name\x94\x8c\x06\xe5\xbc\xa0\xe4\xb8\x89\x94\x8c\x03age\x94K\x1e\x8c\tisMarried\x94\x89u.'</span></span><br><span class="line">p = pickle.loads(p_str)</span><br><span class="line">print(type(p))</span><br><span class="line"><span class="comment"># &lt;class 'dict'&gt;</span></span><br><span class="line">print(p)</span><br><span class="line"><span class="comment"># {'name': '张三', 'age': 30, 'isMarried': False}</span></span><br><span class="line">print(id(p)==id(p_dict))  <span class="comment"># False</span></span><br></pre></td></tr></tbody></table></figure>
-<p>反序列化后得到的p和序列化之前的p_dict内容是一模一样的。不过，p与p_dict已经是两个不同的对象了</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pickle</span><br><span class="line"></span><br><span class="line">p_dict = {<span class="string">'name'</span>: <span class="string">'张三'</span>, <span class="string">'age'</span>: <span class="number">30</span>, <span class="string">'isMarried'</span>: <span class="literal">False</span>}  <span class="comment"># 定义一个字典</span></span><br><span class="line">file = open(<span class="string">"my_dump.txt"</span>, <span class="string">"wb"</span>)  <span class="comment"># 因为序列化只有的是bytes类型，所以必须以wb模式打开</span></span><br><span class="line">pickle.dump(p_dict, file)</span><br><span class="line">file.close()</span><br></pre></td></tr></tbody></table></figure>
-
-<p>此时，通过上面代码我们已经将p_dict序列化成功，并写入到了一个名为my_dump.txt文件中。你可以找到这个文件，然后将它拷贝到任何电脑上进行反序列化：</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">file = open(<span class="string">"my_dump.txt"</span>, <span class="string">"rb"</span>)</span><br><span class="line">p = pickle.load(file)</span><br><span class="line">file.close()</span><br><span class="line">print(type(p))</span><br><span class="line"><span class="comment"># &lt;class 'dict'&gt;</span></span><br><span class="line">print(p)</span><br><span class="line"><span class="comment"># {'name': '张三', 'age': 30, 'isMarried': False}</span></span><br></pre></td></tr></tbody></table></figure>
-<p>反序列化后得到的内容与序列化之前的内容完全一样。体会到序列化与反序列化的作用了吗？序列化之后的内容可以方便得保存到磁盘中，电脑关机也不怕。</p>
-<h3 id="pickle模块与json模块的区别"><a href="#pickle模块与json模块的区别" class="headerlink" title="pickle模块与json模块的区别"></a>pickle模块与json模块的区别</h3><p>（1）pickle模块用于Python语言特有的类型和用户自定义类型与Python基本数据类型之间的转换<br>如下所示，我们自定义一个Person类，用pickle序列化：</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, name, age, isMarried</span>):</span></span><br><span class="line">        self.name = name</span><br><span class="line">        self.age = age</span><br><span class="line">        self.isMarried = isMarried</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">p = Person(<span class="string">'Ashe'</span>, <span class="number">30</span>, <span class="literal">False</span>)</span><br><span class="line">p = Person(<span class="string">'Ashe'</span>, <span class="number">30</span>, <span class="literal">False</span>)</span><br><span class="line">print(Person)  <span class="comment"># &lt;class '__main__.Person'&gt;</span></span><br><span class="line">print(type(Person))  <span class="comment"># &lt;class 'type'&gt;</span></span><br><span class="line">print(p)  <span class="comment"># &lt;__main__.Person object at 0x0000017116500BE0&gt;</span></span><br><span class="line">print(type(p))  <span class="comment"># &lt;class '__main__.Person'&gt;</span></span><br><span class="line"><span class="keyword">import</span> pickle</span><br><span class="line"></span><br><span class="line"><span class="comment"># pickle模块能够对Person实例对象进行序列化</span></span><br><span class="line">pp = pickle.dumps(p)</span><br><span class="line">print(type(pp))  <span class="comment"># &lt;class 'bytes'&gt;</span></span><br><span class="line">print(pp)</span><br><span class="line"><span class="comment"># b'\x80\x03c__main__\nPerson\nq\x00)\x81q\x01}q\x02(X\x04\x00\x00\x00nameq\x03X\x06\x00\x00\x00\xe5\xbc\xa0\xe4\xb8\x89q\x04X\x03\x00\x00\x00ageq\x05K\x1eX\t\x00\x00\x00isMarriedq\x06\x89ub.'</span></span><br><span class="line">p2 = pickle.loads(pp)</span><br><span class="line">print(type(p2))  <span class="comment"># &lt;class '__main__.Person'&gt;</span></span><br><span class="line">print(p2)  <span class="comment"># &lt;__main__.Person object at 0x000001DBED720B20&gt;</span></span><br><span class="line">print(p2.name)</span><br><span class="line"><span class="comment"># 'Ashe'</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># pickle模块能够对Peron本身进行序列化</span></span><br><span class="line">per = pickle.dumps(Person)</span><br><span class="line">print(per)  <span class="comment"># &lt;class 'bytes'&gt;</span></span><br><span class="line">print(type(per))</span><br><span class="line"><span class="comment"># b'\x80\x04\x95\x17\x00\x00\x00\x00\x00\x00\x00\x8c\x08__main__\x94\x8c\x06Person\x94\x93\x94.'</span></span><br><span class="line">per2 = pickle.loads(per)</span><br><span class="line">print(type(per2))  <span class="comment"># &lt;class 'type'&gt;</span></span><br><span class="line">print(per2)  <span class="comment"># &lt;class '__main__.Person'&gt;</span></span><br></pre></td></tr></tbody></table></figure>
-
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/lambda/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/lambda/" class="post-title-link" itemprop="url">lambda</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-02 12:24:46" itemprop="dateModified" datetime="2021-04-02T12:24:46Z">2021-04-02</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="匿名函数：lambda"><a href="#匿名函数：lambda" class="headerlink" title="匿名函数：lambda"></a>匿名函数：lambda</h1><p>参数:表达式<br>匿名函数有个限制，就是只能有一个表达式，不能是语句或代码块，<br>不用写return，返回值就是该表达式的结果。<br>用匿名函数有个好处，因为函数没有名字，不必担心函数名冲突。<br>匿名函数也是一个函数对象，<br>也可以把匿名函数赋值给一个变量，再利用变量来调用该函数：</p>
-<p>无参匿名函数:</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">t = <span class="keyword">lambda</span>: <span class="literal">True</span>  <span class="comment">#冒号前无任何参数</span></span><br><span class="line">print(t())  <span class="comment"># True</span></span><br><span class="line">t = <span class="keyword">lambda</span>: <span class="number">1</span>  <span class="comment"># 冒号前无任何参数</span></span><br><span class="line">print(t())  <span class="comment"># 1</span></span><br></pre></td></tr></tbody></table></figure>
-<p>等价于下面的def定义的函数</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func</span>():</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">print(func())  <span class="comment"># True</span></span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">s = <span class="string">"this is\na\ttest"</span></span><br><span class="line">print(s)</span><br><span class="line"><span class="comment"># this is</span></span><br><span class="line"><span class="comment"># a       test</span></span><br><span class="line">print(s.split())  <span class="comment"># split函数默认以空格分割成列表，换行符，TAB</span></span><br><span class="line"><span class="comment"># ['this', 'is', 'a', 'test']</span></span><br><span class="line">print(<span class="string">' '</span>.join(s.split()))  <span class="comment"># 用join函数转一个列表为字符串</span></span><br><span class="line"><span class="comment"># 'this is a test'</span></span><br></pre></td></tr></tbody></table></figure>
-<p>等价于</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">f1 = (<span class="keyword">lambda</span> s: <span class="string">' '</span>.join(s.split()))(<span class="string">"this is\na\ttest"</span>)</span><br><span class="line">print(f1)</span><br><span class="line"><span class="comment"># 'this is a test'</span></span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 普通python函数</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func</span>(<span class="params">a, b, c</span>):</span></span><br><span class="line">    <span class="keyword">return</span> a + b + c</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">print(func(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>))  <span class="comment"># 6</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p>匿名函数调用：直接赋值给一个变量，然后再像一般函数调用</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">f1 = <span class="keyword">lambda</span> x: x**<span class="number">3</span>  <span class="comment"># 一个参数</span></span><br><span class="line">print(f1(<span class="number">3</span>))  <span class="comment"># 27</span></span><br><span class="line"></span><br><span class="line">f2 = <span class="keyword">lambda</span> x, y, z: x + y + z  <span class="comment"># 多个参数</span></span><br><span class="line">print(f2(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>))  <span class="comment"># 6</span></span><br><span class="line"></span><br><span class="line">f3 = <span class="keyword">lambda</span> x, y=<span class="number">3</span>: x * y  <span class="comment"># 允许参数存在默认值</span></span><br><span class="line">print(f3(<span class="number">1</span>))  <span class="comment"># 3</span></span><br><span class="line"></span><br><span class="line">f4 = <span class="keyword">lambda</span> x, y=<span class="number">3</span>: x * y  <span class="comment"># 允许参数存在默认值</span></span><br><span class="line">print(f4(<span class="number">1</span>, <span class="number">5</span>))  <span class="comment"># 5</span></span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a = <span class="keyword">lambda</span> *z: z  <span class="comment"># *z返回的是一个元祖</span></span><br><span class="line">print(a(<span class="string">'Testing1'</span>, <span class="string">'Testing2'</span>))</span><br><span class="line"><span class="comment">#  ('Testing1', 'Testing2')</span></span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">c = <span class="keyword">lambda</span> **Arg: Arg  <span class="comment"># arg返回的是一个字典</span></span><br><span class="line">print(c())</span><br><span class="line"><span class="comment"># {}</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#直接后面传递实参</span></span><br><span class="line">print((<span class="keyword">lambda</span> x:x**<span class="number">2</span>)(<span class="number">3</span>))  <span class="comment"># 9</span></span><br><span class="line">print((<span class="keyword">lambda</span> x,y: x <span class="keyword">if</span> x&gt; y <span class="keyword">else</span> y)(<span class="number">101</span>,<span class="number">102</span>))  <span class="comment">#  102</span></span><br><span class="line"></span><br><span class="line">print([x <span class="keyword">for</span> x <span class="keyword">in</span> [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>] <span class="keyword">if</span> x % <span class="number">3</span> == <span class="number">0</span>])  <span class="comment"># [3, 6]</span></span><br><span class="line"><span class="comment"># lambda返回的值，结合map,filter,reduce使用 等价于下面的列表推导式</span></span><br><span class="line"><span class="comment"># filter 函数传入两个参数，第一个参入的是lambda函数，第二个参数是列表</span></span><br><span class="line">print(filter(<span class="keyword">lambda</span> x: x % <span class="number">3</span> == <span class="number">0</span>, [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>]))  <span class="comment"># [3, 6]</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">f1 = filter(<span class="keyword">lambda</span> x: <span class="literal">True</span> <span class="keyword">if</span> x != <span class="number">0</span> <span class="keyword">else</span> <span class="literal">False</span>, [<span class="number">1</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">0</span>, <span class="number">5</span>, <span class="number">0</span>, <span class="number">0</span>])</span><br><span class="line">print(f1)  <span class="comment"># &lt;filter object at 0x000001C27B35DAC0&gt;</span></span><br><span class="line">print(list(f1))  <span class="comment"># [1, 2, 5]</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p>嵌套使用</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#lambda嵌套到普通函数中,lambda函数本身做为return的值</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">increment</span>(<span class="params">n</span>):</span></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">lambda</span> x: x + n</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">f = increment(<span class="number">4</span>)</span><br><span class="line">print(f(<span class="number">2</span>))  <span class="comment"># 6</span></span><br></pre></td></tr></tbody></table></figure>
-<hr>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">say</span>():</span></span><br><span class="line">    title = <span class="string">'Sir, '</span></span><br><span class="line">    action = <span class="keyword">lambda</span> x: title + x</span><br><span class="line">    <span class="keyword">return</span> action</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">act = say()</span><br><span class="line">print(act(<span class="string">'Smith!'</span>))  <span class="comment"># 'Sir,Smith!'</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p>大量例子:</p>
-<p>例01: 字符串联合，有默认值，也可以x=(lambda…)这种格式</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>x = (lambda x=”Boo”,y=”Too”,z=”Zoo”: x+y+z)<br>x(“Foo”)<br>‘FooTooZoo’</p>
-</blockquote>
-</blockquote>
-</blockquote>
-<p>例02: 和列表联合使用</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>L = [lambda x:x<strong>2,<br>lambda x:x</strong>3,<br>lambda x:x**4]</p>
-</blockquote>
-</blockquote>
-</blockquote>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>for f in L:<br>… print f(2)<br>…<br>4<br>8<br>16</p>
-</blockquote>
-</blockquote>
-</blockquote>
-<p>也可以如下面这样调用</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>print L<a href="3">0</a><br>9</p>
-</blockquote>
-</blockquote>
-</blockquote>
-<p>例03: 和字典结合使用</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>key = ‘B’<br>dic = { ‘A’: lambda: 2<em>2,<br>… ‘B’: lambda: 2</em>4,<br>… ‘C’: lambda: 2*8}<br>dic<a href="">key</a><br>8</p>
-</blockquote>
-</blockquote>
-</blockquote>
-<p>例04: 求最小值</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>lower = lambda x,y: x if x&lt;y else y<br>lower(‘aa’,’ab’)<br>‘aa’</p>
-</blockquote>
-</blockquote>
-</blockquote>
-<p>例05: 和map及list联合使用</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>import sys<br>showall = lambda x:list(map(sys.stdout.write,x))<br>showall([‘Jerry\n’,’Sherry\n’,’Alice\n’])<br>Jerry<br>Sherry<br>Alice</p>
-</blockquote>
-</blockquote>
-</blockquote>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>showall([‘Jerry’,’Sherry’,’Alice’])<br>JerrySherryAlice</p>
-</blockquote>
-</blockquote>
-</blockquote>
-<p>等价于下面</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>showall = lambda x: [sys.stdout.write(line) for line in x]<br>showall((‘I\t’,’Love\t’,’You!’))<br>I Love You![None, None, None]</p>
-</blockquote>
-</blockquote>
-</blockquote>
-<p>例06: 在Tkinter中定义内联的callback函数</p>
-<p>import sys<br>from Tkinter import Button,mainloop</p>
-<p>x = Button(text=’Press me’,<br>command=(lambda:sys.stdout.write(‘Hello,World\n’)))<br>x.pack()<br>x.mainloop()</p>
-<blockquote>
-<blockquote>
-<blockquote>
-</blockquote>
-</blockquote>
-</blockquote>
-<p>Hello,World!</p>
-<p>Hello,World!</p>
-<p>例07: lambda和map联合使用,</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<p> out = lambda *x: sys.stdout.write(‘ ‘.join(map(str,x)))<br>out(‘This’,’is’,’a’,’book!\n’)<br>This is a book!</p>
-</blockquote>
-</blockquote>
-</blockquote>
-<p>例08: 判断字符串是否以某个字母开头</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>print (lambda x: x.startswith(‘B’))(‘Bob’)<br>True</p>
-</blockquote>
-</blockquote>
-</blockquote>
-<hr>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>Names = [‘Anne’, ‘Amy’, ‘Bob’, ‘David’, ‘Carrie’, ‘Barbara’, ‘Zach’]<br>B_Name= filter(lambda x: x.startswith(‘B’),Names)<br>B_Name<br>[‘Bob’, ‘Barbara’]</p>
-</blockquote>
-</blockquote>
-</blockquote>
-<p>例09: lambda和map联合使用:</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<p> squares = map(lambda x:x**2,range(5))<br>squares<br>[0, 1, 4, 9, 16]</p>
-</blockquote>
-</blockquote>
-</blockquote>
-<p>例10. lambda和map,filter联合使用:</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<p> squares = map(lambda x:x**2,range(10))<br>filters = filter(lambda x:x&gt;5 and x&lt;50,squares)<br>filters<br>[9, 16, 25, 36, 49]</p>
-</blockquote>
-</blockquote>
-</blockquote>
-<p>例11. lambda和sorted联合使用</p>
-<p>#按death名单里面，按年龄来排序</p>
-<p>#匿名函数的值返回给key，进来排序</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>death = [ (‘James’,32),<br>(‘Alies’,20),<br>(‘Wendy’,25)]</p>
-</blockquote>
-</blockquote>
-</blockquote>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>sorted(death,key=lambda age:age[1]) #按照第二个元素，索引为1排序<br>[(‘Alies’, 20), (‘Wendy’, 25), (‘James’, 32)]</p>
-</blockquote>
-</blockquote>
-</blockquote>
-<p>例12. lambda和reduce联合使用</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>L = [1,2,3,4]<br>sum = reduce(lambda x,y:x+y,L)<br>sum<br>10</p>
-</blockquote>
-</blockquote>
-</blockquote>
-<p>例13. 求2-50之间的素数</p>
-<p>#素数:只能被1或被自己整除的数</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>nums = range(2,50)<br>for i in nums:<br>nums = filter(lambda x:x==i or x % i,nums)<br>nums<br>[2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47]</p>
-</blockquote>
-</blockquote>
-</blockquote>
-<p>例14. 求两个列表元素的和</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>a = [1,2,3,4]<br>b = [5,6,7,8]<br>map(lambda x,y:x+y, a,b)<br>[6, 8, 10, 12]</p>
-</blockquote>
-</blockquote>
-</blockquote>
-<p>例15. 求字符串每个单词的长度</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>sentence = “Welcome To Beijing!”<br>words = sentence.split()</p>
-</blockquote>
-</blockquote>
-</blockquote>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>lengths = map(lambda x:len(x),words)<br>lengths<br>[7, 2, 8]</p>
-</blockquote>
-</blockquote>
-</blockquote>
-<p>写成一行:</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<p> print map(lambda x:len(x),’Welcome To Beijing!’.split())</p>
-</blockquote>
-</blockquote>
-</blockquote>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/leetcode-json-shu-ju-ku/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/leetcode-json-shu-ju-ku/" class="post-title-link" itemprop="url">leetcode json 数据库</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-02 12:24:45" itemprop="dateModified" datetime="2021-04-02T12:24:45Z">2021-04-02</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>将leetcode案例的json格式数据转成数据库插入语句，并插入到数据库。</p>
-<p>json用例数据：</p>
-<figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">{</span><br><span class="line">    <span class="attr">"headers"</span>: {</span><br><span class="line">        <span class="attr">"student"</span>: [</span><br><span class="line">            <span class="string">"name"</span>,</span><br><span class="line">            <span class="string">"continent"</span></span><br><span class="line">        ]</span><br><span class="line">    },</span><br><span class="line">    <span class="attr">"rows"</span>: {</span><br><span class="line">        <span class="attr">"student"</span>: [</span><br><span class="line">            [</span><br><span class="line">                <span class="string">"Jane"</span>,</span><br><span class="line">                <span class="string">"America"</span></span><br><span class="line">            ],</span><br><span class="line">            [</span><br><span class="line">                <span class="string">"Pascal"</span>,</span><br><span class="line">                <span class="string">"Europe"</span></span><br><span class="line">            ],</span><br><span class="line">            [</span><br><span class="line">                <span class="string">"Xi"</span>,</span><br><span class="line">                <span class="string">"Asia"</span></span><br><span class="line">            ],</span><br><span class="line">            [</span><br><span class="line">                <span class="string">"Jack"</span>,</span><br><span class="line">                <span class="string">"America"</span></span><br><span class="line">            ]</span><br><span class="line">        ]</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> json</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_mysql_sql_from_leetcodejson</span>(<span class="params">json_str</span>):</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    json_str -- leetcode 题目的案例输入。通常是json串</span></span><br><span class="line"><span class="string">    输出 -- SQL插入串 insert ... values </span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    jo = json.loads(json_str)</span><br><span class="line">    res = []</span><br><span class="line">    <span class="keyword">for</span> db_name <span class="keyword">in</span> jo[<span class="string">'headers'</span>].keys():</span><br><span class="line">        col_list = jo[<span class="string">'headers'</span>][db_name]</span><br><span class="line">        sql = <span class="string">'insert into %s (%s) values'</span> %(db_name,<span class="string">','</span>.join(col_list))</span><br><span class="line">        <span class="comment">#print(sql)</span></span><br><span class="line">        values = []</span><br><span class="line">        <span class="keyword">for</span> x <span class="keyword">in</span> jo[<span class="string">'rows'</span>][db_name]:</span><br><span class="line">            tos = [<span class="string">'NULL'</span> <span class="keyword">if</span> y <span class="keyword">is</span> <span class="literal">None</span> <span class="keyword">else</span> <span class="string">'\'%s\''</span> % (y) <span class="keyword">for</span> y <span class="keyword">in</span> x]</span><br><span class="line">            values.append(<span class="string">'(%s)'</span> % (<span class="string">','</span>.join(tos)))</span><br><span class="line">        sql += <span class="string">','</span>.join(values)+<span class="string">';'</span></span><br><span class="line">        res.append(sql)</span><br><span class="line">    <span class="keyword">return</span> res</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">json_str = input(<span class="string">'input leetcode json string:'</span>)</span><br><span class="line"><span class="keyword">for</span> sql <span class="keyword">in</span> get_mysql_sql_from_leetcodejson(json_str):</span><br><span class="line">    print(sql)</span><br><span class="line"><span class="comment"># 输入上面的json用例数据，执行程序得出：</span></span><br><span class="line"><span class="comment"># insert into student (name,continent) values('Jane','America'),('Pascal','Europe'),('Xi','Asia'),('Jack','America');</span></span><br></pre></td></tr></tbody></table></figure><script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/12/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/12/">12</a><span class="page-number current">13</span><a class="page-number" href="/page/14/">14</a><span class="space">&hellip;</span><a class="page-number" href="/page/27/">27</a><a class="extend next" rel="next" href="/page/14/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/12/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/12/">12</a><span class="page-number current">13</span><a class="page-number" href="/page/14/">14</a><span class="space">&hellip;</span><a class="page-number" href="/page/28/">28</a><a class="extend next" rel="next" href="/page/14/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 <script src="/js/comments.js"></script>
 </div>

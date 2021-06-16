@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<meta name="hexo-config" content="{&quot;hostname&quot;:&quot;bubbleboy11.github.io&quot;,&quot;root&quot;:&quot;/&quot;,&quot;images&quot;:&quot;/images&quot;,&quot;scheme&quot;:&quot;Muse&quot;,&quot;version&quot;:&quot;8.3.0&quot;,&quot;exturl&quot;:false,&quot;sidebar&quot;:{&quot;position&quot;:&quot;left&quot;,&quot;display&quot;:&quot;post&quot;,&quot;padding&quot;:18,&quot;offset&quot;:12},&quot;copycode&quot;:true,&quot;bookmark&quot;:{&quot;enable&quot;:false,&quot;color&quot;:&quot;#222&quot;,&quot;save&quot;:&quot;auto&quot;},&quot;fancybox&quot;:false,&quot;mediumzoom&quot;:false,&quot;lazyload&quot;:false,&quot;pangu&quot;:false,&quot;comments&quot;:{&quot;style&quot;:&quot;tabs&quot;,&quot;active&quot;:null,&quot;storage&quot;:true,&quot;lazyload&quot;:false,&quot;nav&quot;:null},&quot;motion&quot;:{&quot;enable&quot;:true,&quot;async&quot;:false,&quot;transition&quot;:{&quot;post_block&quot;:&quot;fadeIn&quot;,&quot;post_header&quot;:&quot;fadeInDown&quot;,&quot;post_body&quot;:&quot;fadeInDown&quot;,&quot;coll_header&quot;:&quot;fadeInLeft&quot;,&quot;sidebar&quot;:&quot;fadeInUp&quot;}},&quot;prism&quot;:false,&quot;i18n&quot;:{&quot;placeholder&quot;:&quot;搜索...&quot;,&quot;empty&quot;:&quot;没有找到任何搜索结果：${query}&quot;,&quot;hits_time&quot;:&quot;找到 ${hits} 个搜索结果（用时 ${time} 毫秒）&quot;,&quot;hits&quot;:&quot;找到 ${hits} 个搜索结果&quot;}}">
+<meta name="description" content="微信支付和支付宝支付都是要求企业认证才可以完成的，个人开发不可以，所以我们需要用 沙箱环境，它可以让我们不具备这些应用或者说应用审核还没通过的时候先开发调试 如何接入支付宝？（接入其他平台基本类似）  蚂蚁金服开放平台。 入驻平台。 开发者中心。 文档中心。 SDK集成 - PYPI链接。 API列表。  支付宝的支付API还提供了交易查询、交易结算、退款、退款查询等一系列的接口，可以根据业务需要">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python支付宝">
+<meta property="og:url" content="https://bubbleboy11.github.io/2021/05/06/python-zhi-fu-bao/index.html">
+<meta property="og:site_name" content="外心人D的博客">
+<meta property="og:description" content="微信支付和支付宝支付都是要求企业认证才可以完成的，个人开发不可以，所以我们需要用 沙箱环境，它可以让我们不具备这些应用或者说应用审核还没通过的时候先开发调试 如何接入支付宝？（接入其他平台基本类似）  蚂蚁金服开放平台。 入驻平台。 开发者中心。 文档中心。 SDK集成 - PYPI链接。 API列表。  支付宝的支付API还提供了交易查询、交易结算、退款、退款查询等一系列的接口，可以根据业务需要">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://bubbleboy11.github.io/2021/05/06/python-zhi-fu-bao/1.png">
+<meta property="og:image" content="https://bubbleboy11.github.io/2021/05/06/python-zhi-fu-bao/2.png">
+<meta property="article:published_time" content="2021-05-05T16:21:41.000Z">
+<meta property="article:modified_time" content="2021-06-15T01:39:34.351Z">
+<meta property="article:author" content="外心人D">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://bubbleboy11.github.io/2021/05/06/python-zhi-fu-bao/1.png">
+
+
+<link rel="canonical" href="https://bubbleboy11.github.io/2021/05/06/python-zhi-fu-bao/">
+
+
+
+<meta name="hexo-config-page" content="{&quot;sidebar&quot;:&quot;&quot;,&quot;isHome&quot;:false,&quot;isPost&quot;:true,&quot;lang&quot;:&quot;zh-CN&quot;}">
+<meta name="hexo-config-calendar" content="">
+<script data-pjax src="/js/load-config.js"></script>
+  <title>python支付宝 | 外心人D的博客</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="外心人D的博客" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">外心人D的博客</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E6%9E%90returnurl%E5%92%8Cnotifyurl"><span class="nav-text">分析returnurl和notifyurl</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">外心人D</p>
+  <div class="site-description" itemprop="description">本博客大多内容为慕课和网上博客，并非原创</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">275</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">40</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/05/06/python-zhi-fu-bao/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          python支付宝
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-05-05 16:21:41" itemprop="dateCreated datePublished" datetime="2021-05-05T16:21:41Z">2021-05-05</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-06-15 01:39:34" itemprop="dateModified" datetime="2021-06-15T01:39:34Z">2021-06-15</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>微信支付和支付宝支付都是要求企业认证才可以完成的，个人开发不可以，所以我们需要用</p>
+<p>沙箱环境，它可以让我们不具备这些应用或者说应用审核还没通过的时候先开发调试</p>
+<p>如何接入支付宝？（接入其他平台基本类似）</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://open.alipay.com/platform/home.htm">蚂蚁金服开放平台</a>。</li>
+<li><a target="_blank" rel="noopener" href="https://open.alipay.com/platform/homeRoleSelection.htm">入驻平台</a>。</li>
+<li><a target="_blank" rel="noopener" href="https://openhome.alipay.com/platform/appManage.htm#/apps">开发者中心</a>。</li>
+<li><a target="_blank" rel="noopener" href="https://docs.open.alipay.com/270/105899/">文档中心</a>。</li>
+<li><a target="_blank" rel="noopener" href="https://docs.open.alipay.com/54/103419">SDK集成</a> - <a target="_blank" rel="noopener" href="https://pypi.org/project/alipay-sdk-python/">PYPI链接</a>。</li>
+<li><a target="_blank" rel="noopener" href="https://docs.open.alipay.com/270/105900/">API列表</a>。</li>
+</ol>
+<p>支付宝的支付API还提供了交易查询、交易结算、退款、退款查询等一系列的接口，可以根据业务需要进行调用</p>
+<p>沙箱地址<br><a target="_blank" rel="noopener" href="https://openhome.alipay.com/platform/appDaily.htm?tab=info">https://openhome.alipay.com/platform/appDaily.htm?tab=info</a>此时可以看到APPID、支付宝网关和RSA2(SHA256)密钥</p>
+<p>应用私钥需填写到代码中供签名时使用。<br>应用公钥需提供给支付宝账号管理者上传到支付宝开放平台。<br>，这个支付宝公钥在代码中验签使用。<br>应用私钥和支付宝公钥特别重要，应用公钥对我们用处不大。请求支付宝接口时，用我们的应用私钥来进行加密，支付宝用我们上传的应用公钥对签名做验证；支付宝公钥用来查询订单状态。</p>
+<p>公钥和私钥的生成<br><a target="_blank" rel="noopener" href="https://docs.open.alipay.com/291/105971/">https://docs.open.alipay.com/291/105971/</a>下载后安装按照以下示意生成应用公钥和私钥：</p>
+<p>把生成的公钥和私钥拷贝到到项目trade/keys下面—&gt;&gt;&gt;重命名—&gt;&gt;首位各添加下面的内容<br>中间部分对应着公钥或私钥，</p>
+<figure class="highlight vbnet"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">-----BEGIN RSA <span class="keyword">PRIVATE</span> <span class="keyword">KEY</span>-----</span><br><span class="line"></span><br><span class="line">-----<span class="keyword">END</span> RSA <span class="keyword">PRIVATE</span> <span class="keyword">KEY</span>-----</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight txt"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-----BEGIN PUBLIC KEY-----</span><br><span class="line">-----END PUBLIC KEY-----</span><br></pre></td></tr></tbody></table></figure>
+
+<p>文档说明<br>我们主要用到电脑网站支付，<br>文档-网页&amp;移动-API<br>文档地址：<a target="_blank" rel="noopener" href="https://docs.open.alipay.com/270">https://docs.open.alipay.com/270</a><br>用到的API接口：统一收单下单并支付页面接口<br>在公共请求参数中，大部分的参数已经获取到或为固定值，比较重要的两个为sign和biz_content，其中sign是商户请求参数的签名串，biz_content是请求参数的集合，最大长度不限，除公共参数外所有请求参数都必须放在这个参数中传递；在请求参数中，out_trade_no、product_code、total_amount和subject为必填参数，其他均为选填，可根据需要填写。</p>
+<p>sign参数即签名，需要专门生成，可参考<a target="_blank" rel="noopener" href="https://opendocs.alipay.com/open/291/105974%EF%BC%8C%E8%BF%99%E9%87%8C%E9%80%89%E6%8B%A9%E6%99%AE%E9%80%9A%E5%85%AC%E9%92%A5%E6%96%B9%E5%BC%8F%E7%94%9F%E6%88%90%E7%AD%BE%E5%90%8D%EF%BC%8C%E5%8F%AF%E4%BB%A5%E4%BD%BF%E7%94%A8%E5%BC%80%E6%94%BE%E5%B9%B3%E5%8F%B0SDK%E6%8E%A5%E5%85%A5%EF%BC%8C%E4%B9%9F%E5%8F%AF%E4%BB%A5%E6%9C%AA%E4%BD%BF%E7%94%A8%E5%BC%80%E6%94%BE%E5%B9%B3%E5%8F%B0SDK%E3%80%81%E8%87%AA%E8%A1%8C%E5%AE%9E%E7%8E%B0%E7%AD%BE%E5%90%8D%E8%BF%87%E7%A8%8B%EF%BC%8C%E8%BF%98%E5%8F%AF%E4%BB%A5%E7%9B%B4%E6%8E%A5%E4%BD%BF%E7%94%A8%E6%94%AF%E4%BB%98%E5%AE%9D%E5%BC%80%E6%94%BE%E5%B9%B3%E5%8F%B0%E5%BC%80%E5%8F%91%E5%8A%A9%E6%89%8B%E7%9A%84%E7%AD%BE%E5%90%8D%E5%8A%9F%E8%83%BD%E3%80%82">https://opendocs.alipay.com/open/291/105974，这里选择普通公钥方式生成签名，可以使用开放平台SDK接入，也可以未使用开放平台SDK、自行实现签名过程，还可以直接使用支付宝开放平台开发助手的签名功能。</a></p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install python-alipay-sdk</span><br></pre></td></tr></tbody></table></figure>
+
+<p>下载不了</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/fzlee/alipay/releases">https://github.com/fzlee/alipay/releases</a><br><a target="_blank" rel="noopener" href="https://github.com/fzlee/alipay/blob/master/docs/apis.zh-hans.md#alipay.trade.page.pay">https://github.com/fzlee/alipay/blob/master/docs/apis.zh-hans.md#alipay.trade.page.pay</a></p>
+<p>下载模块包到安装地址（压缩文件zip或tar.gz），进行解压，到达指定位置进入模块文件夹，执行：</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python setup.py install</span><br></pre></td></tr></tbody></table></figure>
+
+<p>django集成支付宝notify_url和return_url</p>
+<p><code>settings.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 支付宝相关的key</span></span><br><span class="line">APP_PRIVATE_KEY_PATH = str(BASE_DIR / <span class="string">'apps/trade/keys/app_private.txt'</span>)</span><br><span class="line">ALIPAY_PUBLIC_KEY_PATH = str(BASE_DIR / <span class="string">'apps/trade/keys/ali_public.txt'</span>)</span><br><span class="line">ALI_APP_ID= <span class="string">"2021000116675762"</span></span><br><span class="line">RETURN_URL = <span class="string">'http://127.0.0.1:8000/alipay/return/'</span></span><br><span class="line">NOTIFY_URL = <span class="string">'http://127.0.0.1:8000/alipay/return/'</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>trade/views.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> datetime <span class="keyword">import</span> datetime</span><br><span class="line"><span class="keyword">from</span> utils.alipay <span class="keyword">import</span> AliPay</span><br><span class="line"><span class="keyword">from</span> rest_framework.views <span class="keyword">import</span> APIView</span><br><span class="line"><span class="keyword">from</span> mxshop.settings <span class="keyword">import</span> ali_pub_key_path, private_key_path</span><br><span class="line"><span class="keyword">from</span> rest_framework.response <span class="keyword">import</span> Response</span><br></pre></td></tr></tbody></table></figure>
+
+<p>创建订单的时候生成一个支付的url，通过上面返回的链接可以进入支付页面，支付完成后会自动跳转回上面代码中设定好的项目页面，在该页面中可以获得订单号（out_trade_no）、支付流水号（trade_no）、交易金额（total_amount）和对应的签名（sign）并请求后端验证和保存交易结果，</p>
+<p>这个逻辑<code>OderSerializer</code>和<code>OrderDetailSerializer</code>中都添加<br><code>trade/serializers.py</code></p>
+<p><code>/trade/views.py</code> 增加一个API视图，用于处理支付宝的返回</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> .models <span class="keyword">import</span> ShoppingCart</span><br><span class="line"><span class="keyword">from</span> rest_framework <span class="keyword">import</span> serializers</span><br><span class="line"><span class="keyword">from</span> goods.models <span class="keyword">import</span> Goods</span><br><span class="line"><span class="keyword">from</span> goods.serializers <span class="keyword">import</span> GoodsSerializer</span><br><span class="line"><span class="keyword">from</span> .models <span class="keyword">import</span> OrderInfo,OrderGoods</span><br><span class="line"><span class="keyword">from</span> MxShop.settings <span class="keyword">import</span> ali_pub_key_path, private_key_path</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AliPayView</span>(<span class="params">APIView</span>):</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    通知验证 支付宝的返回</span></span><br><span class="line"><span class="string">    get:</span></span><br><span class="line"><span class="string">        处理支付宝return_url请求</span></span><br><span class="line"><span class="string">    post:</span></span><br><span class="line"><span class="string">        处理支付宝notify_url请求</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line"></span><br><span class="line">    alipay = AliPay(</span><br><span class="line">        appid=settings.ALI_APP_ID,</span><br><span class="line">        app_notify_url=<span class="literal">None</span>,  <span class="comment"># 默认回调 url</span></span><br><span class="line">        app_private_key_string=open(settings.APP_PRIVATE_KEY_PATH).read(),</span><br><span class="line">        alipay_public_key_string=open(settings.ALIPAY_PUBLIC_KEY_PATH).read(),</span><br><span class="line">        sign_type=<span class="string">"RSA2"</span>,</span><br><span class="line">        debug=settings.DEBUG,  <span class="comment"># 默认 False</span></span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span>(<span class="params">self, request</span>):</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        处理支付宝的return_url返回</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="comment"># 1. 获取GET中参数</span></span><br><span class="line">        data = dict(request.GET.items())</span><br><span class="line">        <span class="comment"># 2. 取出sign</span></span><br><span class="line">        signature = data.pop(<span class="string">"sign"</span>, <span class="literal">None</span>)</span><br><span class="line">        print(data)</span><br><span class="line">        success = self.alipay.verify(data, signature)</span><br><span class="line">        order_sn = data.get(<span class="string">'out_trade_no'</span>, <span class="literal">None</span>)</span><br><span class="line">        print(success)</span><br><span class="line">        trade_status = self.alipay.api_alipay_trade_query(out_trade_no=order_sn).get(<span class="string">"trade_status"</span>, <span class="literal">None</span>)</span><br><span class="line">        print(trade_status)</span><br><span class="line">        <span class="keyword">if</span> success <span class="keyword">and</span> trade_status <span class="keyword">in</span> (<span class="string">"TRADE_SUCCESS"</span>, <span class="string">"TRADE_FINISHED"</span>):</span><br><span class="line">            trade_no = data.get(<span class="string">'trade_no'</span>, <span class="literal">None</span>)</span><br><span class="line">            existed_orders = OrderInfo.objects.filter(order_sn=order_sn, is_delete=<span class="literal">False</span>)</span><br><span class="line">            <span class="keyword">if</span> existed_orders:</span><br><span class="line">                <span class="keyword">for</span> order <span class="keyword">in</span> existed_orders:</span><br><span class="line">                    order_goods = order.goods.all()</span><br><span class="line">                    <span class="keyword">for</span> order_good <span class="keyword">in</span> order_goods:</span><br><span class="line">                        goods = order_good.goods</span><br><span class="line">                        goods.sold_num += order_good.goods_num</span><br><span class="line">                        goods.save()</span><br><span class="line">                    order.pay_status = trade_status</span><br><span class="line">                    order.trade_no = trade_no</span><br><span class="line">                    order.pay_time = datetime.now()</span><br><span class="line">                    order.save()</span><br><span class="line">                response = HttpResponseRedirect(<span class="string">'http://127.0.0.1:8080/#/app/home/member/order'</span>)</span><br><span class="line">                response.set_cookie(<span class="string">'nextPath'</span>, <span class="string">'pay'</span>, max_age=<span class="number">2</span>)</span><br><span class="line">                print(<span class="string">'cookie'</span>, response.cookies)</span><br><span class="line">                <span class="keyword">return</span> response</span><br><span class="line">        <span class="keyword">return</span> HttpResponseRedirect(<span class="string">'http://127.0.0.1:8080/#/app/shoppingcart/cart'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">post</span>(<span class="params">self, request</span>):</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        处理支付宝的notify_url 验签处理订单状态</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="comment"># 请求参数（假设是POST请求）中包括订单号、支付流水号、交易金额和签名</span></span><br><span class="line">        data = dict(request.POST.items())</span><br><span class="line">        <span class="comment"># 把sign pop掉，文档有说明</span></span><br><span class="line">        signature = data.pop(<span class="string">"sign"</span>, <span class="literal">None</span>)</span><br><span class="line">        <span class="comment"># 调用验证操作</span></span><br><span class="line">        success = self.alipay.verify(data, signature)</span><br><span class="line">        order_sn = data.get(<span class="string">'out_trade_no'</span>, <span class="literal">None</span>)  <span class="comment"># 原支付请求的商户订单号</span></span><br><span class="line">        trade_status = self.alipay.api_alipay_trade_query(out_trade_no=order_sn).get(<span class="string">"trade_status"</span>, <span class="literal">None</span>)</span><br><span class="line">        <span class="keyword">if</span> success <span class="keyword">and</span> trade_status <span class="keyword">in</span> (<span class="string">"TRADE_SUCCESS"</span>, <span class="string">"TRADE_FINISHED"</span>):</span><br><span class="line">            trade_no = data.get(<span class="string">'trade_no'</span>, <span class="literal">None</span>)  <span class="comment"># 支付宝交易凭证号</span></span><br><span class="line">            <span class="comment"># 订单商品</span></span><br><span class="line">            existed_orders = OrderInfo.objects.filter(order_sn=order_sn, is_delete=<span class="literal">False</span>)</span><br><span class="line">            print(len(existed_orders))</span><br><span class="line">            <span class="keyword">if</span> existed_orders:</span><br><span class="line">                <span class="keyword">for</span> order <span class="keyword">in</span> existed_orders:</span><br><span class="line">                    order_goods = order.goods.all()</span><br><span class="line">                    <span class="comment"># 商品销量增加订单中数值</span></span><br><span class="line">                    <span class="keyword">for</span> order_good <span class="keyword">in</span> order_goods:</span><br><span class="line">                        <span class="comment"># 获取订单中商品</span></span><br><span class="line">                        goods = order_good.goods</span><br><span class="line">                        <span class="comment"># 销量根据订单商品数量增加增加</span></span><br><span class="line">                        goods.sold_num += order_good.goods_num</span><br><span class="line">                        goods.save()</span><br><span class="line">                    <span class="comment"># 更新数据库订单状态</span></span><br><span class="line">                    order.pay_status = trade_status</span><br><span class="line">                    order.trade_no = trade_no</span><br><span class="line">                    order.pay_time = datetime.now()</span><br><span class="line">                    order.save()</span><br><span class="line">                response = HttpResponseRedirect(<span class="string">'http://127.0.0.1:8080/#/app/home/member/order'</span>)</span><br><span class="line">                response.set_cookie(<span class="string">'nextPath'</span>, <span class="string">'pay'</span>, max_age=<span class="number">2</span>)</span><br><span class="line">                print(<span class="string">'cookie'</span>, response.cookies)</span><br><span class="line">                <span class="keyword">return</span> response</span><br><span class="line">        <span class="keyword">return</span> HttpResponseRedirect(<span class="string">'http://127.0.0.1:8080/#/app/shoppingcart/cart'</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>url.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">path(<span class="string">'alipay/return/'</span>, AlipayView.as_view())</span><br></pre></td></tr></tbody></table></figure>
+
+<p>添加商品到购物车–&gt;&gt;去结算–&gt;&gt;生成订单–&gt;&gt;跳到支付页面了–&gt;支付完成后跳转回订单页面。</p>
+<h3 id="分析returnurl和notifyurl"><a href="#分析returnurl和notifyurl" class="headerlink" title="分析returnurl和notifyurl"></a>分析returnurl和notifyurl</h3><p>当用户创建好订单之后，跳转到支付宝页面进行支付，如果用户通过扫码或登录支付宝，就会创建一个支付宝订单，确认支付后，支付宝会自动跳转到<code>return_url="http://{}:8000/".format(server_ip)</code>配置的商户页面地址，并且传入很多参数<br>我们可以获取到url中的参数，验证支付宝返回的数据判断用户是否已经支付，<br>判定用户是否确认时已支付的，因为数据在传输过程中可能会被截获修改，<br>如果不去做验证，系统上修改订单状态后，却没收到款。如果支付就修改订单状态。</p>
+<p>还有一种情况就是创建订单，通过扫码，或登录支付宝创建支付宝订单后，用户并没有确认支付，而是关闭了该页面，在手机上个人订单中去支付，那么<code>return_url</code>就无效了，而此时，我们的应用就无法判断该订单是否已支付。这时候<code>notify_url</code>就有用了，支付宝会通过异步方式，向该url发起一个请求（POST），并传递一些参数，我们的应用获取参数，解析其中的信息，对订单状态进行修改。</p>
+<p><a target="_blank" rel="noopener" href="https://docs.open.alipay.com/270/105902/">https://docs.open.alipay.com/270/105902/</a> 查看参数</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>参数名称</th>
+<th>类型</th>
+<th>必填</th>
+<th>描述</th>
+<th>范例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>sign</td>
+<td>签名</td>
+<td>String(256)</td>
+<td>是</td>
+<td>请参考异步返回结果的验签</td>
+<td>601510b7970e52cc63db0f44997cf70e</td>
+</tr>
+</tbody></table>
+<p>获取url中所有参数，拿到这个sign后，可以通过支付宝的公钥进行验签，验证是否是支付宝发过来的。</p>
+<p>支付宝支付逻辑编写<br>由于<code>return_url</code>是一个同步GET请求，<code>notify_url</code>是一个异步POST请求，可以将其放在一个API中实现，跟支付宝相关，没有model，所以就用最底层的APIView。</p>
+<p>对于<code>return_url</code>，用户支付完成后，支付宝会根据API中商户传入的<code>return_url</code>参数，通过GET请求的形式将部分支付结果参数通知到商户系统。</p>
+<p><code>notify_url</code>很重要，只要用户完成支付，就向该url发起一个异步请求，告诉用户已支付。</p>
+<p>在 支付宝开放平台文档中心-电脑网站支付 中，支付结果异步通知 <a target="_blank" rel="noopener" href="https://docs.open.alipay.com/270/105902/">https://docs.open.alipay.com/270/105902/</a> 文档可以看到相关参数</p>
+<p>对于 PC 网站支付的交易，在用户支付完成之后，支付宝会根据 API 中商户传入的 <code>notify_url</code>，通过 POST 请求的形式将支付结果作为参数通知到商户系统。<br>当前在return_url的GET逻辑中，可以不用再次修改订单状态，因为在用户支付成功后，支付宝发送的POST请求已经修改了订单状态了。</p>
+<p>对比下POST和GET中的内容</p>
+<figure class="highlight 1c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[<span class="number">08</span>/Aug/<span class="number">2019</span> <span class="number">13</span>:<span class="number">25</span>:<span class="number">45</span>] <span class="string">"POST /orderinfo/ HTTP/1.1"</span> <span class="number">201</span> <span class="number">12954</span></span><br><span class="line">request.POST的值： {'gmt_create': '<span class="number">2019-08-08</span> 13:26:12', 'charset': 'utf-8', 'gmt_payment': '<span class="number">2019-08-08</span> 13:26:20', 'notify_time': '<span class="number">2019-08-08</span> 13:26:21', 'subject': '生鲜超市-<span class="number">20190808132544</span>135', 'sign': 'DkQqkJwi5BnNKdlaVrybA0oLC9wL7aD61aV7vaF6jF6KrFsdDKAS+fS8Y2MQuKqAcPobsM/8ab3FVo7diRnEwXckugP8m6KW5TxFnnPwDh6J3dbNDUNyXTWYKiHCAKMvsV4ZuM7YkJQEGGbs2irf90uM8kxvOaZBGuI6D8QPhc/o6CyCYUJgJU4Zvs6DFuu9Wo1JwldnA9K4E9dd5UJpLI5KmIP6OTjZ13EcoXaslRgjcYdDAj21+cqCpwuD5+EGOuO+6/7T/WMgNSjPPy+cSehVBI9GnhuM7WmH2IQafR+510BLgN12agv4DJB+E1dZAibFAMJFA3Gn/cKDPPjqeQ==', 'buyer_id': '<span class="number">20881021794215</span>71', 'invoice_amount': '10.00', 'version': '1.0', 'notify_id': '<span class="number">20190808002221</span><span class="number">32620021571000</span><span class="number">416125</span>', 'fund_bill_list': '[{"amount":"10.00","fundChannel":"ALIPAYACCOUNT"}]', 'notify_type': 'trade_status_sync', 'out_trade_no': '<span class="number">20190808132544</span>135', 'total_amount': '10.00', 'trade_status': 'TRADE_SUCCESS', 'trade_no': '<span class="number">20190808220014</span><span class="number">21571000029372</span>', 'auth_app_id': '<span class="number">20161009006466</span>09', 'receipt_amount': '10.00', 'point_amount': '0.00', 'app_id': '<span class="number">20161009006466</span>09', 'buyer_pay_amount': '10.00', 'sign_type': 'RSA2', 'seller_id': '<span class="number">20881021787621</span>03'}</span><br><span class="line"></span><br><span class="line">[<span class="number">08</span>/Aug/<span class="number">2019</span> <span class="number">13</span>:<span class="number">26</span>:<span class="number">22</span>] <span class="string">"POST /alipay/return/ HTTP/1.1"</span> <span class="number">200</span> <span class="number">9</span></span><br><span class="line">request.GET的值： {'charset': 'utf-8', 'out_trade_no': '<span class="number">20190808132544</span>135', 'method': 'alipay.trade.page.pay.return', 'total_amount': '10.00', 'sign': 'FJputH1jTssknTDV1C5OUOkk3mFNK8qQj5EdszFrizxPmOvS5++v0Apl8ajggksgwlDk20yF/JwI3CdozpnErxZ/4pDMdU2I2A99vXb55akbVPJK6T9/YOo10HC/X+ctctm63ew/vRBIcxtP+BTgj7U+TvKwGkCdy0ZxRm1Ja9GJOwE8Nb4qdp0BQo4hFQ96QNVb0tQ9wTPe6R3qdjLdfyqHhj+GnILxBBehOSHJmDzsQMeMrKhOdY9FtXj21b8aW1YKNulhIU7C8TeUAifu3khmocNMwH+iv9A/hhlqrWjCvlCDUi1GDNRm1W9PCHl+vV6XIitetIOOOsmLlAfq2A==', 'trade_no': '<span class="number">20190808220014</span><span class="number">21571000029372</span>', 'auth_app_id': '<span class="number">20161009006466</span>09', 'version': '1.0', 'app_id': '<span class="number">20161009006466</span>09', 'sign_type': 'RSA2', 'seller_id': '<span class="number">20881021787621</span>03', 'timestamp': '<span class="number">2019-08-08</span> 13:26:27'}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="/2021/05/06/python-zhi-fu-bao/1.png" alt="description"><br><img src="/2021/05/06/python-zhi-fu-bao/2.png" alt="description"></p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/05/05/xu-lie-hua/" rel="prev" title="序列化">
+                  <i class="fa fa-chevron-left"></i> 序列化
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/05/06/drf-ding-dan/" rel="next" title="drf订单">
+                  drf订单 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+<script src="/js/comments.js"></script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">外心人D</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
