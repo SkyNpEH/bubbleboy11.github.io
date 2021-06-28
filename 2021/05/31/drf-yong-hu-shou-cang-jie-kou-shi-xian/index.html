@@ -39,7 +39,7 @@
 <meta property="og:image" content="https://bubbleboy11.github.io/2021/05/31/drf-yong-hu-shou-cang-jie-kou-shi-xian/10.png">
 <meta property="og:image" content="https://bubbleboy11.github.io/2021/05/31/drf-yong-hu-shou-cang-jie-kou-shi-xian/11.jpeg">
 <meta property="article:published_time" content="2021-05-30T16:21:41.000Z">
-<meta property="article:modified_time" content="2021-06-14T11:26:23.446Z">
+<meta property="article:modified_time" content="2021-06-16T15:11:07.548Z">
 <meta property="article:author" content="外心人D">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://bubbleboy11.github.io/2021/05/31/drf-yong-hu-shou-cang-jie-kou-shi-xian/1.png">
@@ -120,7 +120,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Advanced-field-defaults"><span class="nav-text">Advanced field defaults</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#CurrentUserDefault"><span class="nav-text">CurrentUserDefault</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E6%88%B7%E6%94%B6%E8%97%8F%E5%95%86%E5%93%81%E8%AF%A6%E6%83%85"><span class="nav-text">用户收藏商品详情</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%95%86%E5%93%81%E6%94%B6%E8%97%8F%E6%95%B0"><span class="nav-text">商品收藏数</span></a></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E6%88%B7%E6%94%B6%E8%97%8F%E5%95%86%E5%93%81%E8%AF%A6%E6%83%85"><span class="nav-text">用户收藏商品详情</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%95%86%E5%93%81%E6%94%B6%E8%97%8F%E6%95%B0"><span class="nav-text">商品收藏数</span></a></div>
         </div>
         <!--/noindex-->
 
@@ -133,7 +133,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">275</span>
+          <span class="site-state-item-count">301</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -214,7 +214,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-06-14 11:26:23" itemprop="dateModified" datetime="2021-06-14T11:26:23Z">2021-06-14</time>
+        <time title="修改时间：2021-06-16 15:11:07" itemprop="dateModified" datetime="2021-06-16T15:11:07Z">2021-06-16</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -242,20 +242,12 @@
 <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserFav</span>(<span class="params">models.Model</span>):</span></span><br><span class="line">    <span class="string">'''用户收藏'''</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        <span class="comment"># 联合唯一验证，当数据已存在时，数据库就会抛出异常</span></span><br><span class="line">        unique_together = (<span class="string">'user'</span>, <span class="string">'goods'</span>)</span><br></pre></td></tr></tbody></table></figure>
 
 <p>法二：<br>序列化验证器<code>UniqueTogetherValidator</code></p>
-<h3 id="Advanced-field-defaults"><a href="#Advanced-field-defaults" class="headerlink" title="Advanced field defaults"></a>Advanced field defaults</h3><p>添加指定商品和当前用户到收藏，所以需要获取当前用户<br><a target="_blank" rel="noopener" href="https://www.django-rest-framework.org/api-guide/validators/#advanced-field-defaults">https://www.django-rest-framework.org/api-guide/validators/#advanced-field-defaults</a></p>
-<p>Validators that are applied across multiple fields in the serializer can sometimes require a field input that should not be provided by the API client, but that is available as input to the validator.<br>在序列化器中跨多个字段应用的验证器有时可能需要一个字段输入，这个字段不应该由API客户机提供，但是可以作为验证器的输入。</p>
-<p>Two patterns that you may want to use for this sort of validation include:<br>可能想要使用两种模式来进行这种验证:</p>
-<ul>
-<li><p>Using <code>HiddenField</code>. This field will be present in <code>validated_data</code> but will not be used in the serializer output representation.<br>使用<code>HiddenField</code>隐藏字段，该字段将出现在<code>validated_data</code>中，但序列化输出时不会显示出来</p>
-</li>
-<li><p>Using a standard field with <code>read_only=True</code>, but that also includes a <code>default=…</code> argument. This field will be used in the serializer output representation, but cannot be set directly by the user.<br>使用带有<code>read_only=True</code>的标准字段，但该字段也包含一个<code>default=…</code>参数。此字段将在序列化器输出表示中使用，但不能由用户直接设置。</p>
-</li>
-</ul>
-<p>REST framework includes a couple of defaults that may be useful in this context.REST框架包含一些缺省值，这些缺省值在此上下文中可能很有用。</p>
-<h4 id="CurrentUserDefault"><a href="#CurrentUserDefault" class="headerlink" title="CurrentUserDefault"></a><code>CurrentUserDefault</code></h4><p>A default class that can be used to represent the current user. In order to use this, the ‘request’ must have been provided as part of the context dictionary when instantiating the serializer.<br>可用于表示当前用户的默认类。为了使用它，在实例化序列化器时，request必须作为上下文字典的一部分提供</p>
+<p>添加指定商品和当前用户到收藏，所以需要获取当前用户<br><code>Advanced field defaults</code>的<code>CurrentUserDefault</code></p>
+<p>A default class that can be used to represent the current user. In order to use this,<br>the ‘request’ must have been provided as part of the context dictionary when instantiating the serializer.<br>可用于表示当前用户的默认类。为了使用它，在实例化序列化器时，request必须作为上下文字典的一部分提供</p>
 <p><code>user_operation/serializers.py</code></p>
 <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework <span class="keyword">import</span> serializers</span><br><span class="line"><span class="keyword">from</span> rest_framework.validators <span class="keyword">import</span> UniqueTogetherValidator</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> .models <span class="keyword">import</span> UserFav</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserFavSerializer</span>(<span class="params">serializers.ModelSerializer</span>):</span></span><br><span class="line">    <span class="string">"""序列化用户收藏数据"""</span></span><br><span class="line">    <span class="comment"># 获取当前登录用户，不可以选择其他用户</span></span><br><span class="line">    user = serializers.HiddenField(default=serializers.CurrentUserDefault())</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        model = UserFav</span><br><span class="line">        <span class="comment"># 收藏的时候需要返回商品的id，因为取消收藏的时候必须知道商品的id是多少</span></span><br><span class="line">        fields = [<span class="string">'id'</span>, <span class="string">'user'</span>, <span class="string">'goods'</span>]</span><br><span class="line">        <span class="comment"># UserFav items belong to a parent list, and have an ordering defined by the 'position' field.</span></span><br><span class="line">        <span class="comment"># No two items in a given list may share the same position.</span></span><br><span class="line">        <span class="comment"># UserFav项目属于父列表，并且有一个由“position”字段定义的顺序。给定列表中的任何两项不得共享同一位置。</span></span><br><span class="line">        validators = [  <span class="comment"># validate实现唯一联合，同一用户对同一商品只能收藏一次</span></span><br><span class="line">            UniqueTogetherValidator(</span><br><span class="line">                queryset=UserFav.objects.filter(is_delete=<span class="literal">False</span>),</span><br><span class="line">                fields=[<span class="string">'user'</span>, <span class="string">'goods'</span>],</span><br><span class="line">                message=<span class="string">'请勿重复收藏'</span>  <span class="comment"># message的信息可以自定义</span></span><br><span class="line">            )</span><br><span class="line">        ]</span><br></pre></td></tr></tbody></table></figure>
 
+<p>以上<code>validators</code>不是作用域某个字段之上了，需要写在<code>Meta</code>中，因为<code>UniqueTogetherValidator</code>是作用域两个或两个字段以上的，不是针对一个字段，所以需要写在这。</p>
 <p>按照商品的<code>id</code>显示收藏详情。可用性高，用户进入商品详情页，用户要去查询这个商品有没有被收藏，<br>在数据接口url中传入商品 goods_id去查询，<br>如果有记录，则页面就显示已收藏的信息，如果没被记录，表明商品没被收藏。<br>而不再是根据默认的UserFav收藏表的主键id进行查找，实现自己设置查询使用字段进行查询queryset对象</p>
 <p><code>lookup_field</code>字段是在<code>get_queryset(self)</code>筛选过滤之后的结果进行查找，也就是过滤当前登录用户，保证了唯一性，所以不会出错。对于同一个商品，可能会被很多人收藏，但并不会造成查询出错，因为模型定义了商品和用户构成了联合唯一，过滤当前登录用户则对应的收藏商品唯一</p>
 <p><code>user_operation/views.py</code></p>

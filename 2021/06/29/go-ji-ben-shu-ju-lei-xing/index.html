@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<meta name="hexo-config" content="{&quot;hostname&quot;:&quot;bubbleboy11.github.io&quot;,&quot;root&quot;:&quot;/&quot;,&quot;images&quot;:&quot;/images&quot;,&quot;scheme&quot;:&quot;Muse&quot;,&quot;version&quot;:&quot;8.3.0&quot;,&quot;exturl&quot;:false,&quot;sidebar&quot;:{&quot;position&quot;:&quot;left&quot;,&quot;display&quot;:&quot;post&quot;,&quot;padding&quot;:18,&quot;offset&quot;:12},&quot;copycode&quot;:true,&quot;bookmark&quot;:{&quot;enable&quot;:false,&quot;color&quot;:&quot;#222&quot;,&quot;save&quot;:&quot;auto&quot;},&quot;fancybox&quot;:false,&quot;mediumzoom&quot;:false,&quot;lazyload&quot;:false,&quot;pangu&quot;:false,&quot;comments&quot;:{&quot;style&quot;:&quot;tabs&quot;,&quot;active&quot;:null,&quot;storage&quot;:true,&quot;lazyload&quot;:false,&quot;nav&quot;:null},&quot;motion&quot;:{&quot;enable&quot;:true,&quot;async&quot;:false,&quot;transition&quot;:{&quot;post_block&quot;:&quot;fadeIn&quot;,&quot;post_header&quot;:&quot;fadeInDown&quot;,&quot;post_body&quot;:&quot;fadeInDown&quot;,&quot;coll_header&quot;:&quot;fadeInLeft&quot;,&quot;sidebar&quot;:&quot;fadeInUp&quot;}},&quot;prism&quot;:false,&quot;i18n&quot;:{&quot;placeholder&quot;:&quot;搜索...&quot;,&quot;empty&quot;:&quot;没有找到任何搜索结果：${query}&quot;,&quot;hits_time&quot;:&quot;找到 ${hits} 个搜索结果（用时 ${time} 毫秒）&quot;,&quot;hits&quot;:&quot;找到 ${hits} 个搜索结果&quot;}}">
+<meta name="description" content="静态语言中中文处理很容易出错 bool类型布尔型的值只可以是常量 true 或者 false。一个简单的例子：var b bool &#x3D; true 字符在go中字符和字符串不是一种类型字符类型是单引号&#39;&#39; 字符本质是一个数字， 可以进行加减乘除 字符串是双引号&quot;&quot;，字符常量只能使用单引号括起来 Golang中没有专门的字符类型，如果要存储单个字符(字母)，一般使用byte来保存。 字符串就是一串固定">
+<meta property="og:type" content="article">
+<meta property="og:title" content="go基本数据类型">
+<meta property="og:url" content="https://bubbleboy11.github.io/2021/06/29/go-ji-ben-shu-ju-lei-xing/index.html">
+<meta property="og:site_name" content="外心人D的博客">
+<meta property="og:description" content="静态语言中中文处理很容易出错 bool类型布尔型的值只可以是常量 true 或者 false。一个简单的例子：var b bool &#x3D; true 字符在go中字符和字符串不是一种类型字符类型是单引号&#39;&#39; 字符本质是一个数字， 可以进行加减乘除 字符串是双引号&quot;&quot;，字符常量只能使用单引号括起来 Golang中没有专门的字符类型，如果要存储单个字符(字母)，一般使用byte来保存。 字符串就是一串固定">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-06-28T17:46:44.000Z">
+<meta property="article:modified_time" content="2021-06-28T07:19:57.957Z">
+<meta property="article:author" content="外心人D">
+<meta property="article:tag" content="go">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://bubbleboy11.github.io/2021/06/29/go-ji-ben-shu-ju-lei-xing/">
+
+
+
+<meta name="hexo-config-page" content="{&quot;sidebar&quot;:&quot;&quot;,&quot;isHome&quot;:false,&quot;isPost&quot;:true,&quot;lang&quot;:&quot;zh-CN&quot;}">
+<meta name="hexo-config-calendar" content="">
+<script data-pjax src="/js/load-config.js"></script>
+  <title>go基本数据类型 | 外心人D的博客</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="外心人D的博客" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">外心人D的博客</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#bool%E7%B1%BB%E5%9E%8B"><span class="nav-text">bool类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%97%E7%AC%A6"><span class="nav-text">字符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2"><span class="nav-text">字符串</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E5%80%BC%E5%9E%8B"><span class="nav-text">数值型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%95%B4%E6%95%B0%E5%9E%8B"><span class="nav-text">整数型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B5%AE%E7%82%B9%E5%9E%8B"><span class="nav-text">浮点型</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#byte-%E7%AD%89%E4%BA%8E-uint8"><span class="nav-text">byte 等于 uint8</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rune-%E7%AD%89%E4%BA%8E-int32"><span class="nav-text">rune 等于 int32</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AF%B9%E4%BA%8Epython%E6%9D%A5%E8%AF%B4%EF%BC%8Cint%E5%8D%A0%E7%94%A8%E5%AD%97%E8%8A%82%E6%98%AF%E5%8A%A8%E6%80%81%EF%BC%8Cpython%E7%9A%84int%E6%88%91%E4%BB%AC%E4%B8%8D%E7%94%A8%E6%8B%85%E5%BF%83%E8%B6%85%E8%BF%87%E4%B8%8A%E9%99%90"><span class="nav-text">对于python来说，int占用字节是动态，python的int我们不用担心超过上限</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">外心人D</p>
+  <div class="site-description" itemprop="description">本博客大多内容为慕课和网上博客，并非原创</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">301</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">40</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/06/29/go-ji-ben-shu-ju-lei-xing/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          go基本数据类型
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2021-06-28 17:46:44 / 修改时间：07:19:57" itemprop="dateCreated datePublished" datetime="2021-06-28T17:46:44Z">2021-06-28</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/go/" itemprop="url" rel="index"><span itemprop="name">go</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>静态语言中中文处理很容易出错</p>
+<h3 id="bool类型"><a href="#bool类型" class="headerlink" title="bool类型"></a>bool类型</h3><p>布尔型的值只可以是常量 true 或者 false。一个简单的例子：var b bool = true</p>
+<h3 id="字符"><a href="#字符" class="headerlink" title="字符"></a>字符</h3><p>在go中字符和字符串不是一种类型<br>字符类型是单引号<code>''</code></p>
+<p>字符本质是一个数字， 可以进行加减乘除</p>
+<p>字符串是双引号<code>""</code>，字符常量只能使用单引号括起来</p>
+<p>Golang中没有专门的字符类型，如果要存储单个字符(字母)，一般使用<strong>byte</strong>来保存。</p>
+<p>字符串就是一串固定长度的字符连接起来的字符序列。Go的字符串是由单个字节连接起来的。<br>也就是说对于<strong>传统的字符串是由字符组成</strong>的，而Go的字符串不同，它是由<strong>字节</strong>组成的。</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">fmt.Printf(<span class="string">"%d"</span>, <span class="string">'a'</span>) <span class="comment">// 97 digit</span></span><br><span class="line">fmt.Printf(<span class="string">"%T"</span>, <span class="string">'a'</span>) <span class="comment">// int32</span></span><br><span class="line">fmt.Printf(<span class="string">"%c"</span>, <span class="number">97</span>)  <span class="comment">// a character</span></span><br><span class="line">fmt.Printf(<span class="string">"%T"</span>, <span class="number">97</span>)  <span class="comment">// int</span></span><br><span class="line">fmt.Printf(<span class="string">"%d"</span>, <span class="string">'华'</span>) <span class="comment">// 21326 单引号</span></span><br><span class="line">fmt.Printf(<span class="string">"%T"</span>, <span class="string">'华'</span>) <span class="comment">// int32 单引号</span></span><br><span class="line"></span><br><span class="line">fmt.Printf(<span class="string">"%d"</span>, <span class="string">"华"</span>) <span class="comment">// %!d(string=华) 双引号</span></span><br><span class="line">fmt.Printf(<span class="string">"%T"</span>, <span class="string">"华"</span>) <span class="comment">// string 双引号</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> b <span class="keyword">byte</span> = <span class="string">'b'</span></span><br><span class="line">fmt.Println(b)        <span class="comment">// 98</span></span><br><span class="line"><span class="comment">// fmt.Printf(b)        // cannot use b (type byte) as type string in argument to fmt.Printf</span></span><br><span class="line">fmt.Printf(<span class="string">"b=%c"</span>, b) <span class="comment">// b=b</span></span><br><span class="line"><span class="keyword">var</span> c <span class="keyword">int</span> = <span class="string">'c'</span></span><br><span class="line">fmt.Println(c)        <span class="comment">// 99</span></span><br><span class="line">fmt.Printf(<span class="string">"c=%c"</span>, c) <span class="comment">// c=c</span></span><br><span class="line"></span><br><span class="line">a := <span class="string">'a'</span></span><br><span class="line"><span class="comment">// 1. a+1可以和数字计算 2.a+1的类型是32</span></span><br><span class="line">fmt.Println(reflect.TypeOf(a + <span class="number">1</span>)) <span class="comment">// int32</span></span><br><span class="line">fmt.Printf(<span class="string">"%T\n"</span>, a+<span class="number">1</span>)            <span class="comment">// int32</span></span><br><span class="line"><span class="comment">// int类型可以直接变成字符</span></span><br><span class="line">fmt.Printf(<span class="string">"a+1=%c"</span>, a+<span class="number">1</span>)          <span class="comment">// a+1=b</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>python 单引号<code>''</code>、双引号<code>""</code> 都是字符串，没有字符的概念</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">print(<span class="string">'a'</span> + <span class="number">1</span>)  <span class="comment"># TypeError: can only concatenate str (not "int") to str  “a”表示字符串   单引号不代表字符</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="字符串"><a href="#字符串" class="headerlink" title="字符串"></a>字符串</h3><p>一串固定长度的字符连接起来的字符序列。Go 的字符串是由单个字节连接起来的。Go 语言的字符串的字节使用 UTF-8 编码标识 Unicode 文本。</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// string is the set of all strings of 8-bit bytes, conventionally but not</span></span><br><span class="line"><span class="comment">// necessarily representing UTF-8-encoded text. A string may be empty, but</span></span><br><span class="line"><span class="comment">// not nil. Values of string type are immutable.</span></span><br><span class="line"><span class="keyword">type</span> <span class="keyword">string</span> <span class="keyword">string</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="数值型"><a href="#数值型" class="headerlink" title="数值型"></a>数值型</h3><p>二进制和位数的关系，以及int和uint的关系</p>
+<h4 id="整数型"><a href="#整数型" class="headerlink" title="整数型"></a>整数型</h4><p>第一位符号位，0正1负<br>int8 有符号 8 位整型 (-128 到 127) 长度：8bit<br>int16 有符号 16 位整型 (-32768 到 32767)<br>int32 有符号 32 位整型 (-2147483648 到 2147483647)<br>int64 有符号 64 位整型 (-9223372036854775808 到 9223372036854775807)</p>
+<p>unsigned 第一位不是符号位<br>uint8 无符号 8 位整型 (0 到 255) 8位都用于表示数值：<br>uint16 无符号 16 位整型 (0 到 65535)<br>uint32 无符号 32 位整型 (0 到 4294967295)<br>uint64 无符号 64 位整型 (0 到 18446744073709551615)</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// int is a signed integer type that is at least 32 bits in size. It is a</span></span><br><span class="line"><span class="comment">// distinct type, however, and not an alias for, say, int32.</span></span><br><span class="line"><span class="keyword">type</span> <span class="keyword">int</span> <span class="keyword">int</span></span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">age := <span class="number">18</span></span><br><span class="line">fmt.Printf(<span class="string">"%T\n"</span>, age) <span class="comment">// int</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>默认int 类型</p>
+<h4 id="浮点型"><a href="#浮点型" class="headerlink" title="浮点型"></a>浮点型</h4><p>float32  32位浮点型数<br>float64  64位浮点型数</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">fmt.Println(math.MaxFloat32) <span class="comment">// 3.4028234663852886e+38</span></span><br><span class="line">fmt.Println(math.MaxFloat64) <span class="comment">// 1.7976931348623157e+308</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>为什么64位的float最大值远大于int64，float底层存储和int的存储不一样<br>float32和float64两者占用内存不一样，64位的最大数和精度都比32位高</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">weight := <span class="number">71.2</span></span><br><span class="line">fmt.Printf(<span class="string">"%T\n"</span>, weight) <span class="comment">// float64</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>默认 float64 类型</p>
+<h3 id="byte-等于-uint8"><a href="#byte-等于-uint8" class="headerlink" title="byte 等于 uint8"></a>byte 等于 uint8</h3><p>源码</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// byte is an alias for uint8 and is equivalent to uint8 in all ways. It is</span></span><br><span class="line"><span class="comment">// used, by convention, to distinguish byte values from 8-bit unsigned</span></span><br><span class="line"><span class="comment">// integer values.</span></span><br><span class="line"><span class="keyword">type</span> <span class="keyword">byte</span> = <span class="keyword">uint8</span></span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a <span class="keyword">byte</span> = <span class="number">18</span></span><br><span class="line">fmt.Println(a) <span class="comment">// 18</span></span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
+
+
+<h3 id="rune-等于-int32"><a href="#rune-等于-int32" class="headerlink" title="rune 等于 int32"></a>rune 等于 int32</h3><figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// rune is an alias for int32 and is equivalent to int32 in all ways. It is</span></span><br><span class="line"><span class="comment">// used, by convention, to distinguish character values from integer values.</span></span><br><span class="line"><span class="keyword">type</span> <span class="keyword">rune</span> = <span class="keyword">int32</span></span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">``</span><span class="string">`</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">### uint  32 或 64 位</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">相比python而言，go语言为什么有这么多种整数类型</span></span><br><span class="line"><span class="string">年龄，分数都是有上线 年龄不超过0-200 分数0-150</span></span><br><span class="line"><span class="string">很多场景之下，数字有上限，我们可以选择合适的数据类型来降低内存的占用，</span></span><br><span class="line"><span class="string">int是一种动态类型，取决机器本身是多少位，64位机器上运行那么int 就是int64占8个字节，如果是32位机器上那么就是4个字节</span></span><br><span class="line"><span class="string">一般情况下我们都会指明int占用多少个字节</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">`</span><span class="string">``</span><span class="keyword">go</span></span><br><span class="line">    <span class="keyword">var</span> age <span class="keyword">int</span> = <span class="number">18</span></span><br><span class="line">    fmt.Println(unsafe.Sizeof(age)) <span class="comment">// 8</span></span><br><span class="line">    <span class="keyword">var</span> age1 <span class="keyword">int8</span> = <span class="number">18</span></span><br><span class="line">    fmt.Println(unsafe.Sizeof(age1)) <span class="comment">// 1</span></span><br><span class="line">    <span class="keyword">var</span> age2 <span class="keyword">int16</span> = <span class="number">18</span></span><br><span class="line">    fmt.Println(unsafe.Sizeof(age2)) <span class="comment">// 2</span></span><br><span class="line">    <span class="keyword">var</span> age3 <span class="keyword">int32</span> = <span class="number">18</span></span><br><span class="line">    fmt.Println(unsafe.Sizeof(age3)) <span class="comment">// 4</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h4 id="对于python来说，int占用字节是动态，python的int我们不用担心超过上限"><a href="#对于python来说，int占用字节是动态，python的int我们不用担心超过上限" class="headerlink" title="对于python来说，int占用字节是动态，python的int我们不用担心超过上限"></a>对于python来说，int占用字节是动态，python的int我们不用担心超过上限</h4><figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line">print(sys.getsizeof(<span class="number">18</span>))  <span class="comment"># 28 整数</span></span><br><span class="line">print(sys.getsizeof(<span class="number">71.2</span>))  <span class="comment"># 24 浮点数</span></span><br></pre></td></tr></tbody></table></figure>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/go/" rel="tag"># go</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/06/29/go-ji-ben-shu-ju-lei-xing-zhuan-huan/" rel="prev" title="go基本数据类型">
+                  <i class="fa fa-chevron-left"></i> go基本数据类型
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+<script src="/js/comments.js"></script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">外心人D</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

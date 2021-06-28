@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<meta name="hexo-config" content="{&quot;hostname&quot;:&quot;bubbleboy11.github.io&quot;,&quot;root&quot;:&quot;/&quot;,&quot;images&quot;:&quot;/images&quot;,&quot;scheme&quot;:&quot;Muse&quot;,&quot;version&quot;:&quot;8.3.0&quot;,&quot;exturl&quot;:false,&quot;sidebar&quot;:{&quot;position&quot;:&quot;left&quot;,&quot;display&quot;:&quot;post&quot;,&quot;padding&quot;:18,&quot;offset&quot;:12},&quot;copycode&quot;:true,&quot;bookmark&quot;:{&quot;enable&quot;:false,&quot;color&quot;:&quot;#222&quot;,&quot;save&quot;:&quot;auto&quot;},&quot;fancybox&quot;:false,&quot;mediumzoom&quot;:false,&quot;lazyload&quot;:false,&quot;pangu&quot;:false,&quot;comments&quot;:{&quot;style&quot;:&quot;tabs&quot;,&quot;active&quot;:null,&quot;storage&quot;:true,&quot;lazyload&quot;:false,&quot;nav&quot;:null},&quot;motion&quot;:{&quot;enable&quot;:true,&quot;async&quot;:false,&quot;transition&quot;:{&quot;post_block&quot;:&quot;fadeIn&quot;,&quot;post_header&quot;:&quot;fadeInDown&quot;,&quot;post_body&quot;:&quot;fadeInDown&quot;,&quot;coll_header&quot;:&quot;fadeInLeft&quot;,&quot;sidebar&quot;:&quot;fadeInUp&quot;}},&quot;prism&quot;:false,&quot;i18n&quot;:{&quot;placeholder&quot;:&quot;搜索...&quot;,&quot;empty&quot;:&quot;没有找到任何搜索结果：${query}&quot;,&quot;hits_time&quot;:&quot;找到 ${hits} 个搜索结果（用时 ${time} 毫秒）&quot;,&quot;hits&quot;:&quot;找到 ${hits} 个搜索结果&quot;}}">
+<meta name="description" content="页面分为两种情况：  未指定剧集数，默认打开第一集，播放第一集的视频 指定剧集数，打开对应剧集信息  controllers\video.go 1234567891011package controllersimport (    &quot;demo&#x2F;models&quot;    beego &quot;github.com&#x2F;beego&#x2F;beego&#x2F;v2&#x2F;server&#x2F;web&quot;)type VideoController s">
+<meta property="og:type" content="article">
+<meta property="og:title" content="beego视频播放页">
+<meta property="og:url" content="https://bubbleboy11.github.io/2021/06/18/beego-shi-pin-bo-fang-ye/index.html">
+<meta property="og:site_name" content="外心人D的博客">
+<meta property="og:description" content="页面分为两种情况：  未指定剧集数，默认打开第一集，播放第一集的视频 指定剧集数，打开对应剧集信息  controllers\video.go 1234567891011package controllersimport (    &quot;demo&#x2F;models&quot;    beego &quot;github.com&#x2F;beego&#x2F;beego&#x2F;v2&#x2F;server&#x2F;web&quot;)type VideoController s">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://bubbleboy11.github.io/2021/06/18/beego-shi-pin-bo-fang-ye/1.png">
+<meta property="og:image" content="https://bubbleboy11.github.io/2021/06/18/beego-shi-pin-bo-fang-ye/2.png">
+<meta property="article:published_time" content="2021-06-17T16:21:41.000Z">
+<meta property="article:modified_time" content="2021-06-21T16:00:56.780Z">
+<meta property="article:author" content="外心人D">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://bubbleboy11.github.io/2021/06/18/beego-shi-pin-bo-fang-ye/1.png">
+
+
+<link rel="canonical" href="https://bubbleboy11.github.io/2021/06/18/beego-shi-pin-bo-fang-ye/">
+
+
+
+<meta name="hexo-config-page" content="{&quot;sidebar&quot;:&quot;&quot;,&quot;isHome&quot;:false,&quot;isPost&quot;:true,&quot;lang&quot;:&quot;zh-CN&quot;}">
+<meta name="hexo-config-calendar" content="">
+<script data-pjax src="/js/load-config.js"></script>
+  <title>beego视频播放页 | 外心人D的博客</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="外心人D的博客" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">外心人D的博客</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%86%E9%A2%91%E8%AF%A6%E7%BB%86%E4%BF%A1%E6%81%AF%E6%8E%A5%E5%8F%A3"><span class="nav-text">视频详细信息接口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%86%E9%A2%91%E8%AF%A6%E6%83%85%E6%8E%A5%E5%8F%A3%E6%94%B9%E9%80%A0"><span class="nav-text">视频详情接口改造</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%86%E9%A2%91%E5%89%A7%E9%9B%86%E5%88%97%E8%A1%A8%E6%8E%A5%E5%8F%A3"><span class="nav-text">视频剧集列表接口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%86%E9%A2%91%E5%89%A7%E9%9B%86%E5%88%97%E8%A1%A8%E6%8E%A5%E5%8F%A3%E6%94%B9%E9%80%A0"><span class="nav-text">视频剧集列表接口改造</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">外心人D</p>
+  <div class="site-description" itemprop="description">本博客大多内容为慕课和网上博客，并非原创</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">301</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">40</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/06/18/beego-shi-pin-bo-fang-ye/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          beego视频播放页
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-06-17 16:21:41" itemprop="dateCreated datePublished" datetime="2021-06-17T16:21:41Z">2021-06-17</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-06-21 16:00:56" itemprop="dateModified" datetime="2021-06-21T16:00:56Z">2021-06-21</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/beego/" itemprop="url" rel="index"><span itemprop="name">beego</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>页面分为两种情况：</p>
+<ul>
+<li>未指定剧集数，默认打开第一集，播放第一集的视频</li>
+<li>指定剧集数，打开对应剧集信息</li>
+</ul>
+<p><code>controllers\video.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> controllers</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"demo/models"</span></span><br><span class="line"></span><br><span class="line">    beego <span class="string">"github.com/beego/beego/v2/server/web"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> VideoController <span class="keyword">struct</span> {</span><br><span class="line">    beego.Controller</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>routers\default.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">init</span><span class="params">()</span></span> {</span><br><span class="line">    web.InsertFilter(<span class="string">"/demo/*"</span>, web.BeforeRouter, FilterDemo)</span><br><span class="line">    web.Include(&amp;controllers.VideoController{})</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="视频详细信息接口"><a href="#视频详细信息接口" class="headerlink" title="视频详细信息接口"></a>视频详细信息接口</h3><p>接口地址：<code>/video/info</code></p>
+<ul>
+<li><p>接收参数为：videoId（视频ID）</p>
+</li>
+<li><p>返回信息：<br>id = ID<br>title = 标题<br>sub_title = 副标题<br>add_time = 添加时间<br>img = 竖版缩略图<br>img1 = 横版缩略图<br>episodes_count = 剧集数<br>… …和video表中的数字段是一一对应的</p>
+</li>
+<li><p>业务逻辑：获取video表中id=接收参数的数据。<br>注意：这里没有获取到视频播放地址或者阿里云视频ID</p>
+</li>
+</ul>
+<p><code>models\video.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Video <span class="keyword">struct</span> {</span><br><span class="line">    Id                 <span class="keyword">int</span></span><br><span class="line">    Title              <span class="keyword">string</span></span><br><span class="line">    SubTitle           <span class="keyword">string</span></span><br><span class="line">    AddTime            <span class="keyword">int64</span></span><br><span class="line">    Img                <span class="keyword">string</span></span><br><span class="line">    Img1               <span class="keyword">string</span></span><br><span class="line">    EpisodesCount      <span class="keyword">int</span></span><br><span class="line">    IsEnd              <span class="keyword">int</span></span><br><span class="line">    ChannelId          <span class="keyword">int</span></span><br><span class="line">    Status             <span class="keyword">int</span></span><br><span class="line">    RegionId           <span class="keyword">int</span></span><br><span class="line">    TypeId             <span class="keyword">int</span></span><br><span class="line">    EpisodesUpdateTime <span class="keyword">int64</span></span><br><span class="line">    Comment            <span class="keyword">int</span></span><br><span class="line">    UserId             <span class="keyword">int</span></span><br><span class="line">    IsRecommend        <span class="keyword">int</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="comment">// 根据视频ID获取视频详情</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">GetVideoInfo</span><span class="params">(videoId <span class="keyword">int</span>)</span> <span class="params">(Video, error)</span></span> {</span><br><span class="line">    o := orm.NewOrm()</span><br><span class="line">    <span class="keyword">var</span> video Video</span><br><span class="line">    err := o.Raw(<span class="string">"SELECT * FROM video WHERE id=? LIMIT 1"</span>, videoId).QueryRow(&amp;video)</span><br><span class="line">    <span class="keyword">return</span> video, err</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>controllers\video.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 根据视频id获取视频详情</span></span><br><span class="line"><span class="comment">// @router /video/info [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *VideoController)</span> <span class="title">VideoInfo</span><span class="params">()</span></span> {</span><br><span class="line">    videoId, _ := this.GetInt(<span class="string">"videoId"</span>)</span><br><span class="line">    <span class="keyword">if</span> videoId == <span class="number">0</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4001</span>, <span class="string">"必须指定视频ID"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    video, err := models.GetVideoInfo(videoId)</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnSuccess(<span class="number">0</span>, <span class="string">"success"</span>, video, <span class="number">1</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4004</span>, <span class="string">"请求数据失败，请稍后重试~"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="/2021/06/18/beego-shi-pin-bo-fang-ye/1.png" alt="description"></p>
+<h3 id="视频详情接口改造"><a href="#视频详情接口改造" class="headerlink" title="视频详情接口改造"></a>视频详情接口改造</h3><p><code>models\video.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 增加redis缓存 - 根据视频ID获取视频详情</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">RedisGetVideoInfo</span><span class="params">(videoId <span class="keyword">int</span>)</span> <span class="params">(Video, error)</span></span> {</span><br><span class="line">    <span class="keyword">var</span> video Video</span><br><span class="line">    conn := redisClient.PoolConnect()</span><br><span class="line">    <span class="keyword">defer</span> conn.Close()</span><br><span class="line">    <span class="comment">// 定义redis key</span></span><br><span class="line">    redisKey := <span class="string">"video:id:"</span> + strconv.Itoa(videoId)</span><br><span class="line">    <span class="comment">// 判断redis中是否存在</span></span><br><span class="line">    exists, err := redis.Bool(conn.Do(<span class="string">"exists"</span>, redisKey))</span><br><span class="line">    <span class="keyword">if</span> exists {</span><br><span class="line">        res, _ := redis.Values(conn.Do(<span class="string">"hgetall"</span>, redisKey))</span><br><span class="line">        err = redis.ScanStruct(res, &amp;video)</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        o := orm.NewOrm()</span><br><span class="line">        err := o.Raw(<span class="string">"SELECT * FROM video WHERE id=? LIMIT 1"</span>, videoId).QueryRow(&amp;video)</span><br><span class="line">        <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">            <span class="comment">// 从数据库取出的数据保存到redis</span></span><br><span class="line">            _, err := conn.Do(<span class="string">"hmset"</span>, redis.Args{redisKey}.AddFlat(video)...)</span><br><span class="line">            <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">                conn.Do(<span class="string">"expire"</span>, redisKey, <span class="number">60</span>*<span class="number">60</span>*<span class="number">24</span>*<span class="number">30</span>)</span><br><span class="line">            }</span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> video, err</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>controllers\video.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 根据视频id获取视频详情</span></span><br><span class="line"><span class="comment">// @router /video/info [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *VideoController)</span> <span class="title">VideoInfo</span><span class="params">()</span></span> {</span><br><span class="line">    videoId, _ := this.GetInt(<span class="string">"videoId"</span>)</span><br><span class="line">    <span class="keyword">if</span> videoId == <span class="number">0</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4001</span>, <span class="string">"必须指定视频ID"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    <span class="comment">//video, err := models.GetVideoInfo(videoId)</span></span><br><span class="line">    video, err := models.RedisGetVideoInfo(videoId)</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnSuccess(<span class="number">0</span>, <span class="string">"success"</span>, video, <span class="number">1</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4004</span>, <span class="string">"请求数据失败，请稍后重试~"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="视频剧集列表接口"><a href="#视频剧集列表接口" class="headerlink" title="视频剧集列表接口"></a>视频剧集列表接口</h3><p>接口地址：<code>/video/episodes/list</code></p>
+<ul>
+<li><p>接收参数为：videoId（视频ID）</p>
+</li>
+<li><p>返回信息：<br>id = ID<br>title = 剧集标题<br>add_time = 添加时间<br>num = 第几集<br>play_url = 播放地址<br>comment = 剧集评论数<br>aliyun_video_id = 阿里云点播视频ID</p>
+</li>
+<li><p>业务逻辑：获取video_episodes表中video_id=接收参数的数据，按照剧集数正序。</p>
+</li>
+</ul>
+<figure class="highlight sql"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">id</span>,title,add_time,<span class="keyword">num</span>,play_url,<span class="keyword">comment</span> <span class="keyword">FROM</span> video_episodes <span class="keyword">WHERE</span> video_id=? <span class="keyword">order</span> <span class="keyword">by</span> <span class="keyword">num</span> <span class="keyword">asc</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>前端通过episodesId和剧集列表中的id匹配，获取对应播放的play_url和aliyun_video_id</p>
+<p>图二中国漫、日漫、少女推荐功能</p>
+<p>这里和频道页中的规则是一样的，参考频道页的文档就可以了</p>
+<p><code>models\video.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Episodes <span class="keyword">struct</span> {</span><br><span class="line">    Id            <span class="keyword">int</span></span><br><span class="line">    Title         <span class="keyword">string</span></span><br><span class="line">    AddTime       <span class="keyword">int64</span></span><br><span class="line">    Num           <span class="keyword">int</span></span><br><span class="line">    PlayUrl       <span class="keyword">string</span></span><br><span class="line">    Comment       <span class="keyword">int</span></span><br><span class="line">    AliyunVideoId <span class="keyword">string</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="comment">// 根据视频Id获取视频剧集列表</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">GetVideoEpisodesList</span><span class="params">(videoId <span class="keyword">int</span>)</span> <span class="params">(<span class="keyword">int64</span>, []Episodes, error)</span></span> {</span><br><span class="line">    o := orm.NewOrm()</span><br><span class="line">    <span class="keyword">var</span> episodes []Episodes</span><br><span class="line">    num, err := o.Raw(<span class="string">"SELECT id,title,add_time,num,play_url,comment FROM video_episodes WHERE video_id=? order by num asc"</span>, videoId).QueryRows(&amp;episodes)</span><br><span class="line">    <span class="keyword">return</span> num, episodes, err</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>controllers\video.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 获取视频剧集列表</span></span><br><span class="line"><span class="comment">// @router /video/episodes/list [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *VideoController)</span> <span class="title">VideoEpisodesList</span><span class="params">()</span></span> {</span><br><span class="line">    videoId, _ := this.GetInt(<span class="string">"videoId"</span>)</span><br><span class="line">    <span class="keyword">if</span> videoId == <span class="number">0</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4001</span>, <span class="string">"必须指定视频ID"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    num, episodes, err := models.GetVideoEpisodesList(videoId)</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnSuccess(<span class="number">0</span>, <span class="string">"success"</span>, episodes, num)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4004</span>, <span class="string">"请求数据失败，请稍后重试~"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="/2021/06/18/beego-shi-pin-bo-fang-ye/2.png" alt="description"></p>
+<h3 id="视频剧集列表接口改造"><a href="#视频剧集列表接口改造" class="headerlink" title="视频剧集列表接口改造"></a>视频剧集列表接口改造</h3><p><code>models\video.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 增加redis缓存 - 获取视频剧集列表</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">RedisGetVideoEpisodesList</span><span class="params">(videoId <span class="keyword">int</span>)</span> <span class="params">(<span class="keyword">int64</span>, []Episodes, error)</span></span> {</span><br><span class="line">    <span class="keyword">var</span> (</span><br><span class="line">        episodes []Episodes</span><br><span class="line">        num      <span class="keyword">int64</span></span><br><span class="line">        err      error</span><br><span class="line">    )</span><br><span class="line">    conn := redisClient.PoolConnect()</span><br><span class="line">    <span class="keyword">defer</span> conn.Close()</span><br><span class="line"></span><br><span class="line">    redisKey := <span class="string">"video:episodes:videoId:"</span> + strconv.Itoa(videoId)</span><br><span class="line">    <span class="comment">// 判断rediskey是否已存在</span></span><br><span class="line">    exists, err := redis.Bool(conn.Do(<span class="string">"exists"</span>, redisKey))</span><br><span class="line">    <span class="keyword">if</span> exists {</span><br><span class="line">        num, err = redis.Int64(conn.Do(<span class="string">"llen"</span>, redisKey))</span><br><span class="line">        <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">            values, _ := redis.Values(conn.Do(<span class="string">"lrange"</span>, redisKey, <span class="string">"0"</span>, <span class="string">"-1"</span>))</span><br><span class="line">            <span class="keyword">var</span> episodesInfo Episodes</span><br><span class="line">            <span class="comment">// json转换为字符串？list?</span></span><br><span class="line">            <span class="keyword">for</span> _, v := <span class="keyword">range</span> values {</span><br><span class="line">                err = json.Unmarshal(v.([]<span class="keyword">byte</span>), &amp;episodesInfo)</span><br><span class="line">                <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">                    episodes = <span class="built_in">append</span>(episodes, episodesInfo)</span><br><span class="line">                }</span><br><span class="line">            }</span><br><span class="line">        }</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        o := orm.NewOrm()</span><br><span class="line">        num, err = o.Raw(<span class="string">"SELECT id,title,add_time,num,play_url,comment,aliyun_video_id FROM video_episodes WHERE video_id=? order by num asc"</span>, videoId).QueryRows(&amp;episodes)</span><br><span class="line">        <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">            <span class="comment">// 因为这里获取到的不是字符串，不能保存到redis list中，遍历获取到的信息，把信息json化保存</span></span><br><span class="line">            <span class="keyword">for</span> _, v := <span class="keyword">range</span> episodes {</span><br><span class="line">                jsonValue, err := json.Marshal(v)</span><br><span class="line">                <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">                    <span class="comment">// 保存redis</span></span><br><span class="line">                    conn.Do(<span class="string">"rpush"</span>, redisKey, jsonValue)</span><br><span class="line">                }</span><br><span class="line">            }</span><br><span class="line">            conn.Do(<span class="string">"expire"</span>, redisKey, <span class="number">60</span>*<span class="number">60</span>*<span class="number">24</span>*<span class="number">30</span>)</span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> num, episodes, err</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>controllers\video.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 获取视频剧集列表</span></span><br><span class="line"><span class="comment">// @router /video/episodes/list [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *VideoController)</span> <span class="title">VideoEpisodesList</span><span class="params">()</span></span> {</span><br><span class="line">    videoId, _ := this.GetInt(<span class="string">"videoId"</span>)</span><br><span class="line">    <span class="keyword">if</span> videoId == <span class="number">0</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4001</span>, <span class="string">"必须指定视频ID"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    <span class="comment">// num, episodes, err := models.GetVideoEpisodesList(videoId)</span></span><br><span class="line">    num, episodes, err := models.RedisGetVideoEpisodesList(videoId)</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnSuccess(<span class="number">0</span>, <span class="string">"success"</span>, episodes, num)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4004</span>, <span class="string">"请求数据失败，请稍后重试~"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/06/18/beego-ping-lun/" rel="prev" title="beego评论">
+                  <i class="fa fa-chevron-left"></i> beego评论
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/06/18/beego-shi-pin-lie-biao-ye/" rel="next" title="beego视频列表页">
+                  beego视频列表页 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+<script src="/js/comments.js"></script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">外心人D</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
