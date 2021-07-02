@@ -118,13 +118,13 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">301</span>
+          <span class="site-state-item-count">311</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
-        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-count">25</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -167,7 +167,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/04/08/python-cheng-xu-ru-kou-name-main/">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/base64/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -180,7 +180,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/04/08/python-cheng-xu-ru-kou-name-main/" class="post-title-link" itemprop="url">Python程序入口 __name__ == '__main__'</a>
+          <a href="/2020/08/21/base64/" class="post-title-link" itemprop="url">base64</a>
         </h2>
 
         <div class="post-meta-container">
@@ -191,14 +191,14 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2020-04-07 16:21:41" itemprop="dateCreated datePublished" datetime="2020-04-07T16:21:41Z">2020-04-07</time>
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
     </span>
       <span class="post-meta-item">
         <span class="post-meta-item-icon">
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-05-02 12:11:38" itemprop="dateModified" datetime="2021-05-02T12:11:38Z">2021-05-02</time>
+        <time title="修改时间：2021-06-16 07:34:24" itemprop="dateModified" datetime="2021-06-16T07:34:24Z">2021-06-16</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -220,38 +220,1030 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <p>Python的文件头：</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/bin/bash/python3  # 在代码被执行时，主动说明该选哪个路径下的编译器</span></span><br></pre></td></tr></tbody></table></figure>
+          <p>BASE64<br>编码和解码，根据规则可以转回去不是加密，加解密需要钥匙<br>它是一种编码算法，但是具有不可读性，所以可以说是防君子不防小人</p>
+<p>0-9A-Za-z+/<br>1100 0101 1001 0011 0111 0110<br>00110001 00011001 00001101 00110110<br>base64<br>b64encode / b64decode</p>
+<p>默认情况，可视字符基于ASCII码显示出来，</p>
+<p>Base64是一种用64个可视/可打印字符表示所有二进制数据的编码方式，通过将二进制数据每6位一组的方式重新组织，<br>刚好可以使用在Base64中的可打印字符包括大小写字母A-Z、a-z、数字0-9，这样共有62个字符以及“+”和“/”总共64个字符表示从<code>000000</code>到<code>111111</code>的64种状态。</p>
+<h3 id="base64怎么转换"><a href="#base64怎么转换" class="headerlink" title="base64怎么转换"></a>base64怎么转换</h3><p>1,将字符串拆成每三个字符一组,对应3个字节<br>2,计算每一个字符对应的ASCI码二进制,一共24个二进制位<br>3,将8位的二进制码,由于 log{2}64=6，所以按照每6个二进制位一组重新分组为一个单元，不足6位的在低位补0，对应某个可打印字符。对应于4个Base64单元，<br>4,计算对应的十进制编码<br>5,按照base64索引表,查看对应的字符<br>即3个字节可由4个可打印字符来表示，将3个字节编码为4个字符，<br>base64结果的长度一定是4的倍数</p>
+<p>如果要编码的字节数不能被3整除，位数不够填满一组，最后会多出1个或2个字节，那么可以使用下面的方法进行处理：<br>先使用0字节值在末尾补足，使其能够被3整除，然后再进行Base64的编码。在编码后的Base64文本后加上一个或两个=号，代表补足的字节数。也就是说，<br>当最后剩余两个八位(待补足)字节（2个byte）时，最后一个6位的Base64字节块有四位是0值，最后附加上两个等号；<br>如果最后剩余一个八位(待补足)字节（1个byte）时，最后一个6位的base字节块有两位是0值，最后附加一个等号。 参考下表：</p>
+<p>Base64常用于在通常处理文本数据的场合，表示、传输、存储一些二进制数据，包括MIME的电子邮件及XML的一些复杂数据。</p>
+<h2 id="base64-是-Python-内建模块，我们只需要-import-导入模块就可以使用"><a href="#base64-是-Python-内建模块，我们只需要-import-导入模块就可以使用" class="headerlink" title="base64 是 Python 内建模块，我们只需要 import 导入模块就可以使用"></a><code>base64</code> 是 Python 内建模块，我们只需要 import 导入模块就可以使用</h2><p>把超越 ascii 范围的字符用 base64 编码为可见字符，</p>
+<p>base64.b64encode(data)) data为byte字节类型数据。a bytes-like object is required, not ‘str’<br>当解码Base64的时候，字节字符串和Unicode文本都可以作为参数。 但是，Unicode字符串只能包含ASCII字符。</p>
+<p>urlsafe 形式的编码方式，目的是将<code>+</code>和<code>/</code> 替换成 <code>-</code>和<code>_</code>，<br>因为标准的Base64并不适合直接放在URL里传输，<br>URL编码器会把标准Base64中的“/”和“+”字符变为形如“%XX”的形式，<br>而这些“%”号在存入数据库时还需要再进行转换。</p>
+<p><code>urlsafe_b64encode()</code>作用同b64encode(),会将+替换成-，/替换成_编码，不能 <code>b64encode</code>解码，用什么方式转码用同样的方式转回去</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> base64</span><br><span class="line"><span class="comment"># Some byte data</span></span><br><span class="line">s = <span class="string">b'hello'</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Encode as Base64</span></span><br><span class="line">a = base64.b64encode(s)</span><br><span class="line">print(a)</span><br><span class="line"><span class="comment"># b'aGVsbG8='</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Decode from Base64</span></span><br><span class="line">print(base64.b64decode(a))</span><br><span class="line"><span class="comment"># b'hello'</span></span><br><span class="line"></span><br><span class="line">print(base64.b64encode(<span class="string">b'i\xcf\xbf'</span>))</span><br><span class="line"><span class="comment"># b'ac+/'</span></span><br><span class="line"></span><br><span class="line">print(base64.urlsafe_b64encode(<span class="string">b'i\xcf\xbf'</span>))</span><br><span class="line"><span class="comment"># b'ac-_'</span></span><br></pre></td></tr></tbody></table></figure>
 
-<p>Python程序入口 <strong>name</strong> == ‘<strong>main</strong>‘</p>
-<p>既没有写一个被调用的库和多进程的容易错误地认为「程序的入口」没什么用、是编码习惯。<br>事实上程序的入口非常有用，绝非可有可无，例如在Python自带的多线程库要求必须把主进程写在 if入口内部才能正常运行</p>
-<p>直接写在Python最左端没有缩进的代码，在这个 <code>*.py</code> 文件被直接运行、或者被调用时会被执行</p>
-<p>Python用这个方法来判断当前的模块是<strong>被直接运行</strong>还是<strong>被调用</strong><br>一个模块中有<code>__name__</code> 是当前模块名，</p>
+<p>用了JSON作为数据传输的格式（通过JSON格式对传输的数据进行了序列化和反序列化的操作），<br>但是JSON并不能携带二进制数据，因此对图片的二进制数据进行了Base64编码的处理。</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">读写二进制文件</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="keyword">import</span> base64</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'mm.jpg'</span>, <span class="string">'rb'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    data = f.read()</span><br><span class="line">    <span class="comment"># print(type(data))</span></span><br><span class="line">    <span class="comment"># print(data)</span></span><br><span class="line">    print(<span class="string">'字节数:'</span>, len(data))</span><br><span class="line">    <span class="comment"># 将图片处理成BASE-64编码</span></span><br><span class="line">    print(base64.b64encode(data))</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'girl.jpg'</span>, <span class="string">'wb'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    f.write(data)</span><br><span class="line">print(<span class="string">'写入完成!'</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+
+<p>如果直接使用<code>base64.b64decode()</code>函数将base64解码，是得到的16进制字符串是有问题的．<br>此时要使用<code>base64.b64decode(base64_data).hex()</code>来转换成16进制字符串．</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> base64</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># base64解码</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">base64_decode</span>(<span class="params">base64_data</span>):</span></span><br><span class="line">    temp = base64.b64decode(base64_data).hex()</span><br><span class="line">    <span class="keyword">return</span> temp</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">data = <span class="string">"qgEeAGBFRQAAZEIAAFhCAAAAAAAAE0LFEAVqAAAHZhbn9rs="</span></span><br><span class="line">tem = base64_decode(data)</span><br><span class="line">print(tem)</span><br><span class="line"><span class="comment"># aa011e0060454500006442000058420000000000001342c510056a0000076616e7f6bb</span></span><br></pre></td></tr></tbody></table></figure>
+
+
+<p>Base64编码仅仅用于面向字节的数据比如字节字符串和字节数组。 此外，编码处理的输出结果总是一个字节字符串。<br>如果你想混合使用Base64编码的数据和Unicode文本，你必须添加一个额外的解码步骤。例如：</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>a = base64.b64encode(s).decode(<span class="string">'ascii'</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>a</span><br><span class="line"><span class="string">'aGVsbG8='</span></span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.contrib <span class="keyword">import</span> auth <span class="keyword">as</span> django_auth</span><br><span class="line"><span class="keyword">from</span> django.http <span class="keyword">import</span> JsonResponse</span><br><span class="line"><span class="keyword">import</span> hashlib</span><br><span class="line"><span class="keyword">import</span> base64</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 用户认证</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">user_auth</span>(<span class="params">request</span>):</span></span><br><span class="line">    get_http_auth = request.META.get(<span class="string">'HTTP_AUTHORIZATION'</span>, <span class="string">b''</span>)</span><br><span class="line">    auth = get_http_auth.split()</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        auth_parts = base64.b64decode(auth[<span class="number">1</span>]).decode(<span class="string">'iso-8859-1'</span>).partition(<span class="string">':'</span>)</span><br><span class="line">    <span class="keyword">except</span> IndexError:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"null"</span></span><br><span class="line">    userid, password = auth_parts[<span class="number">0</span>], auth_parts[<span class="number">2</span>]</span><br><span class="line">    user = django_auth.authenticate(username=userid, password=password)</span><br><span class="line">    <span class="keyword">if</span> user <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span> <span class="keyword">and</span> user.id_active:</span><br><span class="line">        django_auth.login(request, user)</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"success"</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"fail"</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 发布会查询接口---增加用户认证</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_event_list</span>(<span class="params">request</span>):</span></span><br><span class="line">    auth_result = user_auth(request)  <span class="comment"># 调用认证函数</span></span><br><span class="line">    <span class="keyword">if</span> auth_result == <span class="string">"null"</span>:</span><br><span class="line">        <span class="keyword">return</span> JsonResponse({<span class="string">'status'</span>: <span class="number">10011</span>, <span class="string">'message'</span>: <span class="string">'user auth null'</span>})</span><br><span class="line">    <span class="keyword">if</span> auth_result == <span class="string">"fail"</span>:</span><br><span class="line">        <span class="keyword">return</span> JsonResponse({<span class="string">'status'</span>: <span class="number">10012</span>, <span class="string">'message'</span>: <span class="string">'user auth fail'</span>})</span><br><span class="line">    eid = request.GET.get(<span class="string">"eid"</span>, <span class="string">""</span>)  <span class="comment"># 发布会 id</span></span><br><span class="line">    name = request.GET.get(<span class="string">"name"</span>, <span class="string">""</span>)  <span class="comment"># 发布会名称</span></span><br></pre></td></tr></tbody></table></figure>
+
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> socket <span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">from</span> json <span class="keyword">import</span> loads</span><br><span class="line"><span class="keyword">from</span> base64 <span class="keyword">import</span> b64decode</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span>():</span></span><br><span class="line">    client = socket()</span><br><span class="line">    client.connect((<span class="string">'192.168.1.2'</span>, <span class="number">5566</span>))</span><br><span class="line">    <span class="comment"># 定义一个保存二进制数据的对象</span></span><br><span class="line">    in_data = bytes()</span><br><span class="line">    <span class="comment"># 由于不知道服务器发送的数据有多大每次接收1024字节</span></span><br><span class="line">    data = client.recv(<span class="number">1024</span>)</span><br><span class="line">    <span class="keyword">while</span> data:</span><br><span class="line">        <span class="comment"># 将收到的数据拼接起来</span></span><br><span class="line">        in_data += data</span><br><span class="line">        data = client.recv(<span class="number">1024</span>)</span><br><span class="line">    <span class="comment"># 将收到的二进制数据解码成JSON字符串并转换成字典</span></span><br><span class="line">    <span class="comment"># loads函数的作用就是将JSON字符串转成字典对象</span></span><br><span class="line">    my_dict = loads(in_data.decode(<span class="string">'utf-8'</span>))</span><br><span class="line">    filename = my_dict[<span class="string">'filename'</span>]</span><br><span class="line">    filedata = my_dict[<span class="string">'filedata'</span>].encode(<span class="string">'utf-8'</span>)</span><br><span class="line">    <span class="keyword">with</span> open(<span class="string">'/Users/Hao/'</span> + filename, <span class="string">'wb'</span>) <span class="keyword">as</span> f:</span><br><span class="line">        <span class="comment"># 将base64格式的数据解码成二进制数据并写入文件</span></span><br><span class="line">        f.write(b64decode(filedata))</span><br><span class="line">    print(<span class="string">'图片已保存.'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> socket <span class="keyword">import</span> socket, SOCK_STREAM, AF_INET</span><br><span class="line"><span class="keyword">from</span> base64 <span class="keyword">import</span> b64encode</span><br><span class="line"><span class="keyword">from</span> json <span class="keyword">import</span> dumps</span><br><span class="line"><span class="keyword">from</span> threading <span class="keyword">import</span> Thread</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span>():</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 自定义线程类</span></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">FileTransferHandler</span>(<span class="params">Thread</span>):</span></span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, cclient</span>):</span></span><br><span class="line">            super().__init__()</span><br><span class="line">            self.cclient = cclient</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">run</span>(<span class="params">self</span>):</span></span><br><span class="line">            my_dict = {}</span><br><span class="line">            my_dict[<span class="string">'filename'</span>] = <span class="string">'guido.jpg'</span></span><br><span class="line">            <span class="comment"># JSON是纯文本不能携带二进制数据</span></span><br><span class="line">            <span class="comment"># 所以图片的二进制数据要处理成base64编码</span></span><br><span class="line">            my_dict[<span class="string">'filedata'</span>] = data</span><br><span class="line">            <span class="comment"># 通过dumps函数将字典处理成JSON字符串</span></span><br><span class="line">            json_str = dumps(my_dict)</span><br><span class="line">            <span class="comment"># 发送JSON字符串</span></span><br><span class="line">            self.cclient.send(json_str.encode(<span class="string">'utf-8'</span>))</span><br><span class="line">            self.cclient.close()</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 1.创建套接字对象并指定使用哪种传输服务</span></span><br><span class="line">    server = socket()</span><br><span class="line">    <span class="comment"># 2.绑定IP地址和端口(区分不同的服务)</span></span><br><span class="line">    server.bind((<span class="string">'192.168.1.2'</span>, <span class="number">5566</span>))</span><br><span class="line">    <span class="comment"># 3.开启监听 - 监听客户端连接到服务器</span></span><br><span class="line">    server.listen(<span class="number">512</span>)</span><br><span class="line">    print(<span class="string">'服务器启动开始监听...'</span>)</span><br><span class="line">    <span class="keyword">with</span> open(<span class="string">'guido.jpg'</span>, <span class="string">'rb'</span>) <span class="keyword">as</span> f:</span><br><span class="line">        <span class="comment"># 将二进制数据处理成base64再解码成字符串</span></span><br><span class="line">        data = b64encode(f.read()).decode(<span class="string">'utf-8'</span>)</span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        client, addr = server.accept()</span><br><span class="line">        <span class="comment"># 用一个字典(键值对)来保存要发送的各种数据</span></span><br><span class="line">        <span class="comment"># 待会可以将字典处理成JSON格式在网络上传递</span></span><br><span class="line">        FileTransferHandler(client).start()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">序列化 - 将对象变成字节序列(bytes)或者字符序列(str) - 串行化/腌咸菜</span></span><br><span class="line"><span class="string">反序列化 - 把字节序列或者字符序列还原成对象</span></span><br><span class="line"><span class="string">Python标准库对序列化的支持：</span></span><br><span class="line"><span class="string">json - 字符形式的序列化</span></span><br><span class="line"><span class="string">pickle - 字节形式的序列化</span></span><br><span class="line"><span class="string">dumps / loads</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="keyword">import</span> base64</span><br><span class="line"><span class="keyword">import</span> json</span><br><span class="line"><span class="keyword">import</span> redis</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> example02 <span class="keyword">import</span> Person</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">PersonJsonEncoder</span>(<span class="params">json.JSONEncoder</span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">default</span>(<span class="params">self, o</span>):</span></span><br><span class="line">        <span class="keyword">return</span> o.__dict__</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span>():</span></span><br><span class="line">    cli = redis.StrictRedis(host=<span class="string">'120.77.222.217'</span>, port=<span class="number">6379</span>, </span><br><span class="line">                            password=<span class="string">'123123'</span>)</span><br><span class="line">    data = base64.b64decode(cli.get(<span class="string">'guido'</span>))</span><br><span class="line">    <span class="keyword">with</span> open(<span class="string">'guido2.jpg'</span>, <span class="string">'wb'</span>) <span class="keyword">as</span> file_stream:</span><br><span class="line">        file_stream.write(data)</span><br><span class="line">    <span class="comment"># with open('guido.jpg', 'rb') as file_stream:</span></span><br><span class="line">    <span class="comment">#     result = base64.b64encode(file_stream.read())</span></span><br><span class="line">    <span class="comment"># cli.set('guido', result)</span></span><br><span class="line">    <span class="comment"># persons = [</span></span><br><span class="line">    <span class="comment">#     Person('骆昊', 39), Person('王大锤', 18),</span></span><br><span class="line">    <span class="comment">#     Person('白元芳', 25), Person('狄仁杰', 37)</span></span><br><span class="line">    <span class="comment"># ]</span></span><br><span class="line">    <span class="comment"># persons = json.loads(cli.get('persons'))</span></span><br><span class="line">    <span class="comment"># print(persons)</span></span><br><span class="line">    <span class="comment"># cli.set('persons', json.dumps(persons, cls=PersonJsonEncoder))</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></tbody></table></figure>
+
+
+
+<figure class="highlight scheme"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">```</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight scheme"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">```</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight scheme"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">```</span><br></pre></td></tr></tbody></table></figure>
+<p>```</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/django-jing-tai-zi-yuan/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/django-jing-tai-zi-yuan/" class="post-title-link" itemprop="url">django加载配置静态资源文件</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-05-24 13:16:54" itemprop="dateModified" datetime="2021-05-24T13:16:54Z">2021-05-24</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>如果要在Django项目中使用静态资源，可以先创建一个用于保存静态资源的目录。<br>在<code>vote</code>项目中，我们将静态资源置于名为<code>static</code>的文件夹中，<br>在该文件夹包含了三个子文件夹：css、js和images，<br>分别用来保存外部CSS文件、外部JavaScript文件和图片资源，如下图所示。</p>
+<p><img src="/2020/08/21/django-jing-tai-zi-yuan/pycharm-django-static.png"></p>
+<p>为了能够找到保存静态资源的文件夹，我们还需要修改Django项目的配置文件<code>settings.py</code>，如下所示：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 配置静态文件的存储路径</span></span><br><span class="line">STATICFILES_DIRS = [os.path.join(BASE_DIR, <span class="string">'static'</span>), ]</span><br><span class="line"></span><br><span class="line"><span class="comment"># STATIC_ROOT = os.path.join(BASE_DIR, 'static')    # 生产环境</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 配置静态文件的访问路径(指通过哪个url地址找静态文件) 访问静态文件的路由地址</span></span><br><span class="line">STATIC_URL = <span class="string">'/static/'</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>配置好静态资源之后，大家可以运行项目，然后看看之前我们写的页面上的图片是否能够正常加载出来。需要说明的是，在项目正式部署到线上环境后，我们通常会把静态资源交给专门的静态资源服务器（如Nginx、Apache）来处理，而不是有运行Python代码的服务器来管理静态资源，所以上面的配置并不适用于生产环境，仅供项目开发阶段测试使用。使用静态资源的正确姿势我们会在后续的章节为大家讲解。</p>
+<p>项目处于线下时(DEBUG=TRUE)，放了新的静态文件，需要重启服务：manage.py runserver,<br>django才能接管你的静态文件；处于线上时(DEBUG=False),nginx代替django接管</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/javascript/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/javascript/" class="post-title-link" itemprop="url">js</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-05-22 03:23:09" itemprop="dateModified" datetime="2021-05-22T03:23:09Z">2021-05-22</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>使用var声明的变量，其作用域为该语句所在的函数内，且存在变量提升现象；指变量声明语句位置的改变（提升）<br>使用let声明的变量，其作用域为该语句所在的代码块内，不存在变量提升；<br>使用const声明的是常量，在后面出现的代码中不能再修改该常量的值。对数组下的某个元素或者对象下的某个属性赋值，修改数组的某个元素，或对象的某个属性不会报错，引用类型中变量存储的只是指针，const要求的是指针地址不变而不是指针指向对象内部发生了什么。不能修改的是栈内存在的值和地址。</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/django-shi-wu/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/django-shi-wu/" class="post-title-link" itemprop="url">django事务</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-05-30 15:04:44" itemprop="dateModified" datetime="2021-05-30T15:04:44Z">2021-05-30</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>需要事务控制的情况：<br>对多个ORM模型操作时（比如：用户信息表和用户详细信息表，必须一致）<br>对结果要求严格一致（要么成功，要么失败）</p>
+<p>在django中使用事务：<br>    一：加装饰器自动提交</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.db <span class="keyword">import</span> transaction</span><br><span class="line"><span class="meta">@transaction.atomic</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">viewfunc</span>(<span class="params">request</span>):</span></span><br><span class="line"><span class="comment"># 事务内的代码</span></span><br><span class="line">do_stuff()</span><br></pre></td></tr></tbody></table></figure>
+
+<p>atomic自动提交过程解析<br>a. 进入到最外层的atomic代码块时会打开一个事务<br>b. 进入到内层atomic代码块时会创建一个标记<br>c. 退出内部块时会释放或回滚至标记<br>d. 退出外部块时提交或回退事务</p>
+<p>手动提交和回滚</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.db <span class="keyword">import</span> transaction</span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line"><span class="comment"># 放弃自动提交</span></span><br><span class="line">transaction.set_autocommit(<span class="literal">False</span>)</span><br><span class="line">a.save()</span><br><span class="line">b.save()</span><br><span class="line">transaction.commit() <span class="comment"># 提交事务</span></span><br><span class="line"><span class="keyword">except</span>:</span><br><span class="line">transaction.rollback() <span class="comment"># 回滚</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>举例：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.db <span class="keyword">import</span> transaction</span><br><span class="line"></span><br><span class="line"><span class="meta">@transaction.atomic()</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">trans</span>(<span class="params">request</span>):</span></span><br><span class="line"><span class="string">""" 事务练习：用户发布微博时候，顺便发布一条评论，只能同时成功，否则发生回滚 """</span></span><br><span class="line"><span class="comment"># 获得一个用户</span></span><br><span class="line">user = WeiboUser.objects.get(pk=<span class="number">3</span>)</span><br><span class="line"><span class="comment"># 发布一条微博和评论</span></span><br><span class="line">weibo = Weibo.objects.create(user=user, content=<span class="string">'事务练习'</span>, source=<span class="string">'other'</span>)</span><br><span class="line">WeiboComment.objects.create(user=user, content=<span class="string">'事务练习'</span>, weibo=<span class="literal">None</span>)</span><br><span class="line"><span class="keyword">return</span> HttpResponse(<span class="string">'ojbk'</span>)</span><br></pre></td></tr></tbody></table></figure>
+<p>上例中会weibo不能为空值，会触发回滚机制，若事务机制不存在，则只会将weibo对象创建成功<br>通过with来完成自动的事务提交：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">transaction_with</span>(<span class="params">request</span>):</span></span><br><span class="line"><span class="string">""" 事务练习：用户发布微博时候，顺便发布一条评论，只能同时成功，否则发生回滚 """</span></span><br><span class="line"><span class="comment"># 获得一个用户</span></span><br><span class="line">user = WeiboUser.objects.get(pk=<span class="number">3</span>)</span><br><span class="line"><span class="keyword">with</span> transaction.atomic():</span><br><span class="line"><span class="comment"># 发布一条微博和评论</span></span><br><span class="line">weibo = Weibo.objects.create(user=user, content=<span class="string">'事务练习_with'</span>, source=<span class="string">'other'</span>)</span><br><span class="line">WeiboComment.objects.create(user=user, content=<span class="string">'事务练习_with'</span>, weibo=<span class="literal">None</span>)</span><br><span class="line"><span class="keyword">return</span> HttpResponse(<span class="string">'ojbk'</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>手动提交事务</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">transaction_hand</span>(<span class="params">request</span>):</span></span><br><span class="line"><span class="string">""" 事务练习：用户发布微博时候，顺便发布一条评论，只能同时成功，否则发生回滚 """</span></span><br><span class="line"><span class="comment"># 获得一个用户</span></span><br><span class="line">user = WeiboUser.objects.get(pk=<span class="number">3</span>)</span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line"><span class="comment"># 放弃自动提交</span></span><br><span class="line">transaction.set_autocommit(<span class="literal">False</span>)</span><br><span class="line"><span class="comment"># 发布一条微博和评论</span></span><br><span class="line">weibo = Weibo.objects.create(user=user, content=<span class="string">'事务练习_hand'</span>, source=<span class="string">'other'</span>)</span><br><span class="line">WeiboComment.objects.create(user=user, content=<span class="string">'事务练习_hand'</span>, weibo=<span class="literal">None</span>)</span><br><span class="line">transaction.commit()</span><br><span class="line"><span class="keyword">except</span>:</span><br><span class="line">transaction.rollback()</span><br><span class="line"><span class="keyword">return</span> HttpResponse(<span class="string">'ojbk'</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>atomic()</code> 在<code>with</code>语句结束时，会自动进行提交，或当数据库代码出错时，自动进行回滚</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.db <span class="keyword">import</span> transaction</span><br><span class="line"><span class="keyword">with</span> transaction.atomic():</span><br><span class="line"><span class="comment"># with 语句下面的代码，凡是涉及到数据库操作的代码，</span></span><br><span class="line"><span class="comment"># 在进行数据库操作时，都会放在同一个事物中。</span></span><br><span class="line">    p1 = transaction.savepoint（）</span><br><span class="line">    <span class="comment"># 在进行数据库操作时，设置事物保存点</span></span><br><span class="line">    ..................</span><br><span class="line">    transaction.savepoint_rollback（p1）</span><br><span class="line">    <span class="comment"># 在进行数据库操作时，回滚到指定的保存点</span></span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.db <span class="keyword">import</span> transaction</span><br><span class="line"></span><br><span class="line"><span class="meta">    @transaction.atomic</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">post</span>(<span class="params">self, request, *args, **kwargs</span>):</span></span><br></pre></td></tr></tbody></table></figure><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/django-zhong-jian-jian-zhi-xian-zhi-ip-fang-wen-ci-shu-he-hei-ming-dan/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/django-zhong-jian-jian-zhi-xian-zhi-ip-fang-wen-ci-shu-he-hei-ming-dan/" class="post-title-link" itemprop="url">Django中间件之限制ip访问次数和黑名单</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-06-06 11:30:54" itemprop="dateModified" datetime="2021-06-06T11:30:54Z">2021-06-06</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="限制ip访问频率"><a href="#限制ip访问频率" class="headerlink" title="限制ip访问频率"></a>限制ip访问频率</h2><figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">from</span> django.utils.deprecation <span class="keyword">import</span> MiddlewareMixin</span><br><span class="line"><span class="keyword">from</span> django.http.response <span class="keyword">import</span> HttpResponse</span><br><span class="line"><span class="keyword">from</span> django.core.cache <span class="keyword">import</span> caches</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 频率限制访问</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">IpLimitMiddleware</span>(<span class="params">MiddlewareMixin</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">process_request</span>(<span class="params">self, request</span>):</span></span><br><span class="line">        ip = request.META.get(<span class="string">"REMOTE_ADDR"</span>)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 选择缓存的数据库 redis缓存</span></span><br><span class="line">        cache = caches[<span class="string">'redis_backend'</span>]</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 首先缓存中，根据ip获取数据，假如没有数据，值为空列表 []</span></span><br><span class="line">        requests = cache.get(ip, [])</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 如果值存在，且当前时间 - 最后一个时间 &gt; 30 则清洗掉这个值  这里我们插入请求的时间为头插</span></span><br><span class="line">        <span class="keyword">while</span> requests <span class="keyword">and</span> time.time() - requests[<span class="number">-1</span>] &gt; <span class="number">30</span>:</span><br><span class="line">            requests.pop()</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 若没有存在值，则添加，过期时间为30秒，这个过期时间与上面判断的30 保持一致</span></span><br><span class="line">        requests.insert(<span class="number">0</span>, time.time())</span><br><span class="line">        cache.set(ip, requests, timeout=<span class="number">30</span>)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 限制访问次数为 5 次</span></span><br><span class="line">        print(len(requests))</span><br><span class="line">        <span class="keyword">if</span> len(requests) &gt; <span class="number">5</span>:</span><br><span class="line">            <span class="keyword">return</span> HttpResponse(<span class="string">"请求过于频繁，请稍后重试！"</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="黑名单"><a href="#黑名单" class="headerlink" title="黑名单"></a>黑名单</h2><figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">from</span> django.utils.deprecation <span class="keyword">import</span> MiddlewareMixin</span><br><span class="line"><span class="keyword">from</span> django.http.response <span class="keyword">import</span> HttpResponse</span><br><span class="line"><span class="keyword">from</span> django.core.cache <span class="keyword">import</span> caches</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 频率限制访问</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">IpLimitMiddleware</span>(<span class="params">MiddlewareMixin</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">process_request</span>(<span class="params">self, request</span>):</span></span><br><span class="line">        ip = request.META.get(<span class="string">"REMOTE_ADDR"</span>)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 选择缓存的数据库 redis缓存</span></span><br><span class="line">        cache = caches[<span class="string">'redis_backend'</span>]</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 获取黑名单</span></span><br><span class="line">        black_list = cache.get(<span class="string">'black'</span>, [])</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> ip <span class="keyword">in</span> black_list:</span><br><span class="line">            <span class="keyword">return</span> HttpResponse(<span class="string">"黑名单用户！"</span>)</span><br><span class="line"></span><br><span class="line">        requests = cache.get(ip, [])</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 如果值存在，且当前时间 - 最后一个时间 &gt; 30 则清洗掉这个值  这里我们插入请求的时间为头插</span></span><br><span class="line">        <span class="keyword">while</span> requests <span class="keyword">and</span> time.time() - requests[<span class="number">-1</span>] &gt; <span class="number">60</span>:</span><br><span class="line">            requests.pop()</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 若没有存在值，则添加，过期时间为30秒，这个过期时间与上面判断的30 保持一致</span></span><br><span class="line">        requests.insert(<span class="number">0</span>, time.time())</span><br><span class="line">        cache.set(ip, requests, timeout=<span class="number">60</span>)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 如果访问次数大于30次，假如黑名单，封2分钟</span></span><br><span class="line">        <span class="keyword">if</span> len(requests) &gt; <span class="number">30</span>:</span><br><span class="line">            black_list.append(ip)</span><br><span class="line">            cache.set(<span class="string">'black'</span>, black_list, timeout=<span class="number">60</span> * <span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 限制访问次数为 5 次</span></span><br><span class="line">        print(len(requests))</span><br><span class="line">        <span class="keyword">if</span> len(requests) &gt; <span class="number">5</span>:</span><br><span class="line">            <span class="keyword">return</span> HttpResponse(<span class="string">"请求过于频繁，请稍后重试！"</span>)</span><br></pre></td></tr></tbody></table></figure><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/django-zi-ding-yi-cha-xun/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/django-zi-ding-yi-cha-xun/" class="post-title-link" itemprop="url">django自定义查询</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-06-12 03:09:10" itemprop="dateModified" datetime="2021-06-12T03:09:10Z">2021-06-12</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>自定义查询函数Q(条件判断)<br>Q对象：用于条件之间的逻辑关系（&amp; | <del>）<br>多个可选的查询条件：<br>    实现复杂的查询<br>    优先级从高到低：</del> &amp; | 非  或 与，对应SQL中的AND和OR<br>    可以混合使用 Q 对象和关键字参数，<br>    Q 对象和关键字参数是用”and”拼在一起的（即将逗号看成 and ），<br>    但是 Q 对象必须位于所有关键字参数的前面。</p>
+<p>自定义查询函数F(“字段名称”)<br>之前构造的过滤器都只是将字段值与某个常量做比较，<br>如果想要对两个字段的值做比较，就需要用到 F()。<br>F() 的实例可以在查询中引用字段，<br>来比较同一个 model 实例中两个不同字段的值。</p>
+<p>F()函数从数据库操作层面修改数据<br>F()函数可避免同时操作时竞态条件</p>
+<p>F对象：用于类属性之间的比较。</p>
+<p>使用前要先从 django.db.models 引入 F:<br>from django.db.models import F<br>F 动态获取对象字段的值，可以进行运算。<br>Django 支持 F() 对象之间以及 F() 对象和常数之间的加减乘除和取余的操作。<br>修改操作（update）也可以使用 F() 函数。</p>
+<p>使用SQL查询<br>关联多张表的时候需要使用sql查询</p>
+<p>在视图中获取表单值<br>◆GET请求<br>request.GET.get( name, None)<br>◆POST请求<br>request.POST.get( name, None)</p>
+<p>管理器raw(sql)查询<br>Python<br>1    raw(raw_query,params=None,translations=None)<br>2    # 返回django.db.models.query.RawQuerySet实例<br>def raw_sql(request):</p>
+<h1 id="通过url传入指定参数，在视图中获取表单值"><a href="#通过url传入指定参数，在视图中获取表单值" class="headerlink" title="通过url传入指定参数，在视图中获取表单值"></a>通过url传入指定参数，在视图中获取表单值</h1><p>username = request.GET.get(‘name’, None)<br>sql = (<br>‘SELECT id FROM weibo_user ‘<br>‘WHERE username=%s’<br>)<br>user_list = WeiboUser.objects.raw(sql, (username,))</p>
+<h1 id="user-list对象是一个RawQuerySet"><a href="#user-list对象是一个RawQuerySet" class="headerlink" title="user_list对象是一个RawQuerySet"></a>user_list对象是一个RawQuerySet</h1><p>for user in user_list:</p>
+<h1 id="user也只是单个Query-可指定其字段"><a href="#user也只是单个Query-可指定其字段" class="headerlink" title="user也只是单个Query,可指定其字段"></a>user也只是单个Query,可指定其字段</h1><p>print(user.nickname)<br>return HttpResponse(‘ok’)</p>
+<p>获取数据库连接、游标、直接执行sql<br>类似于python操作数据库，举例：</p>
+<p>def sql(request):<br>    # 获取数据库的连接<br>    from django.db import connection<br>    # 根据连接获取游标<br>    cursor = connection.cursor()<br>    sql = (<br>        ‘SELECT id,username,nickname FROM weibo_user ‘<br>        ‘WHERE id=%s’<br>    )<br>    # 执行sql<br>    cursor.execute(sql, (3,))<br>    # 查询结果<br>    user_list = cursor.fetchall()<br>    # user_list对象是一个元组<br>    for user in user_list:<br>        print(user)<br>    return HttpResponse(‘ok’)</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/drf-huan-cun/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/drf-huan-cun/" class="post-title-link" itemprop="url">drf缓存</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-06-15 13:52:13" itemprop="dateModified" datetime="2021-06-15T13:52:13Z">2021-06-15</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>为了加速网站的访问速度，将一些经常访问的公开变化少数据放入缓存中，<br>可以加快网页响应的速度。<br>对于变化小的数据，将其保存到缓存中请求时直接获取的成本要源于每次请求再重新计算获取的成本，所以使用缓存是很有必要的。<br>Django支持的缓存包括Memcached、数据库高速缓存、文件系统缓存、本地内存缓存、虚拟缓存等，DRF的缓存机制建立在Django的基础上，并进行了一些优化，这里采用的是已经封装好的drf-extensions（DRF扩展），对DRF进行了很多方面的功能扩展，其中就包括缓存功能</p>
+<p>取数据的时候首先去缓存中去，然后再去数据库中取<br>缓存使用的是内存，每次重启之后就会失效</p>
+<p>而需要验证才能访问的私有数据则尽量不要使用缓存，可以根据自己的需要对不同的数据进行缓存配置。</p>
 <ul>
-<li>当 <code>*.py</code> 文件模块被直接运行时，<code>模块名</code>为 <code>__main__</code>，即<code>__name__</code>置为 <code>__main__</code>，<code>if __name__ == '__main__'</code>之下的代码块将被运行。</li>
-<li>当 <code>*.py</code> 文件模块以模块形式被导入调用时，在终端命令行运行时， <code>__name__</code> 为被调用模块的 模块名，<code>if __name__ == '__main__'</code>之下的代码块不被运行。</li>
+<li>第一步，安装</li>
 </ul>
-<p>这种if测试可以让一个模块通过命令行运行时执行一些额外的代码，最常见的就是运行测试。</p>
-<p>假如你叫小明.py，在朋友眼中，你是小明(<strong>name</strong> == ‘小明’)；<br>在你自己眼中，你是你自己(<strong>name</strong> == ‘<strong>main</strong>‘)。</p>
-<p>main文件不能直接用相对路径导入，加个-m</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt; pip install drf-extensions</span><br></pre></td></tr></tbody></table></figure>
+
 <ul>
-<li>把不想在被调用时执行的代码放在程序入口的if内部，比如自检程序。</li>
-<li>把多线程的主线程写在程序入口的if内部。只能这么做，避免自己调用自己时重复执行主进程，下面会详细解释。</li>
+<li>第二步，配置缓存过期时间<br><code>settings.py</code></li>
 </ul>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Python的程序入口</span></span><br><span class="line"><span class="keyword">if</span> __name__ ==<span class="string">'__main__'</span>: <span class="comment"># 它对多进程非常重要</span></span><br><span class="line">    <span class="comment"># 这里是主程序</span></span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">REST_FRAMEWORK_EXTENSIONS = {</span><br><span class="line">    <span class="string">'DEFAULT_CACHE_RESPONSE_TIMEOUT'</span>: <span class="number">5</span>   <span class="comment">#5s过期，时间自己可以随便设定</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
 
-<figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># C语言的程序入口</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">main</span><span class="params">()</span></span>{</span><br><span class="line">    <span class="comment">/* 这里是主程序 */</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+<ul>
+<li>第三步，</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="http://chibisov.github.io/drf-extensions/docs/#cacheresponsemixin">http://chibisov.github.io/drf-extensions/docs/#cacheresponsemixin</a></p>
+<h4 id="CacheResponseMixin"><a href="#CacheResponseMixin" class="headerlink" title="CacheResponseMixin"></a>CacheResponseMixin</h4><p>It is common to cache standard viewset <code>retrieve</code> and <code>list</code> methods. That is why <code>CacheResponseMixin</code> exists. Just mix it into viewset implementation and those methods will use functions, defined in <code>REST_FRAMEWORK_EXTENSIONS</code> settings:<br>缓存标准viewset的<code>retrieve</code>和<code>list</code>方法很常见。 这就是<code>CacheResponseMixin</code>存在的原因。 只需将其混合到viewset实现中，这些方法将使用<code>REST_FRAMEWORK_EXTENSIONS</code>设置中定义的函数：</p>
+<p>“DEFAULT_OBJECT_CACHE_KEY_FUNC” for <code>retrieve</code> method<br>“DEFAULT_LIST_CACHE_KEY_FUNC” for <code>list</code> method<br>By default those functions are using DefaultKeyConstructor and extends it:</p>
+<p>With <code>RetrieveSqlQueryKeyBit</code> for “DEFAULT_OBJECT_CACHE_KEY_FUNC”<br>With <code>ListSqlQueryKeyBit</code> and <code>PaginationKeyBit</code> for “DEFAULT_LIST_CACHE_KEY_FUNC”<br>You can change those settings for custom cache key generation:</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> myapps.serializers <span class="keyword">import</span> UserSerializer</span><br><span class="line"><span class="keyword">from</span> rest_framework_extensions.cache.mixins <span class="keyword">import</span> CacheResponseMixin</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserViewSet</span>(<span class="params">CacheResponseMixin, viewsets.ModelViewSet</span>):</span></span><br><span class="line">    serializer_class = UserSerializer</span><br></pre></td></tr></tbody></table></figure>
 
-<figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># Java的程序入口</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span></span>{</span><br><span class="line">    <span class="comment">// 这里是主程序</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+<p>我们使用的主要是<code>CacheResponseMixin</code>，主要适用于<code>retrieve</code>和<code>list</code>方法，这主要是查询操作，对于新建、修改等操作一般是不能使用缓存的。</p>
+<h3 id="商品列表增加缓存"><a href="#商品列表增加缓存" class="headerlink" title="商品列表增加缓存"></a>商品列表增加缓存</h3><p><code>apps/goods/views.py</code>中的<code>GoodsListViewSet</code>，使之第一个继承自<code>CacheResponseMixin</code>，即可实现缓存，如下：</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework_extensions.cache.mixins <span class="keyword">import</span> CacheResponseMixin</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GoodsListViewSet</span>(<span class="params">CacheResponseMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet</span>):</span></span><br></pre></td></tr></tbody></table></figure>
 
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 新建一个名为【run1.py】的文件，填入下方代码</span></span><br><span class="line"><span class="comment"># 然后在终端输入【python3 run1.py】并运行</span></span><br><span class="line"></span><br><span class="line">print(__name__, <span class="string">'run1-outside'</span>)  <span class="comment"># __main__ run1-outside</span></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    print(__name__, <span class="string">'run1-inside'</span>)  <span class="comment"># __main__ run1-inside</span></span><br></pre></td></tr></tbody></table></figure>
+<p>现在重启服务器，使浏览器缓存失效（因为我们第一次进入该页面，已经将数据放入缓存了，重启服务器，内存中就没了，需要重新到后台获取），然后访问 <a target="_blank" rel="noopener" href="http://127.0.0.1:8000/goods/">http://127.0.0.1:8000/goods/</a> 按F12点击Network查看加载时间。可以看到首次访问需要437ms.再次刷新该页面，第二次以及后面多次访问基本就是13ms</p>
+<p>在视图中配置CacheResponseMixin缓存后，可以使用redis作为缓存后端来存储数据。且针对不同的url以不同的参数，都会生成不同的键值，不同的键缓存不同的内存。如果没有配置CacheResponseMixin缓存，访问这些URL，是不会生成redis键值的。</p>
+<h3 id="DRF的throttle设置API的访问速率"><a href="#DRF的throttle设置API的访问速率" class="headerlink" title="DRF的throttle设置API的访问速率"></a>DRF的throttle设置API的访问速率</h3><p>接口访问速率过快，会导致其它业务受影响，网站打不开，服务器压力过大的请况。</p>
+<p>因为爬虫的存在，如果爬虫的速率过快、不考虑网站的承受能力，会对服务器造成很大的压力，甚至影响正常用户的访问，因此需要限制访问速率，对关键数据、对性能要求高的数据进行限速。</p>
+<p>DRF自带了限速功能，直接使用throttling进行限速即可实现，throttling与权限类似，它决定是否应授权请求。节流指示临时状态，并用于控制客户端可以向API发出的请求的速率，一般对未经身份验证的请求进行限制，而对于经过身份验证的请求则进行限制较少。</p>
+<p><a target="_blank" rel="noopener" href="https://www.django-rest-framework.org/api-guide/throttling/#setting-the-throttling-policy">https://www.django-rest-framework.org/api-guide/throttling/#setting-the-throttling-policy</a></p>
+<h4 id="设置全局限制策略"><a href="#设置全局限制策略" class="headerlink" title="设置全局限制策略"></a>设置全局限制策略</h4><p>The default throttling policy may be set globally, using the <code>DEFAULT_THROTTLE_CLASSES</code> and <code>DEFAULT_THROTTLE_RATES</code> settings.<br>可以使用<code>DEFAULT_THROTTLE_CLASSES</code>和<code>DEFAULT_THROTTLE_RATES</code>设置全局设置默认限制策略。</p>
+<p>修改 DjangoOnlineFreshSupermarket/settings.py 在<code>REST_FRAMEWORK</code>添加配置</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># DRF配置</span></span><br><span class="line">REST_FRAMEWORK = {</span><br><span class="line">    <span class="comment"># throttle对接口访问限速</span></span><br><span class="line">    <span class="string">'DEFAULT_THROTTLE_CLASSES'</span>: [</span><br><span class="line">        <span class="string">'rest_framework.throttling.AnonRateThrottle'</span>,  <span class="comment"># 用户未登录请求限速，通过IP地址判断</span></span><br><span class="line">        <span class="string">'rest_framework.throttling.UserRateThrottle'</span>  <span class="comment"># 用户登陆后请求限速，通过token或Session判断</span></span><br><span class="line">        <span class="comment"># 'rest_framework.throttling.ScopedRateThrottle',  # 限制用户对于每个视图的访问频次，使用ip或user id。</span></span><br><span class="line">    ],</span><br><span class="line">    <span class="string">'DEFAULT_THROTTLE_RATES'</span>: {</span><br><span class="line">        <span class="string">'anon'</span>: <span class="string">'5/minute'</span>,  <span class="comment"># 限制所有匿名未认证用户，使用IP区分用户。使用DEFAULT_THROTTLE_RATES['anon'] 来设置频次</span></span><br><span class="line">        <span class="string">'user'</span>: <span class="string">'10/minute'</span>  <span class="comment"># 限制认证用户，使用User id 来区分。使用DEFAULT_THROTTLE_RATES['user'] 来设置频次</span></span><br><span class="line">        <span class="comment"># 'goods_list': '3/minute'  # 单个API限速</span></span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
 
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 新建另一个名为【run2.py】的文件，填入下方代码，并放在与【run1.py】的相同目录下，</span></span><br><span class="line"><span class="comment"># 然后在终端命令行输入【python3 run2.py】并运行。用run2 调用run1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> run1  <span class="comment"># 这一行代码调用了外部的代码 run1，它只会print出：</span></span><br><span class="line"><span class="comment"># run1 run1-outside # 它只print出这一行东西，并且run1.py的【__main__】变成了【run1】</span></span><br><span class="line"><span class="comment"># run1 run1-inside  # 写在run1【if】缩进里的东西都没有被执行</span></span><br><span class="line"></span><br><span class="line">print(__name__, <span class="string">'run2-outside'</span>)  <span class="comment"># __main__ run2-outside</span></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    print(__name__, <span class="string">'run2-inside'</span>)  <span class="comment"># __main__ run2-inside</span></span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GoodsListViewSet</span>(<span class="params">CacheResponseMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet</span>):</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    商品列表页，并实现分页、搜索、过滤、排序</span></span><br><span class="line"><span class="string">    list:</span></span><br><span class="line"><span class="string">        商品列表</span></span><br><span class="line"><span class="string">    retrieve:</span></span><br><span class="line"><span class="string">        商品详情</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    throttle_classes = [AnonRateThrottle, UserRateThrottle]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>这是所有API调用次数总数计算，并非单个API都有指定的次数。</p>
+<p>单个API限速<br>ScopedRateThrottle</p>
+<p>The <code>ScopedRateThrottle</code> class can be used to restrict access to specific parts of the API. This throttle will only be applied if the view that is being accessed includes a <code>.throttle_scope</code> property. The unique throttle key will then be formed by concatenating the “scope” of the request with the unique user id or IP address.</p>
+<p>The allowed request rate is determined by the <code>DEFAULT_THROTTLE_RATES</code> setting using a key from the request “scope”.</p>
+<p>For example, given the following views…</p>
+<p>还可以使用基于APIView类的视图在每个视图或每个视图集的基础上设置限制策略。</p>
+<p>首先配置限速范围，修改 <code>settings.py</code> ，注释掉全局限速，增加自定义权限</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># DRF配置</span></span><br><span class="line">REST_FRAMEWORK = {</span><br><span class="line">    <span class="comment"># throttle对接口访问限速</span></span><br><span class="line">    <span class="string">'DEFAULT_THROTTLE_CLASSES'</span>: [</span><br><span class="line">        <span class="comment"># 'rest_framework.throttling.AnonRateThrottle',  # 用户未登录请求限速，通过IP地址判断</span></span><br><span class="line">        <span class="comment"># 'rest_framework.throttling.UserRateThrottle'  # 用户登陆后请求限速，通过token或Session判断</span></span><br><span class="line">        <span class="string">'rest_framework.throttling.ScopedRateThrottle'</span>,  <span class="comment"># 限制用户对于每个视图的访问频次，使用ip或user id。</span></span><br><span class="line">    ],</span><br><span class="line">    <span class="string">'DEFAULT_THROTTLE_RATES'</span>: {</span><br><span class="line">        <span class="comment"># 'anon': '5/minute',  # 限制所有匿名未认证用户，使用IP区分用户。使用DEFAULT_THROTTLE_RATES['anon'] 来设置频次</span></span><br><span class="line">        <span class="comment"># 'user': '10/minute'  # 限制认证用户，使用User id 来区分。使用DEFAULT_THROTTLE_RATES['user'] 来设置频次</span></span><br><span class="line">        <span class="string">'goods_list'</span>: <span class="string">'3/minute'</span>  <span class="comment"># 单个API限速</span></span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="/2020/08/21/drf-huan-cun/1.png" alt="description"></p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
 
 
-<p>程序入口与自检程序<br>当一个开发者编写一个库时（例如把它命名为 utils.py），如</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 这个库（模块）被命名为 utils.py</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">C1</span>:</span></span><br><span class="line">   ...</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func1</span>():</span></span><br><span class="line">   ...</span><br><span class="line"></span><br><span class="line">c1 = C1()  <span class="comment"># 这是错误的做法，应该挪到 程序入口if内部</span></span><br><span class="line">func1()    <span class="comment"># 这是错误的做法，应该挪到 程序入口if内部</span></span><br><span class="line"><span class="keyword">if</span> __name__ ==<span class="string">'__main__'</span>:</span><br><span class="line">    c = C1()</span><br><span class="line">    func1()</span><br></pre></td></tr></tbody></table></figure>
-<p>当其他人只想调用 <code>C1</code> 或者 <code>func1</code> 时，他在另一个Python文件中，用 <code>import utils</code> 导入 <code>utils</code> 这个库时就不会运行程序入口if内部的任何代码了。</p>
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/vue-jing-tai-wen-jian-fang-dao-django-zhong/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/vue-jing-tai-wen-jian-fang-dao-django-zhong/" class="post-title-link" itemprop="url">vue静态文件放到django中</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-06-13 06:43:58" itemprop="dateModified" datetime="2021-06-13T06:43:58Z">2021-06-13</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>vue有两种开发模式</p>
+<p>build    用来生成静态文件<br>dev</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cnpm run build</span><br></pre></td></tr></tbody></table></figure>
+
+<p>生成的静态文件 index.html 、index.entry.js 、static 文件后<br>在dist目录下面的index.html拷贝到Django的templates目录下</p>
+<p>django中创建static目录，把 index.entry.js 复制到该文件夹下</p>
+<p>把index.entry.js考到django的static目录下面<br>把dist/static下的两个 fonts和images 文件夹拷贝到django static目录下</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 静态资源设置</span></span><br><span class="line">STATIC_URL = <span class="string">'/static/'</span></span><br><span class="line">STATICFILES_DIRS = (str(BASE_DIR / <span class="string">'static'</span>),)</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>url.py</code>配置首页的url</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.views.generic <span class="keyword">import</span> TemplateView</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    <span class="comment"># 首页</span></span><br><span class="line">    path(<span class="string">'index/'</span>, TemplateView.as_view(template_name=<span class="string">'index.html'</span>), name=<span class="string">'index'</span>),</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>将Vue模板使用Django渲染。</p>
+<p>不使用<code>viewsets.ModelViewSet</code>原因是，订单一般不允许修改的，所有要自定义继承</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/python-luo-ji-yun-suan-fu/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/python-luo-ji-yun-suan-fu/" class="post-title-link" itemprop="url">python逻辑运算符</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-06-29 01:42:56" itemprop="dateModified" datetime="2021-06-29T01:42:56Z">2021-06-29</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>逻辑运算优先 not&gt;and&gt;or<br>0被认为是False，非0表示True</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br></pre></td><td class="code"><pre><span class="line">a = <span class="number">10</span></span><br><span class="line">b = <span class="number">20</span></span><br><span class="line"><span class="comment"># 布尔"与" x and y</span></span><br><span class="line"><span class="comment"># 如果 x 为 False，返回 False，</span></span><br><span class="line"><span class="comment"># x 为 True， 返回 y 的计算值。</span></span><br><span class="line"><span class="comment"># 同真取最后一个真，有假取第一个假。</span></span><br><span class="line"><span class="keyword">if</span> (a <span class="keyword">and</span> b):  <span class="comment"># (a and b) 返回 20</span></span><br><span class="line">    print(<span class="string">"1.变量 a 和 b 都为 true"</span>)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    print(<span class="string">"1.变量 a 和 b 有一个不为 true"</span>)</span><br><span class="line"><span class="comment"># 1.变量 a 和 b 都为 true</span></span><br><span class="line"></span><br><span class="line">print(<span class="number">2</span> <span class="keyword">and</span> <span class="number">0</span>) <span class="comment"># 0</span></span><br><span class="line">print(<span class="number">1</span> <span class="keyword">and</span> <span class="number">2</span>) <span class="comment"># 2</span></span><br><span class="line">print(<span class="number">2</span> <span class="keyword">and</span> <span class="number">1</span>) <span class="comment"># 1</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 布尔"或" x or y</span></span><br><span class="line"><span class="comment"># 如果x是True，它返回x的值，</span></span><br><span class="line"><span class="comment"># x 为False，它返回y的计算值</span></span><br><span class="line"><span class="comment"># 同假取最后一个假，有真取第一个真。</span></span><br><span class="line"><span class="keyword">if</span> (a <span class="keyword">or</span> b):  <span class="comment"># (a or b) 返回 10</span></span><br><span class="line">    print(<span class="string">"2.变量 a 和 b 都为 true，或其中一个变量为 true"</span>)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    print(<span class="string">"2.变量 a 和 b 都不为 true"</span>)</span><br><span class="line"><span class="comment"># 2.变量 a 和 b 都为 true，或其中一个变量为 true</span></span><br><span class="line"></span><br><span class="line">print(<span class="number">2</span> <span class="keyword">or</span> <span class="number">0</span>) <span class="comment"># 2</span></span><br><span class="line">print(<span class="number">2</span> <span class="keyword">or</span> <span class="number">1</span>) <span class="comment"># 2</span></span><br><span class="line">print(<span class="number">0</span> <span class="keyword">or</span> <span class="number">1</span>) <span class="comment"># 0</span></span><br><span class="line">print(<span class="number">1</span> <span class="keyword">or</span> <span class="number">2</span>) <span class="comment"># 1</span></span><br><span class="line">print(<span class="number">4</span> <span class="keyword">or</span> <span class="number">2</span> <span class="keyword">or</span> <span class="number">1</span>) <span class="comment"># 4</span></span><br><span class="line">print(<span class="number">2</span> <span class="keyword">or</span> <span class="number">4</span> <span class="keyword">or</span> <span class="number">1</span>) <span class="comment"># 2</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">print(<span class="string">'a'</span> &gt; <span class="string">'b'</span>)</span><br><span class="line"><span class="comment"># False 'a' 的 ASCII 码比 ‘b’ 小</span></span><br><span class="line">print(<span class="string">'a'</span> &gt; <span class="string">'b'</span> <span class="keyword">or</span> <span class="string">'c'</span>)  <span class="comment"># c</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 修改变量 a 的值</span></span><br><span class="line">a = <span class="number">0</span></span><br><span class="line"><span class="keyword">if</span> (a <span class="keyword">and</span> b):</span><br><span class="line">    print(<span class="string">"3.变量 a 和 b 都为 true"</span>)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    print(<span class="string">"3.变量 a 和 b 有一个不为 true"</span>)</span><br><span class="line"><span class="comment"># 3.变量 a 和 b 有一个不为 true</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (a <span class="keyword">or</span> b):</span><br><span class="line">    print(<span class="string">"4.变量 a 和 b 都为 true，或其中一个变量为 true"</span>)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    print(<span class="string">"4.变量 a 和 b 都不为 true"</span>)</span><br><span class="line"><span class="comment"># 4.变量 a 和 b 都为 true，或其中一个变量为 true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 布尔"非" not x ，取反</span></span><br><span class="line"><span class="comment"># 如果 x 为 True，返回 False 。</span></span><br><span class="line"><span class="comment"># 如果 x 为 False，返回 True。</span></span><br><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> (a <span class="keyword">and</span> b):</span><br><span class="line">    print(<span class="string">"5.变量 a 和 b 都为 false，或其中一个变量为 false"</span>)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    print(<span class="string">"5.变量 a 和 b 都为 true"</span>)</span><br><span class="line"><span class="comment"># 5.变量 a 和 b 都为 false，或其中一个变量为 false</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">x = <span class="literal">True</span></span><br><span class="line">y = <span class="literal">False</span></span><br><span class="line">z = <span class="literal">False</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> x <span class="keyword">or</span> y <span class="keyword">and</span> z:</span><br><span class="line">    print(<span class="string">"yes"</span>)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    print(<span class="string">"no"</span>)</span><br><span class="line"><span class="comment"># yes</span></span><br><span class="line">print(<span class="string">'----'</span>)</span><br><span class="line"></span><br><span class="line">print(<span class="keyword">not</span> <span class="number">0.1</span>)  <span class="comment"># False</span></span><br><span class="line">print(<span class="keyword">not</span> <span class="string">''</span>)  <span class="comment"># True</span></span><br><span class="line">print(<span class="keyword">not</span> <span class="string">'0'</span>)  <span class="comment"># False</span></span><br><span class="line">print(<span class="keyword">not</span> [])  <span class="comment"># True</span></span><br><span class="line">print(<span class="keyword">not</span> [<span class="number">1</span>, <span class="number">2</span>])  <span class="comment"># False</span></span><br><span class="line">print(bool(<span class="literal">None</span>))  <span class="comment"># False</span></span><br><span class="line"></span><br><span class="line">x = <span class="literal">True</span></span><br><span class="line">y = <span class="literal">False</span></span><br><span class="line">z = <span class="literal">False</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> x <span class="keyword">or</span> y:</span><br><span class="line">    print(<span class="number">1</span>)</span><br><span class="line"><span class="keyword">elif</span> <span class="keyword">not</span> x <span class="keyword">or</span> <span class="keyword">not</span> y <span class="keyword">and</span> z:</span><br><span class="line">    print(<span class="number">2</span>)</span><br><span class="line"><span class="keyword">elif</span> <span class="keyword">not</span> x <span class="keyword">or</span> y <span class="keyword">or</span> <span class="keyword">not</span> y <span class="keyword">and</span> x:</span><br><span class="line">    print(<span class="number">3</span>)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    print(<span class="number">4</span>)</span><br><span class="line"><span class="comment"># not x or y or not y and x就可以这么理解</span></span><br><span class="line"><span class="comment"># 假 or 假 or 真 and 真</span></span><br><span class="line"><span class="comment"># 假 or 假 or 真</span></span><br><span class="line"><span class="comment"># 假 or 真</span></span><br><span class="line"><span class="comment"># 真</span></span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 4. bool类型转换 , 字符串转bool只要字符串不是空字符串 都是true</span></span><br><span class="line">bool_data = bool(<span class="string">"12"</span>)</span><br><span class="line">print(bool_data)</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> distutils.util <span class="keyword">import</span> strtobool</span><br><span class="line"></span><br><span class="line"><span class="comment"># bool_data = strtobool("2") # raise ValueError("invalid truth value %r" % (val,))</span></span><br><span class="line"><span class="comment"># ValueError: invalid truth value '2'</span></span><br><span class="line"></span><br><span class="line">bool_data = strtobool(<span class="string">"true"</span>)</span><br><span class="line">print(bool_data)  <span class="comment"># 1</span></span><br><span class="line">bool_data = strtobool(<span class="string">"True"</span>)</span><br><span class="line">print(bool_data)  <span class="comment"># 1</span></span><br><span class="line">bool_data = strtobool(<span class="string">"TRUE"</span>)</span><br><span class="line">print(bool_data)  <span class="comment"># 1</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># bool_data = strtobool("TRUEFalse")  # raise ValueError("invalid truth value %r" % (val,))</span></span><br><span class="line"><span class="comment"># ValueError: invalid truth value 'truefalse'</span></span><br><span class="line"></span><br><span class="line">bool_data = strtobool(<span class="string">"1"</span>)</span><br><span class="line">print(bool_data)  <span class="comment"># 1</span></span><br><span class="line"></span><br><span class="line">bool_data = strtobool(<span class="string">"2"</span>)  <span class="comment"># raise ValueError("invalid truth value %r" % (val,))</span></span><br><span class="line"><span class="comment"># ValueError: invalid truth value '2'</span></span><br></pre></td></tr></tbody></table></figure>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/06/30/hai-xiang-yun-suan-fu/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/06/30/hai-xiang-yun-suan-fu/" class="post-title-link" itemprop="url">海象运算符</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-06-29 16:21:41" itemprop="dateCreated datePublished" datetime="2020-06-29T16:21:41Z">2020-06-29</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-06-29 04:58:58" itemprop="dateModified" datetime="2021-06-29T04:58:58Z">2021-06-29</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>python3.8提供了一个新的运算符 - 海象运算符 可以为我们的表达式赋值<br>可以将两行代码变成一行</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">course_list = [<span class="string">"django"</span>, <span class="string">"scrapy"</span>, <span class="string">"tornado"</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment"># len(course_list)要执行两次</span></span><br><span class="line"><span class="keyword">if</span> len(course_list) &gt;= <span class="number">3</span>:</span><br><span class="line">    print(<span class="string">"课程较多， 课程数量： {}"</span>.format(len(course_list)))</span><br><span class="line">    <span class="comment"># 课程较多， 课程数量： 3</span></span><br><span class="line"></span><br><span class="line">course_size = len(course_list)  <span class="comment"># 多了一行</span></span><br><span class="line"><span class="keyword">if</span> course_size &gt;= <span class="number">3</span>:</span><br><span class="line">    print(<span class="string">"课程较多， 课程数量： {}"</span>.format(course_size))</span><br><span class="line">    <span class="comment"># 课程较多， 课程数量： 3</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> course_size := len(</span><br><span class="line">        course_list</span><br><span class="line">) &gt;= <span class="number">3</span>:  <span class="comment"># if course_size := (len(course_list) &gt;= 3): 因为&gt;=的优先级高于:=</span></span><br><span class="line">    print(<span class="string">"课程较多， 课程数量： {}"</span>.format(course_size))</span><br><span class="line">    <span class="comment"># 课程较多， 课程数量： True</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (course_size := len(course_list)) &gt;= <span class="number">3</span>:</span><br><span class="line">    print(<span class="string">"课程较多， 课程数量： {}"</span>.format(course_size))</span><br><span class="line">    <span class="comment"># 课程较多， 课程数量： 3</span></span><br><span class="line"></span><br><span class="line">course_size = len(course_list)</span><br><span class="line">powers = [course_size, course_size**<span class="number">2</span>, course_size**<span class="number">3</span>]</span><br><span class="line">print(powers)  <span class="comment"># [3, 9, 27]</span></span><br><span class="line"></span><br><span class="line">powers = [course_size := len(course_list), course_size**<span class="number">2</span>, course_size**<span class="number">3</span>]</span><br><span class="line">print(powers)  <span class="comment"># [3, 9, 27]</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"></span><br><span class="line">desc = <span class="string">"bobby:18"</span></span><br><span class="line"></span><br><span class="line">m = re.match(<span class="string">"bobby:(.*)"</span>, desc)</span><br><span class="line"><span class="keyword">if</span> m:</span><br><span class="line">    age = m.group(<span class="number">1</span>)</span><br><span class="line">    print(age)  <span class="comment"># 18</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> m := re.match(<span class="string">"bobby:(.*)"</span>, desc):</span><br><span class="line">    age = m.group(<span class="number">1</span>)</span><br><span class="line">    print(age)  <span class="comment"># 18</span></span><br><span class="line"></span><br><span class="line">age = <span class="number">18</span></span><br><span class="line"><span class="comment"># 海象运算符不能赋值，go可以</span></span><br><span class="line"><span class="comment"># age := 18  # SyntaxError: invalid syntax</span></span><br><span class="line">age += <span class="number">5</span></span><br><span class="line"><span class="comment"># 海象运算符不能加减，go可以</span></span><br><span class="line"><span class="comment"># age :+= 5  # SyntaxError: invalid syntax</span></span><br></pre></td></tr></tbody></table></figure>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -289,7 +1281,7 @@
 
 
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/30/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/30/">30</a><span class="page-number current">31</span>
+    <a class="extend prev" rel="prev" href="/page/30/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/30/">30</a><span class="page-number current">31</span><a class="page-number" href="/page/32/">32</a><a class="extend next" rel="next" href="/page/32/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 <script src="/js/comments.js"></script>
 </div>

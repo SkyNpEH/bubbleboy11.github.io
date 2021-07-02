@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<meta name="hexo-config" content="{&quot;hostname&quot;:&quot;bubbleboy11.github.io&quot;,&quot;root&quot;:&quot;/&quot;,&quot;images&quot;:&quot;/images&quot;,&quot;scheme&quot;:&quot;Muse&quot;,&quot;version&quot;:&quot;8.3.0&quot;,&quot;exturl&quot;:false,&quot;sidebar&quot;:{&quot;position&quot;:&quot;left&quot;,&quot;display&quot;:&quot;post&quot;,&quot;padding&quot;:18,&quot;offset&quot;:12},&quot;copycode&quot;:true,&quot;bookmark&quot;:{&quot;enable&quot;:false,&quot;color&quot;:&quot;#222&quot;,&quot;save&quot;:&quot;auto&quot;},&quot;fancybox&quot;:false,&quot;mediumzoom&quot;:false,&quot;lazyload&quot;:false,&quot;pangu&quot;:false,&quot;comments&quot;:{&quot;style&quot;:&quot;tabs&quot;,&quot;active&quot;:null,&quot;storage&quot;:true,&quot;lazyload&quot;:false,&quot;nav&quot;:null},&quot;motion&quot;:{&quot;enable&quot;:true,&quot;async&quot;:false,&quot;transition&quot;:{&quot;post_block&quot;:&quot;fadeIn&quot;,&quot;post_header&quot;:&quot;fadeInDown&quot;,&quot;post_body&quot;:&quot;fadeInDown&quot;,&quot;coll_header&quot;:&quot;fadeInLeft&quot;,&quot;sidebar&quot;:&quot;fadeInUp&quot;}},&quot;prism&quot;:false,&quot;i18n&quot;:{&quot;placeholder&quot;:&quot;搜索...&quot;,&quot;empty&quot;:&quot;没有找到任何搜索结果：${query}&quot;,&quot;hits_time&quot;:&quot;找到 ${hits} 个搜索结果（用时 ${time} 毫秒）&quot;,&quot;hits&quot;:&quot;找到 ${hits} 个搜索结果&quot;}}">
+<meta name="description" content="切片Go 数组的长度不可改变，在特定场景中这样的集合就不太适用， Go中提供了一种灵活，功能强悍的内置类型切片(“动态数组”)，与数组相比切片的长度是不固定的，可以追加元素，在追加时可能使切片的容量增大 Go的切片类型为处理同类型数据序列提供一个方便而高效的方式。切片有些类似于其他语言中的数组，slice对标的就是python中list，但是有一些不同寻常的特性。 定义切片第一种方法： var i">
+<meta property="og:type" content="article">
+<meta property="og:title" content="go切片">
+<meta property="og:url" content="https://bubbleboy11.github.io/2021/07/02/go-qie-pian/index.html">
+<meta property="og:site_name" content="外心人D的博客">
+<meta property="og:description" content="切片Go 数组的长度不可改变，在特定场景中这样的集合就不太适用， Go中提供了一种灵活，功能强悍的内置类型切片(“动态数组”)，与数组相比切片的长度是不固定的，可以追加元素，在追加时可能使切片的容量增大 Go的切片类型为处理同类型数据序列提供一个方便而高效的方式。切片有些类似于其他语言中的数组，slice对标的就是python中list，但是有一些不同寻常的特性。 定义切片第一种方法： var i">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-07-01T16:21:41.000Z">
+<meta property="article:modified_time" content="2021-07-02T05:02:37.315Z">
+<meta property="article:author" content="外心人D">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://bubbleboy11.github.io/2021/07/02/go-qie-pian/">
+
+
+
+<meta name="hexo-config-page" content="{&quot;sidebar&quot;:&quot;&quot;,&quot;isHome&quot;:false,&quot;isPost&quot;:true,&quot;lang&quot;:&quot;zh-CN&quot;}">
+<meta name="hexo-config-calendar" content="">
+<script data-pjax src="/js/load-config.js"></script>
+  <title>go切片 | 外心人D的博客</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="外心人D的博客" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">外心人D的博客</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%87%E7%89%87"><span class="nav-text">切片</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9A%E4%B9%89%E5%88%87%E7%89%87"><span class="nav-text">定义切片</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E7%A7%8D-%E4%BD%BF%E7%94%A8make"><span class="nav-text">第二种 使用make</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AC%AC%E4%B8%89%E7%A7%8D%EF%BC%8C%E9%80%9A%E8%BF%87%E5%AF%B9%E6%95%B0%E7%BB%84%E6%93%8D%E4%BD%9C%E8%BF%94%E5%9B%9E%E4%B8%80%E4%B8%AA%E5%88%87%E7%89%87"><span class="nav-text">第三种，通过对数组操作返回一个切片</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%87%E7%89%87%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="nav-text">切片初始化</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">外心人D</p>
+  <div class="site-description" itemprop="description">本博客大多内容为慕课和网上博客，并非原创</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">311</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">40</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/07/02/go-qie-pian/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          go切片
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-07-01 16:21:41" itemprop="dateCreated datePublished" datetime="2021-07-01T16:21:41Z">2021-07-01</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-07-02 05:02:37" itemprop="dateModified" datetime="2021-07-02T05:02:37Z">2021-07-02</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/go/" itemprop="url" rel="index"><span itemprop="name">go</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h3 id="切片"><a href="#切片" class="headerlink" title="切片"></a>切片</h3><p>Go 数组的长度不可改变，在特定场景中这样的集合就不太适用，</p>
+<p>Go中提供了一种灵活，功能强悍的内置类型切片(“动态数组”)，与数组相比切片的长度是不固定的，<br>可以追加元素，在追加时可能使切片的容量增大</p>
+<p>Go的切片类型为处理同类型数据序列提供一个方便而高效的方式。<br>切片有些类似于其他语言中的数组，slice对标的就是python中list，但是有一些不同寻常的特性。</p>
+<h3 id="定义切片"><a href="#定义切片" class="headerlink" title="定义切片"></a>定义切片</h3><p>第一种方法： var identifier []type</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// var courses []string // 定义了一个切片</span></span><br><span class="line"><span class="keyword">var</span> courses = []<span class="keyword">string</span>{<span class="string">"django"</span>, <span class="string">"scrapy"</span>, <span class="string">"tornado"</span>}</span><br><span class="line">fmt.Printf(<span class="string">"%T"</span>, courses) <span class="comment">// []string</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h4 id="第二种-使用make"><a href="#第二种-使用make" class="headerlink" title="第二种 使用make"></a>第二种 使用make</h4><p>切片不是没有长度限制，为什么使用make初始化的需要我们传递一个长度，<br>那我传递了长度之后是不是意味着就像数组一样长度不能变了呢？</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> slice1 []<span class="keyword">type</span> = <span class="built_in">make</span>([]<span class="keyword">type</span>, <span class="built_in">len</span>)</span><br><span class="line"></span><br><span class="line">slice1 := <span class="built_in">make</span>([]<span class="keyword">type</span>, <span class="built_in">len</span>)</span><br><span class="line"></span><br><span class="line">courses := <span class="built_in">make</span>([]<span class="keyword">string</span>, <span class="number">5</span>)</span><br><span class="line">fmt.Printf(<span class="string">"%T"</span>, courses) <span class="comment">// []string</span></span><br><span class="line">fmt.Println(<span class="built_in">len</span>(courses)) <span class="comment">// 5</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h4 id="第三种，通过对数组操作返回一个切片"><a href="#第三种，通过对数组操作返回一个切片" class="headerlink" title="第三种，通过对数组操作返回一个切片"></a>第三种，通过对数组操作返回一个切片</h4><p>python中切片的用法非常的多非常的灵活B=,[:-1] [::-1] go都不能用<br>python中的用法叫切片 go语言中切片是一种数据结构</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// course := [5]string{"django", "tornado", "scrapy", "python", "asyncio"}</span></span><br><span class="line"><span class="keyword">var</span> courses = [<span class="number">5</span>]<span class="keyword">string</span>{<span class="string">"django"</span>, <span class="string">"scrapy"</span>, <span class="string">"tornado"</span>, <span class="string">"python"</span>, <span class="string">"asyncio"</span>}</span><br><span class="line">subCourse := courses[<span class="number">1</span>:<span class="number">4</span>]</span><br><span class="line">fmt.Println(courses)        <span class="comment">// [django scrapy tornado python asyncio]</span></span><br><span class="line">subCourse[<span class="number">0</span>] = <span class="string">"bobby"</span>      <span class="comment">// 修改切片，原数组会一样改变，引用传递，</span></span><br><span class="line">fmt.Println(courses)        <span class="comment">// [django bobby tornado python asyncio]</span></span><br><span class="line">fmt.Println(subCourse)      <span class="comment">// [bobby tornado python]</span></span><br><span class="line">fmt.Printf(<span class="string">"%T"</span>, subCourse) <span class="comment">// []string</span></span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">replace</span><span class="params">(mySlice []<span class="keyword">string</span>)</span></span> {</span><br><span class="line">    mySlice[<span class="number">0</span>] = <span class="string">"bobby"</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="keyword">var</span> courses = [<span class="number">5</span>]<span class="keyword">string</span>{<span class="string">"django"</span>, <span class="string">"scrapy"</span>, <span class="string">"tornado"</span>, <span class="string">"python"</span>, <span class="string">"asyncio"</span>}</span><br><span class="line">    subCourse := courses[<span class="number">1</span>:<span class="number">4</span>] <span class="comment">// python中的用法叫切片 go语言中切片是一种数据结构</span></span><br><span class="line">    fmt.Println(subCourse) <span class="comment">// [scrapy tornado python]</span></span><br><span class="line">    fmt.Println(courses)   <span class="comment">// [django scrapy tornado python asyncio]</span></span><br><span class="line">    replace(subCourse)</span><br><span class="line">    fmt.Printf(<span class="string">"%T"</span>, subCourse) <span class="comment">// []string</span></span><br><span class="line">    fmt.Println(subCourse)      <span class="comment">// [bobby tornado python]</span></span><br><span class="line">    fmt.Println(courses)        <span class="comment">// [django bobby tornado python asyncio] 第二个已经变了</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="切片初始化"><a href="#切片初始化" class="headerlink" title="切片初始化"></a>切片初始化</h3><p>创建 slice 的方式有以下几种：<br>序号    方式    代码示例<br>1    直接声明    var slice []int<br>2    new    slice := *new([]int)<br>3    字面量    slice := []int{1,2,3,4,5}<br>4    make    slice := make([]int, 5, 10)<br>5    从切片或数组“截取”    slice := array[1:5]<br> 或 slice := sourceSlice[1:5]</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/07/02/go-shu-zu/" rel="prev" title="go数组">
+                  <i class="fa fa-chevron-left"></i> go数组
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+<script src="/js/comments.js"></script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">外心人D</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

@@ -28,7 +28,7 @@
 <meta property="og:description" content="查询条件的使用结果集QuerySet常用方法    Queryset表示从数据库中取出来的对象的集合    它可以含有零个、一个或者多个过滤器（filter）（相当于数据库的where） 从模型的Manager那里取得QuerySetQuerySet的筛选结果本身还是QuerySet 注意：对一个QuerySet实例对象，可以继续调用上面所有函数  说明2：ORM查询多个对象时会返回QuerySe">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-08-20T16:21:41.000Z">
-<meta property="article:modified_time" content="2021-06-23T01:23:36.053Z">
+<meta property="article:modified_time" content="2021-06-30T09:41:07.233Z">
 <meta property="article:author" content="外心人D">
 <meta name="twitter:card" content="summary">
 
@@ -121,13 +121,13 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">301</span>
+          <span class="site-state-item-count">311</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
-        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-count">25</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -202,7 +202,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-06-23 01:23:36" itemprop="dateModified" datetime="2021-06-23T01:23:36Z">2021-06-23</time>
+        <time title="修改时间：2021-06-30 09:41:07" itemprop="dateModified" datetime="2021-06-30T09:41:07Z">2021-06-30</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -286,7 +286,14 @@ User.objects.bulk_create([user1,user2,user3])
 <figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查找xx数据库的全部记录，并将其通过id降序排列</span></span><br><span class="line">User.objects.all().order_by(<span class="string">'-id'</span>).using(<span class="string">'数据库名'</span>)</span><br></pre></td></tr></tbody></table></figure>
 
 <p>分页处理<br>    减少等待时间，提升用户体验<br>    如何进行分页查询：<br>方法一：对查询结果集QuerySet进行分片</p>
-<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">        <span class="number">1</span>    <span class="comment"># 返回前n个对象（LIMIT 5）</span></span><br><span class="line">        <span class="number">2</span>    User.objects.all()[:<span class="number">5</span>]</span><br><span class="line">        <span class="number">3</span>    <span class="comment"># （offset 5 limit 5）sql中offset偏移的意思</span></span><br><span class="line">        <span class="number">4</span>    跳过前<span class="number">5</span>条数据，从第<span class="number">6</span>条数据开始取，取<span class="number">5</span>条数据，第<span class="number">6</span>到第<span class="number">10</span>个对象</span><br><span class="line">            User.objects.all()[<span class="number">5</span>:<span class="number">10</span>]</span><br><span class="line">```    </span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">100</span>):</span><br><span class="line">  ...:   ...:list.append(User(username=<span class="string">'user{0}'</span>.format(i),nickname=<span class="string">'用户{}'</span>.format(i),password=<span class="string">'123456'</span>))</span><br><span class="line"></span><br><span class="line">  ...:len(list)</span><br><span class="line">Out[<span class="number">7</span>]: <span class="number">100</span></span><br><span class="line">User.objects.bulk_create(list)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">obj_list = User.objects.all()[<span class="number">50</span>:<span class="number">10</span>]  第五列从第<span class="number">50</span>行开始</span><br><span class="line">obj_list</span><br><span class="line">Out[<span class="number">10</span>]: &lt;QuerySet []&gt;</span><br><span class="line">list_all = User.objects.all()</span><br><span class="line">list_all[<span class="number">50</span>:<span class="number">60</span>]</span><br><span class="line">`</span><br><span class="line"></span><br><span class="line">方法二：使用`django.core.paginator`进行分页处理(分页处理器)</span><br><span class="line">分页处理相关类：</span><br><span class="line">Paginator——分页器</span><br><span class="line">Page——某一页对象</span><br><span class="line">异常：</span><br><span class="line">InvalidPage——无效的页码</span><br><span class="line">PageNotAnInteger——页码必须是整数</span><br><span class="line">EmptyPage——空页（没有数据）</span><br><span class="line"></span><br><span class="line">分页处理器</span><br><span class="line">    步骤一：取得分页器Paginator(objects,page_size)</span><br><span class="line">objects——要进行分页的数据，就是我们之前查询获得的结果集</span><br><span class="line">page_size——每页的数据放多少</span><br><span class="line">Python</span><br><span class="line">    <span class="number">1</span>    p = Paginator(objects,<span class="number">2</span>)</span><br><span class="line">    分页器的属性：</span><br><span class="line">    count——数据记录的总条数</span><br><span class="line">    num_pages——总页数（总记录条数/每页大小）</span><br><span class="line">    page_range——页码范围</span><br><span class="line">    步骤二：取得页面实例page=p.page(page_num)</span><br><span class="line">page_num——当前页的页码，如第几页</span><br><span class="line"></span><br><span class="line">```python</span><br><span class="line">p = Paginator(objects,<span class="number">2</span>)</span><br><span class="line">page = p.page(<span class="number">3</span>)</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span>    <span class="comment"># 返回前n个对象（LIMIT 5）</span></span><br><span class="line"><span class="number">2</span>    User.objects.all()[:<span class="number">5</span>]</span><br><span class="line"><span class="number">3</span>    <span class="comment"># （offset 5 limit 5）sql中offset偏移的意思</span></span><br><span class="line"><span class="number">4</span>    跳过前<span class="number">5</span>条数据，从第<span class="number">6</span>条数据开始取，取<span class="number">5</span>条数据，第<span class="number">6</span>到第<span class="number">10</span>个对象</span><br><span class="line">    User.objects.all()[<span class="number">5</span>:<span class="number">10</span>]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>for i in range(100):<br>  …:   …:list.append(User(username=’user{0}’.format(i),nickname=’用户{}’.format(i),password=’123456’))</p>
+<p>  …:len(list)<br>Out[7]: 100<br>User.objects.bulk_create(list)</p>
+<p>obj_list = User.objects.all()[50:10]  第五列从第50行开始<br>obj_list<br>Out[10]: &lt;QuerySet []&gt;<br>list_all = User.objects.all()<br>list_all[50:60]<br>`</p>
+<p>方法二：使用<code>django.core.paginator</code>进行分页处理(分页处理器)<br>分页处理相关类：<br>Paginator——分页器<br>Page——某一页对象<br>异常：<br>InvalidPage——无效的页码<br>PageNotAnInteger——页码必须是整数<br>EmptyPage——空页（没有数据）</p>
+<p>分页处理器<br>    步骤一：取得分页器Paginator(objects,page_size)<br>objects——要进行分页的数据，就是我们之前查询获得的结果集<br>page_size——每页的数据放多少<br>Python<br>    1    p = Paginator(objects,2)<br>    分页器的属性：<br>    count——数据记录的总条数<br>    num_pages——总页数（总记录条数/每页大小）<br>    page_range——页码范围<br>    步骤二：取得页面实例page=p.page(page_num)<br>page_num——当前页的页码，如第几页</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">p = Paginator(objects,<span class="number">2</span>)</span><br><span class="line">page = p.page(<span class="number">3</span>)</span><br></pre></td></tr></tbody></table></figure>
 
 <h4 id="页面实例的属性："><a href="#页面实例的属性：" class="headerlink" title="页面实例的属性："></a>页面实例的属性：</h4><ul>
 <li>number——当前页的页码</li>
