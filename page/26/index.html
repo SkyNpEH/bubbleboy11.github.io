@@ -119,7 +119,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">320</span>
+          <span class="site-state-item-count">322</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -160,6 +160,268 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/liu-lan-qi-fang-wen-url/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/liu-lan-qi-fang-wen-url/" class="post-title-link" itemprop="url">浏览器访问url</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-04-02 12:24:45" itemprop="dateModified" datetime="2021-04-02T12:24:45Z">2021-04-02</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">计算机网络</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>电脑是如何访问百度的？<br>浏览器输入一个网址url并发送请求到服务器，再到服务器返回浏览器发生了哪些事情？</p>
+<p>可以从以下角度回答问题<br>中间涉及到了哪些过程<br>每个过程包含哪些网络协议<br>每个协议都干了什么？</p>
+<p>知道什么说什么，不要把自己带坑里，熟悉到哪一层协议就说到哪一层）</p>
+<p>&nbsp; DNS查询—》TCP握手—》HTTP请求—》反向代理Nginx—》uwsgi / gunicom—》web app 响应—》TCP握手。<br>&nbsp; &nbsp; &nbsp; &nbsp;当浏览器发起请求的时候其实一开始并不会做DNS查询，而是先去看有没有DNS缓存，如果不在DNS缓存里面并且hosts文件里面也没有的时候，它就会向本地DNS服务器发起一个DNS查询，如果本地DNS没有查到的时候(DNS 查询是一个递归查询)它就会向上层继续查询，一直向域名服务器和根服务器继续进行递归查询。一直到查询完之后返回给我们对应的IP地址，<br>比如：输入<code>www.aliyun.com</code>阿里云就会返回对应的IP地址：106.11.62.15。<br>&nbsp; &nbsp; &nbsp; &nbsp;DNS查询完之后就获取到IP地址，当拿到IP地址之后浏览器就可以调用Socket函数来去发起TCP请求，通过三次握手与并等待服务器的确认。<br>在服务器响应请求后，建立TCP连接。<br>&nbsp; &nbsp; &nbsp; &nbsp;建立起连接之后，发起应用层协议HTTP请求，发起的HTTP请求并不是一开始打到web框架，而是打到Nginx反向代理，很多访问量比较高的网站都会使用nginx来作为反向代理和负载均衡，通过nginx转发到多台服务器上。<br>&nbsp; &nbsp; &nbsp; &nbsp;Nginx反向代理之后就到 WSGI服务器这一层，uwsgi / gunicom作用就是主要兼容web应用(flask/django/tornado)。通过uwsgi 再把请求转发到web应用层(web app响应)也就是web框架层。在web应用层一般就是做一些数据库的增删改查或者发一条消息等，最后把请求response，通过TCP发送给用户。<br>&nbsp; &nbsp; &nbsp; 如果没有其它数据传输的时候，就会执行TCP的四次挥手。</p>
+<p>然后，浏览器向服务器发送HTTP请求，服务器收到请求并返回包含HTML代码的HTTP Response。<br>然后浏览器获取到了HTML，并进行HTML内资源请求，比如里面的CSS,JS，图片等资源。<br>最后浏览器将渲染界面，呈现给用户。</p>
+<p>一、精简回答<br>1.DNS：domain name server，域名解析 用于将域名转化成ip地址的服务器。<br> 就像是查号台、地址簿，会告诉互联网该如何去解读IP地址，譬如将38.160.150.31转换成人能读懂的网址，比如bbc.co.uk，并指出哪条途径可以到达存有这个IP地址的服务器。<br>域名：<a target="_blank" rel="noopener" href="http://www.baidu.com/">www.baidu.com</a><br>DNS服务端：119.29.29.29<br>通过DNS服务器解析119.29.29.29，解析<a target="_blank" rel="noopener" href="http://www.baidu.com/">http://www.baidu.com</a><br>2.访问百度的IP<br>百度IP地址：14.215.177.38<br>通过浏览器方位14.215.177.38:443端口</p>
+<p>二、详细回答</p>
+<ol>
+<li>如何到达DNS地址：119.29.29.29</li>
+<li>未知的IP地址我们会发送给网关：192.168.30.254</li>
+<li>如何发送给网关，需要知道网关的MAC地址；</li>
+<li>已知网关的IP地址，如何知道网关的MAC地址。</li>
+<li>ARP解析，IP地址→MAC地址192.168.30.254 00-23-05-43-3f-42</li>
+<li>ARP解析过程<br>1）发送ARP广播包，同一个广播域内的所有设备都会接收到。<br>2）需要解析的IP地址的MAC设备会进行回应。IP→MAC<br>3）电脑段接收到ARP信息保存到arp表</li>
+<li>之后要发送给网关都是通过arp表中的192.168.30.254 00-23-05-43-3f-42</li>
+<li>电脑发送DNS解析请求目的为119.29.29.29地址给网关，网关进行三层路由查询，转发给出口，出口源地址NAT转发给运营商……</li>
+<li>DNS服务器响应的DNS解析请求，返回给百度的IP为14.215.177.38</li>
+<li>浏览器访问14.215.177.38:443（百度）到这个IP的请求；</li>
+<li>14.215.177.38:443（百度）发送页面信息给电脑。</li>
+</ol>
+<p>内网公网地址切换，分布式服务器，网关处理</p>
+<p>再浏览器打开网址或者CMD ping </p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/shen-qian-kao-bei/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/shen-qian-kao-bei/" class="post-title-link" itemprop="url">深浅拷贝</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-07-02 11:15:27" itemprop="dateModified" datetime="2021-07-02T11:15:27Z">2021-07-02</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <ul>
+<li>浅拷贝(shallow copy)：<br><code>b = a.copy()</code>、<code>b = copy.copy(a)</code>、<code>slicing</code> <code>b = a[:]</code> <code>list(path)</code></li>
+</ul>
+<p>当创建一个对象a，然后把它赋给另一个变量b的时候，<br>在另一块地址中创建一个新的变量b或容器b，<br>但是容器b内的元素的地址均是源对象a的元素的地址（引用）的拷贝，<br>即他们的子对象还是指向同一地址（引用），共享同一块内存，<br>只复制指向源对象中元素的地址，而不复制对象本身和内部的子对象。<br>也就是说新的容器中指向了旧的元素（ 新瓶装旧酒 ）。</p>
+<p><code>id()</code> 函数：返回对象的唯一标识，可以类比成该对象在内存中的地址。</p>
+<p>可变对象的浅拷贝</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">a = [<span class="string">'hello'</span>, [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>], <span class="number">1</span>]</span><br><span class="line">b = a[:]  <span class="comment"># b = a.copy() = copy.copy(a)</span></span><br><span class="line">print(a == b)  <span class="comment"># True</span></span><br><span class="line">print(a <span class="keyword">is</span> b)  <span class="comment"># False</span></span><br><span class="line">print(id(a))  <span class="comment"># 1766718196416</span></span><br><span class="line">print(id(b))  <span class="comment"># 1766718196480 容器是新的，a 和 b 是一个独立的对象</span></span><br><span class="line">print([id(x) <span class="keyword">for</span> x <span class="keyword">in</span> a])</span><br><span class="line"><span class="comment"># [1760365870320, 1760360341312, 140725884393120]</span></span><br><span class="line">print([id(x) <span class="keyword">for</span> x <span class="keyword">in</span> b])</span><br><span class="line"><span class="comment"># [1760365870320, 1760360341312, 140725884393120]</span></span><br><span class="line">a[<span class="number">0</span>] = <span class="string">'world'</span></span><br><span class="line">a[<span class="number">1</span>].append(<span class="number">4</span>)</span><br><span class="line">a[<span class="number">2</span>] = <span class="number">233</span></span><br><span class="line">print(a)  <span class="comment"># ['world', [1, 2, 3, 4], 233]</span></span><br><span class="line">print(b)  <span class="comment"># ['hello', [1, 2, 3, 4], 1]</span></span><br><span class="line">print([id(x) <span class="keyword">for</span> x <span class="keyword">in</span> a])</span><br><span class="line"><span class="comment"># [1760365870384, 1760360341312, 140725884400544]</span></span><br><span class="line">print([id(x) <span class="keyword">for</span> x <span class="keyword">in</span> b])</span><br><span class="line"><span class="comment"># [1760365870320, 1760360341312, 140725884393120]</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 浅拷贝后未修改前，a和b中元素的地址都是相同的，a和b的地址不同 </span></span><br><span class="line"><span class="comment"># 不可变的hello和可变的list地址都一样，</span></span><br><span class="line"><span class="comment"># 说明浅拷贝只是将容器内的元素的地址复制了一份。</span></span><br><span class="line"><span class="comment"># 修改后，</span></span><br><span class="line"><span class="comment"># b中字符串和数字没改变，对源对象的不可变元素不能修改，每一次赋值的时候会创建新的对象，原来的形参指向新对象，会开辟新的内存，就有新的引用，而浅拷贝是指向的修改前的引用</span></span><br><span class="line"><span class="comment"># 但是list元素随着a相应改变</span></span><br><span class="line"></span><br><span class="line">num = [<span class="number">2</span>]  <span class="comment"># num不是源对象的元素</span></span><br><span class="line">a.append(num)  <span class="comment"># 修改对象a</span></span><br><span class="line"></span><br><span class="line">print(a)  <span class="comment"># ['world', [1, 2, 3, 4], 233, [2]]</span></span><br><span class="line">print(b)  <span class="comment"># ['hello', [1, 2, 3, 4], 1]  #　浅拷贝的源对象的元素的索引</span></span><br><span class="line"></span><br><span class="line">print(id(num) == id(a[<span class="number">3</span>]))  <span class="comment"># True [2]引用了a原本内存以外的地址，所以b不受影响</span></span><br><span class="line">print(id(num) <span class="keyword">is</span> id(a[<span class="number">3</span>]))  <span class="comment"># False</span></span><br><span class="line"></span><br><span class="line">c = a  <span class="comment"># 赋值</span></span><br><span class="line">print(id(c))  <span class="comment"># 1766718196416  旧瓶装旧酒</span></span><br><span class="line">print(a <span class="keyword">is</span> c)  <span class="comment"># True</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>不可变对象的浅拷贝：</p>
+<ul>
+<li>内存中只能有一个相同值的对象</li>
+<li>只能使用<code>copy</code>模块的 <code>copy()</code> 方法，不能用 <code>object.copy()</code></li>
+</ul>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> copy</span><br><span class="line"></span><br><span class="line">a = (<span class="string">'a'</span>, <span class="string">'b'</span>, <span class="string">'c'</span>)</span><br><span class="line">b = a[:]</span><br><span class="line">c = a</span><br><span class="line"><span class="comment"># d = a.copy()  # AttributeError: 'tuple' object has no attribute 'copy'</span></span><br><span class="line">e = copy.copy(a)</span><br><span class="line">f = copy.deepcopy(a)</span><br><span class="line">print(a == b)  <span class="comment"># True</span></span><br><span class="line">print(a <span class="keyword">is</span> b)  <span class="comment"># True</span></span><br><span class="line">print(id(a))  <span class="comment"># 2699421599552</span></span><br><span class="line">print(id(b))  <span class="comment"># 2699421599552</span></span><br><span class="line">print(id(c))  <span class="comment"># 2699421599552</span></span><br><span class="line"><span class="comment"># print(id(d))  # </span></span><br><span class="line">print(id(e))  <span class="comment"># 2699421599552</span></span><br><span class="line">print(id(f))  <span class="comment"># 2699421599552</span></span><br></pre></td></tr></tbody></table></figure>
+
+<ul>
+<li>深拷贝(deep copy)：引入copy 模块的 deepcopy 方法，<br>是在另一块地址中创建一个新的变量或容器，同时容器内的元素的地址也是新开辟的，新对象跟原对象不共享内存，仅仅是值相同而已，完全拷贝了一个副本，容器内部元素地址都不一样。修改新对象不会改到原对象。<br>（ 新瓶装新酒 ）</li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> copy</span><br><span class="line">a = [<span class="string">'hello'</span>, [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]]</span><br><span class="line">b = copy.deepcopy(a)</span><br><span class="line">print(a == b)  <span class="comment"># True</span></span><br><span class="line">print(a <span class="keyword">is</span> b)  <span class="comment"># False</span></span><br><span class="line">print(id(a))  <span class="comment"># 1766718196416</span></span><br><span class="line">print(id(b))  <span class="comment"># 1766718196480</span></span><br><span class="line"></span><br><span class="line">print([id(x) <span class="keyword">for</span> x <span class="keyword">in</span> a])</span><br><span class="line"><span class="comment"># [55792504, 55645000]</span></span><br><span class="line">print([id(x) <span class="keyword">for</span> x <span class="keyword">in</span> b])</span><br><span class="line"><span class="comment"># [55792504, 58338824]</span></span><br><span class="line">a[<span class="number">0</span>] = <span class="string">'world'</span>  <span class="comment"># 修改对象a中的'hello'对象</span></span><br><span class="line">a[<span class="number">1</span>].append(<span class="number">4</span>)  <span class="comment"># 修改对象a中的[1, 2, 3]数组对象</span></span><br><span class="line"></span><br><span class="line">print(a)</span><br><span class="line"><span class="comment"># ['world', [1, 2, 3, 4]]</span></span><br><span class="line">print(b)</span><br><span class="line"><span class="comment"># ['hello', [1, 2, 3]]</span></span><br></pre></td></tr></tbody></table></figure>
+<p>深拷贝后，a和b的地址以及a和b中的元素地址均不同，这是完全拷贝的一个副本，<br>修改a后，发现b没有发生任何改变，因为b是一个完全的副本，元素地址与a均不同，a修改不影响b。<br>。<br>深拷贝ab的不可变对象字符串时地址显示一样，因为 字符串str的intern驻留机制，</p>
+<p>在pycharm和VScode中，只要是同一个字符串不超过20个字符，都为True，<br>在shell中示例，并非全部的字符串都会采用intern机制。仅仅包括下划线、数字、字母的字符串才会被intern，当然不能超过20个字符。因为如果超过20个字符的话，解释器认为这个字符串不常用，不用放入字符串池中。</p>
+<p>提个建议，a[0] 的 ‘hello’ 应该更换为一个长度大于 20 的字符串，这样会更直观。<br>因为 str.length &lt; 20 会被缓存，相当于 [-5,256] 的小整数对象一样，所以深拷贝的时候 a[0] 的 地址是一样的，但是我们很清楚的知道，深拷贝是完全拷贝。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> copy</span><br><span class="line"></span><br><span class="line">a = [[<span class="number">10</span>], <span class="number">20</span>]</span><br><span class="line">b = a[:]</span><br><span class="line">c = list(a)</span><br><span class="line">d = a * <span class="number">1</span></span><br><span class="line">e = copy.copy(a)</span><br><span class="line">f = copy.deepcopy(a)</span><br><span class="line">a.append(<span class="number">21</span>)</span><br><span class="line">a[<span class="number">0</span>].append(<span class="number">11</span>)</span><br><span class="line">print(id(a), a)</span><br><span class="line"><span class="comment"># 30553152 [[10, 11], 20, 21]</span></span><br><span class="line">print(id(b), b)</span><br><span class="line"><span class="comment"># 44969816 [[10, 11], 20]</span></span><br><span class="line">print(id(c), c)</span><br><span class="line"><span class="comment"># 44855664 [[10, 11], 20]</span></span><br><span class="line">print(id(d), d)</span><br><span class="line"><span class="comment"># 44971832 [[10, 11], 20]</span></span><br><span class="line">print(id(e), e)</span><br><span class="line"><span class="comment"># 44833088 [[10, 11], 20]</span></span><br><span class="line">print(id(f), f)</span><br><span class="line"><span class="comment"># 44834648 [[10], 20]</span></span><br><span class="line"><span class="comment"># 使用 a[:], list(a), a*1, copy.copy(a)四种方式复制列表结果都可以得到一个新的列表，</span></span><br><span class="line"><span class="comment"># 但是如果列表中含有列表，</span></span><br><span class="line"><span class="comment"># 所有b, c, d, e四个新列表的子列表都是指引到同一个对象上。</span></span><br><span class="line"><span class="comment"># 只有使用copy.deepcopy(a)方法得到的新列表f才是包括子列表在内的完全复制。</span></span><br></pre></td></tr></tbody></table></figure>
+
+
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>s3 = <span class="string">"hello!"</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>s4 = <span class="string">"hello!"</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>s3 <span class="keyword">is</span> s4</span><br><span class="line"><span class="literal">False</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>id(s3)</span><br><span class="line"><span class="number">80325968L</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>id(s4)</span><br><span class="line"><span class="number">80326048L</span></span><br></pre></td></tr></tbody></table></figure>
+<p>s3 和 s4 虽然值是一样的，但确确实实是两个不同的字符串对象，Python 会为它们俩各自分配一段内存空间，假设程序中存在大量值相同的字符串，系统就不得不为每个字符串重复地分配内存空间，显然，对系统来说是一种无谓的资源浪费。为了解决这种问题，Python 引入了 intern 机制。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>s3 = intern(<span class="string">'hello!'</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>s4 = intern(<span class="string">'hello!'</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>s3 <span class="keyword">is</span> s4</span><br><span class="line"><span class="literal">True</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>id(s3)</span><br><span class="line"><span class="number">80325968L</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>id(s4)</span><br><span class="line"><span class="number">80325968L</span></span><br></pre></td></tr></tbody></table></figure>
+<p>intern 是 Python 中的一个内建函数，该函数的作用就是对字符串进行 intern 机制处理，处理后返回字符串对象。我们发现但凡是值相同的字符串经过 intern 机制处理之后，返回的都是同一个字符串对象，这种方式在处理大数据的时候无疑能节省更多的内存空间，系统无需为相同的字符串重复分配内存，对于值相同的字符串共用一个对象即可。</p>
+<p>实现 Intern 机制的方式:通过维护一个字符串储蓄池，这个池子是一个字典结构，如果字符串已经存在于池子中了就不再去创建新的字符串，直接返回之前创建好的字符串对象，如果之前还没有加入到该池子中，则先构造一个字符串对象，并把这个对象加入到池子中去，方便下一次获取，用伪代码就可以描述为：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">intern_pool = {}</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">intern</span>(<span class="params">s</span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> s <span class="keyword">in</span> intern_pool:</span><br><span class="line">        <span class="keyword">return</span> intern_pool[s]</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        obj = PyStringObject(s)</span><br><span class="line">        intern_pool[s] = obj</span><br><span class="line">        <span class="keyword">return</span> obj</span><br></pre></td></tr></tbody></table></figure>
+
+<p>在主流面向对象的编程语言中intern 机制对于处理字符串已经成为一种标配，通过 intern 机制可以提高字符串的处理效率，当然，解释器内部很对 intern 机制的使用策略是有考究的，有些场景会自动使用 intern ，有些地方需要通过手动方式才能启动。比如：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>s1 = <span class="string">"hello"</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>s2 = <span class="string">"hello"</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>s1 <span class="keyword">is</span> s2</span><br><span class="line"><span class="literal">True</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>id(s1)</span><br><span class="line"><span class="number">72320704L</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>id(s2)</span><br><span class="line"><span class="number">72320704L</span></span><br></pre></td></tr></tbody></table></figure>
+<p>这段代码就是 Python自动使用了intern机制的结果。</p>
+<p>对一个list后面用 乘号 再加上 数字 的方法来初始化一个list，实际上是对这个list进行了浅拷贝（shallow copy）</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">a = (<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)</span><br><span class="line">print(a * <span class="number">3</span>)  <span class="comment"># (1, 2, 3, 1, 2, 3, 1, 2, 3)返回的是个新元祖</span></span><br><span class="line"></span><br><span class="line">list0 = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]</span><br><span class="line">list1 = list0 * <span class="number">3</span></span><br><span class="line">print(list1)  <span class="comment"># [1, 2, 3, 1, 2, 3, 1, 2, 3] 创建了 1,2,3 的三个浅拷贝 直接乘3，相当于把a1中元素乘3</span></span><br><span class="line"><span class="comment"># 此时我们修改某个1，不会影响其他的，因为这是int不可变元素，不是子对象</span></span><br><span class="line">list1[<span class="number">0</span>] = <span class="number">0</span></span><br><span class="line">print(list1)  <span class="comment"># [0, 2, 3, 1, 2, 3, 1, 2, 3]</span></span><br><span class="line"></span><br><span class="line">print([list0] * <span class="number">3</span>)  <span class="comment"># 加上[], 将list0对象整体作为列表一个元素乘3</span></span><br><span class="line">[[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>], [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>], [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>二维数组也就是矩阵的初始化是这样的 m, n = 3, 4 其中m，n分别是行数和列数。</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">list2 = [[<span class="number">1</span>] * <span class="number">3</span>] * <span class="number">4</span></span><br><span class="line">print(list2)  <span class="comment"># [[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1]]</span></span><br><span class="line"><span class="comment"># 创建了list列表[1,1,1]的四个浅拷贝，</span></span><br><span class="line"><span class="comment"># 这里得到的list是以list为可变类型的，因此改变一个就会影响其他</span></span><br><span class="line">list2[<span class="number">0</span>][<span class="number">0</span>] = <span class="number">0</span></span><br><span class="line">print(list2)</span><br><span class="line"><span class="comment"># [[0, 1, 1], [0, 1, 1], [0, 1, 1], [0, 1, 1]]</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>改用如下方式初始化数组，<br>(1)间接定义(推荐使用)，就可以得到一个可以通过二维下标访问的矩阵了。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">doublearr = [[<span class="number">0</span> <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">3</span>)] <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">4</span>)]</span><br></pre></td></tr></tbody></table></figure>
+<p>(2)直接定义</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">doublearr = [[<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>], [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>], [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]]</span><br></pre></td></tr></tbody></table></figure>
+<p>(3)使用循环定义</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">doublearr = []</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">3</span>):</span><br><span class="line">    doublearr.append([<span class="number">0</span>] * <span class="number">3</span>)</span><br></pre></td></tr></tbody></table></figure><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1073,320 +1335,8 @@
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/kong-6/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/kong-6/" class="post-title-link" itemprop="url">HTML</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-05-21 07:47:21" itemprop="dateModified" datetime="2021-05-21T07:47:21Z">2021-05-21</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E7%94%9F%E9%B2%9C/" itemprop="url" rel="index"><span itemprop="name">生鲜</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h2 id="项目介绍"><a href="#项目介绍" class="headerlink" title="项目介绍"></a>项目介绍</h2><h3 id="掌握的技术"><a href="#掌握的技术" class="headerlink" title="掌握的技术"></a>掌握的技术</h3><ul>
-<li>Vue + Django Rest Framework 前后端分离技术</li>
-<li>彻底玩转restful api 开发流程</li>
-<li>Django Rest Framework 的功能实现和核心源码分析</li>
-<li>Sentry 完成线上系统的错误日志的监控和告警</li>
-<li>第三方登录和支付宝支付的集成</li>
-<li>本地调试远程服务器代码的技巧</li>
-</ul>
-<h3 id="系统构成"><a href="#系统构成" class="headerlink" title="系统构成"></a>系统构成</h3><h4 id="vue前端项目"><a href="#vue前端项目" class="headerlink" title="vue前端项目"></a>vue前端项目</h4><ul>
-<li>API 接口</li>
-<li>Vue 组件 与api的交互</li>
-<li>vue的项目组织结构分析</li>
-</ul>
-<h4 id="django-rest-framework-系统实现前台功能"><a href="#django-rest-framework-系统实现前台功能" class="headerlink" title="django rest framework 系统实现前台功能"></a>django rest framework 系统实现前台功能</h4><ul>
-<li>xadmin后台管理系统<br>vue部分:<br>vue技术选型分析<br>API后端数据填充到Vue组件模板<br>Vue代码结构分析</li>
-</ul>
-<h3 id="Django-Rest-Framework-技能"><a href="#Django-Rest-Framework-技能" class="headerlink" title="Django Rest Framework 技能"></a>Django Rest Framework 技能</h3><ul>
-<li><p>通用view实现 rest api接口</p>
-<ul>
-<li>Apiview方式实现api</li>
-<li>genericView方式实现api接口</li>
-<li>Viewset和router方式实现api接口和url配置</li>
-<li>django_filter, searchFilter, OrderFilter 分页</li>
-<li>通用mixin</li>
-</ul>
-</li>
-<li><p>权限和认证；</p>
-<ul>
-<li>Authentication用户认证设置</li>
-<li>动态设置permission、authentication</li>
-<li>Validators实现字段验证</li>
-</ul>
-</li>
-<li><p>序列化和表单验证</p>
-<ul>
-<li>Serializer</li>
-<li>ModelSerializer</li>
-<li>动态设置Serializer</li>
-</ul>
-</li>
-<li><p>支付登录注册</p>
-<ul>
-<li>json web token 实现登录</li>
-<li>手机注册</li>
-<li>支付宝支付</li>
-<li>第三方登录</li>
-</ul>
-</li>
-<li><p>进阶开发</p>
-<ul>
-<li>Django rest framework 部分核心源码解读</li>
-<li>文档自动化管理</li>
-<li>django rest framework的缓存</li>
-<li>throttling 对用户和ip进行限速</li>
-</ul>
-</li>
-<li><p>django进阶知识点<br>django mirgrations原理<br>django 信号量<br>django从请求到响应的完整过程<br>独立使用django的model</p>
-</li>
-</ul>
-<h3 id="开发中常见的问题"><a href="#开发中常见的问题" class="headerlink" title="开发中常见的问题"></a>开发中常见的问题</h3><ul>
-<li>本地系统不能重现的bug</li>
-<li>api接口出错不能及时的发现或难以找到错误栈</li>
-<li>api文档管理问题，html markdown</li>
-<li>大量的url配置造成url配置越来越多难以维护</li>
-<li>接口不及时去更新文档，对方不知道如何去测试接口，但写文档会花费大量的时间去维护.</li>
-<li>为了防止爬虫，我们需要针对api的访问频率进行限制，比如一分钟，一小时，或者一天用户的访问频率限制问题。</li>
-<li>某些页面将数据放入缓存，加速某些api的访问速度，比如商品的分类变动小</li>
-</ul>
-<h3 id="开发中常见问题解决方案"><a href="#开发中常见问题解决方案" class="headerlink" title="开发中常见问题解决方案"></a>开发中常见问题解决方案</h3><ul>
-<li>通过介绍pycharm 的远程服务器代码调试技巧让大家不仅可以调试支付，第三方登录，还可以远程服务器代码来重现服务器上的bug</li>
-<li>通过docker 搭建 sentry 来体验错误日志监控系统，让我们不仅可以得到线上的错误栈还能及时在发生系统错误时收到邮件通知。</li>
-<li>通过drf的文档自动化管理以及url的注册管理功能会让我们省去写文档的时间</li>
-<li>django rest framework 的文档管理功能不仅可以让我们省去写文档的时间，还能直接在文档里面测试接口，自动生成js接口代码，shell测试代码和python测试代码</li>
-<li>django rest framework 提供的throttle 对于api进行访问频率的限制</li>
-<li>引入第三方框架来设置某些api的缓存</li>
-</ul>
-<p>项目介绍以及开发环境的搭建<br>设计数据库以及导入原始数据<br>restful api基础以及vue项目结构介绍<br>商品列表页功能<br>商品类别功能<br>手机注册和用户登录<br>商品详情页和收藏功能<br>个人中心功能<br>购物车、订单和支付宝支付功能<br>首页，商品相关数量，缓存，访问限速功能<br>第三方登录(微博 qq 微信)<br>sentry系统错误日志监控</p>
-<h3 id="系统功能"><a href="#系统功能" class="headerlink" title="系统功能"></a>系统功能</h3><p>分类 - 子分类 搜索 热搜词 购物车简要展示<br>新品 分类展示， 大类的推荐商品。<br>账户密码登录(json web token)。微博登录，输入账户跳转回首页。<br>注册，手机号码注册，错误提示。倒计时功能，服务器端手机号码发送频次限制。<br>商品大类，导航栏。筛选，排序。富文本。<br>商品 收藏 加入购物车 结算，移出购物车<br>留言 支付宝支付，扫码支付。跳回商户页面。<br>订单详情，收货地址<br>个人信息，收藏商品，我的收藏。<br>留言，上传文件。提交，删除留言<br>快速浏览。页面的缓存<br>访问速度限制 &amp; 接口文档 测试交互<br>出错处理: sentry基于drf。打印错误栈，当前请求用户。邮件通知</p>
-<p>（4）项目目录结构搭建</p>
-<ul>
-<li>在主目录下新建两个python package</li>
-</ul>
-<p><code>extra_apps</code> 保存源码经修改的第三方包 （扩展的源码包）；<br><code>apps</code>，保存项目中所有的app，并将自动生成的users移动到apps目录下；</p>
-<ul>
-<li>新建两个文件夹目录<br><code>media</code>，用于保存文件和图片等<br><code>db_tools</code>，用于保存数据库初始化的脚本</li>
-</ul>
-<p>将<code>apps</code>和<code>extra_apps</code>右键 → Mark Directory as → Sources Root，完成后文件夹颜色会发生改变。方便导入apps里面的内容<code>import users</code>和 <code>from users import</code> 而不是再用相对路径<code>import apps.users</code> 和  <code>from apps.users import</code><br>还需要将apps和extra_apps加入到<code>settings.py</code>的根搜索路径目录参数中，如下：</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line">sys.path.insert(<span class="number">0</span>, str(BASE_DIR))</span><br><span class="line">sys.path.insert(<span class="number">0</span>, str(BASE_DIR / <span class="string">'apps'</span>))</span><br><span class="line">sys.path.insert(<span class="number">0</span>, str(BASE_DIR / <span class="string">'extra_apps'</span>))</span><br><span class="line"><span class="comment"># 等同于</span></span><br><span class="line"><span class="keyword">from</span> pathlib <span class="keyword">import</span> Path</span><br><span class="line"></span><br><span class="line"><span class="comment"># Build paths inside the project like this: BASE_DIR / 'subdir'.</span></span><br><span class="line">BASE_DIR = Path(__file__).resolve().parent.parent</span><br><span class="line">sys.path.insert(<span class="number">0</span>, BASE_DIR)</span><br><span class="line">sys.path.insert(<span class="number">0</span>, BASE_DIR / <span class="string">'apps'</span>)</span><br><span class="line">sys.path.insert(<span class="number">0</span>, BASE_DIR / <span class="string">'extra_apps'</span>)</span><br></pre></td></tr></tbody></table></figure><script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/kong-7/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/kong-7/" class="post-title-link" itemprop="url">删除有序数组中的重复项</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-05-10 02:28:26" itemprop="dateModified" datetime="2021-05-10T02:28:26Z">2021-05-10</time>
-      </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>删除有序数组中的重复项<br>    “””<br>    给定一个排序数组，你需要在 原地 删除重复出现的元素，使得每个元素只出现一次，返回移除后数组的新长度。</p>
-<pre><code>    不要使用额外的数组空间，你必须在 原地 修改输入数组 并在使用 O(1) 额外空间的条件下完成。
-
-示例 1:
-
-给定数组 nums = [1,1,2],
-
-函数应该返回新的长度 2, 并且原数组 nums 的前两个元素被修改为 1, 2。
-
-你不需要考虑数组中超出新长度后面的元素。
-示例 2:
-
-给定 nums = [0,0,1,1,1,2,2,3,3,4],
-
-函数应该返回新的长度 5, 并且原数组 nums 的前五个元素被修改为 0, 1, 2, 3, 4。
-
-你不需要考虑数组中超出新长度后面的元素。
-</code></pre>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>(<span class="params">object</span>):</span></span><br><span class="line"><span class="meta">    @staticmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">removeDuplicates</span>(<span class="params">nums</span>):</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        :type nums: List[int]</span></span><br><span class="line"><span class="string">        :rtype: int</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        flag = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, len(nums)):</span><br><span class="line">            <span class="keyword">if</span> nums[i] != nums[flag]:</span><br><span class="line">                flag += <span class="number">1</span></span><br><span class="line">                nums[flag] = nums[i]</span><br><span class="line">        <span class="keyword">return</span> flag+<span class="number">1</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 解法2 移除</span></span><br><span class="line"><span class="meta">    @staticmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">removeDuplicates1</span>(<span class="params">nums</span>):</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(len(nums)):</span><br><span class="line">            <span class="keyword">try</span>:</span><br><span class="line">                <span class="keyword">while</span> nums[i] == nums[i + <span class="number">1</span>]:</span><br><span class="line">                    nums.pop(i)</span><br><span class="line">            <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">                print(<span class="string">"index超出范围"</span>)</span><br><span class="line">                <span class="keyword">return</span> len(nums)</span><br><span class="line"></span><br><span class="line">                </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    s = Solution</span><br><span class="line">    nums = [<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">3</span>, <span class="number">3</span>, <span class="number">4</span>]</span><br><span class="line">    f = s.removeDuplicates(nums)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(f):</span><br><span class="line">        print(i)</span><br></pre></td></tr></tbody></table></figure>
-
-<pre><code>"""
-给定一个单词，你需要判断单词的大写使用是否正确。
-
-我们定义，在以下情况时，单词的大写用法是正确的：
-
-全部字母都是大写，比如"USA"。
-单词中所有字母都不是大写，比如"leetcode"。
-如果单词不只含有一个字母，只有首字母大写，&nbsp;比如&nbsp;"Google"。
-否则，我们定义这个单词没有正确使用大写字母。
-
-示例 1:
-
-输入: "USA"
-输出: True
-示例 2:
-
-输入: "FlaG"
-输出: False
-注意: 输入是由大写和小写拉丁字母组成的非空单词。
-</code></pre>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>(<span class="params">object</span>):</span></span><br><span class="line"><span class="meta">    @staticmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">detectCapitalUse</span>(<span class="params">word</span>):</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        :type word: str</span></span><br><span class="line"><span class="string">        :rtype: bool</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        flag_u = <span class="number">0</span></span><br><span class="line">        flag_l = <span class="number">0</span></span><br><span class="line">        flag_m = <span class="number">0</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(len(word)<span class="number">-1</span>):</span><br><span class="line">            <span class="keyword">if</span> word[<span class="number">0</span>].isupper() <span class="keyword">and</span> word[i+<span class="number">1</span>].isupper():</span><br><span class="line">                flag_u += <span class="number">1</span></span><br><span class="line">            <span class="keyword">elif</span> word[<span class="number">0</span>].islower() <span class="keyword">and</span> word[i+<span class="number">1</span>].islower():</span><br><span class="line">                flag_l += <span class="number">1</span></span><br><span class="line">            <span class="keyword">elif</span> word[<span class="number">0</span>].isupper() <span class="keyword">and</span> word[i+<span class="number">1</span>].islower():</span><br><span class="line">                flag_m += <span class="number">1</span></span><br><span class="line">        <span class="keyword">if</span> flag_u == len(word)<span class="number">-1</span> <span class="keyword">and</span> len(word) &gt; <span class="number">1</span>:</span><br><span class="line">            print(<span class="string">"这个单词全部为大写"</span>)</span><br><span class="line">        <span class="keyword">elif</span> flag_l == len(word)<span class="number">-1</span> <span class="keyword">and</span> len(word) &gt; <span class="number">1</span>:</span><br><span class="line">            print(<span class="string">"找个单词全部为小写"</span>)</span><br><span class="line">        <span class="keyword">elif</span> flag_m == len(word)<span class="number">-1</span> <span class="keyword">and</span> len(word) &gt; <span class="number">1</span>:</span><br><span class="line">            print(<span class="string">"这个单词只有首字母是大写"</span>)</span><br><span class="line">        <span class="keyword">elif</span> flag_u == <span class="number">0</span> <span class="keyword">and</span> flag_l == <span class="number">0</span> <span class="keyword">and</span> flag_m == <span class="number">0</span>:</span><br><span class="line">            print(<span class="string">"这是一个字母"</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            print(<span class="string">"这个单词是大小写混写"</span>)</span><br><span class="line">        </span><br><span class="line">            </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    s = Solution</span><br><span class="line">    w = <span class="string">"n"</span></span><br><span class="line">    s.detectCapitalUse(w)</span><br></pre></td></tr></tbody></table></figure><script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/25/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/25/">25</a><span class="page-number current">26</span><a class="page-number" href="/page/27/">27</a><span class="space">&hellip;</span><a class="page-number" href="/page/32/">32</a><a class="extend next" rel="next" href="/page/27/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/25/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/25/">25</a><span class="page-number current">26</span><a class="page-number" href="/page/27/">27</a><span class="space">&hellip;</span><a class="page-number" href="/page/33/">33</a><a class="extend next" rel="next" href="/page/27/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 </div>
