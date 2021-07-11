@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css" integrity="sha256-2H3fkXt6FEmrReK448mDVGKb3WW2ZZw35gI7vqHOE4Y=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"bubbleboy11.github.io","root":"/","images":"/images","scheme":"Muse","version":"8.6.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="变量赋值本质上是一次内存浅拷贝，切片的赋值是拷贝了切片头，字符串的赋值是拷贝了字符串的头部，数组的赋值呢是直接拷贝整个数组。 结构体的参数传递函数调用时参数传递结构体变量，Go 语言支持值传递，也支持指针传递。值传递涉及到结构体字段的浅拷贝，指针传递会共享结构体内容，只会拷贝指针地址，规则上和赋值是等价的。 结构体的接收者有两种形式 1. 值传递 2. 指针传递 如果你想改结构体的值 如果结构体的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="go结构体的参数传递和方法">
+<meta property="og:url" content="https://bubbleboy11.github.io/2021/07/07/go-jie-gou-ti-de-can-shu-chuan-di-he-fang-fa/index.html">
+<meta property="og:site_name" content="外心人D的博客">
+<meta property="og:description" content="变量赋值本质上是一次内存浅拷贝，切片的赋值是拷贝了切片头，字符串的赋值是拷贝了字符串的头部，数组的赋值呢是直接拷贝整个数组。 结构体的参数传递函数调用时参数传递结构体变量，Go 语言支持值传递，也支持指针传递。值传递涉及到结构体字段的浅拷贝，指针传递会共享结构体内容，只会拷贝指针地址，规则上和赋值是等价的。 结构体的接收者有两种形式 1. 值传递 2. 指针传递 如果你想改结构体的值 如果结构体的">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-07-06T16:21:41.000Z">
+<meta property="article:modified_time" content="2021-07-09T13:06:16.913Z">
+<meta property="article:author" content="外心人D">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://bubbleboy11.github.io/2021/07/07/go-jie-gou-ti-de-can-shu-chuan-di-he-fang-fa/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://bubbleboy11.github.io/2021/07/07/go-jie-gou-ti-de-can-shu-chuan-di-he-fang-fa/","path":"2021/07/07/go-jie-gou-ti-de-can-shu-chuan-di-he-fang-fa/","title":"go结构体的参数传递和方法"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>go结构体的参数传递和方法 | 外心人D的博客</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="外心人D的博客" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">外心人D的博客</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E6%9E%84%E4%BD%93%E7%9A%84%E5%8F%82%E6%95%B0%E4%BC%A0%E9%80%92"><span class="nav-text">结构体的参数传递</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E6%9E%84%E4%BD%93%E6%96%B9%E6%B3%95"><span class="nav-text">结构体方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E6%9E%84%E4%BD%93%E6%8C%87%E9%92%88%E6%96%B9%E6%B3%95"><span class="nav-text">结构体指针方法</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-overview">
+            <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">外心人D</p>
+  <div class="site-description" itemprop="description">本博客大多内容为慕课和网上博客，并非原创</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">336</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">40</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+          </div>
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/07/07/go-jie-gou-ti-de-can-shu-chuan-di-he-fang-fa/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          go结构体的参数传递和方法
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-07-06 16:21:41" itemprop="dateCreated datePublished" datetime="2021-07-06T16:21:41Z">2021-07-06</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-07-09 13:06:16" itemprop="dateModified" datetime="2021-07-09T13:06:16Z">2021-07-09</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/go/" itemprop="url" rel="index"><span itemprop="name">go</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>变量赋值本质上是一次内存浅拷贝，<br>切片的赋值是拷贝了切片头，<br>字符串的赋值是拷贝了字符串的头部，<br>数组的赋值呢是直接拷贝整个数组。</p>
+<h2 id="结构体的参数传递"><a href="#结构体的参数传递" class="headerlink" title="结构体的参数传递"></a>结构体的参数传递</h2><p>函数调用时参数传递结构体变量，Go 语言支持值传递，也支持指针传递。<br>值传递涉及到结构体字段的浅拷贝，指针传递会共享结构体内容，只会拷贝指针地址，规则上和赋值是等价的。</p>
+<p>结构体的接收者有两种形式 1. 值传递 2. 指针传递 如果你想改结构体的值 如果结构体的数据很大</p>
+<p>通过值传递，在函数里面修改结构体的状态不会影响到原有结构体的状态，函数内部的逻辑并没有产生任何效果。通过指针传递就不一样。</p>
+<p>结构体的值类型和指针类型访问内部字段和方法在形式上是一样的。这点不同于 C++ 语言，在 C++ 语言里，值访问使用句点 . 操作符，而指针访问需要使用箭头 -&gt; 操作符。</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 函数的接收者</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c Course)</span> <span class="title">printCourseInfo</span><span class="params">()</span></span> {</span><br><span class="line">    fmt.Printf(<span class="string">"课程名:%s, 课程价格: %d, 课程的地址:%s\n"</span>, c.Name, c.Price, c.Url)</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c Course)</span> <span class="title">setPrice</span><span class="params">(price <span class="keyword">int</span>)</span></span> { <span class="comment">// c相当于python的self，也可以写成self</span></span><br><span class="line">    c.Price = price</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">setPrice1</span><span class="params">(c Course)</span></span> { <span class="comment">// c相当于python的self，也可以写成self</span></span><br><span class="line">    c.Price = <span class="number">800</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *Course)</span> <span class="title">setPricePoint</span><span class="params">(price <span class="keyword">int</span>)</span></span> { <span class="comment">// c相当于python的self，也可以写成self</span></span><br><span class="line">    c.Price = price <span class="comment">// 等同于(*c).Price = price</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">setPricePoint1</span><span class="params">(c *Course)</span></span> { <span class="comment">// c相当于python的self，也可以写成self</span></span><br><span class="line">    c.Price = <span class="number">800</span> <span class="comment">// 等同于(*c).Price = 800</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="comment">//结构体方法， 达到了封装数据和封装方法的效果</span></span><br><span class="line">    c11 := Course{<span class="string">"scrapy"</span>, <span class="number">110</span>, <span class="string">"https://www.imooc.com"</span>}</span><br><span class="line">    c11.printCourseInfo()       <span class="comment">// 课程名:scrapy, 课程价格: 200, 课程的地址:https://www.imooc.com</span></span><br><span class="line">    Course.printCourseInfo(c11) <span class="comment">// 课程名:scrapy, 课程价格: 200, 课程的地址:https://www.imooc.com</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 结构体是值传递，不改变原来的值</span></span><br><span class="line">    c11.setPrice(<span class="number">200</span>)</span><br><span class="line">    <span class="comment">//Course.setPrice(c11, 200)</span></span><br><span class="line">    fmt.Println(c11.Price) <span class="comment">// 110</span></span><br><span class="line">    fmt.Println(c11)       <span class="comment">// {scrapy 110 https://www.imooc.com}</span></span><br><span class="line"></span><br><span class="line">    setPrice1(c11)</span><br><span class="line">    fmt.Println(c11.Price) <span class="comment">// 110</span></span><br><span class="line">    fmt.Println(c11)       <span class="comment">// {scrapy 110 https://www.imooc.com}</span></span><br><span class="line"></span><br><span class="line">    (&amp;c11).setPrice(<span class="number">300</span>)   <span class="comment">//修改c10的price? 为什么呢？ 语法糖 函数参数的传递是怎么传递的？</span></span><br><span class="line">    fmt.Println(c11.Price) <span class="comment">// 110</span></span><br><span class="line"></span><br><span class="line">    c11.setPricePoint(<span class="number">200</span>)</span><br><span class="line">    <span class="comment">//Course.setPricePoint(c11, 200)</span></span><br><span class="line">    fmt.Println(c11.Price)    <span class="comment">// 200</span></span><br><span class="line">    (&amp;c11).setPricePoint(<span class="number">300</span>) <span class="comment">//修改c10的price? 为什么呢？ 语法糖 函数参数的传递是怎么传递的？</span></span><br><span class="line">    fmt.Println(c11.Price)    <span class="comment">// 300</span></span><br><span class="line"></span><br><span class="line">    (&amp;c11).setPricePoint(<span class="number">400</span>) <span class="comment">//修改c10的price? 为什么呢？ 语法糖 函数参数的传递是怎么传递的？</span></span><br><span class="line">    <span class="comment">// 结构体是值传递</span></span><br><span class="line">    fmt.Println(c11.Price) <span class="comment">// 400</span></span><br><span class="line"></span><br><span class="line">    setPricePoint1(&amp;c11)</span><br><span class="line">    fmt.Println(c11.Price) <span class="comment">// 800</span></span><br><span class="line">    fmt.Println(c11)       <span class="comment">// {scrapy 800 https://www.imooc.com}</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="结构体方法"><a href="#结构体方法" class="headerlink" title="结构体方法"></a>结构体方法</h2><p>Go 语言不是面向对象的语言，它里面不存在类的概念，结构体正是类的替代品。<br>类可以附加很多成员方法，结构体也可以。<br>结构体的方法只能和结构体在同一个包中</p>
+<p>Go 语言不喜欢类型的隐式转换，所以需要将整形显示转换成浮点型，不是很好看，不过这就是 Go 语言的基本规则，显式的代码可能不够简洁，但是易于理解。<br>Go 语言的结构体方法里面没有 self 和 this 这样的关键字来指代当前的对象，它是用户自己定义的变量名称，通常我们都使用单个字母来表示。</p>
+<p>Go 语言的方法名称也分首字母大小写，它的权限规则和字段一样，</p>
+<ul>
+<li>首字母大写就是公开方法，</li>
+<li>首字母小写就是内部方法，只能归属于同一个包的代码才可以访问内部方法。</li>
+</ul>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">"fmt"</span></span><br><span class="line"><span class="keyword">import</span> <span class="string">"math"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Circle <span class="keyword">struct</span> {</span><br><span class="line">    x <span class="keyword">int</span></span><br><span class="line">    y <span class="keyword">int</span></span><br><span class="line">    Radius <span class="keyword">int</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="comment">// 面积</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c Circle)</span> <span class="title">Area</span><span class="params">()</span> <span class="title">float64</span></span> {</span><br><span class="line">    <span class="keyword">return</span> math.Pi * <span class="keyword">float64</span>(c.Radius) * <span class="keyword">float64</span>(c.Radius)</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="comment">// 周长</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c Circle)</span> <span class="title">Circumference</span><span class="params">()</span> <span class="title">float64</span></span> {</span><br><span class="line">    <span class="keyword">return</span> <span class="number">2</span> * math.Pi * <span class="keyword">float64</span>(c.Radius)</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="keyword">var</span> c = Circle {Radius: <span class="number">50</span>}</span><br><span class="line">    fmt.Println(c.Area(), c.Circumference())</span><br><span class="line">    <span class="comment">// 7853.981633974483 314.1592653589793</span></span><br><span class="line">    <span class="comment">// 指针变量调用方法形式上是一样的</span></span><br><span class="line">    <span class="keyword">var</span> pc = &amp;c</span><br><span class="line">    fmt.Println(pc.Area(), pc.Circumference())</span><br><span class="line">    <span class="comment">// 7853.981633974483 314.1592653589793</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="结构体指针方法"><a href="#结构体指针方法" class="headerlink" title="结构体指针方法"></a>结构体指针方法</h3><p>结构体指针方法和值方法在调用时形式上是没有区别的，只不过一个可以改变结构体内部状态，而另一个不会。指针方法使用结构体值变量可以调用，值方法使用结构体指针变量也可以调用。<br>通过指针访问内部的字段需要 2 次内存读取操作，第一步是取得指针地址，第二部是读取地址的内容，它比值访问要慢。但是在方法调用时，指针传递可以避免结构体的拷贝操作，结构体比较大时，这种性能的差距就会比较明显。</p>
+<p>如果使用上面的方法形式给 Circle 增加一个扩大半径的方法，你会发现半径扩大不了。</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c Circle)</span> <span class="title">expand</span><span class="params">()</span></span> {</span><br><span class="line">  c.Radius *= <span class="number">2</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>这是因为上面的方法和前面的 expandByValue 函数是等价的，只不过是把函数的第一个参数挪了位置而已，参数传递时会复制了一份结构体内容，起不到扩大半径的效果。这时候就必须要使用结构体的指针方法</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *Circle)</span> <span class="title">expand</span><span class="params">()</span></span> {</span><br><span class="line">  c.Radius *= <span class="number">2</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>还有一些特殊的结构体它不允许被复制，比如结构体内部包含有锁时，这时就必须使用它的指针形式来定义方法，否则会发生一些莫名其妙的问题。</p>
+<p>内置的int类型不能加方法，可以添加别名 type myInt</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> myInt <span class="keyword">int</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(m myInt)</span> <span class="title">toString</span><span class="params">()</span></span> {</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/07/07/go-jie-gou-ti-de-shi-li-hua-he-new-han-shu/" rel="prev" title="go结构体的实例化和new函数">
+                  <i class="fa fa-chevron-left"></i> go结构体的实例化和new函数
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/07/07/go-de-type/" rel="next" title="go的type">
+                  go的type <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">外心人D</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

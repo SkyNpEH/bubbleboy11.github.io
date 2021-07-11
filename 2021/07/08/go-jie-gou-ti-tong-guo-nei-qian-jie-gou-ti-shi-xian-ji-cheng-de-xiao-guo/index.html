@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css" integrity="sha256-2H3fkXt6FEmrReK448mDVGKb3WW2ZZw35gI7vqHOE4Y=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"bubbleboy11.github.io","root":"/","images":"/images","scheme":"Muse","version":"8.6.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="内嵌结构体结构体作为一种变量它可以放进另外一个结构体作为一个字段来使用，这种内嵌结构体的形式在 Go 语言里称之为「组合」。下面我们来看看内嵌结构体的基本使用方法 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455package mainimpor">
+<meta property="og:type" content="article">
+<meta property="og:title" content="go结构体通过内嵌结构体实现继承的效果">
+<meta property="og:url" content="https://bubbleboy11.github.io/2021/07/08/go-jie-gou-ti-tong-guo-nei-qian-jie-gou-ti-shi-xian-ji-cheng-de-xiao-guo/index.html">
+<meta property="og:site_name" content="外心人D的博客">
+<meta property="og:description" content="内嵌结构体结构体作为一种变量它可以放进另外一个结构体作为一个字段来使用，这种内嵌结构体的形式在 Go 语言里称之为「组合」。下面我们来看看内嵌结构体的基本使用方法 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455package mainimpor">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-07-07T16:21:41.000Z">
+<meta property="article:modified_time" content="2021-07-09T12:24:38.879Z">
+<meta property="article:author" content="外心人D">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://bubbleboy11.github.io/2021/07/08/go-jie-gou-ti-tong-guo-nei-qian-jie-gou-ti-shi-xian-ji-cheng-de-xiao-guo/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://bubbleboy11.github.io/2021/07/08/go-jie-gou-ti-tong-guo-nei-qian-jie-gou-ti-shi-xian-ji-cheng-de-xiao-guo/","path":"2021/07/08/go-jie-gou-ti-tong-guo-nei-qian-jie-gou-ti-shi-xian-ji-cheng-de-xiao-guo/","title":"go结构体通过内嵌结构体实现继承的效果"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>go结构体通过内嵌结构体实现继承的效果 | 外心人D的博客</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="外心人D的博客" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">外心人D的博客</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%85%E5%B5%8C%E7%BB%93%E6%9E%84%E4%BD%93"><span class="nav-text">内嵌结构体</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8C%BF%E5%90%8D%E5%86%85%E5%B5%8C%E7%BB%93%E6%9E%84%E4%BD%93"><span class="nav-text">匿名内嵌结构体</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Go-%E8%AF%AD%E8%A8%80%E7%9A%84%E7%BB%93%E6%9E%84%E4%BD%93%E6%B2%A1%E6%9C%89%E5%A4%9A%E6%80%81%E6%80%A7"><span class="nav-text">Go 语言的结构体没有多态性</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-overview">
+            <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">外心人D</p>
+  <div class="site-description" itemprop="description">本博客大多内容为慕课和网上博客，并非原创</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">336</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">40</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+          </div>
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/07/08/go-jie-gou-ti-tong-guo-nei-qian-jie-gou-ti-shi-xian-ji-cheng-de-xiao-guo/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          go结构体通过内嵌结构体实现继承的效果
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-07-07 16:21:41" itemprop="dateCreated datePublished" datetime="2021-07-07T16:21:41Z">2021-07-07</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-07-09 12:24:38" itemprop="dateModified" datetime="2021-07-09T12:24:38Z">2021-07-09</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/go/" itemprop="url" rel="index"><span itemprop="name">go</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="内嵌结构体"><a href="#内嵌结构体" class="headerlink" title="内嵌结构体"></a>内嵌结构体</h2><p>结构体作为一种变量它可以放进另外一个结构体作为一个字段来使用，这种内嵌结构体的形式在 Go 语言里称之为「组合」。下面我们来看看内嵌结构体的基本使用方法</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">"fmt"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Teacher <span class="keyword">struct</span> {</span><br><span class="line">    Name  <span class="keyword">string</span></span><br><span class="line">    Age   <span class="keyword">int</span></span><br><span class="line">    Title <span class="keyword">string</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(t Teacher)</span> <span class="title">teacherInfo</span><span class="params">()</span></span> {</span><br><span class="line">    fmt.Printf(<span class="string">"姓名:%s, 年龄:%d, 职称:%s\n"</span>, t.Name, t.Age, t.Title)</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Course <span class="keyword">struct</span> {</span><br><span class="line">    Teacher Teacher <span class="comment">// 如果讲师的信息比较多怎么办 将另一个结构体的变量放进来</span></span><br><span class="line">    Name    <span class="keyword">string</span></span><br><span class="line">    Price   <span class="keyword">int</span></span><br><span class="line">    Url     <span class="keyword">string</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c Course)</span> <span class="title">courseInfo</span><span class="params">()</span></span> {</span><br><span class="line">    fmt.Printf(<span class="string">"课程名:%s, 价格:%d, 讲师信息：%s %d %s\n"</span>, c.Name, c.Price, c.Teacher.Name, c.Teacher.Age, c.Teacher.Title)</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">courseInfo1</span><span class="params">(c Course)</span></span> {</span><br><span class="line">    fmt.Printf(<span class="string">"课程名:%s, 价格:%d, 讲师信息：%s %d %s\n"</span>, c.Name, c.Price, c.Teacher.Name, c.Teacher.Age, c.Teacher.Title)</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(t Teacher)</span> <span class="title">show</span><span class="params">()</span></span> {</span><br><span class="line">    fmt.Println(t.Name, t.Age, t.Title)</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    t := Teacher{</span><br><span class="line">        Name:  <span class="string">"bobby"</span>,</span><br><span class="line">        Age:   <span class="number">18</span>,</span><br><span class="line">        Title: <span class="string">"程序员"</span>,</span><br><span class="line">    }</span><br><span class="line">    <span class="comment">// var c Course = Course {</span></span><br><span class="line">    c := Course{</span><br><span class="line">        Teacher: t,</span><br><span class="line">        Price:   <span class="number">100</span>,</span><br><span class="line">        Url:     <span class="string">""</span>,</span><br><span class="line">        Name:    <span class="string">"django"</span>,</span><br><span class="line">    }</span><br><span class="line">    c.courseInfo() <span class="comment">// 课程名:django, 价格:100, 讲师信息：bobby 18 程序员</span></span><br><span class="line">    courseInfo1(c) <span class="comment">// 课程名:django, 价格:100, 讲师信息：bobby 18 程序员</span></span><br><span class="line"></span><br><span class="line">    fmt.Printf(<span class="string">"%+v\n"</span>, c)                                                   <span class="comment">// {Teacher:{Name:bobby Age:18 Title:程序员} Name:django Price:100 Url:}</span></span><br><span class="line">    fmt.Printf(<span class="string">"%+v\n"</span>, c.Teacher)                                           <span class="comment">// {Name:bobby Age:18 Title:程序员}</span></span><br><span class="line">    fmt.Printf(<span class="string">"%s %d %s\n"</span>, c.Teacher.Name, c.Teacher.Age, c.Teacher.Title) <span class="comment">// bobby 18 程序员</span></span><br><span class="line"></span><br><span class="line">    c.Teacher.show() <span class="comment">// bobby 18 程序员</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="匿名内嵌结构体"><a href="#匿名内嵌结构体" class="headerlink" title="匿名内嵌结构体"></a>匿名内嵌结构体</h2><p>还有一种特殊的内嵌结构体形式，内嵌的结构体不提供名称。<br>这时外面的结构体将直接继承内嵌结构体所有的内部字段和方法，就好像把子结构体的一切全部都揉进了父结构体一样。<br>匿名的结构体字段将会自动获得以结构体类型的名字命名的字段名称<br>这种做法其实就是 语法糖</p>
+<p>如果嵌入结构的字段和外部结构的字段相同，那么，想要修改嵌入结构的字段值需要加上外部结构中声明的嵌入结构名称</p>
+<p>外嵌结构体将自动继承内嵌结构体的所有字段、匿名内嵌变量的方法</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Course1 <span class="keyword">struct</span> {</span><br><span class="line">    Teacher <span class="comment">// 匿名内嵌结构体：不写参数名称</span></span><br><span class="line">    Name    <span class="keyword">string</span>  <span class="comment">// 属性变量</span></span><br><span class="line">    Price   <span class="keyword">int</span></span><br><span class="line">    Url     <span class="keyword">string</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c Course1)</span> <span class="title">courseInfo2</span><span class="params">()</span></span> { <span class="comment">// 外结构体会自动继承匿名内嵌变量的方法</span></span><br><span class="line">    <span class="comment">// c.Teacher.Name的Teacher可以省略，但是Course struct也有Name，重名的字段会取外嵌的字段，所以不省略Teacher</span></span><br><span class="line">    <span class="comment">// c.Teacher.Age, c.Teacher.Title的Teacher都可以省略</span></span><br><span class="line">    fmt.Printf(<span class="string">"课程名:%s, 价格:%d, 讲师信息：%s %d %s\n"</span>, c.Name, c.Price, c.Teacher.Name, c.Age, c.Title)</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">courseInfo3</span><span class="params">(c Course1)</span></span> {</span><br><span class="line">    <span class="comment">// c.Teacher.Name的Teacher可以省略，但是Course struct也有Name，重名的字段会取外嵌的字段，所以不省略Teacher</span></span><br><span class="line">    <span class="comment">// c.Teacher.Age, c.Teacher.Title的Teacher都可以省略</span></span><br><span class="line">    fmt.Printf(<span class="string">"课程名:%s, 价格:%d, 讲师信息：%s %d %s\n"</span>, c.Name, c.Price, c.Teacher.Name, c.Age, c.Title)</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    c1 := Course1{</span><br><span class="line">        Teacher: t,</span><br><span class="line">        Price:   <span class="number">100</span>,</span><br><span class="line">        Url:     <span class="string">""</span>,</span><br><span class="line">        Name:    <span class="string">"django"</span>,</span><br><span class="line">    }</span><br><span class="line">    c1.courseInfo2() <span class="comment">// 课程名:django, 价格:100, 讲师信息：bobby 18 程序员</span></span><br><span class="line">    courseInfo3(c1)  <span class="comment">// 课程名:django, 价格:100, 讲师信息：bobby 18 程序员</span></span><br><span class="line"></span><br><span class="line">    fmt.Printf(<span class="string">"%+v\n"</span>, c1)                                                     <span class="comment">// {Teacher:{Name:bobby Age:18 Title:程序员} Name:django Price:100 Url:}</span></span><br><span class="line">    fmt.Printf(<span class="string">"%+v\n"</span>, c1.Teacher)                                             <span class="comment">// {Name:bobby Age:18 Title:程序员}</span></span><br><span class="line">    fmt.Printf(<span class="string">"%s %d %s\n"</span>, c1.Teacher.Name, c1.Teacher.Age, c1.Teacher.Title) <span class="comment">// bobby 18 程序员</span></span><br><span class="line">    <span class="comment">// 继承了字段</span></span><br><span class="line">    fmt.Printf(<span class="string">"%s %d %s\n"</span>, c1.Teacher.Name, c1.Age, c1.Title)                 <span class="comment">// bobby 18 程序员</span></span><br><span class="line"></span><br><span class="line">    c1.Teacher.show() <span class="comment">// bobby 18 程序员</span></span><br><span class="line">    <span class="comment">// 继承了方法</span></span><br><span class="line">    c1.show()         <span class="comment">// bobby 18 程序员</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+
+<p>继承仅仅是形式上的语法糖，c.show() 被转换成二进制代码后和 c.Teacher.show() 是等价的，c.Age 和 c.Teacher.Age 也是等价的。</p>
+<h2 id="Go-语言的结构体没有多态性"><a href="#Go-语言的结构体没有多态性" class="headerlink" title="Go 语言的结构体没有多态性"></a>Go 语言的结构体没有多态性</h2><p>Go 语言不是面向对象语言在于它的结构体不支持多态，它不能算是一个严格的面向对象语言。<br>多态是指父类定义的方法可以调用子类实现的方法，不同的子类有不同的实现，从而给父类的方法带来了多样的不同行为。<br>声明类型的时候你申明的类型是一种兼容类型， 但是实际赋值的时候是另一种类型。<br>但是go语言支持鸭子类型</p>
+<p>下面的例子呈现了 Java 类的多态性。</p>
+<figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Fruit</span> </span>{</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">eat</span><span class="params">()</span> </span>{</span><br><span class="line">    System.out.println(<span class="string">"eat fruit"</span>);</span><br><span class="line">  }</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">enjoy</span><span class="params">()</span> </span>{</span><br><span class="line">    System.out.println(<span class="string">"smell first"</span>);</span><br><span class="line">    eat();</span><br><span class="line">    System.out.println(<span class="string">"clean finally"</span>);</span><br><span class="line">  }</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Apple</span> <span class="keyword">extends</span> <span class="title">Fruit</span> </span>{</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">eat</span><span class="params">()</span> </span>{</span><br><span class="line">    System.out.println(<span class="string">"eat apple"</span>);</span><br><span class="line">  }</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Banana</span> <span class="keyword">extends</span> <span class="title">Fruit</span> </span>{</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">eat</span><span class="params">()</span> </span>{</span><br><span class="line">    System.out.println(<span class="string">"eat banana"</span>);</span><br><span class="line">  }</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>{</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>{</span><br><span class="line">    Apple apple = <span class="keyword">new</span> Apple();</span><br><span class="line">    Banana banana = <span class="keyword">new</span> Banana();</span><br><span class="line">    apple.enjoy();</span><br><span class="line">    banana.enjoy();</span><br><span class="line">  }</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">----------------</span><br><span class="line">smell first</span><br><span class="line">eat apple</span><br><span class="line">clean <span class="keyword">finally</span></span><br><span class="line">smell first</span><br><span class="line">eat banana</span><br><span class="line">clean <span class="keyword">finally</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>父类 Fruit 定义的 enjoy 方法调用了子类实现的 eat 方法，子类的方法可以对父类定义的方法进行覆盖，父类的 eat 方法被隐藏起来了。</p>
+<p>Go 语言的结构体明确不支持这种形式的多态，外结构体的方法不能覆盖内部结构体的方法。比如我们用 Go 语言来改写上面的水果例子观察一下输出结果。</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">"fmt"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Fruit <span class="keyword">struct</span> {}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(f Fruit)</span> <span class="title">eat</span><span class="params">()</span></span> {</span><br><span class="line">    fmt.Println(<span class="string">"eat fruit"</span>)</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(f Fruit)</span> <span class="title">enjoy</span><span class="params">()</span></span> {</span><br><span class="line">    fmt.Println(<span class="string">"smell first"</span>)</span><br><span class="line">    f.eat()</span><br><span class="line">    fmt.Println(<span class="string">"clean finally"</span>)</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Apple <span class="keyword">struct</span> {</span><br><span class="line">    Fruit</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(a Apple)</span> <span class="title">eat</span><span class="params">()</span></span> {</span><br><span class="line">    fmt.Println(<span class="string">"eat apple"</span>)</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Banana <span class="keyword">struct</span> {</span><br><span class="line">    Fruit</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(b Banana)</span> <span class="title">eat</span><span class="params">()</span></span> {</span><br><span class="line">    fmt.Println(<span class="string">"eat banana"</span>)</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="keyword">var</span> apple = Apple {}</span><br><span class="line">    <span class="keyword">var</span> banana = Banana {}</span><br><span class="line">    apple.enjoy()</span><br><span class="line">    banana.enjoy()</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">----------</span><br><span class="line">smell first</span><br><span class="line">eat fruit</span><br><span class="line">clean finally</span><br><span class="line">smell first</span><br><span class="line">eat fruit</span><br><span class="line">clean finally</span><br></pre></td></tr></tbody></table></figure>
+
+<p>enjoy 方法调用的 eat 方法还是 Fruit 自己的 eat 方法，它没能被外面的结构体方法覆盖掉。这意味着面向对象的代码习惯不能直接用到 Go 语言里了，我们需要转变思维。</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/07/08/go-tong-guo-jie-kou-xie-yi-qu-li-jie-sort-de-ben-zhi/" rel="prev" title="go通过接口协议去理解sort的本质">
+                  <i class="fa fa-chevron-left"></i> go通过接口协议去理解sort的本质
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/07/08/go-jie-gou-ti-biao-qian/" rel="next" title="go结构体标签">
+                  go结构体标签 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">外心人D</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css" integrity="sha256-2H3fkXt6FEmrReK448mDVGKb3WW2ZZw35gI7vqHOE4Y=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"bubbleboy11.github.io","root":"/","images":"/images","scheme":"Muse","version":"8.6.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="结构体的字段除了名字和类型外，还可以有一个可选的标签（tag）：它是一个附属于字段的字符串，可以是文档或其他的重要标记。比如在我们解析json或生成json文件时，常用到encoding&#x2F;json包，它提供一些默认标签，例如：  omitempty标签可以在序列化的时候忽略0值或者空值。 -标签的作用是不进行序列化，其效果和和直接将结构体中的字段写成小写的效果一样。  能表述的信息是有限的stri">
+<meta property="og:type" content="article">
+<meta property="og:title" content="go结构体标签">
+<meta property="og:url" content="https://bubbleboy11.github.io/2021/07/08/go-jie-gou-ti-biao-qian/index.html">
+<meta property="og:site_name" content="外心人D的博客">
+<meta property="og:description" content="结构体的字段除了名字和类型外，还可以有一个可选的标签（tag）：它是一个附属于字段的字符串，可以是文档或其他的重要标记。比如在我们解析json或生成json文件时，常用到encoding&#x2F;json包，它提供一些默认标签，例如：  omitempty标签可以在序列化的时候忽略0值或者空值。 -标签的作用是不进行序列化，其效果和和直接将结构体中的字段写成小写的效果一样。  能表述的信息是有限的stri">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-07-07T16:21:41.000Z">
+<meta property="article:modified_time" content="2021-07-07T14:41:13.050Z">
+<meta property="article:author" content="外心人D">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://bubbleboy11.github.io/2021/07/08/go-jie-gou-ti-biao-qian/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://bubbleboy11.github.io/2021/07/08/go-jie-gou-ti-biao-qian/","path":"2021/07/08/go-jie-gou-ti-biao-qian/","title":"go结构体标签"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>go结构体标签 | 外心人D的博客</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="外心人D的博客" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">外心人D的博客</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-overview-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-overview">
+            <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">外心人D</p>
+  <div class="site-description" itemprop="description">本博客大多内容为慕课和网上博客，并非原创</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">336</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">40</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+          </div>
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/07/08/go-jie-gou-ti-biao-qian/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          go结构体标签
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2021-07-07 16:21:41 / 修改时间：14:41:13" itemprop="dateCreated datePublished" datetime="2021-07-07T16:21:41Z">2021-07-07</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/go/" itemprop="url" rel="index"><span itemprop="name">go</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>结构体的字段除了名字和类型外，还可以有一个可选的标签（tag）：<br>它是一个附属于字段的字符串，可以是文档或其他的重要标记。<br>比如在我们解析json或生成json文件时，常用到encoding/json包，它提供一些默认标签，例如：</p>
+<ul>
+<li><code>omitempty</code>标签可以在序列化的时候忽略0值或者空值。</li>
+<li><code>-</code>标签的作用是不进行序列化，其效果和和直接将结构体中的字段写成小写的效果一样。</li>
+</ul>
+<p>能表述的信息是有限的<br>string是映射成mysql中char类型还是varchar类型还是text类型， 即使能够说明 但是额外的信息 max_length<br>没有标签会采用默认字段的名称作为key</p>
+<p>在序列化和反序列化的时候，也支持类型转化等操作。如</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Info <span class="keyword">struct</span> {</span><br><span class="line">    Name <span class="keyword">string</span></span><br><span class="line">    Age  <span class="keyword">int</span>   <span class="string">`json:"age,string"`</span></span><br><span class="line">    <span class="comment">// 这样生成的json对象中，age就为字符串</span></span><br><span class="line">    Sex  <span class="keyword">string</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"encoding/json"</span></span><br><span class="line">    <span class="string">"fmt"</span></span><br><span class="line">    <span class="string">"reflect"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Info <span class="keyword">struct</span> {</span><br><span class="line">    Name   <span class="keyword">string</span></span><br><span class="line">    Age    <span class="keyword">int</span> <span class="string">`json:"age,omitempty"`</span></span><br><span class="line">    Weight <span class="keyword">int</span></span><br><span class="line">    height <span class="keyword">int</span></span><br><span class="line">    Gender <span class="keyword">string</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    info := Info{</span><br><span class="line">       Name:   <span class="string">"bobby"</span>,</span><br><span class="line">       Gender: <span class="string">"男"</span>,</span><br><span class="line">    }</span><br><span class="line">    re, _ := json.Marshal(info)</span><br><span class="line">    fmt.Println(<span class="keyword">string</span>(re)) <span class="comment">// {"Name":"bobby","Weight":0,"Gender":"男"}</span></span><br><span class="line">    <span class="comment">// 小写的height和有标签的age都没有打印，因为没有序列化</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Info1 <span class="keyword">struct</span> {</span><br><span class="line">    Name   <span class="keyword">string</span> <span class="string">`json:"name"`</span> <span class="comment">// 字段转换成指定的name ，也就是转换成小写</span></span><br><span class="line">    Age    <span class="keyword">int</span>    <span class="string">`json:"age,omitempty"`</span></span><br><span class="line">    Gender <span class="keyword">string</span> <span class="string">`json:"-"`</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    info1 := Info1{</span><br><span class="line">        Name:   <span class="string">"bobby"</span>,</span><br><span class="line">        Gender: <span class="string">"男"</span>,</span><br><span class="line">    }</span><br><span class="line">    re1, _ := json.Marshal(info1)</span><br><span class="line">    fmt.Println(<span class="keyword">string</span>(re1)) <span class="comment">// {"name":"bobby"} N变n</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>设置自定义的标签，以及如何像官方包一样，可以通过标签，对字段进行自定义处理。<br>要实现这些，我们要用到reflect包。通过反射包去识别这些tag 把结构体的关键信息提取到变量中，java的 spring 底层都是反射<br>具体的应用绝大部分情况之下我们是不需要使用到反射的 实际开发的项目中会用到的</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Info2 <span class="keyword">struct</span> { <span class="comment">// 能表述的信息是有限的</span></span><br><span class="line">    Name   <span class="keyword">string</span> <span class="string">`orm:"name, max_length=17, min_length=5"`</span></span><br><span class="line">    Age    <span class="keyword">int</span>    <span class="string">`orm:"age, min=18, max=70"`</span></span><br><span class="line">    Gender <span class="keyword">string</span> <span class="string">`orm:"gender, required"`</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    info2 := Info2{</span><br><span class="line">        Name:   <span class="string">"bobby"</span>,</span><br><span class="line">        Gender: <span class="string">"男"</span>,</span><br><span class="line">    }</span><br><span class="line">    re2, _ := json.Marshal(info2)</span><br><span class="line">    fmt.Println(<span class="keyword">string</span>(re2)) <span class="comment">// {"Name":"bobby","Age":0,"Gender":"男"}</span></span><br><span class="line">    <span class="comment">// 通过反射包去识别这些tag 把结构体的关键信息提取到变量中，获取变量的动态类型</span></span><br><span class="line">    t := reflect.TypeOf(info2)</span><br><span class="line">    fmt.Println(<span class="string">"Type:"</span>, t.Name()) <span class="comment">// Type: Info2 是struct的类型而不是Name类型</span></span><br><span class="line">    fmt.Println(<span class="string">"Kind:"</span>, t.Kind()) <span class="comment">// Kind: struct</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> i := <span class="number">0</span>; i &lt; t.NumField(); i++ {</span><br><span class="line">        field := t.Field(i) <span class="comment">//获取结构体的每一个字段</span></span><br><span class="line">        tag := field.Tag.Get(<span class="string">"orm"</span>)</span><br><span class="line">        fmt.Printf(<span class="string">"%d. %v (%v), tag: '%v'\n"</span>, i+<span class="number">1</span>, field.Name, field.Type.Name(), tag)</span><br><span class="line">        <span class="comment">//1. Name (string), tag: 'name, max_length=17, min_length=5'</span></span><br><span class="line">        <span class="comment">//2. Age (int), tag: 'age, min=18, max=70'</span></span><br><span class="line">        <span class="comment">//3. Gender (string), tag: 'gender, required'</span></span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/07/08/go-jie-gou-ti-tong-guo-nei-qian-jie-gou-ti-shi-xian-ji-cheng-de-xiao-guo/" rel="prev" title="go结构体通过内嵌结构体实现继承的效果">
+                  <i class="fa fa-chevron-left"></i> go结构体通过内嵌结构体实现继承的效果
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/07/08/go-jie-kou/" rel="next" title="go接口">
+                  go接口 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">外心人D</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

@@ -28,7 +28,7 @@
 <meta property="og:description" content="切片Go 数组的长度不可改变，在特定场景中这样的集合就不太适用， Go中提供了一种灵活，功能强悍的内置类型切片(“动态数组”)，与数组相比切片的长度是不固定的，可以追加元素，在追加时可能使切片的容量增大 Go的切片类型为处理同类型数据序列提供一个方便而高效的方式。切片有些类似于其他语言中的数组，go的slice更像是python的list，但是有一些不同寻常的特性。 数组的传递是值传递切片是引用传">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-07-01T16:21:41.000Z">
-<meta property="article:modified_time" content="2021-07-06T13:28:16.372Z">
+<meta property="article:modified_time" content="2021-07-09T13:05:43.612Z">
 <meta property="article:author" content="外心人D">
 <meta name="twitter:card" content="summary">
 
@@ -122,7 +122,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">322</span>
+          <span class="site-state-item-count">336</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -204,7 +204,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-07-06 13:28:16" itemprop="dateModified" datetime="2021-07-06T13:28:16Z">2021-07-06</time>
+        <time title="修改时间：2021-07-09 13:05:43" itemprop="dateModified" datetime="2021-07-09T13:05:43Z">2021-07-09</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -229,13 +229,10 @@
         <h3 id="切片"><a href="#切片" class="headerlink" title="切片"></a>切片</h3><p>Go 数组的长度不可改变，在特定场景中这样的集合就不太适用，</p>
 <p>Go中提供了一种灵活，功能强悍的内置类型切片(“动态数组”)，与数组相比切片的长度是不固定的，<br>可以追加元素，在追加时可能使切片的容量增大</p>
 <p>Go的切片类型为处理同类型数据序列提供一个方便而高效的方式。<br>切片有些类似于其他语言中的数组，go的slice更像是python的list，但是有一些不同寻常的特性。</p>
-<p>数组的传递是值传递<br>切片是引用传递，同一块内存，底层是数组，如果是基于数组产生的 会有一个问题就是进行的操作会影响原来的数组。<br> slice更像是一个指针 本身不存值</p>
+<p>数组的传递是值传递<br>切片是引用传递，同一块内存，底层是数组，如果是基于数组产生的 会有一个问题就是进行的操作会影响原来的数组。<br>slice更像是一个指针 本身不存值</p>
 <p> go语言的底层是基于数组实现的 python的list底层也是基于数组实现的</p>
 <p>如果小于1024 扩容的速度是2倍 如果大于了1024 扩容的速度就是1.25</p>
-<ol>
-<li><h3 id="定义切片初始化"><a href="#定义切片初始化" class="headerlink" title="定义切片初始化"></a>定义切片初始化</h3></li>
-</ol>
-<p>直接初始化切片，[]表示是切片类型，</p>
+<h3 id="定义切片初始化"><a href="#定义切片初始化" class="headerlink" title="定义切片初始化"></a>定义切片初始化</h3><p>直接初始化切片，[]表示是切片类型，</p>
 <p>创建 slice 的方式有以下几种：<br>序号    方式    代码示例<br>1    直接声明    <code>var slice []int</code><br>2    new <code>slice := *new([]int)</code><br>3    字面量    <code>slice := []int{1,2,3,4,5}</code><br>4    make    <code>slice := make([]int, 5, 10)</code><br>5    从切片或数组“截取”    <code>slice := array[1:5]</code>或 <code>slice := sourceSlice[1:5]</code></p>
 <p>第一种方法： var identifier []type</p>
 <figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> courses []<span class="keyword">string</span> <span class="comment">// 定义了一个切片</span></span><br><span class="line">fmt.Println(courses) <span class="comment">// []</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> courses = []<span class="keyword">string</span>{<span class="string">"django"</span>, <span class="string">"scrapy"</span>, <span class="string">"tornado"</span>}</span><br><span class="line">fmt.Printf(<span class="string">"%T"</span>, courses) <span class="comment">// []string</span></span><br></pre></td></tr></tbody></table></figure>
@@ -247,7 +244,6 @@
 <figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// course := [5]string{"django", "tornado", "scrapy", "python", "asyncio"}</span></span><br><span class="line"><span class="keyword">var</span> courses = [<span class="number">5</span>]<span class="keyword">string</span>{<span class="string">"django"</span>, <span class="string">"scrapy"</span>, <span class="string">"tornado"</span>, <span class="string">"python"</span>, <span class="string">"asyncio"</span>}</span><br><span class="line">subCourse := courses[<span class="number">1</span>:<span class="number">4</span>]</span><br><span class="line">fmt.Println(courses)        <span class="comment">// [django scrapy tornado python asyncio]</span></span><br><span class="line">subCourse[<span class="number">0</span>] = <span class="string">"bobby"</span>      <span class="comment">// 修改切片，原数组会一样改变，引用传递</span></span><br><span class="line">fmt.Println(courses)        <span class="comment">// [django bobby tornado python asyncio]</span></span><br><span class="line">fmt.Println(subCourse)      <span class="comment">// [bobby tornado python]</span></span><br><span class="line">fmt.Printf(<span class="string">"%T"</span>, subCourse) <span class="comment">// []string</span></span><br></pre></td></tr></tbody></table></figure>
 
 <figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">replace</span><span class="params">(mySlice []<span class="keyword">string</span>)</span></span> {</span><br><span class="line">    mySlice[<span class="number">0</span>] = <span class="string">"bobby"</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="keyword">var</span> courses = [<span class="number">5</span>]<span class="keyword">string</span>{<span class="string">"django"</span>, <span class="string">"scrapy"</span>, <span class="string">"tornado"</span>, <span class="string">"python"</span>, <span class="string">"asyncio"</span>}</span><br><span class="line">    subCourse := courses[<span class="number">1</span>:<span class="number">4</span>] <span class="comment">// python中的用法叫切片 go语言中切片是一种数据结构</span></span><br><span class="line">    fmt.Println(subCourse) <span class="comment">// [scrapy tornado python]</span></span><br><span class="line">    fmt.Println(courses)   <span class="comment">// [django scrapy tornado python asyncio]</span></span><br><span class="line">    replace(subCourse)</span><br><span class="line">    fmt.Printf(<span class="string">"%T"</span>, subCourse) <span class="comment">// []string</span></span><br><span class="line">    fmt.Println(subCourse)      <span class="comment">// [bobby tornado python]</span></span><br><span class="line">    fmt.Println(courses)        <span class="comment">// [django bobby tornado python asyncio] 第二个已经变了</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
 
 <figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">s :=[] <span class="keyword">int</span> {<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span> }</span><br><span class="line">{<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>}初始化值依次是<span class="number">1</span>,<span class="number">2</span>,<span class="number">3.</span>其<span class="built_in">cap</span>=<span class="built_in">len</span>=<span class="number">3</span></span><br><span class="line">s := arr[:]</span><br></pre></td></tr></tbody></table></figure>
 
@@ -266,7 +262,6 @@
 
 <p>append函数追加多个元素， 既然是切片，那为什么这个时候有来提出长度的要求<br>想从切片中删除元素怎么办？</p>
 <figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">deleteCourses := [<span class="number">5</span>]<span class="keyword">string</span>{<span class="string">"django"</span>, <span class="string">"scrapy"</span>, <span class="string">"tornado"</span>, <span class="string">"python"</span>, <span class="string">"asyncio"</span>}</span><br><span class="line">courseSlice := deleteCourses[:]</span><br><span class="line">courseSlice = <span class="built_in">append</span>(courseSlice[:<span class="number">1</span>], courseSlice[<span class="number">2</span>:]...) <span class="comment">//取巧的做法，第一段+第二段</span></span><br><span class="line">fmt.Println(courseSlice)                                  <span class="comment">// [django tornado python asyncio] 没有了scrapy</span></span><br></pre></td></tr></tbody></table></figure>
-
 
 <p>第一个现象     // 不会去扩展a的空间</p>
 <figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">a := <span class="built_in">make</span>([]<span class="keyword">int</span>, <span class="number">0</span>)</span><br><span class="line">b := []<span class="keyword">int</span>{<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>}</span><br><span class="line">fmt.Println(<span class="built_in">copy</span>(a, b)) <span class="comment">// 0</span></span><br><span class="line">fmt.Println(a)          <span class="comment">// []</span></span><br></pre></td></tr></tbody></table></figure>

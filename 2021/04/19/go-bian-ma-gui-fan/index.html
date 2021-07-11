@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css" integrity="sha256-2H3fkXt6FEmrReK448mDVGKb3WW2ZZw35gI7vqHOE4Y=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"bubbleboy11.github.io","root":"/","images":"/images","scheme":"Muse","version":"8.6.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="Go编码规范本文参考自     Effective Go.     Golang Code Review  侵删。   Gofmt 注释语句 Contexts Goroutine 生命周期 拷贝 使用crypto rand生成随机值 空切片 Panic 错误 用法示例 Imports 接口 单行代码长度 名称 传值 Receiver 同步函数 有效测试信息 函数  Gofmt  你可以在你的代码中">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go编码规范">
+<meta property="og:url" content="https://bubbleboy11.github.io/2021/04/19/go-bian-ma-gui-fan/index.html">
+<meta property="og:site_name" content="外心人D的博客">
+<meta property="og:description" content="Go编码规范本文参考自     Effective Go.     Golang Code Review  侵删。   Gofmt 注释语句 Contexts Goroutine 生命周期 拷贝 使用crypto rand生成随机值 空切片 Panic 错误 用法示例 Imports 接口 单行代码长度 名称 传值 Receiver 同步函数 有效测试信息 函数  Gofmt  你可以在你的代码中">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-04-18T17:46:44.000Z">
+<meta property="article:modified_time" content="2021-07-11T03:39:43.072Z">
+<meta property="article:author" content="外心人D">
+<meta property="article:tag" content="go">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://bubbleboy11.github.io/2021/04/19/go-bian-ma-gui-fan/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://bubbleboy11.github.io/2021/04/19/go-bian-ma-gui-fan/","path":"2021/04/19/go-bian-ma-gui-fan/","title":"Go编码规范"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Go编码规范 | 外心人D的博客</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="外心人D的博客" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">外心人D的博客</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Go%E7%BC%96%E7%A0%81%E8%A7%84%E8%8C%83"><span class="nav-text">Go编码规范</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Gofmt"><span class="nav-text">Gofmt</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B3%A8%E9%87%8A%E8%AF%AD%E5%8F%A5"><span class="nav-text">注释语句</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8C%85%E7%9A%84%E6%B3%A8%E9%87%8A"><span class="nav-text">包的注释</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Contexts"><span class="nav-text">Contexts</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Goroutine-%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F"><span class="nav-text">Goroutine 生命周期</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8B%B7%E8%B4%9D"><span class="nav-text">拷贝</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8crypto-rand%E7%94%9F%E6%88%90%E9%9A%8F%E6%9C%BA%E5%80%BC"><span class="nav-text">使用crypto rand生成随机值</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A9%BA%E5%88%87%E7%89%87"><span class="nav-text">空切片</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Panic"><span class="nav-text">Panic</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%94%99%E8%AF%AF"><span class="nav-text">错误</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%BC%E5%BC%8F"><span class="nav-text">格式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%84%E7%90%86"><span class="nav-text">处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%99%84%E5%B8%A6%E8%BF%94%E5%9B%9E"><span class="nav-text">附带返回</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%A9%E8%BF%9B"><span class="nav-text">缩进</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%A8%E6%B3%95%E7%A4%BA%E4%BE%8B"><span class="nav-text">用法示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Imports"><span class="nav-text">Imports</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%87%8D%E5%91%BD%E5%90%8D%E3%80%81goimports"><span class="nav-text">重命名、goimports</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Import-Dot"><span class="nav-text">Import Dot</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8E%A5%E5%8F%A3"><span class="nav-text">接口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%95%E8%A1%8C%E4%BB%A3%E7%A0%81%E9%95%BF%E5%BA%A6"><span class="nav-text">单行代码长度</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%8D%E7%A7%B0"><span class="nav-text">名称</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%98%E9%87%8F%E5%90%8D"><span class="nav-text">变量名</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8C%85%E5%90%8D"><span class="nav-text">包名</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%84%E5%90%88%E5%90%8D"><span class="nav-text">组合名</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E6%9E%9C%E5%8F%82%E6%95%B0%E5%91%BD%E5%90%8D"><span class="nav-text">结果参数命名</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%A0%E5%80%BC"><span class="nav-text">传值</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Receiver"><span class="nav-text">Receiver</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%8D%E7%A7%B0-1"><span class="nav-text">名称</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%87%E9%92%88%E8%BF%98%E6%98%AF%E5%80%BC"><span class="nav-text">指针还是值</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%8C%E6%AD%A5%E5%87%BD%E6%95%B0"><span class="nav-text">同步函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%89%E6%95%88%E6%B5%8B%E8%AF%95%E4%BF%A1%E6%81%AF"><span class="nav-text">有效测试信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%BD%E6%95%B0"><span class="nav-text">函数</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-overview">
+            <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">外心人D</p>
+  <div class="site-description" itemprop="description">本博客大多内容为慕课和网上博客，并非原创</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">336</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">40</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+          </div>
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/04/19/go-bian-ma-gui-fan/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Go编码规范
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-04-18 17:46:44" itemprop="dateCreated datePublished" datetime="2021-04-18T17:46:44Z">2021-04-18</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-07-11 03:39:43" itemprop="dateModified" datetime="2021-07-11T03:39:43Z">2021-07-11</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/go/" itemprop="url" rel="index"><span itemprop="name">go</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="Go编码规范"><a href="#Go编码规范" class="headerlink" title="Go编码规范"></a>Go编码规范</h1><p>本文参考自<br>     <a target="_blank" rel="noopener" href="https://golang.org/doc/effective_go.html">Effective Go</a>.<br>     <a target="_blank" rel="noopener" href="https://github.com/golang/go/wiki/CodeReviewComments#initialisms">Golang Code Review</a></p>
+<pre><code> 侵删。
+</code></pre>
+<ul>
+<li><a href="#gofmt">Gofmt</a></li>
+<li><a href="#%E6%B3%A8%E9%87%8A%E8%AF%AD%E5%8F%A5">注释语句</a></li>
+<li><a href="#contexts">Contexts</a></li>
+<li><a href="#goroutine-%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F">Goroutine 生命周期</a></li>
+<li><a href="#%E6%8B%B7%E8%B4%9D">拷贝</a></li>
+<li><a href="#%E4%BD%BF%E7%94%A8crypto-rand%E7%94%9F%E6%88%90%E9%9A%8F%E6%9C%BA%E5%80%BC">使用crypto rand生成随机值</a></li>
+<li><a href="#%E7%A9%BA%E5%88%87%E7%89%87">空切片</a></li>
+<li><a href="#panic">Panic</a></li>
+<li><a href="#%E9%94%99%E8%AF%AF">错误</a></li>
+<li><a href="#%E7%94%A8%E6%B3%95%E7%A4%BA%E4%BE%8B">用法示例</a></li>
+<li><a href="#imports">Imports</a></li>
+<li><a href="#%E6%8E%A5%E5%8F%A3">接口</a></li>
+<li><a href="#%E5%8D%95%E8%A1%8C%E4%BB%A3%E7%A0%81%E9%95%BF%E5%BA%A6">单行代码长度</a></li>
+<li><a href="#%E5%90%8D%E7%A7%B0">名称</a></li>
+<li><a href="#%E4%BC%A0%E5%80%BC">传值</a></li>
+<li><a href="#receiver">Receiver</a></li>
+<li><a href="#%E5%90%8C%E6%AD%A5%E5%87%BD%E6%95%B0">同步函数</a></li>
+<li><a href="#%E6%9C%89%E6%95%88%E6%B5%8B%E8%AF%95%E4%BF%A1%E6%81%AF">有效测试信息</a></li>
+<li><a href="#%E5%87%BD%E6%95%B0">函数</a></li>
+</ul>
+<h2 id="Gofmt"><a href="#Gofmt" class="headerlink" title="Gofmt"></a>Gofmt</h2><p>  你可以在你的代码中运行 <a target="_blank" rel="noopener" href="https://golang.org/cmd/gofmt/">Gofmt</a> 以解决大多数代码格式问题。几乎所有的代码都使用 <code>gofmt</code>。如果使用<a target="_blank" rel="noopener" href="https://github.com/visualfc/liteide">liteide</a>编写Go代码时，使用ctrl+s即可调用gofmt。<br>  另一种方法是使用 <a target="_blank" rel="noopener" href="https://godoc.org/golang.org/x/tools/cmd/goimports">goimports</a>，它是 <code>gofmt</code>的超集，可根据需要添加（删除）行。</p>
+<h2 id="注释语句"><a href="#注释语句" class="headerlink" title="注释语句"></a>注释语句</h2><p>  参考 [<a target="_blank" rel="noopener" href="https://golang.org/doc/effective_go.html#commentary]">https://golang.org/doc/effective_go.html#commentary]</a> </p>
+<p>  所有导出的名称、函数声明、结构声明等都应该有注释  </p>
+<p>  Go语言提供C风格的<code>/* */</code>块注释和C++风格的<code>//</code>行注释。</p>
+<p>  包应该有一个包注释，对于多文件包，注释只需要出现在任意一个文件中。包注释应当提供整个包相关的信息。</p>
+<p>  注释的句子应当具有完整性，这使得它们在提取到文档时能保持良好的格式。使用godoc时包注释将与声明一起提取，作为项目的解释性文本。这些注释的风格和内容决定了文档的质量。</p>
+<p>  注释应当以描述的事物名称开头，以句点（或者 ! ? ）结束。</p>
+<p>代码逻辑注释<br>对于一些关键位置的代码逻辑，或者局部较为复杂的逻辑，需要有相应的逻辑说明，方便其他开发者阅读该段代码，实例如下：</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 从 Redis 中批量读取属性，对于没有读取到的 id ， 记录到一个数组里面，准备从 DB 中读取</span></span><br><span class="line">xxxxx</span><br><span class="line">xxxxxxx</span><br><span class="line">xxxxxxx</span><br></pre></td></tr></tbody></table></figure>
+
+<p>注释风格<br>统一使用中文注释，对于中英文字符之间严格使用空格分隔， 这个不仅仅是中文和英文之间，英文和中文标点之间也都要使用空格分隔，例如：</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 从 Redis 中批量读取属性，对于没有读取到的 id ， 记录到一个数组里面，准备从 DB 中读取</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>上面 Redis 、 id 、 DB 和其他中文字符之间都是用了空格分隔。</p>
+<p>建议全部使用单行注释<br>和代码的规范一样，单行注释不要过长，禁止超过 120 字符。</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Request represents a request to run a command.</span></span><br><span class="line"><span class="keyword">type</span> Request <span class="keyword">struct</span> { ...</span><br><span class="line"></span><br><span class="line"><span class="comment">// Encode writes the JSON encoding of req to w.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Encode</span><span class="params">(w io.Writer, req *Request)</span></span> { ...</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">Package regexp implements a simple library for regular expressions.</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">The syntax of the regular expressions accepted is:</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">    regexp:</span></span><br><span class="line"><span class="comment">        concatenation { '|' concatenation }</span></span><br><span class="line"><span class="comment">    concatenation:</span></span><br><span class="line"><span class="comment">        { closure }</span></span><br><span class="line"><span class="comment">    closure:</span></span><br><span class="line"><span class="comment">        term [ '*' | '+' | '?' ]</span></span><br><span class="line"><span class="comment">    term:</span></span><br><span class="line"><span class="comment">        '^'</span></span><br><span class="line"><span class="comment">        '$'</span></span><br><span class="line"><span class="comment">        '.'</span></span><br><span class="line"><span class="comment">        character</span></span><br><span class="line"><span class="comment">        '[' [ '^' ] character-ranges ']'</span></span><br><span class="line"><span class="comment">        '(' regexp ')'</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">package</span> regexp</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="包的注释"><a href="#包的注释" class="headerlink" title="包的注释"></a>包的注释</h3><p>与godoc呈现的所有注释一样，包的注释必须出现在package子句的旁边，且不带空行：</p>
+<p>包注释<br>每个包都应该有一个包注释，一个位于package子句之前的块注释或行注释。包如果有多个go文件，只需要出现在一个go文件中（一般是和包同名的文件）即可。<br> 包注释应该包含下面基本信息(请严格按照这个顺序，简介，创建人，创建时间）</p>
+<p>包的基本简介（包名，简介）<br>创建者，格式： 创建人： rtx 名<br>创建时间，格式：创建时间： yyyyMMdd<br>例如 util 包的注释示例如下</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// util 包， 该包包含了项目共用的一些常量，封装了项目中一些共用函数。</span></span><br><span class="line"><span class="comment">// 创建人： hanru</span></span><br><span class="line"><span class="comment">// 创建时间： 20190419</span></span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Package math provides basic constants and mathematical functions.</span></span><br><span class="line"><span class="keyword">package</span> math</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">Package template implements data-driven templates for generating textual</span></span><br><span class="line"><span class="comment">output such as HTML.</span></span><br><span class="line"><span class="comment">....</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">package</span> template</span><br></pre></td></tr></tbody></table></figure>
+
+<p>对于main包的注释，很多种注释格式都是可以接受的，比如在目录<code>seedgen</code>中的 <code>package main</code>包，注释可以这下写:</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Binary seedgen ...</span></span><br><span class="line"><span class="keyword">package</span> main</span><br></pre></td></tr></tbody></table></figure>
+<p>或</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Command seedgen ...</span></span><br><span class="line"><span class="keyword">package</span> main</span><br></pre></td></tr></tbody></table></figure>
+<p>or</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Program seedgen ...</span></span><br><span class="line"><span class="keyword">package</span> main</span><br></pre></td></tr></tbody></table></figure>
+<p>或</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// The seedgen command ...</span></span><br><span class="line"><span class="keyword">package</span> main</span><br></pre></td></tr></tbody></table></figure>
+<p>或</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// The seedgen program ...</span></span><br><span class="line"><span class="keyword">package</span> main</span><br></pre></td></tr></tbody></table></figure>
+<p>或</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Seedgen ..</span></span><br><span class="line"><span class="keyword">package</span> main</span><br></pre></td></tr></tbody></table></figure>
+<p>请注意，以小写字母开头的句子不在包注释的可接受选项中，因为包是公开可见的，应当用合适的英语格式写成，包括将第一个词首字母大写。</p>
+<p><a target="_blank" rel="noopener" href="https://golang.org/doc/effective_go.html#commentary">获取更多有关包注释的规范</a></p>
+<h2 id="Contexts"><a href="#Contexts" class="headerlink" title="Contexts"></a>Contexts</h2><p>Go提供了<code>context</code>包来管理gorountine的生命周期。</p>
+<p><code>context.Context</code>类型的值包括了跨API和进程边界的安全凭证，跟踪信息，结束时间和取消信号。</p>
+<p>使用context包时请遵循以下规则：</p>
+<ul>
+<li><p>不要将 Contexts 放入结构体，context应该作为第一个参数传入。 不过也有例外，函数签名(method signature)必须与标准库或者第三方库中的接口相匹配</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">F</span><span class="params">(ctx context.Context, /* other arguments */)</span></span> {}</span><br></pre></td></tr></tbody></table></figure></li>
+<li><p>即使函数允许，也不要传入nil的 Context。如果不知道用哪种 Context，可以使用context.TODO()</p>
+</li>
+<li><p>使用context的Value相关方法只应该用于在程序和接口中传递的和请求相关的元数据，不要用它来传递一些可选的参数</p>
+</li>
+<li><p>相同的 Context 可以传递给共享结束时间、取消信号、安全凭证和父进程追踪等信息的多个goroutine，Context 是并发安全的</p>
+</li>
+<li><p>从不做特定请求的函数可以使用 context.Background()，但即使您认为不需要，也可以在传递Context时使用错误(error)。如果您有充分的理由认为替代方案是错误的，那么只能直接使用context.Background()</p>
+</li>
+<li><p>不要在函数签名中创建Context类型或者使用Context以外的接口。</p>
+</li>
+</ul>
+<p>官方使用context的例子：</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"context"</span></span><br><span class="line">    <span class="string">"fmt"</span></span><br><span class="line">    <span class="string">"time"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    d := time.Now().Add(<span class="number">50</span> * time.Millisecond)</span><br><span class="line">    ctx, cancel := context.WithDeadline(context.Background(), d)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Even though ctx will be expired, it is good practice to call its</span></span><br><span class="line">    <span class="comment">// cancelation function in any case. Failure to do so may keep the</span></span><br><span class="line">    <span class="comment">// context and its parent alive longer than necessary.</span></span><br><span class="line">    <span class="keyword">defer</span> cancel()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">select</span> {</span><br><span class="line">    <span class="keyword">case</span> &lt;-time.After(<span class="number">1</span> * time.Second):</span><br><span class="line">        fmt.Println(<span class="string">"overslept"</span>)</span><br><span class="line">    <span class="keyword">case</span> &lt;-ctx.Done():</span><br><span class="line">        fmt.Println(ctx.Err())</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="Goroutine-生命周期"><a href="#Goroutine-生命周期" class="headerlink" title="Goroutine 生命周期"></a>Goroutine 生命周期</h2><p>当你需要使用goruntines时，请确保它们什么时候/什么条件下退出。</p>
+<p>Goroutines可能会因阻塞channel的send或者receives而泄露,即使被阻塞的通道无法访问，垃圾收集器也不会终止goroutine。</p>
+<p>即使gorountine没有泄露，当不再需要它们时仍在继续运行会导致难以诊断的问题。即使在不需要结果后，修改正在使用的数据也会导致数据竞争。</p>
+<p>尽量保证并发代码足够简单，使gorountine的生命周期更明显。如果难以做到，请记录gorountines退出的时间和原因。</p>
+<h2 id="拷贝"><a href="#拷贝" class="headerlink" title="拷贝"></a>拷贝</h2><p>为了避免意外的别名(alias)，从另一个包复制结构时要小心。比如， <code>bytes.Buffer</code> 类型包含了 <code>[]byte</code> 切片类型，并且作为小字符串的优化，可被较小的字节数组引用。如果你拷贝了一个<code>Buffer</code>，拷贝中的切片可能会alias原始数组中的切片，从而导致后续的操作带来不可预测的结果。</p>
+<p>通常来说，如果一个类型 <code>T</code>其方法与指针结构相关，那么请不要拷贝 <code>T</code>的值。</p>
+<h2 id="使用crypto-rand生成随机值"><a href="#使用crypto-rand生成随机值" class="headerlink" title="使用crypto rand生成随机值"></a>使用crypto rand生成随机值</h2><p>请不要使用包 <code>math/rand</code> 来生成密钥，即使是一次性的。如果不提供种子，则密钥完全可以被预测到。就算用<code>time.Nanoseconds()</code>作为种子，也仅仅只有几个位上的差别。</p>
+<p>使用<code>crypto/rand</code>‘s Reader作为代替。并且如果你需要生成文本，打印成16进制或者base64类型即可。</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"crypto/rand"</span></span><br><span class="line">    <span class="comment">// "encoding/base64"</span></span><br><span class="line">    <span class="comment">// "encoding/hex"</span></span><br><span class="line">    <span class="string">"fmt"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Key</span><span class="params">()</span> <span class="title">string</span></span> {</span><br><span class="line">    buf := <span class="built_in">make</span>([]<span class="keyword">byte</span>, <span class="number">16</span>)</span><br><span class="line">    _, err := rand.Read(buf)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">        <span class="built_in">panic</span>(err)  <span class="comment">// out of randomness, should never happen</span></span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> fmt.Sprintf(<span class="string">"%x"</span>, buf)</span><br><span class="line">    <span class="comment">// or hex.EncodeToString(buf)</span></span><br><span class="line">    <span class="comment">// or base64.StdEncoding.EncodeToString(buf)</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="空切片"><a href="#空切片" class="headerlink" title="空切片"></a>空切片</h2><p>当声明一个空切片时， 使用</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> t []<span class="keyword">string</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>而不是</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">t := []<span class="keyword">string</span>{}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>前者声明了一个指向nil的切片，后者声明了一个 non-nil 且 len = 0的切片。虽然他们的功能是等价的：它们的 <code>len</code> 和<code>cap</code> 都是0，但nil切片应当作为首选方案。</p>
+<p>请注意在有些情况下， non-nil 切片表现更好，比如当解码JSON对象时，nil切片解码为 <code>null</code>, non-nil 切片解码为 JSON 数组</p>
+<p>在设计接口时，应当避免因nil切片和non-nil切片带来的不同表现，因为这可能会导致细微的编码错误。</p>
+<p>有关nil的更多讨论，参考 <a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=ynoY2xz-F8s">Understanding Nil</a>.</p>
+<h2 id="Panic"><a href="#Panic" class="headerlink" title="Panic"></a>Panic</h2><p>不要使用<code>panic</code>作为日常错误处理机制（除非你知道你在干什么），请使用<code>error</code>。</p>
+<p>参考 <a target="_blank" rel="noopener" href="https://golang.org/doc/effective_go.html#panic">https://golang.org/doc/effective_go.html#panic</a>. </p>
+<h2 id="错误"><a href="#错误" class="headerlink" title="错误"></a>错误</h2><h3 id="格式"><a href="#格式" class="headerlink" title="格式"></a>格式</h3><p>错误信息的字符串不应该大写（除非以专有名词或首字母缩略词开头）或以标点符号结尾，因为它们通常是在其他上下文后打印的。</p>
+<p>使用  <code>fmt.Errorf("something bad")</code> 而不是 <code>fmt.Errorf("Something bad")</code> 。</p>
+<h3 id="处理"><a href="#处理" class="headerlink" title="处理"></a>处理</h3><p>请不要使用<code>_</code>丢弃错误。如果一个函数返回一个错误，请检查错误，处理错误，必要情况下请panic。</p>
+<p>标准库函数通常会向调用者返回某种错误指示，比如os.Open不仅在失败时返回一个nil指针，它还返回一个描述错误的错误值。如果不确保调用函数的成功返回，后续代码的行为将变得不可预测。</p>
+<p>错误处理的原则就是不能丢弃任何有返回err的调用，<br>接收到错误，要么返回err，或者使用log记录下来<br>尽早return：一旦有错误发生，马上返回<br>尽量不要使用panic，除非你知道你在做什么<br>错误描述如果是英文必须为小写，不需要标点结尾<br>采用独立的错误流进行处理</p>
+<p>参考 <a target="_blank" rel="noopener" href="https://golang.org/doc/effective_go.html#errors">https://golang.org/doc/effective_go.html#errors</a>.</p>
+<h3 id="附带返回"><a href="#附带返回" class="headerlink" title="附带返回"></a>附带返回</h3><p>在C语言和类似语言中，函数常常返回 -1 或 null 值表示错误或者结果缺失。</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Lookup returns the value for key or "" if there is no mapping for key.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Lookup</span><span class="params">(key <span class="keyword">string</span>)</span> <span class="title">string</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Failing to check a for an in-band error value can lead to bugs:</span></span><br><span class="line">Parse(Lookup(key))  <span class="comment">// returns "parse failure for value" instead of "no value for key"</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>Go语言对多个返回值的支持提供了更好的解决方案。<br>相比要求客户端特判返回值情况，函数应该在最后返回一个附加值以指示其他返回值是否有效。此返回值可能是一个error，或者在不需要解释时可以是bool。</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Lookup returns the value for key or ok=false if there is no mapping for key.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Lookup</span><span class="params">(key <span class="keyword">string</span>)</span> <span class="params">(value <span class="keyword">string</span>, ok <span class="keyword">bool</span>)</span></span></span><br></pre></td></tr></tbody></table></figure>
+<p>这还可以防止调用者错误地使用结果:</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Parse(Lookup(key))  <span class="comment">// compile-time error</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>鼓励编写更强大和可读性更强的代码:</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">value, ok := Lookup(key)</span><br><span class="line"><span class="keyword">if</span> !ok  {</span><br><span class="line">    <span class="keyword">return</span> fmt.Errorf(<span class="string">"no value for %q"</span>, key)</span><br><span class="line">}</span><br><span class="line"><span class="keyword">return</span> Parse(value)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>此规则适用于导出的函数，但对未导出的函数也很有用。<br>如 nil， “”， 0 和 -1 都可以作为函数的无效返回值。<br>一些标准库函数，比如包 “strings” 中的函数，返回值都会附带一个err.这极大地简化了花在字符串上的操作，代价是需要程序员花更多的功夫来处理err。</p>
+<p>总而言之，通常情况下，Go代码应额外返回一个error值.</p>
+<h3 id="缩进"><a href="#缩进" class="headerlink" title="缩进"></a>缩进</h3><p>尽量减少代码缩进，在获取错误后立即处理错误信息。这通常可以提高代码的可阅读性。</p>
+<p>例如，不要写成：</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">    <span class="comment">// error handling</span></span><br><span class="line">} <span class="keyword">else</span> {</span><br><span class="line">    <span class="comment">// normal code</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>而应该写成：</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">    <span class="comment">// error handling</span></span><br><span class="line">    <span class="keyword">return</span> <span class="comment">// or continue, etc.</span></span><br><span class="line">}</span><br><span class="line"><span class="comment">// normal code</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>如果<code>if</code>语句有初始化语句，比如：</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> x, err := f(); err != <span class="literal">nil</span> {</span><br><span class="line">    <span class="comment">// error handling</span></span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line">} <span class="keyword">else</span> {</span><br><span class="line">    <span class="comment">// use x</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+<p>那么这可能需要将变量的声明另提一行：</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">x, err := f()</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">    <span class="comment">// error handling</span></span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line">}</span><br><span class="line"><span class="comment">// use x</span></span><br></pre></td></tr></tbody></table></figure>
+<h2 id="用法示例"><a href="#用法示例" class="headerlink" title="用法示例"></a>用法示例</h2><p>添加新的包时，请包含预期用法的示例。可以是一个可运行的例子或者演示完整调用的简单测试<br>参考 <a target="_blank" rel="noopener" href="https://blog.golang.org/examples">可测试示例函数</a></p>
+<h2 id="Imports"><a href="#Imports" class="headerlink" title="Imports"></a>Imports</h2><h3 id="重命名、goimports"><a href="#重命名、goimports" class="headerlink" title="重命名、goimports"></a>重命名、goimports</h3><p>尽量避免导入包时的重命名，以避免名称冲突。如果发生名称冲突，尽量重命名本地或项目特定的包。</p>
+<p>import在多行的情况下，goimports会自动帮你格式化，但是我们这里还是规范一下import的一些规范，如果你在一个文件里面引入了一个package，还是建议采用如下格式：</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"fmt"</span></span><br><span class="line">)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>如果你的包引入了三种类型的包，标准库包，程序内部包，第三方包，</p>
+<p>导入包按名称分组，用空行隔开。</p>
+<p>标准库包应始终位于第一组。</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"encoding/json"</span></span><br><span class="line">    <span class="string">"strings"</span></span><br><span class="line">​</span><br><span class="line">    <span class="string">"github.com/astaxie/beego"</span></span><br><span class="line">    <span class="string">"github.com/go-sql-driver/mysql"</span></span><br><span class="line"></span><br><span class="line">    <span class="string">"myproject/models"</span></span><br><span class="line">    <span class="string">"myproject/controller"</span></span><br><span class="line">    <span class="string">"myproject/utils"</span></span><br><span class="line">)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>有顺序的引入包，不同的类型采用空格分离，第一种实标准库，第二是项目包，第三是第三方包。</p>
+<p>在项目中不要使用相对路径引入包：</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 这是不好的导入</span></span><br><span class="line"><span class="keyword">import</span> “../net”</span><br><span class="line">​</span><br><span class="line"><span class="comment">// 这是正确的做法</span></span><br><span class="line"><span class="keyword">import</span> “github.com/repo/proj/src/net”</span><br></pre></td></tr></tbody></table></figure>
+
+<p>但是如果是引入本项目中的其他包，最好使用相对路径。</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"fmt"</span></span><br><span class="line">    <span class="string">"hash/adler32"</span></span><br><span class="line">    <span class="string">"os"</span></span><br><span class="line"></span><br><span class="line">    <span class="string">"appengine/foo"</span></span><br><span class="line">    <span class="string">"appengine/user"</span></span><br><span class="line"></span><br><span class="line">        <span class="string">"github.com/foo/bar"</span></span><br><span class="line">    <span class="string">"rsc.io/goversion/version"</span></span><br><span class="line">)</span><br></pre></td></tr></tbody></table></figure>
+<p>可以使用 <a target="_blank" rel="noopener" href="https://godoc.org/golang.org/x/tools/cmd/goimports">goimports</a> 来规范包的排序。</p>
+<h3 id="Import-Dot"><a href="#Import-Dot" class="headerlink" title="Import Dot"></a>Import Dot</h3><p>使用 <code>import .</code> 来导入包在测试中很有用，但由于循环依赖性，它不能成为被测试包的一部分：</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> foo_test</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"bar/testutil"</span> <span class="comment">// also imports "foo"</span></span><br><span class="line">    . <span class="string">"foo"</span></span><br><span class="line">)</span><br></pre></td></tr></tbody></table></figure>
+<p>在这种情况下，测试文件不能在包<code>foo</code>中，因为它使用了同样导入<code>foo</code>的包 <code>bar/testutil</code>，所以我们使用<code>import .</code>格式导入来让测试文件伪装成包foo的一部分，即使它并不是。除了这一情况，不要在你的程序中使用<code>import .</code>来导入包。它将使程序更难阅读，因为不清楚 Quux 这样的名称是在当前包中还是导入包中。</p>
+<h2 id="接口"><a href="#接口" class="headerlink" title="接口"></a>接口</h2><p>Go语言接口类型通常属于包中的interface类型，而不是实现这些值的包。实现了接口的包应该返回具体的(通常是指针或者结构)类型：这样，新方法可以不需要大量重构就可以添加到实现中。</p>
+<p>不要“为了模仿”而在API的实现端定义接口。<br>相反，设计的API应当能够使用公共的API来进行测试。</p>
+<p>并且在使用之前不要定义接口：没有真实的例子之前，很难看出接口是否必需，更不要说它应该包含哪些方法。</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> consumer  <span class="comment">// consumer.go</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Thinger <span class="keyword">interface</span> { Thing() <span class="keyword">bool</span> }</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Foo</span><span class="params">(t Thinger)</span> <span class="title">string</span></span> { … }</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> consumer <span class="comment">// consumer_test.go</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> fakeThinger <span class="keyword">struct</span>{ … }</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(t fakeThinger)</span> <span class="title">Thing</span><span class="params">()</span> <span class="title">bool</span></span> { … }</span><br><span class="line">…</span><br><span class="line"><span class="keyword">if</span> Foo(fakeThinger{…}) == <span class="string">"x"</span> { … }</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// DO NOT DO IT!!!</span></span><br><span class="line"><span class="keyword">package</span> producer</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Thinger <span class="keyword">interface</span> { Thing() <span class="keyword">bool</span> }</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> defaultThinger <span class="keyword">struct</span>{ … }</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(t defaultThinger)</span> <span class="title">Thing</span><span class="params">()</span> <span class="title">bool</span></span> { … }</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">NewThinger</span><span class="params">()</span> <span class="title">Thinger</span></span> { <span class="keyword">return</span> defaultThinger{ … } }</span><br></pre></td></tr></tbody></table></figure>
+
+<p>取而代之的，可以直接使用原先的API接口，返回一个具体类型，让消费者模拟生产者的实现。</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> producer</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Thinger <span class="keyword">struct</span>{ … }</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(t Thinger)</span> <span class="title">Thing</span><span class="params">()</span> <span class="title">bool</span></span> { … }</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">NewThinger</span><span class="params">()</span> <span class="title">Thinger</span></span> { <span class="keyword">return</span> Thinger{ … } }</span><br></pre></td></tr></tbody></table></figure>
+
+
+<h2 id="单行代码长度"><a href="#单行代码长度" class="headerlink" title="单行代码长度"></a>单行代码长度</h2><p>Go代码中没有严格限制行的长度，但请避免使用不舒服的长行。同样，当一行长代码可读性还行时，不要添加换行符来增加行数。</p>
+<p>较长的行似乎与较长的名称有关，所以请尽量避免长的名称。<br>实际上，这与关于函数应该有多长的建议完全相同。没有规则“函数不应该超过N行”，但肯定会有这么长的一个函数，并且这个函数也可以分解为多个小函数来实现相同的功能。</p>
+<h2 id="名称"><a href="#名称" class="headerlink" title="名称"></a>名称</h2><p>如果要在其他包使用该名称，请大写首字母。</p>
+<p>名称如果是首字母或首字母缩略词（例如 “URL” 或 “NATO”)，应当具有一致的大小写. 例如，”URL” 应写为 “URL” 或”url”，而不是 “Url”。</p>
+<p>举个例子： ServerHTTP与ServerHttp，应当使用前者。<br>对于具有多个缩略单词的标识符，使用例如 “xmlHTTPRequest” 或 “XMLHTTPRequest”。<br>当”ID”是标识符的缩写时，此规则也同样适用，因此请写成 “appID” 而不是 “appId”。</p>
+<h3 id="变量名"><a href="#变量名" class="headerlink" title="变量名"></a>变量名</h3><p>Go中变量名应尽量短。对于局部变量尤其如此，首选<code>c</code>作为<code>lineCount</code>,<code>i</code>作为<code>sliceIndex</code>。</p>
+<p>基本规则：名称使用的地方距其声明的地方越远，则名称必须越具描述性。对一个方法receiver，一个或两个字母就足够了。循环索引或读取之类的常见变量可以使单个字母(<code>i r</code>)，更多不常见的事物和全局变量需要更具描述性的名称。</p>
+<h3 id="包名"><a href="#包名" class="headerlink" title="包名"></a>包名</h3><p>包名应当简洁、清晰、意义深刻。按照惯例，包名应该由小写字母组成，不要使用下划线或混合大小写。</p>
+<p>包中名称的所有引用都将会使用到包名，所以你可以省略包中名称的标识符。<br>例如，<code>chubby.ChubbyFile</code>，可以精简为<code>chubby.File</code>。</p>
+<p>请注意避免使用无意义的包名称，如 util,common,misc,api,types和interfaces。</p>
+<p>参考：</p>
+<p><a target="_blank" rel="noopener" href="http://golang.org/doc/effective_go.html#package-names">http://golang.org/doc/effective_go.html#package-names</a> </p>
+<p><a target="_blank" rel="noopener" href="http://blog.golang.org/package-names">http://blog.golang.org/package-names</a> </p>
+<h3 id="组合名"><a href="#组合名" class="headerlink" title="组合名"></a>组合名</h3><p>Go语言决定使用MixedCaps或mixedCaps来命名由多个单词组合的名称，而不是使用下划线来连接多个单词。即使它打破了其他语言的惯例。</p>
+<p>例如，未导出的常量名为<code>maxLength</code> 而不是<code>MaxLength</code> 或 <code>MAX_LENGTH</code>。</p>
+<h3 id="结果参数命名"><a href="#结果参数命名" class="headerlink" title="结果参数命名"></a>结果参数命名</h3><p>考虑下结果参数命名为下面这种情况时，godoc下的文档会是什么样子</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(n *Node)</span> <span class="title">Parent1</span><span class="params">()</span> <span class="params">(node *Node)</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(n *Node)</span> <span class="title">Parent2</span><span class="params">()</span> <span class="params">(node *Node, err error)</span></span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>文档会念起来更拗口，推荐下面这种：</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(n *Node)</span> <span class="title">Parent1</span><span class="params">()</span> *<span class="title">Node</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(n *Node)</span> <span class="title">Parent2</span><span class="params">()</span> <span class="params">(*Node, error)</span></span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>另一方面，如果函数返回值意义不明，给返回参数添加名称可能会很有用。</p>
+<p>总之，尽量提高API可读性，比如：</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(f *Foo)</span> <span class="title">Location</span><span class="params">()</span> <span class="params">(<span class="keyword">float64</span>, <span class="keyword">float64</span>, error)</span></span></span><br></pre></td></tr></tbody></table></figure>
+<p>更优的写法：</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Location returns f's latitude and longitude.</span></span><br><span class="line"><span class="comment">// Negative values mean south and west, respectively.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(f *Foo)</span> <span class="title">Location</span><span class="params">()</span> <span class="params">(lat, long <span class="keyword">float64</span>, err error)</span></span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>结论： 文档的清晰度比节约一两行代码更加重要。</p>
+<p>最后，在某些情况下，如果您需要命名结果参数才能在defer中关闭变量的话，也是可以的。</p>
+<h2 id="传值"><a href="#传值" class="headerlink" title="传值"></a>传值</h2><p>不要仅仅为了节省几个字节而传指针给函数。如果函数仅仅将其参数”x”作为<code>*x</code>使用，那么参数就不应该是指针。</p>
+<p>常见的传指针的情况有：传递一个string的指针、指向接口值(<code>*io.Reader</code>)的指针;这两种情况下，值本身都是固定的，可以直接传递。</p>
+<p>对于大型数据结构，或者是小型的可能增长的结构，请考虑传指针。</p>
+<p>更多情况请见 <a href="#receiver-type">Receiver Type</a></p>
+<h2 id="Receiver"><a href="#Receiver" class="headerlink" title="Receiver"></a>Receiver</h2><h3 id="名称-1"><a href="#名称-1" class="headerlink" title="名称"></a>名称</h3><p>方法receiver的名称应该反映其身份；通常，其类型的一个或两个字母缩写就足够了(例如”client”的”c”或”cl”)。请不要使用通用名称如”me”, “this” 或 “self”。请始终保持名称不变，如果你在一个地方命名receiver为 “c”，那么请不要在另一处叫其”cl”</p>
+<h3 id="指针还是值"><a href="#指针还是值" class="headerlink" title="指针还是值"></a>指针还是值</h3><p>如果您不知道怎么决定，请使用指针。但有时候receiver为值也挺有用，这种通常是出于效率的原因，且值为小的不变结构或基本类型的值。</p>
+<p>一些建议：</p>
+<ul>
+<li>请不要使用指针，如果满足receiver为map，func或者chan，或receiver为切片并且该方法不会重新分配切片</li>
+<li>请不要使用指针，如果receiver是较小数组或结构体，没有可变的字段和指针，或者是一个简单的基本类型，int或者string</li>
+<li>请使用指针，如果方法需要改变receiver</li>
+<li>请使用指针，以避免被拷贝，如果receiver包含了sync.Mutex 或类似同步字段的结构</li>
+<li>请使用指针，以提升效率，如果receiver是较大的数组或结构体</li>
+<li>请使用指针，如果需要在方法中改变receiver的值</li>
+<li>请使用指针，如果receiver是结构体，数组或切片这种成员是一个指向可变内容的指针</li>
+<li>请使用指针，如果不清楚该如何选择</li>
+</ul>
+<h2 id="同步函数"><a href="#同步函数" class="headerlink" title="同步函数"></a>同步函数</h2><p>相比异步函数，应当首选同步函数 —— 直接返回结果或在返回之前完成任何回调或通道操作的函数。</p>
+<p>同步函数使得gorountine在调用中本地化，更容易推断其生命周期并避免泄露和数据竞争。它们也更容易测试:调用者可以传递输入并检查输出，而无需轮询或同步。</p>
+<p>如果调用者需要更多的并发，他们可以简单地在单独的gorountine中调用函数来实现。但在调用者端删除不必要的并发是非常困难甚至是不可能的。</p>
+<h2 id="有效测试信息"><a href="#有效测试信息" class="headerlink" title="有效测试信息"></a>有效测试信息</h2><p>测试失败时应当返回有效的错误信息，说明错误在哪，输入是什么，输出时什么，期望输出是什么。<br>一个典型的测试条件形如：</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> got != tt.want {</span><br><span class="line">    t.Errorf(<span class="string">"Foo(%q) = %d; want %d"</span>, tt.in, got, tt.want) <span class="comment">// or Fatalf, if test can't test anything more past this point</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>请注意此处的命令是 <code>实际结果 != 预期结果</code>.一些测试框架鼓励程序员编写： 0 != x, “expected 0, got x”，go并不推荐。</p>
+<p>在任何情况下，您有责任提供有用的错误信息，以便将来调试您的代码。</p>
+<p>单元测试文件名命名规范为 example_test.go 测试用例的函数名称必须以 Test 开头，例如：TestExample 每个重要的函数都要首先编写测试用例，测试用例和正规代码一起提交方便进行回归测试</p>
+<h2 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h2><ul>
+<li>函数采用命名的多值返回，但请考虑 <a href="#%E7%BB%93%E6%9E%9C%E5%8F%82%E6%95%B0%E5%91%BD%E5%90%8D">结果参数命名</a></li>
+<li>传入变量和返回变量以小写字母开头</li>
+</ul>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">nextInt</span><span class="params">(b []<span class="keyword">byte</span>, pos <span class="keyword">int</span>)</span> <span class="params">(value, nextPos <span class="keyword">int</span>)</span></span> {</span><br><span class="line"><span class="comment">//</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+<ul>
+<li>如果需要，请返回错误信息</li>
+</ul>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/go/" rel="tag"># go</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/04/19/go-bian-ma-gui-fan-1/" rel="prev" title="Go编码规范1">
+                  <i class="fa fa-chevron-left"></i> Go编码规范1
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/04/19/go-yi-lai-guan-li/" rel="next" title="go依赖管理">
+                  go依赖管理 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">外心人D</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

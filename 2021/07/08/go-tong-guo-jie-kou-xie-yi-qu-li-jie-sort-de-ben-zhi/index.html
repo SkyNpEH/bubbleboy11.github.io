@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css" integrity="sha256-2H3fkXt6FEmrReK448mDVGKb3WW2ZZw35gI7vqHOE4Y=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"bubbleboy11.github.io","root":"/","images":"/images","scheme":"Muse","version":"8.6.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="1234567&#x2F;&#x2F; Sort sorts data.&#x2F;&#x2F; It makes one call to data.Len to determine n and O(n*log(n)) calls to&#x2F;&#x2F; data.Less and data.Swap. The sort is not guaranteed to be stable.func Sort(data Interface) {    n :">
+<meta property="og:type" content="article">
+<meta property="og:title" content="go通过接口协议去理解sort的本质">
+<meta property="og:url" content="https://bubbleboy11.github.io/2021/07/08/go-tong-guo-jie-kou-xie-yi-qu-li-jie-sort-de-ben-zhi/index.html">
+<meta property="og:site_name" content="外心人D的博客">
+<meta property="og:description" content="1234567&#x2F;&#x2F; Sort sorts data.&#x2F;&#x2F; It makes one call to data.Len to determine n and O(n*log(n)) calls to&#x2F;&#x2F; data.Less and data.Swap. The sort is not guaranteed to be stable.func Sort(data Interface) {    n :">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-07-07T16:21:41.000Z">
+<meta property="article:modified_time" content="2021-07-09T07:09:55.222Z">
+<meta property="article:author" content="外心人D">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://bubbleboy11.github.io/2021/07/08/go-tong-guo-jie-kou-xie-yi-qu-li-jie-sort-de-ben-zhi/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://bubbleboy11.github.io/2021/07/08/go-tong-guo-jie-kou-xie-yi-qu-li-jie-sort-de-ben-zhi/","path":"2021/07/08/go-tong-guo-jie-kou-xie-yi-qu-li-jie-sort-de-ben-zhi/","title":"go通过接口协议去理解sort的本质"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>go通过接口协议去理解sort的本质 | 外心人D的博客</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="外心人D的博客" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">外心人D的博客</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-overview-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-overview">
+            <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">外心人D</p>
+  <div class="site-description" itemprop="description">本博客大多内容为慕课和网上博客，并非原创</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">336</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">40</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+          </div>
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/07/08/go-tong-guo-jie-kou-xie-yi-qu-li-jie-sort-de-ben-zhi/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          go通过接口协议去理解sort的本质
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-07-07 16:21:41" itemprop="dateCreated datePublished" datetime="2021-07-07T16:21:41Z">2021-07-07</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-07-09 07:09:55" itemprop="dateModified" datetime="2021-07-09T07:09:55Z">2021-07-09</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/go/" itemprop="url" rel="index"><span itemprop="name">go</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Sort sorts data.</span></span><br><span class="line"><span class="comment">// It makes one call to data.Len to determine n and O(n*log(n)) calls to</span></span><br><span class="line"><span class="comment">// data.Less and data.Swap. The sort is not guaranteed to be stable.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Sort</span><span class="params">(data Interface)</span></span> {</span><br><span class="line">    n := data.Len()</span><br><span class="line">    quickSort(data, <span class="number">0</span>, n, maxDepth(n))</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// An implementation of Interface can be sorted by the routines in this package.</span></span><br><span class="line"><span class="comment">// The methods refer to elements of the underlying collection by integer index.</span></span><br><span class="line"><span class="keyword">type</span> Interface <span class="keyword">interface</span> {</span><br><span class="line">    <span class="comment">// Len is the number of elements in the collection.</span></span><br><span class="line">    Len() <span class="keyword">int</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// Less reports whether the element with index i</span></span><br><span class="line">    <span class="comment">// must sort before the element with index j.</span></span><br><span class="line">    <span class="comment">//</span></span><br><span class="line">    <span class="comment">// If both Less(i, j) and Less(j, i) are false,</span></span><br><span class="line">    <span class="comment">// then the elements at index i and j are considered equal.</span></span><br><span class="line">    <span class="comment">// Sort may place equal elements in any order in the final result,</span></span><br><span class="line">    <span class="comment">// while Stable preserves the original input order of equal elements.</span></span><br><span class="line">    <span class="comment">//</span></span><br><span class="line">    <span class="comment">// Less must describe a transitive ordering:</span></span><br><span class="line">    <span class="comment">//  - if both Less(i, j) and Less(j, k) are true, then Less(i, k) must be true as well.</span></span><br><span class="line">    <span class="comment">//  - if both Less(i, j) and Less(j, k) are false, then Less(i, k) must be false as well.</span></span><br><span class="line">    <span class="comment">//</span></span><br><span class="line">    <span class="comment">// Note that floating-point comparison (the &lt; operator on float32 or float64 values)</span></span><br><span class="line">    <span class="comment">// is not a transitive ordering when not-a-number (NaN) values are involved.</span></span><br><span class="line">    <span class="comment">// See Float64Slice.Less for a correct implementation for floating-point values.</span></span><br><span class="line">    Less(i, j <span class="keyword">int</span>) <span class="keyword">bool</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// Swap swaps the elements with indexes i and j.</span></span><br><span class="line">    Swap(i, j <span class="keyword">int</span>)</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"fmt"</span></span><br><span class="line">    <span class="string">"sort"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Course <span class="keyword">struct</span> {</span><br><span class="line">    Name  <span class="keyword">string</span></span><br><span class="line">    Price <span class="keyword">int</span></span><br><span class="line">    Url   <span class="keyword">string</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Courses []Course <span class="comment">// 基于slice创建新的类型</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c Courses)</span> <span class="title">Len</span><span class="params">()</span> <span class="title">int</span></span> {</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">len</span>(c)</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c Courses)</span> <span class="title">Less</span><span class="params">(i, j <span class="keyword">int</span>)</span> <span class="title">bool</span></span> {</span><br><span class="line">    <span class="keyword">return</span> c[i].Price &lt; c[j].Price</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c Courses)</span> <span class="title">Swap</span><span class="params">(i, j <span class="keyword">int</span>)</span></span> {</span><br><span class="line">    c[i], c[j] = c[j], c[i]</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="comment">//通过sort来排序</span></span><br><span class="line">    <span class="comment">//让你写一个排序算法， 冒泡 插入 快速 归并 桶排序 算法本质是一样 比较 计数排序</span></span><br><span class="line">    <span class="comment">//你的排序算法是否能应付各种类型的排序</span></span><br><span class="line">    courses := Courses{ <span class="comment">// 切片</span></span><br><span class="line">        Course{<span class="string">"django"</span>, <span class="number">300</span>, <span class="string">""</span>},</span><br><span class="line">        Course{<span class="string">"scrapy"</span>, <span class="number">100</span>, <span class="string">""</span>},</span><br><span class="line">        Course{<span class="string">"go"</span>, <span class="number">400</span>, <span class="string">""</span>},</span><br><span class="line">        Course{<span class="string">"torando"</span>, <span class="number">200</span>, <span class="string">""</span>},</span><br><span class="line">    }</span><br><span class="line">    sort.Sort(courses) <span class="comment">//协议 你的目的不是要告诉别人具体的类型，重要的是你的类型必要提供具体的方法</span></span><br><span class="line">    <span class="keyword">for</span> _, v := <span class="keyword">range</span> courses {</span><br><span class="line">        fmt.Println(v)</span><br><span class="line">    }</span><br><span class="line">    <span class="comment">//{scrapy 100 }</span></span><br><span class="line">    <span class="comment">//{torando 200 }</span></span><br><span class="line">    <span class="comment">//{django 300 }</span></span><br><span class="line">    <span class="comment">//{go 400 }</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/07/08/rpc/" rel="prev" title="RPC">
+                  <i class="fa fa-chevron-left"></i> RPC
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/07/08/go-jie-gou-ti-tong-guo-nei-qian-jie-gou-ti-shi-xian-ji-cheng-de-xiao-guo/" rel="next" title="go结构体通过内嵌结构体实现继承的效果">
+                  go结构体通过内嵌结构体实现继承的效果 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">外心人D</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
