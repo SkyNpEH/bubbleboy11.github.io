@@ -119,7 +119,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">336</span>
+          <span class="site-state-item-count">338</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -160,6 +160,267 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/06/18/beego-zhu-ce-deng-lu/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/06/18/beego-zhu-ce-deng-lu/" class="post-title-link" itemprop="url">beego注册登录</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-06-17 16:21:41" itemprop="dateCreated datePublished" datetime="2021-06-17T16:21:41Z">2021-06-17</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-06-19 09:53:11" itemprop="dateModified" datetime="2021-06-19T09:53:11Z">2021-06-19</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/beego/" itemprop="url" rel="index"><span itemprop="name">beego</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><code>bee api demo</code></p>
+<h2 id="注册"><a href="#注册" class="headerlink" title="注册"></a>注册</h2><p>接口地址：<code>/register/save</code></p>
+<p>接收参数为：mobile（手机号），password（密码）<br>返回信息：json格式，其中 code（状态码，0=正确），items（返回信息），count（条数）<br><img src="/2021/06/18/beego-zhu-ce-deng-lu/0.png" alt="description"></p>
+<p><code>router.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">init</span><span class="params">()</span></span> {</span><br><span class="line">    web.Include(&amp;controllers.UserController{})</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>controllers/common.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> controllers</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"crypto/md5"</span></span><br><span class="line">    <span class="string">"encoding/hex"</span></span><br><span class="line"></span><br><span class="line">    beego <span class="string">"github.com/beego/beego/v2/server/web"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 用户密码加密</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">MD5V</span><span class="params">(password <span class="keyword">string</span>)</span> <span class="title">string</span></span> {</span><br><span class="line">    h := md5.New()</span><br><span class="line">    <span class="comment">//h.Write([]byte(password + web.AppConfig.String("md5code")))</span></span><br><span class="line">    h.Write([]<span class="keyword">byte</span>(password + <span class="string">"RaW#XhH2aVgo!Iy1"</span>))</span><br><span class="line">    <span class="keyword">return</span> hex.EncodeToString(h.Sum(<span class="literal">nil</span>))</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>models/User.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> User <span class="keyword">struct</span> {</span><br><span class="line">    Id       <span class="keyword">int</span></span><br><span class="line">    Name     <span class="keyword">string</span></span><br><span class="line">    Password <span class="keyword">string</span></span><br><span class="line">    Status   <span class="keyword">int</span></span><br><span class="line">    AddTime  <span class="keyword">int64</span></span><br><span class="line">    Mobile   <span class="keyword">string</span></span><br><span class="line">    Avatar   <span class="keyword">string</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="comment">// 根据手机号判断用户是否存在</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">IsUserMobile</span><span class="params">(mobile <span class="keyword">string</span>)</span> <span class="title">bool</span></span> {</span><br><span class="line">    o := orm.NewOrm()</span><br><span class="line">    user := User{Mobile: mobile}</span><br><span class="line">    err := o.Read(&amp;user, <span class="string">"Mobile"</span>)</span><br><span class="line">    <span class="keyword">if</span> err == orm.ErrNoRows {</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">    } <span class="keyword">else</span> <span class="keyword">if</span> err == orm.ErrMissPK {</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="comment">// 保存用户</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">UserSave</span><span class="params">(mobile <span class="keyword">string</span>, password <span class="keyword">string</span>)</span> <span class="title">error</span></span> {</span><br><span class="line">    o := orm.NewOrm()</span><br><span class="line">    <span class="keyword">var</span> user User</span><br><span class="line">    user.Name = <span class="string">""</span></span><br><span class="line">    user.Password = password</span><br><span class="line">    user.Mobile = mobile</span><br><span class="line">    user.Status = <span class="number">1</span></span><br><span class="line">    user.AddTime = time.Now().Unix()</span><br><span class="line">    _, err := o.Insert(&amp;user)</span><br><span class="line">    <span class="keyword">return</span> err</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>controllers/user.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 用户注册功能</span></span><br><span class="line"><span class="comment">// @router /register/save [get]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *UserController)</span> <span class="title">SaveRegister</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="keyword">var</span> (</span><br><span class="line">        mobile   <span class="keyword">string</span></span><br><span class="line">        password <span class="keyword">string</span></span><br><span class="line">        err      error</span><br><span class="line">    )</span><br><span class="line">    mobile = this.GetString(<span class="string">"mobile"</span>)  <span class="comment">// 获取接受手机号</span></span><br><span class="line">    password = this.GetString(<span class="string">"password"</span>)  <span class="comment">// 获取接受密码</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> mobile == <span class="string">""</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4001</span>, <span class="string">"手机号不能为空"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    isorno, _ := regexp.MatchString(<span class="string">`^1(3|4|5|7|8)[0-9]\d{8}$`</span>, mobile)</span><br><span class="line">    <span class="keyword">if</span> !isorno {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4002</span>, <span class="string">"手机号格式不正确"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">if</span> password == <span class="string">""</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4003</span>, <span class="string">"密码不能为空"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 判断手机号是否已经注册</span></span><br><span class="line">    status := models.IsUserMobile(mobile)</span><br><span class="line">    <span class="keyword">if</span> status {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4005</span>, <span class="string">"此手机号已经注册"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        <span class="comment">// 保存用户信息，密码有MD5加密</span></span><br><span class="line">        err = models.UserSave(mobile, MD5V(password))</span><br><span class="line">        <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">            this.Data[<span class="string">"json"</span>] = ReturnSuccess(<span class="number">0</span>, <span class="string">"注册成功"</span>, <span class="literal">nil</span>, <span class="number">0</span>)</span><br><span class="line">            this.ServeJSON()</span><br><span class="line">        } <span class="keyword">else</span> {</span><br><span class="line">            this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">5000</span>, err)</span><br><span class="line">            this.ServeJSON()</span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="/2021/06/18/beego-zhu-ce-deng-lu/1.png" alt="description"><br><img src="/2021/06/18/beego-zhu-ce-deng-lu/2.png" alt="description"><br><img src="/2021/06/18/beego-zhu-ce-deng-lu/3.png" alt="description"></p>
+<p>测试接口用get查看</p>
+<p>实际注册用post</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//用户注册功能</span></span><br><span class="line"><span class="comment">// @router /register/save [post]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *UserController)</span> <span class="title">SaveRegister</span><span class="params">()</span></span> {</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="/2021/06/18/beego-zhu-ce-deng-lu/4.png" alt="description"></p>
+<h2 id="登录"><a href="#登录" class="headerlink" title="登录"></a>登录</h2><p>接口地址：<code>/login/do</code><br>接收参数为：mobile（手机号），password（密码）<br>返回信息：json格式，items中返回uid和username</p>
+<p><img src="/2021/06/18/beego-zhu-ce-deng-lu/5.png" alt="description"></p>
+<p><code>models/User.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 登录功能</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">IsMobileLogin</span><span class="params">(mobile <span class="keyword">string</span>, password <span class="keyword">string</span>)</span> <span class="params">(<span class="keyword">int</span>, <span class="keyword">string</span>)</span></span> {</span><br><span class="line">    o := orm.NewOrm()</span><br><span class="line">    <span class="keyword">var</span> user User</span><br><span class="line">    err := o.QueryTable(<span class="string">"user"</span>).Filter(<span class="string">"mobile"</span>, mobile).Filter(<span class="string">"password"</span>, password).One(&amp;user)</span><br><span class="line">    <span class="keyword">if</span> err == orm.ErrNoRows {</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>, <span class="string">""</span></span><br><span class="line">    } <span class="keyword">else</span> <span class="keyword">if</span> err == orm.ErrMissPK {</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>, <span class="string">""</span></span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> user.Id, user.Name</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>controllers/user.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//用户登录</span></span><br><span class="line"><span class="comment">// @router /login/do [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *UserController)</span> <span class="title">LoginDo</span><span class="params">()</span></span> {</span><br><span class="line">    mobile := this.GetString(<span class="string">"mobile"</span>)  <span class="comment">// 获取手机号</span></span><br><span class="line">    password := this.GetString(<span class="string">"password"</span>)  <span class="comment">// 获取密码</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> mobile == <span class="string">""</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4001</span>, <span class="string">"手机号不能为空"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    isorno, _ := regexp.MatchString(<span class="string">`^1(3|4|5|7|8)[0-9]\d{8}$`</span>, mobile)</span><br><span class="line">    <span class="keyword">if</span> !isorno {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4002</span>, <span class="string">"手机号格式不正确"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">if</span> password == <span class="string">""</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4003</span>, <span class="string">"密码不能为空"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    <span class="comment">// 数据库中查找手机号和密码是否正确</span></span><br><span class="line">    uid, name := models.IsMobileLogin(mobile, MD5V(password))</span><br><span class="line">    <span class="keyword">if</span> uid != <span class="number">0</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnSuccess(<span class="number">0</span>, <span class="string">"登录成功"</span>, <span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">interface</span>{}{<span class="string">"uid"</span>: uid, <span class="string">"username"</span>: name}, <span class="number">1</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4004</span>, <span class="string">"手机号或密码不正确"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="/2021/06/18/beego-zhu-ce-deng-lu/6.png" alt="description"></p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/06/18/beego-shi-pin-lie-biao-ye/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/06/18/beego-shi-pin-lie-biao-ye/" class="post-title-link" itemprop="url">beego视频列表页</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-06-17 16:21:41" itemprop="dateCreated datePublished" datetime="2021-06-17T16:21:41Z">2021-06-17</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-06-20 10:11:53" itemprop="dateModified" datetime="2021-06-20T10:11:53Z">2021-06-20</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/beego/" itemprop="url" rel="index"><span itemprop="name">beego</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><code>controllers\base.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> controllers</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"demo/models"</span></span><br><span class="line"></span><br><span class="line">    beego <span class="string">"github.com/beego/beego/v2/server/web"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> BaseController <span class="keyword">struct</span> {</span><br><span class="line">    beego.Controller</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>routers\default.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">init</span><span class="params">()</span></span> {</span><br><span class="line">    web.Include(&amp;controllers.BaseController{})</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="获取频道下地区"><a href="#获取频道下地区" class="headerlink" title="获取频道下地区"></a>获取频道下地区</h3><p>接口地址：<code>/channel/region</code></p>
+<p>接受参数和返回信息</p>
+<p>接收参数为：channelId（频道ID，1=动漫）<br>返回信息：<br>id = ID<br>name = 名称</p>
+<p>业务逻辑：获取channel_region表中channelId=接收参数和status=1的数据<br><code>models\base.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Region <span class="keyword">struct</span> {</span><br><span class="line">    Id   <span class="keyword">int</span></span><br><span class="line">    Name <span class="keyword">string</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">GetChannelRegion</span><span class="params">(channelId <span class="keyword">int</span>)</span> <span class="params">(<span class="keyword">int64</span>, []Region, error)</span></span> {</span><br><span class="line">    <span class="comment">// 获取频道下地区</span></span><br><span class="line">    o := orm.NewOrm()</span><br><span class="line">    <span class="keyword">var</span> regions []Region</span><br><span class="line">    num, err := o.Raw(<span class="string">"SELECT id,name FROM channel_region WHERE status=1 AND channel_id=? ORDER BY sort DESC"</span>, channelId).QueryRows(&amp;regions)</span><br><span class="line">    <span class="keyword">return</span> num, regions, err</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>controllers\base.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 根据频道下地区ID获取频道地区推荐视频列表</span></span><br><span class="line"><span class="comment">// @router /channel/region [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *BaseController)</span> <span class="title">ChannelRegion</span><span class="params">()</span></span> {</span><br><span class="line">    channelId, _ := this.GetInt(<span class="string">"channelId"</span>)</span><br><span class="line">    <span class="keyword">if</span> channelId == <span class="number">0</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4001</span>, <span class="string">"必须指定频道"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    num, regions, err := models.GetChannelRegion(channelId)</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnSuccess(<span class="number">0</span>, <span class="string">"success"</span>, regions, num)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4004</span>, <span class="string">"没有相关内容"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="/2021/06/18/beego-shi-pin-lie-biao-ye/1.png" alt="description"></p>
+<h3 id="获取频道下类型"><a href="#获取频道下类型" class="headerlink" title="获取频道下类型"></a>获取频道下类型</h3><p>接口地址：</p>
+<p>/channel/type</p>
+<p>接受参数和返回信息</p>
+<p>接收参数为：channelId（频道ID，1=动漫）<br>返回信息：<br>id = ID<br>name = 名称</p>
+<p>业务逻辑：获取channel_type表中channelId=接收参数和status=1的数据</p>
+<p><code>models\base.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Type <span class="keyword">struct</span> {</span><br><span class="line">    Id   <span class="keyword">int</span></span><br><span class="line">    Name <span class="keyword">string</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">GetChannelType</span><span class="params">(channelId <span class="keyword">int</span>)</span> <span class="params">(<span class="keyword">int64</span>, []Type, error)</span></span> {</span><br><span class="line">    <span class="comment">// 获取频道下类型</span></span><br><span class="line">    o := orm.NewOrm()</span><br><span class="line">    <span class="keyword">var</span> types []Type</span><br><span class="line">    num, err := o.Raw(<span class="string">"SELECT id,name FROM channel_type WHERE status=1 AND channel_id=? ORDER BY sort DESC"</span>, channelId).QueryRows(&amp;types)</span><br><span class="line">    <span class="keyword">return</span> num, types, err</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 根据频道下类型ID获取频道类型推荐视频列表</span></span><br><span class="line"><span class="comment">// @router /channel/type [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *BaseController)</span> <span class="title">ChannelType</span><span class="params">()</span></span> {</span><br><span class="line">    channelId, _ := this.GetInt(<span class="string">"channelId"</span>)</span><br><span class="line">    <span class="keyword">if</span> channelId == <span class="number">0</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4001</span>, <span class="string">"必须指定频道"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    num, types, err := models.GetChannelType(channelId)</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnSuccess(<span class="number">0</span>, <span class="string">"success"</span>, types, num)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4004</span>, <span class="string">"没有相关内容"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="/2021/06/18/beego-shi-pin-lie-biao-ye/2.png" alt="description"></p>
+<h3 id="获取视频列表"><a href="#获取视频列表" class="headerlink" title="获取视频列表"></a>获取视频列表</h3><p>接口地址：</p>
+<p>/channel/video</p>
+<p>接受参数和返回信息</p>
+<p>接收参数为：<br>channelId（频道ID，1=动漫）<br>regionId（地区ID） typeId（分类ID） end（是否完结） sort（排序方式） offset（起始条数） limit（每页条数）<br>返回信息：<br>id = 视频ID<br>title = 标题<br>sub_title = 副标题<br>img = 竖版图片地址<br>img1 = 横版图片地址<br>add_time = 添加时间<br>episodes_count = 剧集集数<br>is_end = 是否完结<br>业务逻辑：<br>获取video表中数据<br>channelId=接收参数（必填项）<br>status=1<br>regionId、typeId（根据是否传值，增加筛选条件）<br>end（n=未完结，y=已完结）<br>sort（默认时间倒序，episodesUpdateTime=剧集更新时间倒序，comment=评论数倒序）</p>
+<p><code>models\base.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 频道下根据不同条件和排序方式获取视频信息</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">GetChannelVideoList</span><span class="params">(channelId <span class="keyword">int</span>, regionId <span class="keyword">int</span>, typeId <span class="keyword">int</span>, end <span class="keyword">string</span>, sort <span class="keyword">string</span>, offset <span class="keyword">int</span>, limit <span class="keyword">int</span>)</span> <span class="params">(<span class="keyword">int64</span>, []orm.Params, error)</span></span> {</span><br><span class="line">    o := orm.NewOrm()</span><br><span class="line">    <span class="keyword">var</span> videos []orm.Params</span><br><span class="line"></span><br><span class="line">    qs := o.QueryTable(<span class="string">"video"</span>)</span><br><span class="line">    qs = qs.Filter(<span class="string">"channel_id"</span>, channelId)</span><br><span class="line">    qs = qs.Filter(<span class="string">"status"</span>, <span class="number">1</span>)</span><br><span class="line">    <span class="keyword">if</span> regionId &gt; <span class="number">0</span> {</span><br><span class="line">        qs = qs.Filter(<span class="string">"region_id"</span>, regionId)</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">if</span> typeId &gt; <span class="number">0</span> {</span><br><span class="line">        qs = qs.Filter(<span class="string">"type_id"</span>, typeId)</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">if</span> end == <span class="string">"n"</span> {</span><br><span class="line">        qs = qs.Filter(<span class="string">"is_end"</span>, <span class="number">0</span>)</span><br><span class="line">    } <span class="keyword">else</span> <span class="keyword">if</span> end == <span class="string">"y"</span> {</span><br><span class="line">        qs = qs.Filter(<span class="string">"is_end"</span>, <span class="number">1</span>)</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">if</span> sort == <span class="string">"episodesUpdateTime"</span> {</span><br><span class="line">        qs = qs.OrderBy(<span class="string">"-episodes_update_time"</span>)</span><br><span class="line">    } <span class="keyword">else</span> <span class="keyword">if</span> sort == <span class="string">"comment"</span> {</span><br><span class="line">        qs = qs.OrderBy(<span class="string">"-comment"</span>)</span><br><span class="line">    } <span class="keyword">else</span> <span class="keyword">if</span> sort == <span class="string">"addTime"</span> {</span><br><span class="line">        qs = qs.OrderBy(<span class="string">"-add_time"</span>)</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        qs = qs.OrderBy(<span class="string">"-add_time"</span>)</span><br><span class="line">    }</span><br><span class="line">    nums, _ := qs.Values(&amp;videos, <span class="string">"id"</span>, <span class="string">"title"</span>, <span class="string">"sub_title"</span>, <span class="string">"add_time"</span>, <span class="string">"img"</span>, <span class="string">"img1"</span>, <span class="string">"episodes_count"</span>, <span class="string">"is_end"</span>)</span><br><span class="line">    qs = qs.Limit(limit, offset)</span><br><span class="line">    _, err := qs.Values(&amp;videos, <span class="string">"id"</span>, <span class="string">"title"</span>, <span class="string">"sub_title"</span>, <span class="string">"add_time"</span>, <span class="string">"img"</span>, <span class="string">"img1"</span>, <span class="string">"episodes_count"</span>, <span class="string">"is_end"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> nums, videos, err</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 频道页，根据接收到的参数获取视频列表</span></span><br><span class="line"><span class="comment">// @router /channel/video [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *VideoController)</span> <span class="title">ChannelVideo</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="comment">// 获取频道ID</span></span><br><span class="line">    channelId, _ := this.GetInt(<span class="string">"channelId"</span>)</span><br><span class="line">    <span class="comment">// 获取频道地区ID</span></span><br><span class="line">    regionId, _ := this.GetInt(<span class="string">"regionId"</span>)</span><br><span class="line">    <span class="comment">// 获取频道类型ID</span></span><br><span class="line">    typeId, _ := this.GetInt(<span class="string">"typeId"</span>)</span><br><span class="line">    <span class="comment">// 获取状态</span></span><br><span class="line">    end := this.GetString(<span class="string">"end"</span>)</span><br><span class="line">    <span class="comment">// 获取排序</span></span><br><span class="line">    sort := this.GetString(<span class="string">"sort"</span>)</span><br><span class="line">    <span class="comment">// 获取页码信息</span></span><br><span class="line">    limit, _ := this.GetInt(<span class="string">"limit"</span>)</span><br><span class="line">    <span class="comment">// 从多少页开始获取信息</span></span><br><span class="line">    offset, _ := this.GetInt(<span class="string">"offset"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> channelId == <span class="number">0</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4001</span>, <span class="string">"必须指定频道"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> limit == <span class="number">0</span> {</span><br><span class="line">        limit = <span class="number">12</span></span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    num, videos, err := models.GetChannelVideoList(channelId, regionId, typeId, end, sort, offset, limit)</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnSuccess(<span class="number">0</span>, <span class="string">"success"</span>, videos, num)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4004</span>, <span class="string">"没有相关内容"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="/2021/06/18/beego-shi-pin-lie-biao-ye/3.png" alt="description"></p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1113,362 +1374,6 @@
 <figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[root@VM-0-9-centos order_srv]<span class="comment"># unzip install.zip</span></span><br><span class="line">Archive:  install.zip</span><br><span class="line">  inflating: install/README.md</span><br><span class="line">   creating: install/conf/</span><br><span class="line">  inflating: install/conf/broker.conf</span><br><span class="line">  inflating: install/docker-compose.yml</span><br><span class="line">[root@VM-0-9-centos order_srv]<span class="comment"># ls</span></span><br><span class="line">install  install.zip</span><br><span class="line">[root@VM-0-9-centos order_srv]<span class="comment"># cd install/</span></span><br><span class="line">[root@VM-0-9-centos install]<span class="comment"># ls</span></span><br><span class="line">conf  docker-compose.yml  README.md</span><br></pre></td></tr></tbody></table></figure>
 
 <p><img src="/2021/06/07/pycharm-shang-chuan-wen-jian-dao-linux/1.png" alt="description"></p>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/06/05/drf-fan-xu-lie-hua-yan-zheng/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/06/05/drf-fan-xu-lie-hua-yan-zheng/" class="post-title-link" itemprop="url">drf反序列化验证</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-06-04 16:21:41" itemprop="dateCreated datePublished" datetime="2021-06-04T16:21:41Z">2021-06-04</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-06-23 02:09:32" itemprop="dateModified" datetime="2021-06-23T02:09:32Z">2021-06-23</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <ul>
-<li>验证处理：反序列化，前端post传递过来的dict类型数据放在<code>request.data</code> 的时候，要把他转换成模型类实例进行保存到数据表，对前端提交的数据进行验证</li>
-</ul>
-<h3 id="字段选项验证"><a href="#字段选项验证" class="headerlink" title="字段选项验证"></a>字段选项验证</h3><p>在定义序列化器时，指明每个字段的序列化类型和选项参数，本身就是一种验证行为。<br><code>required</code>、<code>max_length</code>、<code>min_length</code> <code>allow_blank</code>是否允许为空<br><code>trim_whitespace</code>是否截断空白字符<br><code>max_value</code> 最小值<br><code>min_value</code> 最大值等验证方式，<br><code>default</code></p>
-<h3 id="在序列化器或字段类上编写自定义显式验证方法，"><a href="#在序列化器或字段类上编写自定义显式验证方法，" class="headerlink" title="在序列化器或字段类上编写自定义显式验证方法，"></a>在序列化器或字段类上编写自定义显式验证方法，</h3><ul>
-<li><p>自定义单一字段验证，函数名必须：<code>validate_&lt;field_name&gt;</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">validate_code</span>(<span class="params">self, code</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    自定义单一字段验证，函数名必须：validate + _ + 验证字段名</span></span><br><span class="line"><span class="string">    验证验证码</span></span><br><span class="line"><span class="string">    形参名随便写</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="comment"># 用户以post方式提交注册信息，前端post的数据都保存在initial_data里面</span></span><br><span class="line">    <span class="comment"># username就是用户注册的手机号，</span></span><br><span class="line">    <span class="comment"># 验证码按添加时间倒序排序，为了后面验证过期，错误等</span></span><br><span class="line">    verify_records = VerifyCode.objects.filter(mobile=self.initial_data[<span class="string">"username"</span>]).order_by(<span class="string">"-add_time"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> verify_records:  <span class="comment"># 验证验证码是否存在</span></span><br><span class="line">        <span class="comment"># 最近的一个验证码</span></span><br><span class="line">        last_record = verify_records[<span class="number">0</span>]</span><br><span class="line">        <span class="comment"># 获取5分钟以前的时间</span></span><br><span class="line">        five_mintes_ago = datetime.now() - timedelta(hours=<span class="number">0</span>, minutes=<span class="number">5</span>, seconds=<span class="number">0</span>)</span><br><span class="line">        <span class="keyword">if</span> five_mintes_ago &gt; last_record.add_time:</span><br><span class="line">            <span class="keyword">raise</span> serializers.ValidationError(<span class="string">"验证码过期"</span>)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> last_record.code != code:</span><br><span class="line">            <span class="keyword">raise</span> serializers.ValidationError(<span class="string">"验证码错误"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">raise</span> serializers.ValidationError(<span class="string">"验证码错误"</span>)</span><br><span class="line">    <span class="keyword">return</span> code</span><br></pre></td></tr></tbody></table></figure>
-</li>
-<li><p>多个字段同时验证，函数名必须：<code>validate(self, attrs):</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">validate</span>(<span class="params">self, attrs</span>):</span></span><br><span class="line">  <span class="string">"""</span></span><br><span class="line"><span class="string">  多个字段验证，函数名必须：validate</span></span><br><span class="line"><span class="string">  :param attrs: 所有字段验证合法之后返回的所有字段的dict，形参名随便写</span></span><br><span class="line"><span class="string">  :return:</span></span><br><span class="line"><span class="string">  """</span></span><br><span class="line">  <span class="comment"># 人为设定前端传递到后端的手机号数据变量名为username而非mobile</span></span><br><span class="line">  <span class="comment"># 把`username`的值赋值给`mobile`的值。</span></span><br><span class="line">  attrs[<span class="string">"mobile"</span>] = attrs[<span class="string">"username"</span>]</span><br><span class="line">  <span class="comment"># code字段只是为了验证临时生成的、不需要保存到用户数据表中，因此在验证之后需要删除</span></span><br><span class="line">  <span class="keyword">del</span> attrs[<span class="string">"code"</span>]</span><br><span class="line">  <span class="keyword">return</span> attrs</span><br></pre></td></tr></tbody></table></figure>
-
-</li>
-</ul>
-<h3 id="在视图中验证"><a href="#在视图中验证" class="headerlink" title="在视图中验证"></a>在视图中验证</h3><p>生成序列化器对象，<code>serializer=UserDetailSerializer()</code>或者<code>get_serializer_class</code>的<code>return get_serializer_class</code><br>调用<code>serializer.is_valid()</code>验证成功返回True，否则返回False。在验证失败时抛出异常serializers.ValidationError，可以通过传递raise_exception=True参数开启，REST framework接收到此异常，会向前端返回HTTP 400 Bad Request响应。<br>调用<code>serializer.errors</code> 查看验证状态信息，如果验证成功，返回一个空字典，失败，返回一个有字段和字段的错误的字典<br>调用<code>serializer.validated_data</code>获取验证后的字段dict类型数据</p>
-<p>We now use single-step object creation, like so:</p>
-<ol>
-<li>Validating the data makes the cleaned data available as <code>serializer.validated_data</code>.</li>
-<li>Calling <code>serializer.save()</code> then saves and returns the new object instance.</li>
-</ol>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># viewset</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserViewSet</span>(<span class="params">CreateModelMixin</span>):</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    create:</span></span><br><span class="line"><span class="string">        创建添加一用户，用户注册成功携带token登录</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    queryset = User.objects.filter(is_delete=<span class="literal">False</span>)</span><br><span class="line">    <span class="comment"># serializer_class = UserSerializer  # 改用get_serializer_class</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">create</span>(<span class="params">self, request, *args, **kwargs</span>):</span></span><br><span class="line">        <span class="string">"""注册后自动登录需要携带token"""</span></span><br><span class="line">        serializer = self.get_serializer(data=request.data)</span><br><span class="line">        serializer.is_valid(raise_exception=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_serializer_class</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        动态选择用哪个序列化方式</span></span><br><span class="line"><span class="string">        1.UserSerializer（用户注册），只返回username和mobile，会员中心页面需要显示更多字段，</span></span><br><span class="line"><span class="string">        所以要创建一个UserDetailSerializer</span></span><br><span class="line"><span class="string">        2.问题又来了，如果注册的使用userdetailSerializer，又会导致验证失败，所以需要动态的使用serializer</span></span><br><span class="line"><span class="string">        :return:</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="keyword">if</span> self.action == <span class="string">"retrieve"</span>:</span><br><span class="line">            <span class="keyword">return</span> UserDetailSerializer</span><br><span class="line">        <span class="keyword">elif</span> self.action == <span class="string">"create"</span>:</span><br><span class="line">            <span class="keyword">return</span> UserSerializer</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> UserDetailSerializer</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># view</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Books</span>(<span class="params">View</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">post</span>(<span class="params">self, request</span>):</span></span><br><span class="line">        <span class="comment"># 1、获取前端数据</span></span><br><span class="line">        data = request.body.decode()</span><br><span class="line">        data_dict = json.loads(data)</span><br><span class="line">        <span class="comment"># 2、验证数据</span></span><br><span class="line">        ser = BookSerialzier(data=data_dict)</span><br><span class="line">        ser.is_valid()  <span class="comment"># 验证方法</span></span><br></pre></td></tr></tbody></table></figure>
-
-<h3 id="DRF还提供了专业的验证器validators"><a href="#DRF还提供了专业的验证器validators" class="headerlink" title="DRF还提供了专业的验证器validators"></a>DRF还提供了专业的验证器<code>validators</code></h3><p><a target="_blank" rel="noopener" href="https://www.django-rest-framework.org/api-guide/validators/">https://www.django-rest-framework.org/api-guide/validators/</a></p>
-<p><a target="_blank" rel="noopener" href="https://www.django-rest-framework.org/api-guide/validators/#uniquevalidator">https://www.django-rest-framework.org/api-guide/validators/#uniquevalidator</a></p>
-<p>Validation in REST framework</p>
-<p>Validation in Django REST framework serializers is handled a little differently to how validation works in Django’s ModelForm class.</p>
-<p>With ModelForm the validation is performed partially on the form, and partially on the model instance. With REST framework the validation is performed entirely on the serializer class. This is advantageous for the following reasons:</p>
-<p>It introduces a proper separation of concerns, making your code behavior more obvious.<br>It is easy to switch between using shortcut ModelSerializer classes and using explicit Serializer classes. Any validation behavior being used for ModelSerializer is simple to replicate.<br>Printing the repr of a serializer instance will show you exactly what validation rules it applies. There’s no extra hidden validation behavior being called on the model instance.<br>When you’re using ModelSerializer all of this is handled automatically for you. If you want to drop down to using Serializer classes instead, then you need to define the validation rules explicitly.</p>
-<ul>
-<li><p><code>UniqueValidator</code><br>This validator can be used to enforce the <code>unique=True</code> constraint on model fields. It takes a single required argument, and an optional <code>messages</code> argument:对模型字段强制<code>unique=True</code>约束。它接受一个必需的参数和一个可选的消息参数:</p>
-<ul>
-<li><p><code>queryset</code> required - This is the queryset against which uniqueness should be enforced.必须的，这是应该强制惟一性的queryset</p>
-</li>
-<li><p><code>message</code> - The error message that should be used when validation fails.验证失败时应该使用的错误消息。</p>
-</li>
-<li><p><code>lookup</code> - The lookup used to find an existing instance with the value being validated. Defaults to ‘exact’.<br>用于查找正在验证值的现有实例。默认为“精确”。</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework.validators <span class="keyword">import</span> UniqueValidator</span><br><span class="line"></span><br><span class="line">slug = SlugField(</span><br><span class="line">    max_length=<span class="number">100</span>,</span><br><span class="line">    validators=[UniqueValidator(queryset=BlogPost.objects.all())]</span><br><span class="line">)</span><br></pre></td></tr></tbody></table></figure>
-</li>
-</ul>
-</li>
-<li><p><code>UniqueTogetherValidator</code><br>This validator can be used to enforce <code>unique_together</code> constraints on model instances. 验证器可用于对模型实例强制<code>unique_together</code>约束。<br>It has two required arguments, and a single optional <code>messages</code> argument:它有两个必需的参数和一个可选的消息参数:</p>
-<ul>
-<li><p><code>queryset</code> required - This is the queryset against which uniqueness should be enforced.强制惟一性的queryset</p>
-</li>
-<li><p><code>fields</code> required - A list or tuple of field names which should make a unique set. These must exist as fields on the serializer class.段名的列表或元组，应该构成一个惟一的集合。这些字段必须作为字段存在于序列化器类中。</p>
-</li>
-<li><p><code>message</code> - The error message that should be used when validation fails.验证失败时应该使用的错误消息</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework.validators <span class="keyword">import</span> UniqueTogetherValidator</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ExampleSerializer</span>(<span class="params">serializers.Serializer</span>):</span></span><br><span class="line">    <span class="comment"># ...</span></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        <span class="comment"># ToDo items belong to a parent list, and have an ordering defined</span></span><br><span class="line">        <span class="comment"># by the 'position' field. No two items in a given list may share the same position.</span></span><br><span class="line">        validators = [</span><br><span class="line">            UniqueTogetherValidator(</span><br><span class="line">                queryset=ToDoItem.objects.all(),</span><br><span class="line">                fields=[<span class="string">'list'</span>, <span class="string">'position'</span>]</span><br><span class="line">            )</span><br><span class="line">        ]</span><br></pre></td></tr></tbody></table></figure>
-
-</li>
-</ul>
-</li>
-</ul>
-<p>Note: The <code>UniqueTogetherValidator</code> class always imposes an implicit constraint that all the fields it applies to are always treated as required. Fields with <code>default</code> values are an exception to this as they always supply a value even when omitted from user input.<br>注意：<code>UniqueTogetherValidation</code>类总是施加一个隐式的约束，它所应用的所有字段总是按需要处理。具有默认值的字段是一个例外，因为它们总是提供一个值，即使在用户输入中省略了这个值。</p>
-<p>以上<code>validators</code>不是作用域某个字段之上了，需要写在<code>Meta</code>中，因为<code>UniqueTogetherValidator</code>是作用域两个或两个字段以上的，不是针对一个字段，所以需要写在这。</p>
-<ul>
-<li><code>UniqueForDateValidator</code></li>
-</ul>
-<h3 id="Advanced-field-defaults"><a href="#Advanced-field-defaults" class="headerlink" title="Advanced field defaults"></a><code>Advanced field defaults</code></h3><p><a target="_blank" rel="noopener" href="https://www.django-rest-framework.org/api-guide/validators/#advanced-field-defaults">https://www.django-rest-framework.org/api-guide/validators/#advanced-field-defaults</a></p>
-<p>Validators that are applied across multiple fields in the serializer can sometimes require a field input that should not be provided by the API client, but that is available as input to the validator.<br>在序列化器中跨多个字段应用的验证器有时可能需要一个字段输入，这个字段不应该由API客户机提供，但是可以作为验证器的输入。</p>
-<p>Two patterns that you may want to use for this sort of validation include:<br>可能想要使用两种模式来进行这种验证:</p>
-<ul>
-<li><p>Using <code>HiddenField</code>. This field will be present in <code>validated_data</code> but will not be used in the serializer output representation.<br>使用<code>HiddenField</code>隐藏字段，该字段将出现在<code>validated_data</code>中，但序列化输出时不会显示出来</p>
-</li>
-<li><p>Using a standard field with <code>read_only=True</code>, but that also includes a <code>default=…</code> argument. This field will be used in the serializer output representation, but cannot be set directly by the user.<br>使用带有<code>read_only=True</code>的标准字段，但该字段也包含一个<code>default=…</code>参数。此字段将在序列化器输出表示中使用，但不能由用户直接设置。</p>
-</li>
-</ul>
-<p>REST framework includes a couple of defaults that may be useful in this context.REST框架包含一些缺省值，这些缺省值在此上下文中可能很有用。</p>
-<h4 id="CurrentUserDefault"><a href="#CurrentUserDefault" class="headerlink" title="CurrentUserDefault"></a><code>CurrentUserDefault</code></h4><p>A default class that can be used to represent the current user. In order to use this,<br>the ‘request’ must have been provided as part of the context dictionary when instantiating the serializer.<br>可用于表示当前用户的默认类。为了使用它，在实例化序列化器时，request必须作为上下文字典的一部分提供</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BookInfoSerializer</span>(<span class="params">serializers.Serializer</span>):</span></span><br><span class="line">    <span class="string">"""图书数据序列化器"""</span></span><br><span class="line">    id = serializers.IntegerField(label=<span class="string">'ID'</span>, read_only=<span class="literal">True</span>)</span><br><span class="line">    btitle = serializers.CharField(label=<span class="string">'名称'</span>, max_length=<span class="number">20</span>)</span><br><span class="line">    bpub_date = serializers.DateField(label=<span class="string">'发布日期'</span>, required=<span class="literal">False</span>)</span><br><span class="line">    bread = serializers.IntegerField(label=<span class="string">'阅读量'</span>, required=<span class="literal">False</span>)</span><br><span class="line">    bcomment = serializers.IntegerField(label=<span class="string">'评论量'</span>, required=<span class="literal">False</span>)</span><br><span class="line">    image = serializers.ImageField(label=<span class="string">'图片'</span>, required=<span class="literal">False</span>)</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> booktest.serializers <span class="keyword">import</span> BookInfoSerializer</span><br><span class="line">data = {<span class="string">'bpub_date'</span>: <span class="number">123</span>}</span><br><span class="line">serializer = BookInfoSerializer(data=data)</span><br><span class="line">serializer.is_valid()  <span class="comment"># 返回False</span></span><br><span class="line">serializer.errors</span><br><span class="line"><span class="comment"># {'btitle': [ErrorDetail(string='This field is required.', code='required')], 'bpub_date': [ErrorDetail(string='Date has wrong format. Use one of these formats instead: YYYY[-MM[-DD]].', code='invalid')]}</span></span><br><span class="line">serializer.validated_data  <span class="comment"># {}</span></span><br><span class="line"></span><br><span class="line">data = {<span class="string">'btitle'</span>: <span class="string">'python'</span>}</span><br><span class="line">serializer = BookInfoSerializer(data=data)</span><br><span class="line">serializer.is_valid()  <span class="comment"># True</span></span><br><span class="line">serializer.errors  <span class="comment"># {}</span></span><br><span class="line">serializer.validated_data  <span class="comment">#  OrderedDict([('btitle', 'python')])</span></span><br></pre></td></tr></tbody></table></figure><script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/05/31/beego/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/05/31/beego/" class="post-title-link" itemprop="url">beego</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-05-30 16:21:41" itemprop="dateCreated datePublished" datetime="2021-05-30T16:21:41Z">2021-05-30</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-07-08 05:53:15" itemprop="dateModified" datetime="2021-07-08T05:53:15Z">2021-07-08</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/beego/" itemprop="url" rel="index"><span itemprop="name">beego</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>不要用clash的terminal</p>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">go get -u github.com/beego/beego/v2</span><br><span class="line">go get -u github.com/beego/bee/v2</span><br><span class="line">bee version</span><br></pre></td></tr></tbody></table></figure>
-
-<p>Bee主要命令<br><code>bee new project_name</code>新建一个 Web 项目</p>
-<p>bee工具创建的项目结构<br>conf  : 保存了项目的一些配置信息<br>controllers : 保存MVC中的控制器<br>models : 保存MVC中的模型<br>views 保存MVC中的视图<br>routers : 保存了项目的路由<br>static : 保存了项目中的静态资源 images .css .js<br>tests : 保存测试用例<br>main.go : 项目的入口文件</p>
-<p><code>bee api apiproject</code>创建 API 应用的，和 Web 项目相比，少了 static 和 views 目录，多了一个 test 模块，用来做单元测试的</p>
-<p><code>bee run</code> 运行监控 beego 的项目</p>
-<p><code>bee pack</code> 发布应用的时候打包，会把项目打包成 zip 包，这样我们部署的时候直接把打包之后的项目上传，解压就可以部署</p>
-<p>注意：<code>bee pack -be GOOS=linux</code><br>MAC下打的包是不能再linux执行的，需要制定参数</p>
-<h3 id="Beego项目的执行流程"><a href="#Beego项目的执行流程" class="headerlink" title="Beego项目的执行流程"></a>Beego项目的执行流程</h3><p>5.1客户端发起请求<br><a target="_blank" rel="noopener" href="http://127.0.0.1:8080/">http://127.0.0.1:8080/</a><br>5.2执行项目的路由相关代码, 找到处理对应请求的控制器<br>beego.Router(“/“, &amp;controllers.MainController{})<br>5.3执行控制器对应的方法<br>默认会根据请求类型找到对应的请求方法Get/Post方法<br>5.4在对应的方法中处理业务逻辑, 返回对应的界面<br>c.TplName = “index.tpl” // 返回对应的界面<br>5.5客户端显示对应的界面</p>
-<p>先把入门看了<br><a target="_blank" rel="noopener" href="https://beego.me/quickstart">https://beego.me/quickstart</a></p>
-<p>命令行进行编译并执行</p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"github.com/beego/beego/v2/server/web"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> MainController <span class="keyword">struct</span> {</span><br><span class="line">    web.Controller</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *MainController)</span> <span class="title">Get</span><span class="params">()</span></span> {</span><br><span class="line">    this.Ctx.WriteString(<span class="string">"hello world"</span>)</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    web.Router(<span class="string">"/"</span>, &amp;MainController{})</span><br><span class="line">    web.Run()</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ go build -o hello hello.go</span><br><span class="line">$ ./hello</span><br></pre></td></tr></tbody></table></figure>
-
-<ol>
-<li><p>首先我们导入了包 <code>github.com/beego/beego/v2/server/web</code>。我们知道 Go 语言里面被导入的包会按照<strong>深度优先</strong>的顺序去执行导入包的初始化（变量和 init 函数，更多详情），beego 包中会初始化一个 BeeAPP 的应用和一些参数。</p>
-</li>
-<li><p>定义 Controller，这里我们定义了一个 <code>struct</code> 为 M<code>ainController</code>，充分利用了 Go 语言的组合的概念，匿名包含了 <code>web.Controller</code>，这样我们的 <code>MainController</code> 就拥有了 <code>web.Controller</code> 的所有方法。</p>
-</li>
-<li><p>定义 RESTful 方法，通过匿名组合之后，其实目前的 <code>MainController</code> 已经拥有了 <code>Get</code>、<code>Post</code>、<code>Delete</code>、<code>Put</code> 等方法，这些方法是分别用来对应用户请求的 Method 函数，<br>如果用户发起的是 POST 请求，那么就执行 Post 函数。<br>所以这里我们定义了 <code>MainController</code> 的 <code>Get</code> 方法用来重写继承的 <code>Get</code> 函数，这样当用户发起 GET 请求的时候就会执行该函数。</p>
-</li>
-<li><p>定义 <code>main</code> 函数，所有的 Go 应用程序和 C 语言一样都是 main 函数作为入口，所以我们这里定义了我们应用的入口。</p>
-</li>
-<li><p>Router 注册路由，路由就是告诉 beego，当用户来请求的时候，该如何去调用相应的 Controller，这里我们注册了请求 <code>/</code> 的时候，请求到 <code>MainController</code>。这里我们需要知道，Router 函数的两个参数函数，第一个是路径，第二个是 Controller 的指针。</p>
-</li>
-<li><p>Run 应用，最后一步就是把在步骤 1 中初始化的 BeeApp 开启起来，其实就是内部监听了 8080 端口：Go 默认情况会监听你本机所有的 IP 上面的 8080 端口。</p>
-</li>
-</ol>
-<p><code>URLMapping</code> 新增加的函数，用户如果没有进行注册，那么就会通过反射来执行对应的函数，如果注册了就会通过 interface 来进行执行函数，性能上面会提升很多</p>
-<h3 id="路由设置"><a href="#路由设置" class="headerlink" title="路由设置"></a>路由设置</h3><p>v1是<code>beego.Router</code><br>v2是<code>web.Router</code></p>
-<p>有两种方式：</p>
-<h4 id="在router-go中配置"><a href="#在router-go中配置" class="headerlink" title="在router.go中配置"></a>在<code>router.go</code>中配置</h4><p><code>default.go</code></p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 浏览器输出Hello World</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *MainController)</span> <span class="title">GetHello</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="keyword">var</span> (</span><br><span class="line">        title <span class="keyword">string</span></span><br><span class="line">    )</span><br><span class="line">    title = <span class="string">"Hello world"</span></span><br><span class="line">    c.Ctx.WriteString(title)</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>router.go</code></p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">init</span><span class="params">()</span></span> {</span><br><span class="line">    web.Router(<span class="string">"/hello"</span>, &amp;controllers.MainController{}, <span class="string">"get:GetHello"</span>)</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p><img src="/2021/05/31/beego/1.png" alt="description"></p>
-<h4 id="在router-go中include引入，直接在函数上方配置规则"><a href="#在router-go中include引入，直接在函数上方配置规则" class="headerlink" title="在router.go中include引入，直接在函数上方配置规则"></a>在<code>router.go</code>中<code>include</code>引入，直接在函数上方配置规则</h4><p><code>demo.go</code></p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 输出Hello World!</span></span><br><span class="line"><span class="comment">// @router /demo/hello [get]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *DemoController)</span> <span class="title">GetHello</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="keyword">var</span> (</span><br><span class="line">        title <span class="keyword">string</span></span><br><span class="line">    )</span><br><span class="line">    title = <span class="string">"Hello World!"</span></span><br><span class="line">    this.Ctx.WriteString(title)</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>router.go</code>注册路由</p>
-<p>controller 的 method 方法上面须有 router 注释（// @router），</p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">init</span><span class="params">()</span></span> {</span><br><span class="line">    web.Include(&amp;controllers.DemoController{})</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p><img src="/2021/05/31/beego/2.png" alt="description"></p>
-<h3 id="MVC模式"><a href="#MVC模式" class="headerlink" title="MVC模式"></a>MVC模式</h3><p>在目录下有 controllers models views 文件夹分别存放controller文件，model文件和模板文件。<br>后面项目中用到的文件都会分别在这三个文件夹中</p>
-<p>过滤器，<br>进行安全验证，访问用户中心的时候，<br>进行是否登录的判断可以在过滤器中，<br>也可以实现屏蔽IP的功能，<br>屏蔽黑名单的功能等等，对项目有整体的规则时，<br>都可以在过滤器中实现，不用在每个函数中来实现了</p>
-<p>过滤器是通过<code>beego.insertfilter(pattern string, positon int, filter FilterFunc, skip ...bool)</code>函数来实现的</p>
-<p><code>router.go</code></p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">init</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="comment">// 这里是屏蔽规则，包含demo/的url都走过滤规则屏蔽；</span></span><br><span class="line">    <span class="comment">// 第二个参数是BeforeRouter，在寻找加载路由之前</span></span><br><span class="line">    <span class="comment">// 第三个参数是要执行的函数名。</span></span><br><span class="line">    <span class="keyword">var</span> FilterDemo = <span class="function"><span class="keyword">func</span><span class="params">(ctx *context.Context)</span></span> {</span><br><span class="line">        <span class="keyword">var</span> (</span><br><span class="line">            title <span class="keyword">string</span></span><br><span class="line">        )</span><br><span class="line">        title = <span class="string">"禁止访问"</span></span><br><span class="line">        ctx.WriteString(title)</span><br><span class="line">    }</span><br><span class="line">    web.InsertFilter(<span class="string">"/demo/*"</span>, web.BeforeRouter, FilterDemo)</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p><img src="/2021/05/31/beego/3.png" alt="description"></p>
-<h3 id="配置信息"><a href="#配置信息" class="headerlink" title="配置信息"></a>配置信息</h3><p>beego提供了专门配置文件，配置信息定义在conf文件夹中的app.conf</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">appname = fyouku // 项目名称</span><br><span class="line">httpport = 8098  // 访问端口号</span><br><span class="line">runmode = dev    // 运行环境，下面会根据运行环境加载不同配置</span><br><span class="line"></span><br><span class="line">[dev]  // 开发环境</span><br><span class="line">apiurl = http://127.0.0.1:8099</span><br><span class="line">microApi = http://127.0.0.1:8085</span><br><span class="line">defaultdb = root:123456@(127.0.0.1:3306)/fyouku?charset=utf8</span><br><span class="line">redisdb = 127.0.0.1:6379</span><br><span class="line">rabbitmq = amqp://guest:guest@127.0.0.1:5672/</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[prod]  // 线上环境</span><br><span class="line">apiurl = http://127.0.0.1:8099</span><br><span class="line">microApi = http://127.0.0.1:8085</span><br><span class="line">defaultdb = root:123456@(127.0.0.1:3306)/fyouku?charset=utf8</span><br><span class="line">redisdb = 127.0.0.1:6379</span><br><span class="line">rabbitmq = amqp://guest:guest@127.0.0.1:5672/</span><br></pre></td></tr></tbody></table></figure>
-
-<p>静态文件</p>
-<p>项目中的css、js、img文件都是怎样访问的，bee new创建的项目中有static文件夹，这是beego默认注册的静态文件处理目录</p>
-<figure class="highlight actionscript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">├── <span class="keyword">static</span></span><br><span class="line">    │   ├── css</span><br><span class="line">    │   ├── img</span><br><span class="line">    │   └── js</span><br></pre></td></tr></tbody></table></figure>
-<p>访问地址为：<a target="_blank" rel="noopener" href="http://127.0.0.1:8080/static/js/fyouku.js">http://127.0.0.1:8080/static/js/fyouku.js</a></p>
-<p>也可以通过下面命令来自定义目录</p>
-<figure class="highlight less"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">beego</span><span class="selector-class">.SetStaticPath</span>(<span class="string">"/down1"</span>, <span class="string">"download1"</span>)</span><br></pre></td></tr></tbody></table></figure>
-
-<p>view语法</p>
-<ul>
-<li>统一使用 作为左右标签</li>
-<li><code>.</code> 访问当前位置的上下文</li>
-<li><code>$</code> 引用当前模板根级的上下文</li>
-<li><code>$var</code> 访问创建的变量</li>
-</ul>
-<p>判断语句 <code>if ... else ... end</code></p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">{{if eq .IsEmail 1}}</span><br><span class="line">    &lt;a class="email" href="mailto:{{.Email}}"&gt;{{.Email}}&lt;/a&gt;</span><br><span class="line">{{else}}</span><br><span class="line">    &lt;a class="email" href="#"&gt;不允许访问Email&lt;/a&gt;</span><br><span class="line">{{end}}</span><br></pre></td></tr></tbody></table></figure>
-
-<p>循环语句 range</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">{{range $index,$value := .Pages}}</span><br><span class="line">    {{$index}} - {{$value.Num}} of {{$.Website}}</span><br><span class="line">    &lt;br&gt;</span><br><span class="line">{{end}}</span><br></pre></td></tr></tbody></table></figure>
-
-<p>载入其它模板</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">{{template "head.html" .}}</span><br></pre></td></tr></tbody></table></figure>
-
-<p>指定首页的模板</p>
-<p><code>controllers/default.go</code></p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *MainController)</span> <span class="title">Get</span><span class="params">()</span></span> {</span><br><span class="line">    c.Data[<span class="string">"Website"</span>] = <span class="string">"beego.me"</span></span><br><span class="line">    c.Data[<span class="string">"Email"</span>] = <span class="string">"astaxie@gmail.com"</span></span><br><span class="line">    c.Data[<span class="string">"IsEmail"</span>] = <span class="number">1</span></span><br><span class="line">    c.TplName = <span class="string">"index.tpl"</span></span><br><span class="line">    pages := []<span class="keyword">struct</span> {</span><br><span class="line">        Num <span class="keyword">int</span></span><br><span class="line">    }{{<span class="number">10</span>}, {<span class="number">20</span>}, {<span class="number">30</span>}}</span><br><span class="line">    c.Data[<span class="string">"Pages"</span>] = pages</span><br><span class="line"></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>views/footer.tpl</code></p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;footer&gt;</span><br><span class="line">  &lt;div class="author"&gt;</span><br><span class="line">    demo Official website:</span><br><span class="line">    &lt;a href="http://{{.Website}}"&gt;{{.Website}}&lt;/a&gt; /</span><br><span class="line">    Contact me:</span><br><span class="line">    {{if eq .IsEmail 1}}</span><br><span class="line">      &lt;a class="email" href="mailto:{{.Email}}"&gt;{{.Email}}&lt;/a&gt;</span><br><span class="line">    {{else}}</span><br><span class="line">          &lt;a class="email" href="mailto:{{.Email}}"&gt;禁止显示&lt;/a&gt;</span><br><span class="line">    {{end}}</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/footer&gt;</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>views/index.tpl</code></p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">  &lt;header&gt;</span><br><span class="line">    &lt;h1 class="logo"&gt;Welcome to Beego&lt;/h1&gt;</span><br><span class="line">    &lt;div class="description"&gt;</span><br><span class="line">      Beego is a simple &amp; powerful Go web framework which is inspired by tornado and sinatra.</span><br><span class="line">      {{range $index, $value := .Pages}}</span><br><span class="line">      &lt;br&gt;</span><br><span class="line">      {{$index}} - {{$value.Num}} of {{$.Website}}</span><br><span class="line">      {{end}}</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  &lt;/header&gt;</span><br><span class="line">{{template "footer.tpl" .}}</span><br></pre></td></tr></tbody></table></figure>
-
-<p><img src="/2021/05/31/beego/4.png" alt="description"></p>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {

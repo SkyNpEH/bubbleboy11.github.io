@@ -119,7 +119,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">336</span>
+          <span class="site-state-item-count">338</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -160,6 +160,223 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/xss/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/xss/" class="post-title-link" itemprop="url">XSS(Cross Site Scripting)</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-04-02 12:24:45" itemprop="dateModified" datetime="2021-04-02T12:24:45Z">2021-04-02</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Markdown/" itemprop="url" rel="index"><span itemprop="name">Markdown</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h3 id="XSS-Cross-Site-Scripting-跨站脚本。因为CSS名字被层叠样式表给占用，所以就改成XSS。"><a href="#XSS-Cross-Site-Scripting-跨站脚本。因为CSS名字被层叠样式表给占用，所以就改成XSS。" class="headerlink" title="XSS Cross Site Scripting, 跨站脚本。因为CSS名字被层叠样式表给占用，所以就改成XSS。"></a>XSS Cross Site Scripting, 跨站脚本。因为CSS名字被层叠样式表给占用，所以就改成XSS。</h3><p>实施XSS攻击需要具备两个条件：<br>　　一、需要向web页面注入恶意代码；<br>　　二、这些恶意代码能够被浏览器成功的执行。<br>当我们的用户访问一个站点的时候，在渲染页面的时候，恶意用户将代码植入到提供给其他用户使用的页面中，出现了一些我们没有预期到的脚本的指令，这些指令是恶意的，未经转义的恶意代码输出到其他用户的浏览器被执行，这样就是产生了xss攻击。用户浏览页面的时候嵌入页面中的脚本( js )会被执行，攻击用户。</p>
+<p>为什么能盗取获取用户的信息，比如cookie，删除用户本地的一些东西<br>通过document.cookie把这个Cookie发送到攻击者的服务器上，这样他就能拿到用户的cookie可以想干嘛就干嘛。</p>
+<pre><code>   XSS攻击主要分为两类：反射型(非持久型)，存储型(持久型)。反射型攻击方式就是把可以执行的 js脚本放到URL参数里面。存储型的攻击方式通过评论的这种方式，加载评论的时候把它写入到评论里面，它被后台存储之后，用户再打开的时候就会执行评论里面的脚本。
+
+    (1) .评论框中输入script 代码&lt;script&gt;alert('hello')&lt;/script&gt;, 一段未经转义过的 JS 代码被插入到页面之后，其他用户浏览的时候也会去执行它。
+    如果是黑客它插一段JS代码，把用户cookie的值发送到指定的服务器上，这样他就能拿到用户的cookie值想干嘛就可以干嘛。
+     我们知道HTTP协议它是没有状态，所以很多网站是通过Cookie去识别用户的，一旦黑客获取到你这个cookie就相当于拥有了你的账户就可以随便使用你这个账号了。这是个什么类型的 xss? 这个是把提交的脚本插入到数据库里面，所以这个是存储型的攻击方式。
+
+    (2).有一些后端它是通过URL参数来去获取的，有时候会把脚本放入URL参数里面。如：http://test.com/xss/example.php?name=&lt;script&gt;alert(" hey! ")&lt;/script&gt;，然后通过邮件方式发送给用户，诱导用户去点击，这就是非存储形式的 XSS。
+</code></pre>
+<p>2.XSS利用 js的危害<br>盗用用户 cookie，获取敏感信息<br>利用用户私人账号执行一些违法操作，比如盗取个人或者商业资料，执行一些隐私操作<br>甚至可以在一些访问量很大的网站上实现DDoS攻击</p>
+<p>3.如何防范 XSS？<br>  不要相信用户的任何输入，因为只要是用户的输入都有可能被黑客精心的构造来去做一些不好的事。</p>
+<p>过滤(针对用户的输入和URL中参数)。针对敏感标签<script>、<img>、<a>等把它过滤掉，假如都没有script标签了也就没有办法执行 JS 代码了。</p>
+<p>转义。对常见符号( “&amp;”, “&lt;” and “&gt;”)转义，现在很多模板引擎已经实现自动转义，不需要手动实现这个功能。 (python3 html.escape)</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> html</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>html.escape(<span class="string">&#x27;&lt;script&gt;&#x27;</span>) <span class="comment"># 转义操作</span></span><br><span class="line"><span class="string">&#x27;&amp;lt;script&amp;gt;&#x27;</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>html.unescape(html.escape(<span class="string">&#x27;&lt;script&gt;&#x27;</span>)) <span class="comment"># 反转义操作</span></span><br><span class="line"><span class="string">&#x27;&lt;script&gt;&#x27;</span></span><br></pre></td></tr></table></figure>
+<p>设置HttpOnly 禁止浏览器JS脚本访问和操作 Document.cookie。这个时候也就没办法使用JS脚本搞破坏了。浏览器禁止js 脚本访问和修改 cookie。但是发送给当前域名的请求里依然是有这个 cookie 的，后端可以通过 cookie 里的信息识别用户。</p>
+</script></p><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/ajax/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/ajax/" class="post-title-link" itemprop="url">Ajax</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-05-20 02:52:20" itemprop="dateModified" datetime="2021-05-20T02:52:20Z">2021-05-20</time>
+      </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>AJAX = Asynchronous JavaScript and XML（异步的 JavaScript 和 XML）。<br>一种在无需重新加载整个网页的情况下，能够更新部分网页的技术。</p>
+<ul>
+<li>原生的Ajax</li>
+<li>基于jQuery的Ajax<ul>
+<li>加载内容</li>
+<li>提交表单</li>
+</ul>
+</li>
+</ul>
+<p>Ajax 不是一种新的编程语言，而是一种用于创建更好更快以及交互性更强的Web应用程序的技术。</p>
+<p>在 2005 年，Google 通过其 Google Suggest 使 AJAX 变得流行起来。Google Suggest能够自动帮你完成搜索单词。</p>
+<p>Google Suggest 使用 AJAX 创造出动态性极强的 web 界面：当您在谷歌的搜索框输入关键字时，JavaScript 会把这些字符发送到服务器，然后服务器会返回一个搜索建议的列表。</p>
+<p>就和国内百度的搜索框一样!</p>
+<p>传统的网页(即不用ajax技术的网页)，想要更新内容或者提交一个表单，都需要重新加载整个网页。</p>
+<p>使用ajax技术的网页，通过在后台服务器进行少量的数据交换，就可以实现异步局部更新。</p>
+<p>使用Ajax，用户可以创建接近本地桌面应用的直接、高可用、更丰富、更动态的Web用户界面。</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1477,265 +1694,6 @@ User.objects.bulk_create([user1,user2,user3])
 
 <h5 id="模型元数据选项和描述"><a href="#模型元数据选项和描述" class="headerlink" title="模型元数据选项和描述"></a>模型元数据选项和描述</h5><p>使用<code>Meta</code>类来表示，在定义好的模型类里面定义一个内部类，定义一些 Django 模型类的行为特性和补充说明<br>| 选项                    | 说明                                                         |<br>| ———————– | ———————————————————— |<br>| <code>abstract</code>              | 设置为True时模型是抽象父类 (抽象类不会生成相应数据表)，其他子类需要继承自这个公共类的字段部分   |<br>| <code>app_label</code>             | 如果定义模型的应用不在INSTALLED_APPS中可以用该属性指定，你的模型类不在默认的应用程序包下的 <code>models.py</code> 文件里。这时候你须要指定你这个模型类是那个应用程序的。比方你在其它地方写了一个模型类，而这个模型类是属于myapp 的，那么你这是须要指定 <code>app_label='myapp'</code>  |<br>| <code>db_table</code>              | 模型使用映射的数据表名称，指定自己定义数据库表名的。                                      |<br>| <code>db_tablespace</code>         | 模型使用的数据表空间                                         |<br>| <code>default_related_name</code>  | 关联对象回指这个模型时默认使用的名称，默认为<model_name>_set |<br>| <code>get_latest_by</code>         | 模型中可排序字段的名称。                                     |<br>| <code>managed</code>               | 设置为True时，Django在迁移中创建数据表并在执行flush管理命令时把表移除 |<br>| <code>order_with_respect_to</code> | 标记对象为可排序的                                           |<br>| <code>ordering</code>              | 对象的默认排序，指定数据表的默认排序规则                                               |<br>| <code>permissions</code>           | 创建对象时写入权限表的额外权限                               |<br>| <code>default_permissions</code>   | 默认为<code>('add', 'change', 'delete')</code>                          |<br>| <code>unique_together</code>       | 设定组合在一起时必须唯一 的字段名                         |<br>| <code>index_together</code>        | 设定一起建立索引的多个字段名                                 |<br>| <code>verbose_name</code>          | 为对象设定人类可读的名称                           |<br>| <code>verbose_name_plural</code>   | 设定对象的复数名称                                           |<br>| <code>proxy</code>   | 代理模型(对父模型的功能进行扩充) |</model_name></p>
 <script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/docker/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/docker/" class="post-title-link" itemprop="url">docker</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-06-25 03:41:28" itemprop="dateModified" datetime="2021-06-25T03:41:28Z">2021-06-25</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/docker/" itemprop="url" rel="index"><span itemprop="name">docker</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>Docker<br>Docker是一个容器化的平台，他将应用程序和所需要的依赖打包在一个容器里面，在其他的环境下 ，拿上镜像就可以运行，<br>学习docker就是，学习在docker中安装依赖和将项目部署到docker中。</p>
-<p>Docker架构是什么<br>Docker deamon  ： docker的守护进程<br>Client  ：         docker的客户端<br>Images ：   docker的镜像<br>Container   ：  docker的容器<br>Registry：      docker的仓库</p>
-<p>linux安装</p>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun</span><br><span class="line"></span><br><span class="line">[root@VM-0-9-centos ~]<span class="comment"># docker -v</span></span><br><span class="line">Docker version 20.10.7, build f0df350</span><br></pre></td></tr></tbody></table></figure>
-
-
-<p>设置开机启动docker</p>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[root@VM-0-9-centos ~]<span class="comment"># systemctl enable docker  # 设置开机启动</span></span><br><span class="line">[root@VM-0-9-centos ~]<span class="comment"># systemctl start docker  # 启动服务</span></span><br><span class="line">[root@VM-0-9-centos ~]<span class="comment"># ps -ef |grep docker</span></span><br><span class="line">root      3699     1  2 23:17 ?        00:00:00 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock</span><br><span class="line">root      3840  1544  0 23:17 pts/5    00:00:00 grep --color=auto docker</span><br><span class="line">[</span><br><span class="line"></span><br><span class="line">[root@VM-0-9-centos ~]<span class="comment"># docker ps -a</span></span><br><span class="line">CONTAINER ID   IMAGE                           COMMAND                  CREATED          STATUS                      PORTS                                                                   NAMES</span><br><span class="line">000e44fb8450   rabbitmq:management             <span class="string">"docker-entrypoint.s…"</span>   16 minutes ago   Created                                                                                             rabbitmq</span><br><span class="line">bd592bce48b8   styletang/rocketmq-console-ng   <span class="string">"sh -c 'java <span class="variable">$JAVA_O</span>…"</span>   2 weeks ago      Up 2 weeks                  0.0.0.0:8080-&gt;8080/tcp, :::8080-&gt;8080/tcp                               rmqconsole</span><br><span class="line">01a559d554f8   foxiswho/rocketmq:broker        <span class="string">"mqbroker -c /etc/ro…"</span>   2 weeks ago      Exited (137) 23 hours ago                                                                           rmqbroker</span><br><span class="line">bff14878447c   foxiswho/rocketmq:server        <span class="string">"/bin/sh -c 'cd <span class="variable">${RO…"   2 weeks ago      Up 2 weeks                  10909/tcp, 0.0.0.0:9876-&gt;9876/tcp, :::9876-&gt;9876/tcp, 10911-10912/tcp   rmqnamesrv</span></span></span><br><span class="line"><span class="string"><span class="variable">a7df53a51485   mysql:5.7                       "docker-entrypoint.s…"   2 weeks ago      Up 2 weeks                  0.0.0.0:3306-&gt;3306/tcp, :::3306-&gt;3306/tcp, 33060/tcp                    mymysql</span></span></span><br></pre></td></tr></tbody></table></figure>
-
-<p><a target="_blank" rel="noopener" href="https://cloud.tencent.com/document/product/1207/45596">使用腾讯云 Docker 镜像源加速镜像下载</a></p>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">curl -L https://get.daocloud.io/docker/compose/releases/download/1.29.2/docker-compose-`uname -s`-`uname -m` &gt; /usr/<span class="built_in">local</span>/bin/docker-compose</span><br><span class="line">chmod +x /usr/<span class="built_in">local</span>/bin/docker-compose</span><br><span class="line">[root@VM-0-9-centos ~]<span class="comment"># docker-compose -v</span></span><br><span class="line">docker-compose version 1.29.2, build 5becea4c</span><br></pre></td></tr></tbody></table></figure>
-
-<p>如果本机linux的mysql启动会占用3306，先关掉，才能启动docker mysql</p>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[root@VM-0-9-centos ~]<span class="comment"># netstat -tanlp</span></span><br><span class="line">    ESTABLISHED 1097/YDService      </span><br><span class="line">tcp6       0      0 :::33060                :::*                    LISTEN      25791/mysqld        </span><br><span class="line">tcp6       0      0 :::3306                 :::*                    LISTEN      25791/mysqld        </span><br><span class="line">[root@VM-0-9-centos ~]<span class="comment"># kill 25791</span></span><br><span class="line">[root@VM-0-9-centos ~]<span class="comment"># netstat -tanlp</span></span><br><span class="line">[root@VM-0-9-centos ~]<span class="comment"># docker run -p 3306:3306 --name mymysql -v $PWD/conf:/etc/mysql/conf.d -v $PWD/logs:/logs -v $PWD/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 -d mysql:5.7</span></span><br><span class="line">a7df53a51485060228adcf9b7b307f1c63aa1f6de8266ee798b3b3a376af0fc6</span><br><span class="line">[root@VM-0-9-centos ~]<span class="comment"># docker ps -aCONTAINER ID   IMAGE       COMMAND                  CREATED          STATUS          PORTS                                                  NAMES</span></span><br><span class="line">a7df53a51485   mysql:5.7   <span class="string">"docker-entrypoint.s…"</span>   35 seconds ago   Up 35 seconds   0.0.0.0:3306-&gt;3306/tcp, :::3306-&gt;3306/tcp, 33060/tcp   mymysql</span><br></pre></td></tr></tbody></table></figure>
-
-<p>-p 3306:3306：将容器的 3306 端口映射到主机的 3306 端口。</p>
-<p>-v -v $PWD/conf:/etc/mysql/conf.d：将主机当前目录下的 conf/my.cnf 挂载到容器的 /etc/mysql/my.cnf。</p>
-<p>-v $PWD/logs:/logs：将主机当前目录下的 logs 目录挂载到容器的 /logs。</p>
-<p>-v $PWD/data:/var/lib/mysql ：将主机当前目录下的data目录挂载到容器的 /var/lib/mysql 。</p>
-<p>-e MYSQL_ROOT_PASSWORD=123456：初始化 root 用户的密码。</p>
-<h3 id="容器配置"><a href="#容器配置" class="headerlink" title="容器配置"></a>容器配置</h3><p>由于mysql的安全策略，现在还不能使用root/123456来访问数据库</p>
-<ol>
-<li>进入容器<br>docker ps [options]  查看docker容器进程信息：<br>通过<code>docker ps -a</code>来查看mysql的容器id，status 为 up</li>
-</ol>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">exec</span> -it a7df53a51485 /bin/bash</span><br></pre></td></tr></tbody></table></figure>
-<p> 进入mysql</p>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql -uroot -p123456</span><br></pre></td></tr></tbody></table></figure>
-
-<p>建立用户并授权</p>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">GRANT ALL PRIVILEGES ON *.* TO <span class="string">'root'</span>@<span class="string">'%'</span> IDENTIFIED BY <span class="string">'root'</span> WITH GRANT OPTION;</span><br><span class="line">GRANT ALL PRIVILEGES ON *.* TO <span class="string">'root'</span>@<span class="string">'127.0.0.1'</span> IDENTIFIED BY <span class="string">'root'</span> WITH GRANT OPTION;</span><br><span class="line">GRANT ALL PRIVILEGES ON *.* TO <span class="string">'root'</span>@<span class="string">'localhost'</span> IDENTIFIED BY <span class="string">'root'</span> WITH GRANT OPTION;</span><br><span class="line">FLUSH PRIVILEGES;</span><br></pre></td></tr></tbody></table></figure>
-
-<p>密码为root</p>
-<p>Docker镜像的常用的命令：<br><code>docker images</code>：  列出已经下载的镜像</p>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@VM-0-9-centos ~]<span class="comment"># docker images</span></span><br><span class="line">REPOSITORY                      TAG          IMAGE ID       CREATED         SIZE</span><br><span class="line">rabbitmq                        management   94fae7da05d6   5 days ago      226MB</span><br><span class="line">mysql                           5.7          2c9028880e58   5 weeks ago     447MB</span><br><span class="line">hello-world                     latest       d1165f221234   3 months ago    13.3kB</span><br><span class="line">foxiswho/rocketmq               broker       2f4ee5914ff4   21 months ago   489MB</span><br><span class="line">foxiswho/rocketmq               server       16680398c098   21 months ago   489MB</span><br><span class="line">styletang/rocketmq-console-ng   latest       7df83bb6e638   3 years ago     702MB</span><br></pre></td></tr></tbody></table></figure>
-
-<p>docker  search 镜像名字：tag     ：  搜索这个镜像</p>
-<p>docker  pull  镜像名称:tag        拉取镜像<br>docker  rmi   镜像名称:tag         删除镜像<br>docker rmi <your-image-id>  删除镜像</your-image-id></p>
-<p>docker 容器常用的命令：<br>创建容器<br>docker create -p 3306:3306 –name suiyi -e MYSQL_ROOT_PASSWORD=smallming mysql:5.7<br>新建并且启动<br>docker run -p 3306:3306 –name mysql -e MYSQL_ROOT_PASSWORD=root -d mysql:5.7 </p>
-<p>列出正在运行的容器： docker container ls</p>
-<p>docker exec [options] 容器ID [command]</p>
-<p>进入 mysql 客户端<br>docker exec -it mysql /bin/bash</p>
-<p>进入 Redis 客户端<br>docker exec -it b9e507a86439 redis-cli<br>其中 b9e507a86439 是我 Docker 中的 Redis 容器 ID，使用 docker ps 即可查看自己容器中的 Redis ID</p>
-<p>5    停止容器<br>docker stop 容器ID<br>docker stop mysql<br>6    启动容器<br>docker start 容器ID<br>docker start mysql<br>7    强制停止容器<br>不推荐使用，容易造成容器服务不正常关闭，影响后续使用。<br>docker kill 容器ID<br>docker kill mysql<br>8    删除容器<br>要删除的容器，必须是关闭状态的。<br>docker rm 容器ID<br>docker rm mysql<br>9    查看容器日志<br>docker logs -f -t –tail 行数 容器ID<br>docker logs -f -t –tail 5 mysql<br>10    查看容器中运行的进程<br>可以知道容器中到底运行的是哪个应用程序。<br>docker top 容器ID<br>docker top mysql<br>11    查看容器内部详情<br>docker inspect 容器ID<br>docker inspect mysql<br>12    复制容器数据到宿主机<br>docker cp 容器ID:容器内路径 宿主机路径<br>复制MySQL配置到宿主机：  docker cp mysql:/etc/mysql ~/tmp/conf    </p>
-<p>WARNING: IPv4 forwarding is disabled. Networking will not work.</p>
-<p>在宿主机上执行</p>
-<figure class="highlight shell"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> cat /proc/sys/net/ipv4/ip_forward</span></span><br><span class="line">net.ipv4.ip_forward = 0</span><br></pre></td></tr></tbody></table></figure>
-
-
-<p>vi /etc/sysctl.conf<br>修改net.ipv4.ip_forward的值0改为1：<br>net.ipv4.ip_forward = 1</p>
-<p>sysctl -w net.ipv4.ip_forward=1</p>
-<figure class="highlight shell"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@VM-0-9-centos ~]# sysctl net.ipv4.ip_forward</span><br><span class="line">net.ipv4.ip_forward = 1</span><br><span class="line">[root@VM-0-9-centos ~]# cat /proc/sys/net/ipv4/ip_forward</span><br><span class="line">1</span><br></pre></td></tr></tbody></table></figure>
-
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/doctest-mo-kuai/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/doctest-mo-kuai/" class="post-title-link" itemprop="url">doctest模块</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-14 07:34:57" itemprop="dateModified" datetime="2021-04-14T07:34:57Z">2021-04-14</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>doctest模块<br>扫描模块并根据程序中内嵌的文档字符串执行测试。<br>测试构造如同简单的将它的输出结果剪切并粘贴到文档字符串中。</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">```doctest.test_mod```函数从一个模块中读取所有文档字符串，找出所有看起来像是在交互式解释器中输入的例子的文本，之后检查例子是否符合实际要求。</span><br><span class="line">在python代码中寻找类似交互解释器里执行的命令，执行它们并且和这些命令的期望值进行比较。通过用户提供的例子，它强化了文档，允许 doctest 模块确认代码的结果是否与文档一致:</span><br><span class="line">用来验证docstring中的注释和代码实际的作用是一致的</span><br><span class="line">可以作为回归测试来验证代码能够正确执行</span><br><span class="line">可以用来编写模块的文档演示这些模块是如何处理输入得到输出的。</span><br><span class="line"></span><br><span class="line">一般写在函数的docstring里面，较为标准的文档字符串格式，</span><br><span class="line">用```&gt;&gt;&gt;```表示一个用例的开始，&gt;&gt;&gt;后有一个空格，直到遇到```空行```或者下一个```&gt;&gt;&gt;```</span><br><span class="line">```’’’```后的英文文档后有一个空行。</span><br><span class="line"></span><br><span class="line">使用```#doctest: +ELLIPSIS（中文含义省略）```来表示下面的省略号匹配任意内容</span><br><span class="line"></span><br><span class="line">```python sample.py```只打印出错的用例结果</span><br><span class="line">```python sample.py -v``` 将会打印所有测试用例的结果。</span><br><span class="line">pychamr右键 run doctest</span><br><span class="line"></span><br><span class="line">定义如下函数代码square，求一个数的平方，并且在它的文档字符串中添加两个例子，文件名为my_math.py</span><br><span class="line"></span><br><span class="line">```py</span><br><span class="line"># my_math.py</span><br><span class="line">import doctest</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def square(x):</span><br><span class="line">    '''</span><br><span class="line">    Squares a number and returns the result</span><br><span class="line">    </span><br><span class="line">    &gt;&gt;&gt; square(2)</span><br><span class="line">    4</span><br><span class="line">    &gt;&gt;&gt; square(3)</span><br><span class="line">    9</span><br><span class="line">    '''</span><br><span class="line">    return x * x</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">if __name__ == '__main__':</span><br><span class="line">    import my_math</span><br><span class="line">    doctest.testmod(my_math)</span><br></pre></td></tr></tbody></table></figure>
-
-<p>在 win或 Linux终端命令行中运行查看测试结果。</p>
-<figure class="highlight shell"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">[root@centos ~]# python my_math.py</span><br><span class="line"><span class="meta">#</span><span class="bash"> 没反应，因为符合预期结果，默认只打印出错的用例结果</span></span><br><span class="line">[root@centos ~]# python my_math.py -v</span><br><span class="line">Trying:</span><br><span class="line">    square(2)</span><br><span class="line">Expecting:</span><br><span class="line">    4</span><br><span class="line">ok</span><br><span class="line">Trying:</span><br><span class="line">    square(3)</span><br><span class="line">Expecting:</span><br><span class="line">    9</span><br><span class="line">ok</span><br><span class="line">1 items had no tests:</span><br><span class="line">    my_math</span><br><span class="line">1 items passed all tests:</span><br><span class="line">   2 tests in my_math.square</span><br><span class="line">2 tests in 2 items.</span><br><span class="line">2 passed and 0 failed.</span><br><span class="line">Test passed.</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight sh"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[root@centos ~]<span class="comment"># python my_math.py</span></span><br><span class="line">**********************************************************************</span><br><span class="line">File <span class="string">"my_math.py"</span>, line 9, <span class="keyword">in</span> __main__.average</span><br><span class="line">Failed example:</span><br><span class="line">    <span class="built_in">print</span>(average([20, 30, 70]))</span><br><span class="line">Expected:</span><br><span class="line">    50.0</span><br><span class="line">Got:</span><br><span class="line">    40.0</span><br><span class="line">**********************************************************************</span><br><span class="line">1 items had failures:</span><br><span class="line">   1 of   2 <span class="keyword">in</span> __main__.average</span><br><span class="line">***Test Failed*** 1 failures.</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight sh"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">[root@centos ~]<span class="comment"># python my_math.py -v</span></span><br><span class="line">Trying:</span><br><span class="line">    <span class="built_in">print</span>(average([20, 30, 70]))</span><br><span class="line">Expecting:</span><br><span class="line">    40.0</span><br><span class="line">ok</span><br><span class="line">Trying:</span><br><span class="line">    <span class="built_in">print</span>(average([20, 30, 70]))</span><br><span class="line">Expecting:</span><br><span class="line">    50.0</span><br><span class="line">**********************************************************************</span><br><span class="line">File <span class="string">"my_math.py"</span>, line 9, <span class="keyword">in</span> __main__.average</span><br><span class="line">Failed example:</span><br><span class="line">    <span class="built_in">print</span>(average([20, 30, 70]))</span><br><span class="line">Expected:</span><br><span class="line">    50.0</span><br><span class="line">Got:</span><br><span class="line">    40.0</span><br><span class="line">1 items had no tests:</span><br><span class="line">    __main__</span><br><span class="line">**********************************************************************</span><br><span class="line">1 items had failures:</span><br><span class="line">   1 of   2 <span class="keyword">in</span> __main__.average</span><br><span class="line">2 tests <span class="keyword">in</span> 2 items.</span><br><span class="line">1 passed and 1 failed.</span><br><span class="line">***Test Failed*** 1 failures.</span><br></pre></td></tr></tbody></table></figure>
-
-
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add</span>(<span class="params">x, y</span>):</span></span><br><span class="line">    <span class="string">""" add two number or string</span></span><br><span class="line"><span class="string">    &gt;&gt;&gt; add(1, 2)</span></span><br><span class="line"><span class="string">    3</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    &gt;&gt;&gt; add("hello", " world")</span></span><br><span class="line"><span class="string">    'hello world'</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    &gt;&gt;&gt; add(1, 2.0)</span></span><br><span class="line"><span class="string">    3</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    &gt;&gt;&gt; add("hello", " python")  # doctest: +ELLIPSIS</span></span><br><span class="line"><span class="string">    'hello ...'</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="keyword">return</span> x+y</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    <span class="keyword">import</span> doctest</span><br><span class="line">    doctest.testmod()</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight markdown"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">[root@centos ~]# python my<span class="emphasis">_math.py -v</span></span><br><span class="line"><span class="emphasis">Trying:</span></span><br><span class="line"><span class="emphasis">    add(1, 2)</span></span><br><span class="line"><span class="emphasis">Expecting:</span></span><br><span class="line"><span class="emphasis">    3</span></span><br><span class="line"><span class="emphasis">ok</span></span><br><span class="line"><span class="emphasis">Trying:</span></span><br><span class="line"><span class="emphasis">    add("hello", " world")</span></span><br><span class="line"><span class="emphasis">Expecting:</span></span><br><span class="line"><span class="emphasis">    'hello world'</span></span><br><span class="line"><span class="emphasis">ok</span></span><br><span class="line"><span class="emphasis">Trying:</span></span><br><span class="line"><span class="emphasis">    add(1, 2.0)</span></span><br><span class="line"><span class="emphasis">Expecting:</span></span><br><span class="line"><span class="emphasis">    3</span></span><br><span class="line"><span class="emphasis"><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">**</span></span></span><br><span class="line"><span class="emphasis"><span class="strong">File "my<span class="emphasis">_math.py", line 9, in <span class="strong">__main__</span>.add  </span></span></span></span><br><span class="line"><span class="emphasis"><span class="strong"><span class="emphasis">Failed example:</span></span></span></span><br><span class="line"><span class="emphasis"><span class="strong"><span class="emphasis">    add(1, 2.0)</span></span></span></span><br><span class="line"><span class="emphasis"><span class="strong"><span class="emphasis">Expected:</span></span></span></span><br><span class="line"><span class="emphasis"><span class="strong"><span class="emphasis">    3</span></span></span></span><br><span class="line"><span class="emphasis"><span class="strong"><span class="emphasis">Got:</span></span></span></span><br><span class="line"><span class="emphasis"><span class="strong"><span class="emphasis">    3.0</span></span></span></span><br><span class="line"><span class="emphasis"><span class="strong"><span class="emphasis">Trying:</span></span></span></span><br><span class="line"><span class="emphasis"><span class="strong"><span class="emphasis">    add("hello", " python")  # doctest: +ELLIPSIS</span></span></span></span><br><span class="line"><span class="emphasis"><span class="strong"><span class="emphasis">Expecting:</span></span></span></span><br><span class="line"><span class="emphasis"><span class="strong"><span class="emphasis">    'hello ...'</span></span></span></span><br><span class="line"><span class="emphasis"><span class="strong"><span class="emphasis">ok</span></span></span></span><br><span class="line"><span class="emphasis"><span class="strong"><span class="emphasis">1 items had no tests:</span></span></span></span><br><span class="line"><span class="emphasis"><span class="strong"><span class="emphasis">    <span class="strong">__main__</span></span></span></span></span><br><span class="line"><span class="emphasis"><span class="strong"><span class="emphasis"><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">****</span><span class="strong">**</span></span></span></span></span><br><span class="line"><span class="emphasis"><span class="strong"><span class="emphasis"><span class="strong">1 items had failures:</span></span></span></span></span><br><span class="line"><span class="emphasis"><span class="strong"><span class="emphasis"><span class="strong">   1 of   4 in _<span class="emphasis">_main<span class="strong">__.add</span></span></span></span></span></span></span><br><span class="line"><span class="emphasis"><span class="strong"><span class="emphasis"><span class="strong"><span class="emphasis"><span class="strong">4 tests in 2 items.</span></span></span></span></span></span></span><br><span class="line"><span class="emphasis"><span class="strong"><span class="emphasis"><span class="strong"><span class="emphasis"><span class="strong">3 passed and 1 failed.</span></span></span></span></span></span></span><br><span class="line"><span class="emphasis"><span class="strong"><span class="emphasis"><span class="strong"><span class="emphasis"><span class="strong">**<span class="emphasis">*Test Failed<span class="strong">**<span class="emphasis">* 1 failures.</span></span></span></span></span></span></span></span></span></span><br></pre></td></tr></tbody></table></figure><script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }

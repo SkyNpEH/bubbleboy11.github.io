@@ -119,7 +119,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">336</span>
+          <span class="site-state-item-count">338</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -445,6 +445,250 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/07/15/go-zuo-yong-yu/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/07/15/go-zuo-yong-yu/" class="post-title-link" itemprop="url">go作用域</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2021-07-14 16:21:41 / 修改时间：13:27:38" itemprop="dateCreated datePublished" datetime="2021-07-14T16:21:41Z">2021-07-14</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/go/" itemprop="url" rel="index"><span itemprop="name">go</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>任何一种编程中，作用域是程序中定义的变量所存在的区域，超过该区域变量就不能被访问。</p>
+<p>变量的作用域由变量的定义位置决定，在不同位置定义的变量，它的作用域是不一样的。<br>作用域（Scope）为已声明标识符所表示的常量、类型、变量、函数或包在源代码中的作用范围。权限的概念，可见性就是变量可以在哪个范围以内使用。有些变量可以在所有代码文件中使用，有些变量只能在当前的文件中使用，有些变量只能在函数内部使用，有些变量只能在 for 循环内部使用。</p>
+<p>Go 语言中变量可以在三个地方声明：</p>
+<h4 id="局部变量-（Local-Variable）"><a href="#局部变量-（Local-Variable）" class="headerlink" title="局部变量 （Local Variable）"></a>局部变量 （Local Variable）</h4><p>函数体内定义的变量，作用域只在函数体内有效，在函数外部是不可知的。<br>函数的参数和返回值变量也是局部变量。<br>局部变量不是一直存在的，它只在定义它的函数被调用后存在，函数调用结束后这个局部变量定义的内存空间就会被释放。销毁。</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 声明局部变量 */</span></span><br><span class="line"><span class="keyword">var</span> a, b, c <span class="keyword">int</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 初始化参数 */</span></span><br><span class="line">a = <span class="number">10</span></span><br><span class="line">b = <span class="number">20</span></span><br><span class="line">c = a + b</span><br><span class="line"></span><br><span class="line">fmt.Printf(<span class="string">"结果： a = %d, b = %d and c = %d\n"</span>, a, b, c)</span><br><span class="line"><span class="comment">// 结果： a = 10, b = 20 and c = 30</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h4 id="全局变量"><a href="#全局变量" class="headerlink" title="全局变量"></a>全局变量</h4><p>在函数体外定义声明的变量，全局变量只需要在一个源文件中定义声明后，就可以在整个程序所有源文件中使用，<br>可以在整个包甚至外部包（被导出后）不包含这个全局变量的源文件需要使用“import”关键字引入全局变量所在的源文件之后才能使用这个全局变量。<br>在整个程序生命周期内都是有效的，在任意的函数内部能访问全局变量。</p>
+<p>全局变量声明必须以 var 关键字开头，如果想要在外部包中使用全局变量的首字母必须大写。</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 声明全局变量 */</span></span><br><span class="line"><span class="keyword">var</span> g <span class="keyword">int</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">   <span class="comment">/* 声明局部变量 */</span></span><br><span class="line">    <span class="keyword">var</span> a, b <span class="keyword">int</span></span><br><span class="line">    <span class="comment">/* 初始化参数 */</span></span><br><span class="line">    a = <span class="number">10</span></span><br><span class="line">    b = <span class="number">20</span></span><br><span class="line">    g = a + b</span><br><span class="line">    fmt.Printf(<span class="string">"结果： a = %d, b = %d and g = %d\n"</span>, a, b, g)</span><br><span class="line">    <span class="comment">// 结果： a = 10, b = 20 and g = 30</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>Go 语言程序中全局变量与局部变量名称可以相同，但是函数内的局部变量会被优先考虑</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 声明全局变量 */</span></span><br><span class="line"><span class="keyword">var</span> g <span class="keyword">int</span> = <span class="number">20</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="comment">/* 声明局部变量 */</span></span><br><span class="line">    <span class="keyword">var</span> g <span class="keyword">int</span> = <span class="number">30</span></span><br><span class="line">    fmt.Printf(<span class="string">"结果： g = %d\n"</span>, g) <span class="comment">// 结果： g = 30</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<h4 id="形式参数"><a href="#形式参数" class="headerlink" title="形式参数"></a>形式参数</h4><p>在定义函数时函数名后面括号中的变量<br>值传递，会作为函数的局部变量来使用。<br>如果与全局变量同名它们会优先使用。</p>
+<p>形式参数只在函数调用时才会生效，函数调用结束后就会被销毁，在函数未被调用时，函数的形参并不占用实际的存储单元，也没有实际值。</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 声明全局变量 */</span></span><br><span class="line"><span class="keyword">var</span> a <span class="keyword">int</span> = <span class="number">20</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="comment">/* main 函数中声明局部变量 */</span></span><br><span class="line">    <span class="keyword">var</span> a <span class="keyword">int</span> = <span class="number">10</span></span><br><span class="line">    <span class="keyword">var</span> b <span class="keyword">int</span> = <span class="number">20</span></span><br><span class="line">    <span class="keyword">var</span> c <span class="keyword">int</span> = <span class="number">0</span></span><br><span class="line"></span><br><span class="line">    fmt.Printf(<span class="string">"main()函数中 a = %d\n"</span>, a)</span><br><span class="line">    <span class="comment">// main()函数中 a = 10</span></span><br><span class="line">    c = sum(a, b)</span><br><span class="line">    <span class="comment">// sum() 函数中 a = 10</span></span><br><span class="line">    <span class="comment">// sum() 函数中 b = 20</span></span><br><span class="line">    fmt.Printf(<span class="string">"main()函数中 c = %d\n"</span>, c)</span><br><span class="line">    <span class="comment">// main()函数中 c = 30</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 函数定义-两数相加 */</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">sum</span><span class="params">(a, b <span class="keyword">int</span>)</span> <span class="title">int</span></span> {</span><br><span class="line">    fmt.Printf(<span class="string">"sum() 函数中 a = %d\n"</span>, a)</span><br><span class="line">    fmt.Printf(<span class="string">"sum() 函数中 b = %d\n"</span>, b)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> a + b</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">testScope</span><span class="params">(args <span class="keyword">int</span>)</span></span> {</span><br><span class="line">    args = <span class="number">100</span></span><br><span class="line">    fmt.Println(args)</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> args <span class="keyword">int</span></span><br><span class="line">    testScope(args) <span class="comment">// 100</span></span><br><span class="line">    fmt.Println(args) <span class="comment">// 0</span></span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">add</span><span class="params">(params ...<span class="keyword">int</span>)</span> <span class="params">(sum <span class="keyword">int</span>)</span></span> {</span><br><span class="line">    <span class="keyword">for</span> _, v := <span class="keyword">range</span> params {</span><br><span class="line">        sum += v</span><br><span class="line">    }</span><br><span class="line">    params[<span class="number">0</span>] = <span class="number">9</span> <span class="comment">// 值传递不影响</span></span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line">}</span><br><span class="line">    fmt.Println(add(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>)) <span class="comment">// 15</span></span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">add1</span><span class="params">(params []<span class="keyword">int</span>)</span> <span class="params">(sum <span class="keyword">int</span>)</span></span> {</span><br><span class="line">    <span class="comment">// 切片 解决可能有不定个int值传递进来</span></span><br><span class="line">    <span class="keyword">for</span> _, v := <span class="keyword">range</span> params {</span><br><span class="line">        sum += v</span><br><span class="line">    }</span><br><span class="line">    params[<span class="number">0</span>] = <span class="number">9</span> <span class="comment">// 引用传递影响</span></span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="变量的生命周期"><a href="#变量的生命周期" class="headerlink" title="变量的生命周期"></a>变量的生命周期</h2><p>在程序运行期间变量有效存在的时间间隔。</p>
+<p>变量的生命周期与变量的作用域有着不可分割的联系：</p>
+<ul>
+<li>全局变量：它的生命周期和整个程序的运行周期是一致的；</li>
+<li>局部变量：它的生命周期则是动态的，从创建这个变量的声明语句开始，到这个变量不再被引用为止；</li>
+<li>形式参数和函数返回值：它们都属于局部变量，在函数被调用的时候创建，函数调用结束后被销毁。</li>
+</ul>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> t := <span class="number">0.0</span>; t &lt; cycles*<span class="number">2</span>*math.Pi; t += res {</span><br><span class="line">    x := math.Sin(t)</span><br><span class="line">    y := math.Sin(t*freq + phase)</span><br><span class="line">    img.SetColorIndex(</span><br><span class="line">        size+<span class="keyword">int</span>(x*size+<span class="number">0.5</span>), size+<span class="keyword">int</span>(y*size+<span class="number">0.5</span>),</span><br><span class="line">        blackIndex, <span class="comment">// 最后插入的逗号不会导致编译错误，这是Go编译器的一个特性</span></span><br><span class="line">    )               <span class="comment">// 小括号另起一行缩进，和大括号的风格保存一致</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>上面代码中，在每次循环的开始会创建临时变量 t，然后在每次循环迭代中创建临时变量 x 和 y。临时变量 x、y 存放在栈中，随着函数执行结束（执行遇到最后一个}），释放其内存。</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/07/14/go-di-gui-han-shu/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/07/14/go-di-gui-han-shu/" class="post-title-link" itemprop="url">go递归函数.md</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-07-13 16:21:41" itemprop="dateCreated datePublished" datetime="2021-07-13T16:21:41Z">2021-07-13</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-07-14 16:21:22" itemprop="dateModified" datetime="2021-07-14T16:21:22Z">2021-07-14</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/go/" itemprop="url" rel="index"><span itemprop="name">go</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>递归函数指的是在运行的过程中函数内部调用函数自身的函数，<br>从数学解题思路来说，递归就是把一个大问题拆分成多个小问题，再各个击破，在实际开发过程中，递归函数可以解决许多数学问题，</p>
+<p>递归函数 在一个循环体当中执行，必须有一个条件可以在满足某个条件时终止当前的循环，否则为死循环</p>
+<p>构成递归需要具备以下条件：</p>
+<ul>
+<li>一个问题可以被拆分成多个子问题；</li>
+<li>拆分前的原问题与拆分后的子问题除了数据规模不同，但处理问题的思路是一样的；</li>
+<li>不能无限制的调用本身，子问题需要有退出递归状态的条件。<br>注意：编写递归函数时，一定要有终止条件，否则就会无限调用下去，直到内存溢出。</li>
+</ul>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">recursion</span><span class="params">()</span></span> {</span><br><span class="line">   recursion() <span class="comment">/* 函数调用自身 */</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">   recursion()</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="斐波那契数列"><a href="#斐波那契数列" class="headerlink" title="斐波那契数列"></a>斐波那契数列</h3><p>位置     值<br>1        1<br>2        1<br>3        2<br>4        3<br>..    ..<br>n    func(n-1) + func(n-2)</p>
+<p>传递一个位置，返回当前位置的值</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    result := <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> i := <span class="number">1</span>; i &lt;= <span class="number">5</span>; i++ {</span><br><span class="line">        result = fibonacci(i)</span><br><span class="line">        fmt.Printf(<span class="string">"fibonacci(%d) is: %d\n"</span>, i, result)</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">fibonacci</span><span class="params">(n <span class="keyword">int</span>)</span> <span class="params">(res <span class="keyword">int</span>)</span></span> {</span><br><span class="line">    <span class="keyword">if</span> n &lt;= <span class="number">2</span> {</span><br><span class="line">        res = <span class="number">1</span> <span class="comment">// res = n</span></span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        res = fibonacci(n<span class="number">-1</span>) + fibonacci(n<span class="number">-2</span>)</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">fibonacci</span><span class="params">(n <span class="keyword">int</span>)</span> <span class="title">int</span></span> {</span><br><span class="line">    <span class="keyword">if</span> n &lt; <span class="number">2</span> {</span><br><span class="line">        <span class="keyword">return</span> n</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> fibonacci(n<span class="number">-2</span>) + fibonacci(n<span class="number">-1</span>)</span><br><span class="line">}</span><br><span class="line">---</span><br><span class="line">fibonacci(<span class="number">1</span>) is: <span class="number">1</span></span><br><span class="line">fibonacci(<span class="number">2</span>) is: <span class="number">1</span></span><br><span class="line">fibonacci(<span class="number">3</span>) is: <span class="number">2</span></span><br><span class="line">fibonacci(<span class="number">4</span>) is: <span class="number">3</span></span><br><span class="line">fibonacci(<span class="number">5</span>) is: <span class="number">5</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="数字阶乘"><a href="#数字阶乘" class="headerlink" title="数字阶乘"></a>数字阶乘</h3><p>一个正整数的阶乘（factorial）是所有小于及等于该数的正整数的积，并且 0 的阶乘为 1，自然数 n 的阶乘写作n!</p>
+<p>例如，n!=1×2×3×…×n，阶乘亦可以递归方式定义：0!=1，n!=(n-1)!×n。</p>
+<p>使用递归函数计算给定数的阶乘，示例代码如下所示：</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Factorial</span><span class="params">(n <span class="keyword">uint64</span>)</span> <span class="params">(result <span class="keyword">uint64</span>)</span></span> {</span><br><span class="line">    <span class="keyword">if</span> n &gt; <span class="number">0</span> {</span><br><span class="line">        result = n * Factorial(n<span class="number">-1</span>)</span><br><span class="line">        <span class="keyword">return</span> result</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span></span><br><span class="line">}</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="keyword">var</span> i <span class="keyword">int</span> = <span class="number">10</span></span><br><span class="line">    fmt.Printf(<span class="string">"%d 的阶乘是 %d\n"</span>, i, Factorial(<span class="keyword">uint64</span>(i)))</span><br><span class="line">}</span><br><span class="line">---</span><br><span class="line"><span class="number">10</span> 的阶乘是 <span class="number">3628800</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="多个函数组成递归"><a href="#多个函数组成递归" class="headerlink" title="多个函数组成递归"></a>多个函数组成递归</h3><p>Go语言中也可以使用相互调用的递归函数，多个函数之间相互调用形成闭环，因为Go语言编译器的特殊性，这些函数的声明顺序可以是任意的，下面这个简单的例子展示了函数 odd 和 even 之间的相互调用：</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"fmt"</span></span><br><span class="line">)</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    fmt.Printf(<span class="string">"%d is even: is %t\n"</span>, <span class="number">16</span>, even(<span class="number">16</span>)) <span class="comment">// 16 is even: is true</span></span><br><span class="line">    fmt.Printf(<span class="string">"%d is odd: is %t\n"</span>, <span class="number">17</span>, odd(<span class="number">17</span>))</span><br><span class="line">    <span class="comment">// 17 is odd: is true</span></span><br><span class="line">    fmt.Printf(<span class="string">"%d is odd: is %t\n"</span>, <span class="number">18</span>, odd(<span class="number">18</span>))</span><br><span class="line">    <span class="comment">// 18 is odd: is false</span></span><br><span class="line">}</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">even</span><span class="params">(nr <span class="keyword">int</span>)</span> <span class="title">bool</span></span> {</span><br><span class="line">    <span class="keyword">if</span> nr == <span class="number">0</span> {</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> odd(RevSign(nr) - <span class="number">1</span>)</span><br><span class="line">}</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">odd</span><span class="params">(nr <span class="keyword">int</span>)</span> <span class="title">bool</span></span> {</span><br><span class="line">    <span class="keyword">if</span> nr == <span class="number">0</span> {</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> even(RevSign(nr) - <span class="number">1</span>)</span><br><span class="line">}</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">RevSign</span><span class="params">(nr <span class="keyword">int</span>)</span> <span class="title">int</span></span> {</span><br><span class="line">    <span class="keyword">if</span> nr &lt; <span class="number">0</span> {</span><br><span class="line">        <span class="keyword">return</span> -nr</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> nr</span><br><span class="line">}</span><br><span class="line">---</span><br><span class="line"><span class="number">16</span> is even: is <span class="literal">true</span></span><br><span class="line"><span class="number">17</span> is odd: is <span class="literal">true</span></span><br><span class="line"><span class="number">18</span> is odd: is <span class="literal">false</span></span><br></pre></td></tr></tbody></table></figure>
+
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></tbody></table></figure><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
     <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/07/12/grpc/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -574,7 +818,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-07-13 02:58:36" itemprop="dateModified" datetime="2021-07-13T02:58:36Z">2021-07-13</time>
+        <time title="修改时间：2021-07-13 08:17:34" itemprop="dateModified" datetime="2021-07-13T08:17:34Z">2021-07-13</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -610,7 +854,7 @@
 <h2 id="空接口"><a href="#空接口" class="headerlink" title="空接口"></a>空接口</h2><p>如果一个接口里面没有定义任何方法，那么它就是空接口，任意结构体都隐式地实现了空接口。</p>
 <p>Go 语言为了避免用户重复定义很多空接口，它自己内置了一个，这个空接口的名字特别奇怪，叫 interface{} ，初学者会非常不习惯。之所以这个类型名带上了大括号，那是在告诉用户括号里什么也没有。我始终认为这种名字很古怪，它让代码看起来有点丑陋。</p>
 <p>空接口里面没有方法，所以它也不具有任何能力，其作用相当于 Java和python中 的 Object 类型，可以容纳任意对象，它是一个万能容器。比如一个字典的 key 是字符串，但是希望 value 可以容纳任意类型的对象，类似于 Java 语言的 Map 类型，这时候就可以使用空接口类型 interface{}。<br>最顶层的对象，可以把任何类型都赋值给空接口变量</p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">"fmt"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Course <span class="keyword">struct</span> {</span><br><span class="line">    name  <span class="keyword">string</span></span><br><span class="line">    price <span class="keyword">int</span></span><br><span class="line">    url   <span class="keyword">string</span></span><br><span class="line">}</span><br><span class="line"><span class="keyword">type</span> Printer <span class="keyword">interface</span> {</span><br><span class="line">    printInfo() <span class="keyword">string</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c Course)</span> <span class="title">printInfo</span><span class="params">()</span> <span class="title">string</span></span> {</span><br><span class="line">    <span class="keyword">return</span> <span class="string">"课程信息"</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">print</span><span class="params">(x <span class="keyword">interface</span>{})</span></span> {</span><br><span class="line">    <span class="comment">//判断是不是int类型，是返回ture，否则返回false</span></span><br><span class="line">    <span class="keyword">if</span> v, ok := x.(<span class="keyword">int</span>); ok {</span><br><span class="line">        fmt.Printf(<span class="string">"%d(整数)\n"</span>, v)</span><br><span class="line">    }</span><br><span class="line">    <span class="comment">//判断是不是string类型</span></span><br><span class="line">    <span class="keyword">if</span> s, ok := x.(<span class="keyword">string</span>); ok {</span><br><span class="line">        fmt.Printf(<span class="string">"%s(字符串)\n"</span>, s)</span><br><span class="line">    }</span><br><span class="line">    <span class="comment">//fmt.Printf("%v\n", i)</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">print1</span><span class="params">(x <span class="keyword">interface</span>{})</span></span> {</span><br><span class="line">    <span class="keyword">switch</span> v := x.(<span class="keyword">type</span>) {</span><br><span class="line">    <span class="keyword">case</span> <span class="keyword">string</span>:</span><br><span class="line">        fmt.Printf(<span class="string">"%s(字符串)\n"</span>, v)</span><br><span class="line">    <span class="keyword">case</span> <span class="keyword">int</span>:</span><br><span class="line">        fmt.Printf(<span class="string">"%d(整数)\n"</span>, v)</span><br><span class="line">    <span class="keyword">default</span>:</span><br><span class="line">        fmt.Printf(<span class="string">"%v(本来值)\n"</span>, v)</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="keyword">var</span> i <span class="keyword">interface</span>{} <span class="comment">// 空接口</span></span><br><span class="line">    <span class="comment">// 参数传递</span></span><br><span class="line">    i = Course{}</span><br><span class="line">    fmt.Println(i) <span class="comment">// { 0 }</span></span><br><span class="line">    i = <span class="number">10</span></span><br><span class="line">    <span class="built_in">print</span>(i) <span class="comment">// 10(整数)</span></span><br><span class="line">    i = <span class="string">"bobby"</span></span><br><span class="line">    <span class="built_in">print</span>(i) <span class="comment">// bobby(字符串)</span></span><br><span class="line">    i = []<span class="keyword">string</span>{<span class="string">"django"</span>, <span class="string">"scrapy"</span>}</span><br><span class="line">    <span class="built_in">print</span>(i) <span class="comment">// [django scrapy](本来值)</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 空接口可以作为map的值,value可以是任何类型，而不是固定的指定类型</span></span><br><span class="line">    <span class="keyword">var</span> teacherInfo = <span class="built_in">make</span>(<span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">interface</span>{})</span><br><span class="line">    teacherInfo[<span class="string">"name"</span>] = <span class="string">"bobby"</span></span><br><span class="line">    teacherInfo[<span class="string">"age"</span>] = <span class="number">18</span></span><br><span class="line">    teacherInfo[<span class="string">"weight"</span>] = <span class="number">75.2</span></span><br><span class="line">    teacherInfo[<span class="string">"courses"</span>] = []<span class="keyword">string</span>{<span class="string">"django"</span>, <span class="string">"scrapy"</span>, <span class="string">"sanic"</span>}</span><br><span class="line">    fmt.Printf(<span class="string">"%v"</span>, teacherInfo) <span class="comment">// map[age:18 courses:[django scrapy sanic] name:bobby weight:75.2]</span></span><br><span class="line">    <span class="comment">//类型断言0-, 接口引入了</span></span><br><span class="line">    <span class="comment">// 接口有一个默认的规范  接口的名称一般以 er 结尾</span></span><br><span class="line">    c := &amp;Course{}</span><br><span class="line">    c.printInfo()</span><br><span class="line">    c1 := Course{}</span><br><span class="line">    c1.printInfo()</span><br><span class="line">    <span class="comment">//var c Printer = Course{}  // 实现了方法可以实例化</span></span><br><span class="line">    <span class="comment">//c.printInfo()</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">"fmt"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Course <span class="keyword">struct</span> {</span><br><span class="line">    name  <span class="keyword">string</span></span><br><span class="line">    price <span class="keyword">int</span></span><br><span class="line">    url   <span class="keyword">string</span></span><br><span class="line">}</span><br><span class="line"><span class="keyword">type</span> Printer <span class="keyword">interface</span> {</span><br><span class="line">    printInfo() <span class="keyword">string</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c Course)</span> <span class="title">printInfo</span><span class="params">()</span> <span class="title">string</span></span> {</span><br><span class="line">    <span class="keyword">return</span> <span class="string">"课程信息"</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">print</span><span class="params">(x <span class="keyword">interface</span>{})</span></span> {</span><br><span class="line">    <span class="comment">// 判断是不是int类型，是返回ture，否则返回false</span></span><br><span class="line">    <span class="keyword">if</span> v, ok := x.(<span class="keyword">int</span>); ok {</span><br><span class="line">        fmt.Printf(<span class="string">"%d(整数)\n"</span>, v)</span><br><span class="line">    }</span><br><span class="line">    <span class="comment">// 判断是不是string类型</span></span><br><span class="line">    <span class="keyword">if</span> s, ok := x.(<span class="keyword">string</span>); ok {</span><br><span class="line">        fmt.Printf(<span class="string">"%s(字符串)\n"</span>, s)</span><br><span class="line">    }</span><br><span class="line">    <span class="comment">//fmt.Printf("%v\n", i)</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">print1</span><span class="params">(x <span class="keyword">interface</span>{})</span></span> {</span><br><span class="line">    <span class="keyword">switch</span> v := x.(<span class="keyword">type</span>) {</span><br><span class="line">    <span class="keyword">case</span> <span class="keyword">string</span>:</span><br><span class="line">        fmt.Printf(<span class="string">"%s(字符串)\n"</span>, v)</span><br><span class="line">    <span class="keyword">case</span> <span class="keyword">int</span>:</span><br><span class="line">        fmt.Printf(<span class="string">"%d(整数)\n"</span>, v)</span><br><span class="line">    <span class="keyword">default</span>:</span><br><span class="line">        fmt.Printf(<span class="string">"%v(本来值)\n"</span>, v)</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="keyword">var</span> i <span class="keyword">interface</span>{} <span class="comment">// 空接口</span></span><br><span class="line">    <span class="comment">// 参数传递</span></span><br><span class="line">    i = Course{}</span><br><span class="line">    fmt.Println(i) <span class="comment">// { 0 }</span></span><br><span class="line">    i = <span class="number">10</span></span><br><span class="line">    <span class="built_in">print</span>(i) <span class="comment">// 10(整数)</span></span><br><span class="line">    i = <span class="string">"bobby"</span></span><br><span class="line">    <span class="built_in">print</span>(i) <span class="comment">// bobby(字符串)</span></span><br><span class="line">    i = []<span class="keyword">string</span>{<span class="string">"django"</span>, <span class="string">"scrapy"</span>}</span><br><span class="line">    <span class="built_in">print</span>(i) <span class="comment">// [django scrapy](本来值)</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 空接口可以作为map的值,value可以是任何类型，而不是固定的指定类型</span></span><br><span class="line">    <span class="keyword">var</span> teacherInfo = <span class="built_in">make</span>(<span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">interface</span>{})</span><br><span class="line">    teacherInfo[<span class="string">"name"</span>] = <span class="string">"bobby"</span></span><br><span class="line">    teacherInfo[<span class="string">"age"</span>] = <span class="number">18</span></span><br><span class="line">    teacherInfo[<span class="string">"weight"</span>] = <span class="number">75.2</span></span><br><span class="line">    teacherInfo[<span class="string">"courses"</span>] = []<span class="keyword">string</span>{<span class="string">"django"</span>, <span class="string">"scrapy"</span>, <span class="string">"sanic"</span>}</span><br><span class="line">    fmt.Printf(<span class="string">"%v"</span>, teacherInfo) <span class="comment">// map[age:18 courses:[django scrapy sanic] name:bobby weight:75.2]</span></span><br><span class="line">    <span class="comment">//类型断言0-, 接口引入了</span></span><br><span class="line">    <span class="comment">// 接口有一个默认的规范  接口的名称一般以 er 结尾</span></span><br><span class="line">    c := &amp;Course{}</span><br><span class="line">    c.printInfo()</span><br><span class="line">    c1 := Course{}</span><br><span class="line">    c1.printInfo()</span><br><span class="line">    <span class="comment">//var c Printer = Course{}  // 实现了方法可以实例化</span></span><br><span class="line">    <span class="comment">//c.printInfo()</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
 
 <figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> user = <span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">interface</span>{}{</span><br><span class="line">    <span class="string">"age"</span>: <span class="number">30</span>,</span><br><span class="line">    <span class="string">"address"</span>: <span class="string">"Beijing Tongzhou"</span>,</span><br><span class="line">    <span class="string">"married"</span>: <span class="literal">true</span>,</span><br><span class="line">}</span><br><span class="line">fmt.Println(user) <span class="comment">// map[age:30 address:Beijing Tongzhou married:true]</span></span><br><span class="line"><span class="comment">// 类型转换语法来了</span></span><br><span class="line"><span class="keyword">var</span> age = user[<span class="string">"age"</span>].(<span class="keyword">int</span>)</span><br><span class="line"><span class="keyword">var</span> address = user[<span class="string">"address"</span>].(<span class="keyword">string</span>)</span><br><span class="line"><span class="keyword">var</span> married = user[<span class="string">"married"</span>].(<span class="keyword">bool</span>)</span><br><span class="line">fmt.Println(age, address, married) <span class="comment">// 30 Beijing Tongzhou true</span></span><br></pre></td></tr></tbody></table></figure>
 
@@ -1069,212 +1313,6 @@
     
     <div class="post-body" itemprop="articleBody">
           <script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/07/07/go-de-http/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/07/07/go-de-http/" class="post-title-link" itemprop="url">go的http</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-      
-
-      <time title="创建时间：2021-07-06 16:21:41 / 修改时间：03:36:02" itemprop="dateCreated datePublished" datetime="2021-07-06T16:21:41Z">2021-07-06</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/go/" itemprop="url" rel="index"><span itemprop="name">go</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/07/07/go-de-type/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/07/07/go-de-type/" class="post-title-link" itemprop="url">go的type</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-      
-
-      <time title="创建时间：2021-07-06 16:21:41 / 修改时间：08:08:39" itemprop="dateCreated datePublished" datetime="2021-07-06T16:21:41Z">2021-07-06</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/go/" itemprop="url" rel="index"><span itemprop="name">go</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <ol>
-<li>给一个类型定义别名, 实际上为什么会有byte， 就是我为了强调我们现在处理的对象是字节类型</li>
-</ol>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="comment">//这种别名实际上还是为了代码的可读性， 这个实际上本质上仍然是uint8 无非就是在代码编码阶段可读性强而已</span></span><br><span class="line">    <span class="keyword">type</span> myByte = <span class="keyword">byte</span></span><br><span class="line">    <span class="keyword">var</span> a myByte</span><br><span class="line">    fmt.Printf(<span class="string">"%T\n"</span>, a) <span class="comment">// uint8</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> b <span class="keyword">uint8</span></span><br><span class="line">    fmt.Printf(<span class="string">"%T\n"</span>, b) <span class="comment">// uint8</span></span><br></pre></td></tr></tbody></table></figure>
-
-<ol start="2">
-<li>第二种 就是基于一个已有的类型定义一个新的类型</li>
-</ol>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> myInt <span class="keyword">int</span></span><br><span class="line"><span class="keyword">var</span> i myInt</span><br><span class="line">fmt.Printf(<span class="string">"%T\n"</span>, i) <span class="comment">// main.myInt</span></span><br></pre></td></tr></tbody></table></figure>
-
-<ol start="3">
-<li>定义结构体</li>
-</ol>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Course <span class="keyword">struct</span> {</span><br><span class="line">    name  <span class="keyword">string</span></span><br><span class="line">    price <span class="keyword">int</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<ol start="4">
-<li>定义接口</li>
-</ol>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Callable <span class="keyword">interface</span> {</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<ol start="5">
-<li>定义函数别名</li>
-</ol>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> handle <span class="function"><span class="keyword">func</span><span class="params">(str <span class="keyword">string</span>)</span></span></span><br></pre></td></tr></tbody></table></figure>
-<script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
