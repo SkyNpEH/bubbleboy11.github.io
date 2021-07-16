@@ -119,7 +119,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">338</span>
+          <span class="site-state-item-count">339</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -160,6 +160,151 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/drf-huan-cun/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/drf-huan-cun/" class="post-title-link" itemprop="url">drf缓存</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-06-15 13:52:13" itemprop="dateModified" datetime="2021-06-15T13:52:13Z">2021-06-15</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>为了加速网站的访问速度，将一些经常访问的公开变化少数据放入缓存中，<br>可以加快网页响应的速度。<br>对于变化小的数据，将其保存到缓存中请求时直接获取的成本要源于每次请求再重新计算获取的成本，所以使用缓存是很有必要的。<br>Django支持的缓存包括Memcached、数据库高速缓存、文件系统缓存、本地内存缓存、虚拟缓存等，DRF的缓存机制建立在Django的基础上，并进行了一些优化，这里采用的是已经封装好的drf-extensions（DRF扩展），对DRF进行了很多方面的功能扩展，其中就包括缓存功能</p>
+<p>取数据的时候首先去缓存中去，然后再去数据库中取<br>缓存使用的是内存，每次重启之后就会失效</p>
+<p>而需要验证才能访问的私有数据则尽量不要使用缓存，可以根据自己的需要对不同的数据进行缓存配置。</p>
+<ul>
+<li>第一步，安装</li>
+</ul>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt; pip install drf-extensions</span><br></pre></td></tr></tbody></table></figure>
+
+<ul>
+<li>第二步，配置缓存过期时间<br><code>settings.py</code></li>
+</ul>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">REST_FRAMEWORK_EXTENSIONS = {</span><br><span class="line">    <span class="string">'DEFAULT_CACHE_RESPONSE_TIMEOUT'</span>: <span class="number">5</span>   <span class="comment">#5s过期，时间自己可以随便设定</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<ul>
+<li>第三步，</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="http://chibisov.github.io/drf-extensions/docs/#cacheresponsemixin">http://chibisov.github.io/drf-extensions/docs/#cacheresponsemixin</a></p>
+<h4 id="CacheResponseMixin"><a href="#CacheResponseMixin" class="headerlink" title="CacheResponseMixin"></a>CacheResponseMixin</h4><p>It is common to cache standard viewset <code>retrieve</code> and <code>list</code> methods. That is why <code>CacheResponseMixin</code> exists. Just mix it into viewset implementation and those methods will use functions, defined in <code>REST_FRAMEWORK_EXTENSIONS</code> settings:<br>缓存标准viewset的<code>retrieve</code>和<code>list</code>方法很常见。 这就是<code>CacheResponseMixin</code>存在的原因。 只需将其混合到viewset实现中，这些方法将使用<code>REST_FRAMEWORK_EXTENSIONS</code>设置中定义的函数：</p>
+<p>“DEFAULT_OBJECT_CACHE_KEY_FUNC” for <code>retrieve</code> method<br>“DEFAULT_LIST_CACHE_KEY_FUNC” for <code>list</code> method<br>By default those functions are using DefaultKeyConstructor and extends it:</p>
+<p>With <code>RetrieveSqlQueryKeyBit</code> for “DEFAULT_OBJECT_CACHE_KEY_FUNC”<br>With <code>ListSqlQueryKeyBit</code> and <code>PaginationKeyBit</code> for “DEFAULT_LIST_CACHE_KEY_FUNC”<br>You can change those settings for custom cache key generation:</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> myapps.serializers <span class="keyword">import</span> UserSerializer</span><br><span class="line"><span class="keyword">from</span> rest_framework_extensions.cache.mixins <span class="keyword">import</span> CacheResponseMixin</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserViewSet</span>(<span class="params">CacheResponseMixin, viewsets.ModelViewSet</span>):</span></span><br><span class="line">    serializer_class = UserSerializer</span><br></pre></td></tr></tbody></table></figure>
+
+<p>我们使用的主要是<code>CacheResponseMixin</code>，主要适用于<code>retrieve</code>和<code>list</code>方法，这主要是查询操作，对于新建、修改等操作一般是不能使用缓存的。</p>
+<h3 id="商品列表增加缓存"><a href="#商品列表增加缓存" class="headerlink" title="商品列表增加缓存"></a>商品列表增加缓存</h3><p><code>apps/goods/views.py</code>中的<code>GoodsListViewSet</code>，使之第一个继承自<code>CacheResponseMixin</code>，即可实现缓存，如下：</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework_extensions.cache.mixins <span class="keyword">import</span> CacheResponseMixin</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GoodsListViewSet</span>(<span class="params">CacheResponseMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet</span>):</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>现在重启服务器，使浏览器缓存失效（因为我们第一次进入该页面，已经将数据放入缓存了，重启服务器，内存中就没了，需要重新到后台获取），然后访问 <a target="_blank" rel="noopener" href="http://127.0.0.1:8000/goods/">http://127.0.0.1:8000/goods/</a> 按F12点击Network查看加载时间。可以看到首次访问需要437ms.再次刷新该页面，第二次以及后面多次访问基本就是13ms</p>
+<p>在视图中配置CacheResponseMixin缓存后，可以使用redis作为缓存后端来存储数据。且针对不同的url以不同的参数，都会生成不同的键值，不同的键缓存不同的内存。如果没有配置CacheResponseMixin缓存，访问这些URL，是不会生成redis键值的。</p>
+<h3 id="DRF的throttle设置API的访问速率"><a href="#DRF的throttle设置API的访问速率" class="headerlink" title="DRF的throttle设置API的访问速率"></a>DRF的throttle设置API的访问速率</h3><p>接口访问速率过快，会导致其它业务受影响，网站打不开，服务器压力过大的请况。</p>
+<p>因为爬虫的存在，如果爬虫的速率过快、不考虑网站的承受能力，会对服务器造成很大的压力，甚至影响正常用户的访问，因此需要限制访问速率，对关键数据、对性能要求高的数据进行限速。</p>
+<p>DRF自带了限速功能，直接使用throttling进行限速即可实现，throttling与权限类似，它决定是否应授权请求。节流指示临时状态，并用于控制客户端可以向API发出的请求的速率，一般对未经身份验证的请求进行限制，而对于经过身份验证的请求则进行限制较少。</p>
+<p><a target="_blank" rel="noopener" href="https://www.django-rest-framework.org/api-guide/throttling/#setting-the-throttling-policy">https://www.django-rest-framework.org/api-guide/throttling/#setting-the-throttling-policy</a></p>
+<h4 id="设置全局限制策略"><a href="#设置全局限制策略" class="headerlink" title="设置全局限制策略"></a>设置全局限制策略</h4><p>The default throttling policy may be set globally, using the <code>DEFAULT_THROTTLE_CLASSES</code> and <code>DEFAULT_THROTTLE_RATES</code> settings.<br>可以使用<code>DEFAULT_THROTTLE_CLASSES</code>和<code>DEFAULT_THROTTLE_RATES</code>设置全局设置默认限制策略。</p>
+<p>修改 DjangoOnlineFreshSupermarket/settings.py 在<code>REST_FRAMEWORK</code>添加配置</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># DRF配置</span></span><br><span class="line">REST_FRAMEWORK = {</span><br><span class="line">    <span class="comment"># throttle对接口访问限速</span></span><br><span class="line">    <span class="string">'DEFAULT_THROTTLE_CLASSES'</span>: [</span><br><span class="line">        <span class="string">'rest_framework.throttling.AnonRateThrottle'</span>,  <span class="comment"># 用户未登录请求限速，通过IP地址判断</span></span><br><span class="line">        <span class="string">'rest_framework.throttling.UserRateThrottle'</span>  <span class="comment"># 用户登陆后请求限速，通过token或Session判断</span></span><br><span class="line">        <span class="comment"># 'rest_framework.throttling.ScopedRateThrottle',  # 限制用户对于每个视图的访问频次，使用ip或user id。</span></span><br><span class="line">    ],</span><br><span class="line">    <span class="string">'DEFAULT_THROTTLE_RATES'</span>: {</span><br><span class="line">        <span class="string">'anon'</span>: <span class="string">'5/minute'</span>,  <span class="comment"># 限制所有匿名未认证用户，使用IP区分用户。使用DEFAULT_THROTTLE_RATES['anon'] 来设置频次</span></span><br><span class="line">        <span class="string">'user'</span>: <span class="string">'10/minute'</span>  <span class="comment"># 限制认证用户，使用User id 来区分。使用DEFAULT_THROTTLE_RATES['user'] 来设置频次</span></span><br><span class="line">        <span class="comment"># 'goods_list': '3/minute'  # 单个API限速</span></span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GoodsListViewSet</span>(<span class="params">CacheResponseMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet</span>):</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    商品列表页，并实现分页、搜索、过滤、排序</span></span><br><span class="line"><span class="string">    list:</span></span><br><span class="line"><span class="string">        商品列表</span></span><br><span class="line"><span class="string">    retrieve:</span></span><br><span class="line"><span class="string">        商品详情</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    throttle_classes = [AnonRateThrottle, UserRateThrottle]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>这是所有API调用次数总数计算，并非单个API都有指定的次数。</p>
+<p>单个API限速<br>ScopedRateThrottle</p>
+<p>The <code>ScopedRateThrottle</code> class can be used to restrict access to specific parts of the API. This throttle will only be applied if the view that is being accessed includes a <code>.throttle_scope</code> property. The unique throttle key will then be formed by concatenating the “scope” of the request with the unique user id or IP address.</p>
+<p>The allowed request rate is determined by the <code>DEFAULT_THROTTLE_RATES</code> setting using a key from the request “scope”.</p>
+<p>For example, given the following views…</p>
+<p>还可以使用基于APIView类的视图在每个视图或每个视图集的基础上设置限制策略。</p>
+<p>首先配置限速范围，修改 <code>settings.py</code> ，注释掉全局限速，增加自定义权限</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># DRF配置</span></span><br><span class="line">REST_FRAMEWORK = {</span><br><span class="line">    <span class="comment"># throttle对接口访问限速</span></span><br><span class="line">    <span class="string">'DEFAULT_THROTTLE_CLASSES'</span>: [</span><br><span class="line">        <span class="comment"># 'rest_framework.throttling.AnonRateThrottle',  # 用户未登录请求限速，通过IP地址判断</span></span><br><span class="line">        <span class="comment"># 'rest_framework.throttling.UserRateThrottle'  # 用户登陆后请求限速，通过token或Session判断</span></span><br><span class="line">        <span class="string">'rest_framework.throttling.ScopedRateThrottle'</span>,  <span class="comment"># 限制用户对于每个视图的访问频次，使用ip或user id。</span></span><br><span class="line">    ],</span><br><span class="line">    <span class="string">'DEFAULT_THROTTLE_RATES'</span>: {</span><br><span class="line">        <span class="comment"># 'anon': '5/minute',  # 限制所有匿名未认证用户，使用IP区分用户。使用DEFAULT_THROTTLE_RATES['anon'] 来设置频次</span></span><br><span class="line">        <span class="comment"># 'user': '10/minute'  # 限制认证用户，使用User id 来区分。使用DEFAULT_THROTTLE_RATES['user'] 来设置频次</span></span><br><span class="line">        <span class="string">'goods_list'</span>: <span class="string">'3/minute'</span>  <span class="comment"># 单个API限速</span></span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="/2020/08/21/drf-huan-cun/1.png" alt="description"></p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 

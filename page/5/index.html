@@ -119,7 +119,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">338</span>
+          <span class="site-state-item-count">339</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -160,6 +160,108 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/06/22/go-redis/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/06/22/go-redis/" class="post-title-link" itemprop="url">go redis</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-06-21 16:21:41" itemprop="dateCreated datePublished" datetime="2021-06-21T16:21:41Z">2021-06-21</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-06-22 08:21:32" itemprop="dateModified" datetime="2021-06-22T08:21:32Z">2021-06-22</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><code>services/redis/Redis.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> redisClient</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"time"</span></span><br><span class="line"></span><br><span class="line">    <span class="string">"github.com/gomodule/redigo/redis"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 直接连接 项目中不会用 因为频繁的连接断开会造成网络的压力</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Connect</span><span class="params">()</span> <span class="title">redis</span>.<span class="title">Conn</span></span> {</span><br><span class="line">    <span class="comment">//pool, _ := redis.Dial("tcp", web.AppConfig.String("redisdb"))</span></span><br><span class="line">    pool, _ := redis.Dial(<span class="string">"tcp"</span>, <span class="string">"127.0.0.1:6379"</span>)</span><br><span class="line">    <span class="keyword">return</span> pool</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="comment">// 通过连接池</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">PoolConnect</span><span class="params">()</span> <span class="title">redis</span>.<span class="title">Conn</span></span> {</span><br><span class="line">    <span class="comment">// 建立连接池</span></span><br><span class="line">    pool := &amp;redis.Pool{</span><br><span class="line">        MaxIdle:     <span class="number">5000</span>,              <span class="comment">// 最大空闲连接数</span></span><br><span class="line">        MaxActive:   <span class="number">10000</span>,             <span class="comment">// 最大连接数</span></span><br><span class="line">        IdleTimeout: <span class="number">180</span> * time.Second, <span class="comment">// 空闲连接超时时间</span></span><br><span class="line">        Wait:        <span class="literal">true</span>,              <span class="comment">// 超过最大连接数时，是等待还是报错</span></span><br><span class="line">        Dial: <span class="function"><span class="keyword">func</span><span class="params">()</span> <span class="params">(redis.Conn, error)</span></span> { <span class="comment">// 建立连接</span></span><br><span class="line">            <span class="comment">//c, err := redis.Dial("tcp", web.AppConfig.String("redisdb"))</span></span><br><span class="line">            c, err := redis.Dial(<span class="string">"tcp"</span>, <span class="string">"127.0.0.1:6379"</span>, redis.DialPassword(<span class="string">"123456"</span>))</span><br><span class="line">            <span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">            }</span><br><span class="line">            <span class="comment">// 选择db</span></span><br><span class="line">            <span class="comment">//c.Do("SELECT", '')</span></span><br><span class="line">            <span class="keyword">return</span> c, <span class="literal">nil</span></span><br><span class="line">        },</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> pool.Get()</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>controllers\redisDemo.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> controllers</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    redisClient <span class="string">"demo/services/redis"</span></span><br><span class="line">    <span class="string">"fmt"</span></span><br><span class="line"></span><br><span class="line">    beego <span class="string">"github.com/beego/beego/v2/server/web"</span></span><br><span class="line">    <span class="string">"github.com/garyburd/redigo/redis"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> RedisDemoController <span class="keyword">struct</span> {</span><br><span class="line">    beego.Controller</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="comment">// @router /redis/demo [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *RedisDemoController)</span> <span class="title">Demo</span><span class="params">()</span></span> {</span><br><span class="line">    c := redisClient.PoolConnect()</span><br><span class="line">    <span class="keyword">defer</span> c.Close()</span><br><span class="line"></span><br><span class="line">    <span class="comment">// _, err := c.Do("SET", "username", "frog")</span></span><br><span class="line">    <span class="comment">// if err == nil {</span></span><br><span class="line">    <span class="comment">//     // 设置过期时间</span></span><br><span class="line">    <span class="comment">//     c.Do("expire", "username", 1000)</span></span><br><span class="line">    <span class="comment">// }</span></span><br><span class="line"></span><br><span class="line">    r, err := redis.String(c.Do(<span class="string">"get"</span>, <span class="string">"username"</span>))</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        fmt.Println(<span class="number">1</span>)</span><br><span class="line">        fmt.Println(r)</span><br><span class="line">        <span class="comment">// 获取剩余过期时间</span></span><br><span class="line">        ttl, _ := redis.Int64(c.Do(<span class="string">"ttl"</span>, <span class="string">"username"</span>))</span><br><span class="line">        fmt.Println(ttl)</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        fmt.Println(<span class="number">2</span>)</span><br><span class="line">        fmt.Println(err)</span><br><span class="line">    }</span><br><span class="line">    this.Ctx.WriteString(<span class="string">"hello"</span>)</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1315,147 +1417,6 @@
 
 <p><img src="/2021/06/18/beego-pi-liang-fa-song-xiao-xi-gai-zao/1.png" alt="description"><br><img src="/2021/06/18/beego-pi-liang-fa-song-xiao-xi-gai-zao/2.png" alt="description"></p>
 <script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/06/18/beego-pai-xing-bang/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/06/18/beego-pai-xing-bang/" class="post-title-link" itemprop="url">beego排行榜</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-06-17 16:21:41" itemprop="dateCreated datePublished" datetime="2021-06-17T16:21:41Z">2021-06-17</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-06-21 14:53:04" itemprop="dateModified" datetime="2021-06-21T14:53:04Z">2021-06-21</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/beego/" itemprop="url" rel="index"><span itemprop="name">beego</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>排行榜功能分为两部分</p>
-<p>图一，频道页中动漫排行模块<br>图二，点击页面顶部热搜榜，打开排行榜页面</p>
-<p><code>controllers\top.go</code></p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> controllers</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"demo/models"</span></span><br><span class="line"></span><br><span class="line">    beego <span class="string">"github.com/beego/beego/v2/server/web"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> TopController <span class="keyword">struct</span> {</span><br><span class="line">    beego.Controller</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<h3 id="频道排行榜接口"><a href="#频道排行榜接口" class="headerlink" title="频道排行榜接口"></a>频道排行榜接口</h3><p>接口地址：</p>
-<p>/channel/top</p>
-<p>接受参数和返回信息</p>
-<p>接收参数为：channelId（频道ID，1=动漫）<br>返回信息：<br>id = 视频ID<br>title = 标题<br>sub_title = 副标题<br>img = 竖版图片地址<br>img1 = 横版图片地址<br>add_time = 添加时间<br>episodes_count = 剧集集数<br>is_end = 是否完结<br>comment = 评论数</p>
-<p>业务逻辑：获取video表中channel_id=接收参数和status=1的数据，按照评论数倒序，获取10条。</p>
-<figure class="highlight sql"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">id</span>,title,sub_title,img,img1,add_time,episodes_count,is_end <span class="keyword">FROM</span> video <span class="keyword">WHERE</span> <span class="keyword">status</span>=<span class="number">1</span> <span class="keyword">AND</span> channel_id=? <span class="keyword">ORDER</span> <span class="keyword">BY</span> <span class="keyword">comment</span> <span class="keyword">DESC</span> <span class="keyword">LIMIT</span> <span class="number">10</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>models\video.go</code></p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 频道排行榜</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">GetChannelTop</span><span class="params">(channelId <span class="keyword">int</span>)</span> <span class="params">(<span class="keyword">int64</span>, []VideoData, error)</span></span> {</span><br><span class="line">    o := orm.NewOrm()</span><br><span class="line">    <span class="keyword">var</span> videos []VideoData</span><br><span class="line">    num, err := o.Raw(<span class="string">"SELECT id,title,sub_title,img,img1,add_time,episodes_count,is_end FROM video WHERE status=1 AND channel_id=? ORDER BY comment DESC LIMIT 10"</span>, channelId).QueryRows(&amp;videos)</span><br><span class="line">    <span class="keyword">return</span> num, videos, err</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>controllers\top.go</code></p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 根据频道Id获取排行榜</span></span><br><span class="line"><span class="comment">// @router /channel/top [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *TopController)</span> <span class="title">ChannelTop</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="comment">// 获取频道Id</span></span><br><span class="line">    channelId, _ := this.GetInt(<span class="string">"channelId"</span>)</span><br><span class="line">    <span class="keyword">if</span> channelId == <span class="number">0</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4001</span>, <span class="string">"必须指定频道"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    num, videos, err := models.GetChannelTop(channelId)</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnSuccess(<span class="number">0</span>, <span class="string">"success"</span>, videos, num)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4004</span>, <span class="string">"没有相关内容"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p><img src="/2021/06/18/beego-pai-xing-bang/1.png" alt="description"></p>
-<h3 id="频道排行榜接口改造"><a href="#频道排行榜接口改造" class="headerlink" title="频道排行榜接口改造"></a>频道排行榜接口改造</h3><p><code>models\video.go</code></p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 增加redis缓存 - 频道排行榜</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">RedisGetChannelTop</span><span class="params">(channelId <span class="keyword">int</span>)</span> <span class="params">(<span class="keyword">int64</span>, []VideoData, error)</span></span> {</span><br><span class="line">    <span class="keyword">var</span> (</span><br><span class="line">        videos []VideoData</span><br><span class="line">        num    <span class="keyword">int64</span></span><br><span class="line">    )</span><br><span class="line">    conn := redisClient.PoolConnect()</span><br><span class="line">    <span class="keyword">defer</span> conn.Close()</span><br><span class="line">    <span class="comment">// 定义Rediskey</span></span><br><span class="line">    redisKey := <span class="string">"video:top:channel:channelId:"</span> + strconv.Itoa(channelId)</span><br><span class="line">    <span class="comment">// 判断是否存在</span></span><br><span class="line">    exists, err := redis.Bool(conn.Do(<span class="string">"exists"</span>, redisKey))</span><br><span class="line">    <span class="keyword">if</span> exists {</span><br><span class="line">        num = <span class="number">0</span></span><br><span class="line">        res, _ := redis.Values(conn.Do(<span class="string">"zrevrange"</span>, redisKey, <span class="string">"0"</span>, <span class="string">"10"</span>, <span class="string">"WITHSCORES"</span>))</span><br><span class="line">        <span class="comment">// zrevrange获得的值第一条是属性也就是下边的id，第二条是分数，交替获取</span></span><br><span class="line">        <span class="comment">// 这里只需要id不需要分数</span></span><br><span class="line">        <span class="keyword">for</span> k, v := <span class="keyword">range</span> res {</span><br><span class="line">            fmt.Println(<span class="keyword">string</span>(v.([]<span class="keyword">byte</span>)))</span><br><span class="line">            <span class="keyword">if</span> k%<span class="number">2</span> == <span class="number">0</span> {</span><br><span class="line">                <span class="comment">// 获取到的值转换为数字</span></span><br><span class="line">                videoId, err := strconv.Atoi(<span class="keyword">string</span>(v.([]<span class="keyword">byte</span>)))</span><br><span class="line">                videoInfo, err := RedisGetVideoInfo(videoId)</span><br><span class="line">                <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">                    <span class="keyword">var</span> videoDataInfo VideoData</span><br><span class="line">                    videoDataInfo.Id = videoInfo.Id</span><br><span class="line">                    videoDataInfo.Img = videoInfo.Img</span><br><span class="line">                    videoDataInfo.Img1 = videoInfo.Img1</span><br><span class="line">                    videoDataInfo.IsEnd = videoInfo.IsEnd</span><br><span class="line">                    videoDataInfo.SubTitle = videoInfo.SubTitle</span><br><span class="line">                    videoDataInfo.Title = videoInfo.Title</span><br><span class="line">                    videoDataInfo.AddTime = videoInfo.AddTime</span><br><span class="line">                    videoDataInfo.Comment = videoInfo.Comment</span><br><span class="line">                    videoDataInfo.EpisodesCount = videoInfo.EpisodesCount</span><br><span class="line">                    videos = <span class="built_in">append</span>(videos, videoDataInfo)</span><br><span class="line">                    num++</span><br><span class="line">                }</span><br><span class="line">            }</span><br><span class="line">        }</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        o := orm.NewOrm()</span><br><span class="line">        num, err = o.Raw(<span class="string">"SELECT id,title,sub_title,img,img1,add_time,episodes_count,is_end FROM video WHERE status=1 AND channel_id=? ORDER BY comment DESC LIMIT 10"</span>, channelId).QueryRows(&amp;videos)</span><br><span class="line">        <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">            <span class="comment">//保存redis</span></span><br><span class="line">            <span class="keyword">for</span> _, v := <span class="keyword">range</span> videos {</span><br><span class="line">                conn.Do(<span class="string">"zadd"</span>, redisKey, v.Comment, v.Id)</span><br><span class="line">            }</span><br><span class="line">            conn.Do(<span class="string">"expire"</span>, redisKey, <span class="number">60</span>*<span class="number">60</span>*<span class="number">24</span>*<span class="number">30</span>)</span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> num, videos, err</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>controllers\top.go</code></p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 根据频道Id获取排行榜</span></span><br><span class="line"><span class="comment">// @router /channel/top [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *TopController)</span> <span class="title">ChannelTop</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="comment">// 获取频道Id</span></span><br><span class="line">    channelId, _ := this.GetInt(<span class="string">"channelId"</span>)</span><br><span class="line">    <span class="keyword">if</span> channelId == <span class="number">0</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4001</span>, <span class="string">"必须指定频道"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    <span class="comment">//num, videos, err := models.GetChannelTop(channelId)</span></span><br><span class="line">    num, videos, err := models.RedisGetChannelTop(channelId)</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnSuccess(<span class="number">0</span>, <span class="string">"success"</span>, videos, num)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4004</span>, <span class="string">"没有相关内容"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<h3 id="类型排行榜接口"><a href="#类型排行榜接口" class="headerlink" title="类型排行榜接口"></a>类型排行榜接口</h3><p>接口地址：</p>
-<p>/type/top</p>
-<p>接受参数和返回信息</p>
-<p>接收参数为：typeId（类型ID）<br>返回信息：<br>id = 视频ID<br>title = 标题<br>sub_title = 副标题<br>img = 竖版图片地址<br>img1 = 横版图片地址<br>add_time = 添加时间<br>episodes_count = 剧集集数<br>is_end = 是否完结<br>comment = 评论数</p>
-<p>业务逻辑：获取video表中type_id=接收参数和status=1的数据，按照评论数倒序，获取10条。</p>
-<figure class="highlight sql"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">id</span>,title,sub_title,img,img1,add_time,episodes_count,is_end <span class="keyword">FROM</span> video <span class="keyword">WHERE</span> <span class="keyword">status</span>=<span class="number">1</span> <span class="keyword">AND</span> type_id=? <span class="keyword">ORDER</span> <span class="keyword">BY</span> <span class="keyword">comment</span> <span class="keyword">DESC</span> <span class="keyword">LIMIT</span> <span class="number">10</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p>注意：本节排行榜功能是通过mysql实现的，对应条件倒序就可以了，但是假如数据量比较大的时候，接口访问速度肯定很慢。怎么优化和改造呢？小伙伴可以思考一下，先做铺垫，后面章节对应讲解。</p>
-<p><code>models\video.go</code></p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 类型排行榜</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">GetTypeTop</span><span class="params">(typeId <span class="keyword">int</span>)</span> <span class="params">(<span class="keyword">int64</span>, []VideoData, error)</span></span> {</span><br><span class="line">    o := orm.NewOrm()</span><br><span class="line">    <span class="keyword">var</span> videos []VideoData</span><br><span class="line">    num, err := o.Raw(<span class="string">"SELECT id,title,sub_title,img,img1,add_time,episodes_count,is_end FROM video WHERE status=1 AND type_id=? ORDER BY comment DESC LIMIT 10"</span>, typeId).QueryRows(&amp;videos)</span><br><span class="line">    <span class="keyword">return</span> num, videos, err</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>controllers\top.go</code></p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 根据类型获取排行榜</span></span><br><span class="line"><span class="comment">// @router /type/top [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *TopController)</span> <span class="title">TypeTop</span><span class="params">()</span></span> {</span><br><span class="line">    typeId, _ := this.GetInt(<span class="string">"typeId"</span>)</span><br><span class="line">    <span class="keyword">if</span> typeId == <span class="number">0</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4001</span>, <span class="string">"必须指定类型"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    num, videos, err := models.GetTypeTop(typeId)</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnSuccess(<span class="number">0</span>, <span class="string">"success"</span>, videos, num)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4004</span>, <span class="string">"没有相关内容"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p><img src="/2021/06/18/beego-pai-xing-bang/2.png" alt="description"></p>
-<h3 id="类型排行榜接口改造"><a href="#类型排行榜接口改造" class="headerlink" title="类型排行榜接口改造"></a>类型排行榜接口改造</h3><p><code>models\video.go</code></p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 增加redis缓存 - 类型排行榜</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">RedisGetTypeTop</span><span class="params">(typeId <span class="keyword">int</span>)</span> <span class="params">(<span class="keyword">int64</span>, []VideoData, error)</span></span> {</span><br><span class="line">    <span class="keyword">var</span> (</span><br><span class="line">        videos []VideoData</span><br><span class="line">        num    <span class="keyword">int64</span></span><br><span class="line">    )</span><br><span class="line">    conn := redisClient.PoolConnect()</span><br><span class="line">    <span class="keyword">defer</span> conn.Close()</span><br><span class="line">    <span class="comment">// 数字转换为字符串</span></span><br><span class="line">    redisKey := <span class="string">"video:top:type:typeId:"</span> + strconv.Itoa(typeId)</span><br><span class="line">    exists, err := redis.Bool(conn.Do(<span class="string">"exists"</span>, redisKey))</span><br><span class="line">    <span class="keyword">if</span> exists {</span><br><span class="line">        num = <span class="number">0</span></span><br><span class="line">        res, _ := redis.Values(conn.Do(<span class="string">"zrevrange"</span>, redisKey, <span class="string">"0"</span>, <span class="string">"10"</span>, <span class="string">"WITHSCORES"</span>))</span><br><span class="line">        <span class="keyword">for</span> k, v := <span class="keyword">range</span> res {</span><br><span class="line">            <span class="keyword">if</span> k%<span class="number">2</span> == <span class="number">0</span> {</span><br><span class="line">                videoId, err := strconv.Atoi(<span class="keyword">string</span>(v.([]<span class="keyword">byte</span>)))</span><br><span class="line">                videoInfo, err := RedisGetVideoInfo(videoId)</span><br><span class="line">                <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">                    <span class="keyword">var</span> videoDataInfo VideoData</span><br><span class="line">                    videoDataInfo.Id = videoInfo.Id</span><br><span class="line">                    videoDataInfo.Img = videoInfo.Img</span><br><span class="line">                    videoDataInfo.Img1 = videoInfo.Img1</span><br><span class="line">                    videoDataInfo.IsEnd = videoInfo.IsEnd</span><br><span class="line">                    videoDataInfo.SubTitle = videoInfo.SubTitle</span><br><span class="line">                    videoDataInfo.Title = videoInfo.Title</span><br><span class="line">                    videoDataInfo.AddTime = videoInfo.AddTime</span><br><span class="line">                    videoDataInfo.Comment = videoInfo.Comment</span><br><span class="line">                    videoDataInfo.EpisodesCount = videoInfo.EpisodesCount</span><br><span class="line">                    videos = <span class="built_in">append</span>(videos, videoDataInfo)</span><br><span class="line">                    num++</span><br><span class="line">                }</span><br><span class="line">            }</span><br><span class="line">        }</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        o := orm.NewOrm()</span><br><span class="line">        num, err = o.Raw(<span class="string">"SELECT id,title,sub_title,img,img1,add_time,episodes_count,is_end FROM video WHERE status=1 AND type_id=? ORDER BY comment DESC LIMIT 10"</span>, typeId).QueryRows(&amp;videos)</span><br><span class="line">        <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">            <span class="comment">//保存redis</span></span><br><span class="line">            <span class="keyword">for</span> _, v := <span class="keyword">range</span> videos {</span><br><span class="line">                conn.Do(<span class="string">"zadd"</span>, redisKey, v.Comment, v.Id)</span><br><span class="line">            }</span><br><span class="line">            conn.Do(<span class="string">"expire"</span>, redisKey, <span class="number">60</span>*<span class="number">60</span>*<span class="number">24</span>*<span class="number">30</span>)</span><br><span class="line">        }</span><br><span class="line"></span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> num, videos, err</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>controllers\top.go</code></p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 根据类型获取排行榜</span></span><br><span class="line"><span class="comment">// @router /type/top [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *TopController)</span> <span class="title">TypeTop</span><span class="params">()</span></span> {</span><br><span class="line">    typeId, _ := this.GetInt(<span class="string">"typeId"</span>)</span><br><span class="line">    <span class="keyword">if</span> typeId == <span class="number">0</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4001</span>, <span class="string">"必须指定类型"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    <span class="comment">//num, videos, err := models.GetTypeTop(typeId)</span></span><br><span class="line">    num, videos, err := models.RedisGetTypeTop(typeId)</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnSuccess(<span class="number">0</span>, <span class="string">"success"</span>, videos, num)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4004</span>, <span class="string">"没有相关内容"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure><script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }

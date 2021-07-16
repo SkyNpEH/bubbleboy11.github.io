@@ -119,7 +119,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">338</span>
+          <span class="site-state-item-count">339</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -160,6 +160,128 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/05/06/drf-ding-dan/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/05/06/drf-ding-dan/" class="post-title-link" itemprop="url">drf订单</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-05-05 16:21:41" itemprop="dateCreated datePublished" datetime="2021-05-05T16:21:41Z">2021-05-05</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-06-15 01:50:33" itemprop="dateModified" datetime="2021-06-15T01:50:33Z">2021-06-15</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>用户添加商品到购物车，点去购物车结算，填上地址留言，结算生成订单，在会员中心我的订单里面，可以看到订单列表，点订单可以看到订单的详细信息。</p>
+<p>先看模型</p>
+<p><code>trade/model.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">OrderInfo</span>(<span class="params">models.Model</span>):</span></span><br><span class="line">    <span class="string">'''订单信息'''</span></span><br><span class="line">    ORDER_STATUS = (</span><br><span class="line">        (<span class="string">"TRADE_SUCCESS"</span>, <span class="string">"支付成功"</span>),</span><br><span class="line">        (<span class="string">"TRADE_CLOSED"</span>, <span class="string">"交易关闭"</span>),</span><br><span class="line">        (<span class="string">"WAIT_BUYER_PAY"</span>, <span class="string">"交易创建"</span>),</span><br><span class="line">        (<span class="string">"TRADE_FINISHED"</span>, <span class="string">"交易完结"</span>),</span><br><span class="line">    )</span><br><span class="line">    user = models.ForeignKey(User, verbose_name=<span class="string">'用户'</span>, null=<span class="literal">True</span>, on_delete=models.CASCADE)</span><br><span class="line">    <span class="comment"># 订单编号是在提交订单之后生成的，因此在创建记录时应该允许为空</span></span><br><span class="line">    order_sn = models.CharField(max_length=<span class="number">30</span>, unique=<span class="literal">True</span>, null=<span class="literal">True</span>, blank=<span class="literal">True</span>, verbose_name=<span class="string">'订单号'</span>)</span><br><span class="line">    trade_no = models.CharField(max_length=<span class="number">50</span>, unique=<span class="literal">True</span>, null=<span class="literal">True</span>, blank=<span class="literal">True</span>, verbose_name=<span class="string">'交易号'</span>)</span><br><span class="line">    pay_status = models.CharField(max_length=<span class="number">30</span>, default=<span class="string">'WAIT_BUYER_PAY'</span>, choices=ORDER_STATUS, verbose_name=<span class="string">'订单状态'</span>)</span><br><span class="line">    post_script = models.CharField(max_length=<span class="number">11</span>, default=<span class="string">''</span>, null=<span class="literal">True</span>, blank=<span class="literal">True</span>, verbose_name=<span class="string">'订单留言'</span>)</span><br><span class="line">    order_amount = models.FloatField(default=<span class="number">0.0</span>, verbose_name=<span class="string">'订单金额'</span>)</span><br><span class="line">    pay_time = models.DateTimeField(null=<span class="literal">True</span>, blank=<span class="literal">True</span>, verbose_name=<span class="string">'支付时间'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 用户基本信息</span></span><br><span class="line">    <span class="comment"># address不直接使用外键，因为用户如果修改了个人中心的收货地址，订单中地址就会跟着变化</span></span><br><span class="line">    address = models.CharField(max_length=<span class="number">100</span>, default=<span class="string">''</span>, verbose_name=<span class="string">'收货地址'</span>)</span><br><span class="line">    signer_name = models.CharField(max_length=<span class="number">20</span>, default=<span class="string">''</span>, verbose_name=<span class="string">'签收人'</span>)</span><br><span class="line">    signer_mobile = models.CharField(max_length=<span class="number">11</span>, verbose_name=<span class="string">'联系电话'</span>)</span><br><span class="line"></span><br><span class="line">    add_time = models.DateTimeField(auto_now_add=<span class="literal">True</span>, verbose_name=<span class="string">u'添加时间'</span>)</span><br><span class="line">    is_delete = models.BooleanField(default=<span class="literal">False</span>, verbose_name=<span class="string">'是否删除'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        verbose_name = <span class="string">u"订单信息"</span></span><br><span class="line">        verbose_name_plural = verbose_name</span><br><span class="line">        ordering = [<span class="string">'-add_time'</span>]</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__str__</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> str(self.order_sn)</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>order_sn</code>字段能为空，订单号需要由后台生成。但用户点击去结算时，后台需要生成一个订单号，但是如果我们用到<code>CreateModelMixin</code>，这个会对该字段进行验证，在用户界面是不可能post一个订单号到后台，从而导致验证失败，所以该字段增加设置<code>blank=True, null=True</code></p>
+<p><code>pay_status</code>可以设置一个默认值，为待支付状态<code>default='WAIT_BUYER_PAY'</code>，提交订单时，用户也不用指定该字段了。</p>
+<p><code>address</code>不直接使用外键的原因是：用户如果修改了个人中心的收货地址，订单中地址就会跟着变化，显然是不对的，所以订单中的地址就保存一个当时下单的地址组合的字符串。</p>
+<p>对于一个订单，有多个商品，所以需要设置另外一个model，用外键关联。</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">OrderGoods</span>(<span class="params">models.Model</span>):</span></span><br><span class="line">    <span class="string">'''订单商品详情'''</span></span><br><span class="line">    order = models.ForeignKey(OrderInfo, verbose_name=<span class="string">'订单信息'</span>, on_delete=models.CASCADE, related_name=<span class="string">'goods'</span>)</span><br><span class="line">    goods = models.ForeignKey(Goods, verbose_name=<span class="string">'商品'</span>, null=<span class="literal">True</span>, on_delete=models.CASCADE)</span><br><span class="line">    goods_num = models.IntegerField(default=<span class="number">0</span>, verbose_name=<span class="string">'商品数量'</span>)</span><br><span class="line"></span><br><span class="line">    add_time = models.DateTimeField(auto_now_add=<span class="literal">True</span>, verbose_name=<span class="string">u'添加时间'</span>)</span><br><span class="line">    is_delete = models.BooleanField(default=<span class="literal">False</span>, verbose_name=<span class="string">'是否删除'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        verbose_name = <span class="string">'订单商品'</span></span><br><span class="line">        verbose_name_plural = verbose_name</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__str__</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> str(self.order.order_sn)</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>trade/serializer.py</code></p>
+<p>用户添加商品到购物车，点去购物车结算，填上地址留言，结算生成订单，在会员中心我的订单里面，可以看到订单列表，点订单可以看到订单的详细信息。</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> trade.models <span class="keyword">import</span> OrderInfo</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">OrderListSerializer</span>(<span class="params">serializers.ModelSerializer</span>):</span></span><br><span class="line">    <span class="comment"># 表示user为隐藏字段，默认为获取当前登录用户</span></span><br><span class="line">    user = serializers.HiddenField(default=serializers.CurrentUserDefault())</span><br><span class="line">    <span class="comment"># 生成订单的时候这些不能显示给用户修改和post，只能后台去修改</span></span><br><span class="line">    pay_status = serializers.CharField(read_only=<span class="literal">True</span>)</span><br><span class="line">    trade_no = serializers.CharField(read_only=<span class="literal">True</span>)</span><br><span class="line">    order_sn = serializers.CharField(read_only=<span class="literal">True</span>)</span><br><span class="line">    pay_time = serializers.DateTimeField(read_only=<span class="literal">True</span>)</span><br><span class="line">    is_delete = serializers.BooleanField(read_only=<span class="literal">True</span>)</span><br><span class="line">    <span class="comment"># 用于订单创建时，生成支付宝的支付url</span></span><br><span class="line">    alipay_url = serializers.SerializerMethodField(read_only=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_alipay_url</span>(<span class="params">self, obj</span>):</span></span><br><span class="line">        <span class="comment"># 方法命名规则为：get_&lt;field_name&gt;</span></span><br><span class="line">        alipay = AliPay(  <span class="comment"># 创建调用支付宝的对象</span></span><br><span class="line">            appid=settings.ALI_APP_ID,</span><br><span class="line">            app_notify_url=settings.NOTIFY_URL,</span><br><span class="line">            app_private_key_string=open(settings.APP_PRIVATE_KEY_PATH).read(),</span><br><span class="line">            alipay_public_key_string=open(settings.ALIPAY_PUBLIC_KEY_PATH).read(),</span><br><span class="line">            sign_type=<span class="string">"RSA2"</span>,</span><br><span class="line">            debug=settings.DEBUG,</span><br><span class="line">        )</span><br><span class="line">        <span class="comment"># 调用获取支付页面操作</span></span><br><span class="line">        <span class="comment"># 电脑网站支付，需要跳转到：</span></span><br><span class="line">        <span class="comment"># 真实环境：https://openapi.alipay.com/gateway.do? + order_string</span></span><br><span class="line">        <span class="comment"># 沙箱环境：https://openapi.alipaydev.com/gateway.do? + order_string</span></span><br><span class="line">        order_string = alipay.api_alipay_trade_page_pay(</span><br><span class="line">            out_trade_no=obj.order_sn,</span><br><span class="line">            total_amount=obj.order_amount,</span><br><span class="line">            subject=<span class="string">'订单号：%s'</span> % obj.order_sn,</span><br><span class="line">            return_url=settings.RETURN_URL,</span><br><span class="line">            notify_url=settings.NOTIFY_URL</span><br><span class="line">        )</span><br><span class="line">        <span class="comment"># 生成完整的支付页面URL</span></span><br><span class="line">        pay_url = alipay._gateway + <span class="string">'?'</span> + order_string</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> pay_url</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">generate_order_sn</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        生成订单编号=当前时间+userid+随机数</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">'%s%d%d'</span> % (time.strftime(<span class="string">'%Y%m%d%H%M%S'</span>), self.context[<span class="string">'request'</span>].user.id, randint(<span class="number">1000</span>, <span class="number">9999</span>))</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">validate</span>(<span class="params">self, attrs</span>):</span></span><br><span class="line">        <span class="comment"># 数据验证validate成功后，生成一个订单号，</span></span><br><span class="line">        <span class="comment"># 然后在view中就可以perform_create(self, serializer)执行.save()</span></span><br><span class="line">        attrs[<span class="string">'order_sn'</span>] = self.generate_order_sn()</span><br><span class="line">        <span class="keyword">return</span> attrs</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        model = OrderInfo</span><br><span class="line">        fields = <span class="string">'__all__'</span></span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> trade.models <span class="keyword">import</span> OrderInfo, OrderGoods</span><br><span class="line"><span class="keyword">from</span> goods.serializers <span class="keyword">import</span> GoodsSerializer</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">OrderGoodsSerializer</span>(<span class="params">serializers.ModelSerializer</span>):</span></span><br><span class="line">    <span class="string">"""订单中的商品序列化"""</span></span><br><span class="line">    goods = GoodsSerializer(many=<span class="literal">False</span>)  <span class="comment"># 一对一，嵌套商品详情的序列化</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        model = OrderGoods</span><br><span class="line">        fields = <span class="string">'__all__'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">OrderDetailSerializer</span>(<span class="params">serializers.ModelSerializer</span>):</span></span><br><span class="line">    <span class="string">"""订单详情显示"""</span></span><br><span class="line">    goods = OrderGoodsSerializer(many=<span class="literal">True</span>)  <span class="comment"># 为OrderGoods中外键关联字段</span></span><br><span class="line">    <span class="comment"># 在订单详情页也能显示支付的url</span></span><br><span class="line">    alipay_url = serializers.SerializerMethodField(read_only=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_alipay_url</span>(<span class="params">self, obj</span>):</span></span><br><span class="line">        <span class="comment"># 方法命名规则为：get_&lt;field_name&gt;</span></span><br><span class="line">        alipay = AliPay(  <span class="comment"># 创建调用支付宝的对象</span></span><br><span class="line">            appid=settings.ALI_APP_ID,</span><br><span class="line">            app_notify_url=settings.NOTIFY_URL,</span><br><span class="line">            app_private_key_string=open(settings.APP_PRIVATE_KEY_PATH).read(),</span><br><span class="line">            alipay_public_key_string=open(settings.ALIPAY_PUBLIC_KEY_PATH).read(),</span><br><span class="line">            sign_type=<span class="string">"RSA2"</span>,</span><br><span class="line">            debug=settings.DEBUG,  <span class="comment"># 默认False</span></span><br><span class="line">        )</span><br><span class="line">        <span class="comment"># 调用获取支付页面操作</span></span><br><span class="line">        <span class="comment"># 电脑网站支付，需要跳转到：https://openapi.alipay.com/gateway.do? + order_string</span></span><br><span class="line">        order_string = alipay.api_alipay_trade_page_pay(</span><br><span class="line">            out_trade_no=obj.order_sn,</span><br><span class="line">            total_amount=obj.order_amount,</span><br><span class="line">            subject=<span class="string">'订单号：%s'</span> % obj.order_sn,</span><br><span class="line">            return_url=settings.RETURN_URL,</span><br><span class="line">            notify_url=settings.NOTIFY_URL</span><br><span class="line">        )</span><br><span class="line">        <span class="comment"># 生成完整的支付页面URL</span></span><br><span class="line">        pay_url = alipay._gateway + <span class="string">'?'</span> + order_string</span><br><span class="line">        <span class="keyword">return</span> pay_url</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        model = OrderInfo</span><br><span class="line">        fields = <span class="string">'__all__'</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>对于订单提交，会告诉后台创建一个订单，将购物车<code>ShoppingCart</code>中的该用户对应的单品和数量，添加到订单商品<code>OrderGoods</code>中，然后清空该用户的购物车。</p>
+<p><code>trade/views.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">OrderInfoViewSet</span>(<span class="params">mixins.CreateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin,</span></span></span><br><span class="line"><span class="class"><span class="params">                       mixins.DestroyModelMixin,</span></span></span><br><span class="line"><span class="class"><span class="params">                       viewsets.GenericViewSet</span>):</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    订单管理，不能修改，不需要继承自UpdateModelMixin</span></span><br><span class="line"><span class="string">    list:</span></span><br><span class="line"><span class="string">        订单列表</span></span><br><span class="line"><span class="string">    retrieve:</span></span><br><span class="line"><span class="string">        订单详情</span></span><br><span class="line"><span class="string">    delete:</span></span><br><span class="line"><span class="string">        删除订单</span></span><br><span class="line"><span class="string">    create:</span></span><br><span class="line"><span class="string">        新增订单</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    queryset = OrderInfo.objects.all()</span><br><span class="line">    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]  <span class="comment"># 用户必须登录才能访问</span></span><br><span class="line">    authentication_classes = [JWTAuthentication, SessionAuthentication]  <span class="comment"># 配置登录认证：支持JWT认证和DRF基本认证</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># serializer_class = OrderListSerializer</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_queryset</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> OrderInfo.objects.filter(user=self.request.user, is_delete=<span class="literal">False</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_serializer_class</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">if</span> self.action == <span class="string">'retrieve'</span>:</span><br><span class="line">            <span class="keyword">return</span> OrderDetailSerializer</span><br><span class="line">        <span class="keyword">return</span> OrderListSerializer</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">perform_create</span>(<span class="params">self, serializer</span>):</span></span><br><span class="line">        <span class="string">"""在完成创建订单后提交保存之前保存到数据库的OrderInfo对象还需要多两步步骤"""</span></span><br><span class="line">        order = serializer.save()</span><br><span class="line">        shop_carts = ShoppingCart.objects.filter(user=self.request.user, is_delete=<span class="literal">False</span>)</span><br><span class="line">        <span class="keyword">for</span> shop_cart <span class="keyword">in</span> shop_carts:</span><br><span class="line">            <span class="comment"># 将该用户购物车所有商品都取出来保存到订单商品中</span></span><br><span class="line">            OrderGoods.objects.create(</span><br><span class="line">                order=order,</span><br><span class="line">                goods=shop_cart.goods,</span><br><span class="line">                goods_num=shop_cart.nums</span><br><span class="line">            )</span><br><span class="line">            <span class="comment"># 清空该用户购物车</span></span><br><span class="line">            shop_cart.delete()</span><br><span class="line">        <span class="keyword">return</span> order</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>url.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> trade.views <span class="keyword">import</span> OrderInfoViewSet</span><br><span class="line"></span><br><span class="line">router.register(<span class="string">'orders'</span>, OrderInfoViewSet)</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="/2021/05/06/drf-ding-dan/1.png" alt="description"><br><img src="/2021/05/06/drf-ding-dan/2.png" alt="description"><br><img src="/2021/05/06/drf-ding-dan/3.png" alt="description"><br><img src="/2021/05/06/drf-ding-dan/5.png" alt="description"><br><img src="/2021/05/06/drf-ding-dan/4.png" alt="description"><br><img src="/2021/05/06/drf-ding-dan/6.jpeg" alt="description"><br><img src="/2021/05/06/drf-ding-dan/7.png" alt="description"></p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1662,165 +1784,6 @@
 </li>
 </ol>
 <p>12.4</p>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/04/26/linux-an-zhuang-mysql/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/04/26/linux-an-zhuang-mysql/" class="post-title-link" itemprop="url">linux安装mysql</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-04-25 17:46:44" itemprop="dateCreated datePublished" datetime="2021-04-25T17:46:44Z">2021-04-25</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-06-11 09:10:48" itemprop="dateModified" datetime="2021-06-11T09:10:48Z">2021-06-11</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" itemprop="url" rel="index"><span itemprop="name">操作系统</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>官方文档<a target="_blank" rel="noopener" href="https://dev.mysql.com/doc/refman/8.0/en/linux-installation-yum-repo.html">https://dev.mysql.com/doc/refman/8.0/en/linux-installation-yum-repo.html</a></p>
-<ol>
-<li>下载 <a target="_blank" rel="noopener" href="https://dev.mysql.com/downloads/file/?id=484922%EF%BC%8C%E6%89%BE%E5%88%B0linux7">https://dev.mysql.com/downloads/file/?id=484922，找到linux7</a> 或 8 对应的版本右键<code>No thanks, just start my download.</code>复制链接<br>下载并安装MySQL官方的Yum Repository</li>
-</ol>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">wget https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-community-8.0.24-1.el7.src.rpm</span><br><span class="line">[root@VM-0-9-centos ~]<span class="comment"># ls</span></span><br><span class="line">authorized_keys  dev  file1  file2  file3  mysql-community-8.0.24-1.el7.src.rpm  test1</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install -y mysql80-community-release-el7-3.noarch.rpm</span><br></pre></td></tr></tbody></table></figure>
-
-<p>安装这个包后，会获得两个mysql的yum repo源：<code>/etc/yum.repos.d/mysql-community.repo</code>，<code>/etc/yum.repos.d/mysql-community-source.repo</code>。</p>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">yum install mysqlMySQL</span><br><span class="line">yum install mysql-server</span><br><span class="line"><span class="comment"># 也可以</span></span><br><span class="line">sudo apt-get mysql-server</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@VM-0-9-centos ~]<span class="comment"># yum repolist enabled | grep "mysql.*-community.*"</span></span><br><span class="line">mysql-connectors-community/x86_64    MySQL Connectors Community              194</span><br><span class="line">mysql-tools-community/x86_64         MySQL Tools Community                   126</span><br><span class="line">mysql80-community/x86_64             MySQL 8.0 Community Server              247</span><br></pre></td></tr></tbody></table></figure>
-
-<p>linux MySQL的启动控制 进入mysql的方式：</p>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[root@VM-0-9-centos ~]<span class="comment"># systemctl start/stop/restart mysqld</span></span><br><span class="line">[root@VM-0-9-centos ~]<span class="comment"># ps aux|grep mysql</span></span><br><span class="line">root     20615  0.0  0.0 112816   976 pts/9    R+   12:34   0:00 grep --color=auto mysql</span><br><span class="line">mysql    25791  0.1 20.3 1338744 382980 ?      Ssl  Apr24  32:25 /usr/sbin/mysqld</span><br><span class="line">[root@VM-0-9-centos ~]<span class="comment"># ps -ef | grep mysql</span></span><br><span class="line">root     20797 14488  0 12:35 pts/9    00:00:00 grep --color=auto mysql</span><br><span class="line">mysql    25791     1  0 Apr24 ?        00:32:25 /usr/sbin/mysqld</span><br><span class="line">systemctl status mysqld</span><br><span class="line"></span><br><span class="line">[root@VM-0-9-centos ~]<span class="comment"># sudo grep 'temporary password' /var/log/mysqld.log</span></span><br><span class="line">2021-04-24T08:45:29.536875Z 6 [Note] [MY-010454] [Server] A temporary password is generated <span class="keyword">for</span> root@localhost: Q+s/T:;dS8r9</span><br></pre></td></tr></tbody></table></figure>
-
-<p>Q+s/T:;dS8r9 为mysql root用户密码</p>
-<p>查看端口号（默认端口号3306）</p>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@VM-0-9-centos ~]<span class="comment"># netstat -tnlp</span></span><br><span class="line">Active Internet connections (only servers)</span><br><span class="line">Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    </span><br><span class="line">tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      25528/nginx: master </span><br><span class="line">tcp        0      0 127.0.0.1:39602         0.0.0.0:*               LISTEN      14656/node          </span><br><span class="line">tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      1346/sshd           </span><br><span class="line">tcp6       0      0 :::33060                :::*                    LISTEN      25791/mysqld        </span><br><span class="line">tcp6       0      0 :::3306                 :::* </span><br></pre></td></tr></tbody></table></figure>
-
-<p>连接 远程登陆</p>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mysql -u用户名 -p</span><br><span class="line">mysql -h 服务器IP地址、主机 -P 端口号 -uroot -p</span><br></pre></td></tr></tbody></table></figure>
-
-<p>输入密码</p>
-<p>建立用户并授权用户访问该数据库</p>
-<p>自定义密码MyNewPass4</p>
-<figure class="highlight sql"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">// 法1</span><br><span class="line">mysql&gt; ALTER USER 'root'@'localhost' IDENTIFIED BY 'MyNewPass4!';</span><br><span class="line"></span><br><span class="line"><span class="comment"># 法二</span></span><br><span class="line"><span class="keyword">GRANT</span> <span class="keyword">ALL</span> <span class="keyword">PRIVILEGES</span> <span class="keyword">ON</span> *.* <span class="keyword">TO</span> <span class="string">'root'</span>@<span class="string">'%'</span> <span class="keyword">IDENTIFIED</span> <span class="keyword">BY</span> <span class="string">'MyNewPass4!'</span> <span class="keyword">WITH</span> <span class="keyword">GRANT</span> <span class="keyword">OPTION</span>;</span><br><span class="line"><span class="keyword">flush</span> <span class="keyword">PRIVILEGES</span>;</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>*.*</code> 表示所有表<br><code>%</code> 表示所有的外部ip，不包括localhost</p>
-<figure class="highlight sql"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">USER</span> <span class="string">'root'</span>@<span class="string">'%'</span> <span class="keyword">IDENTIFIED</span> <span class="keyword">WITH</span> mysql_native_password <span class="keyword">BY</span> <span class="string">'MyNewPass4!'</span>;</span><br></pre></td></tr></tbody></table></figure>
-
-<p>在实际运维工作中，远程连接账号尽量不要使用root。<br>应该手工创建 一个普通账号，然后按需分配权限</p>
-<p>退出MySQL到linux命令行：</p>
-<figure class="highlight"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql &gt; exit</span><br></pre></td></tr></tbody></table></figure>
-
-<p>默认root只能在本地连接</p>
-<figure class="highlight sql"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; select user,host from mysql.user;</span><br><span class="line">+<span class="comment">------------------+-----------+</span></span><br><span class="line">| user             | host      |</span><br><span class="line">+<span class="comment">------------------+-----------+</span></span><br><span class="line">| mysql.infoschema | localhost |</span><br><span class="line">| mysql.session    | localhost |</span><br><span class="line">| mysql.sys        | localhost |</span><br><span class="line">| root             | localhost |</span><br><span class="line">+<span class="comment">------------------+-----------+</span></span><br><span class="line">4 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></tbody></table></figure>
-
-<p>Linux配置MySQL远程连接访问权限</p>
-<figure class="highlight sql"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; update mysql.user set host = '%' where user = 'root' ;</span><br><span class="line">mysql&gt; select user,host from mysql.user;</span><br><span class="line">+<span class="comment">------------------+-----------+</span></span><br><span class="line">| user             | host      |</span><br><span class="line">+<span class="comment">------------------+-----------+</span></span><br><span class="line">| root             | %         |</span><br><span class="line">| mysql.infoschema | localhost |</span><br><span class="line">| mysql.session    | localhost |</span><br><span class="line">| mysql.sys        | localhost |</span><br><span class="line">+<span class="comment">------------------+-----------+</span></span><br><span class="line">4 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; <span class="keyword">select</span> <span class="keyword">user</span>,host <span class="keyword">from</span> mysql.user <span class="keyword">where</span> <span class="keyword">user</span>=<span class="string">'root'</span>;</span><br><span class="line">+<span class="comment">------+------+</span></span><br><span class="line">| user | host |</span><br><span class="line">+<span class="comment">------+------+</span></span><br><span class="line">| root | %    |</span><br><span class="line">+<span class="comment">------+------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></tbody></table></figure>
-
-<p>看到有一条 host值为<code>%</code>，说明授权了</p>
-<p>看你的mysql在哪，通过which命令</p>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@VM-0-9-centos ~]<span class="comment"># which mysql</span></span><br><span class="line">/usr/bin/mysql</span><br></pre></td></tr></tbody></table></figure>
-
-<p>查看 mysql 配置文件加载顺序</p>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[root@VM-0-9-centos ~]<span class="comment"># /usr/bin/mysql --verbose --help | grep -A 1 'Default options'</span></span><br><span class="line">Default options are <span class="built_in">read</span> from the following files <span class="keyword">in</span> the given order:</span><br><span class="line">/etc/my.cnf /etc/mysql/my.cnf /usr/etc/my.cnf ~/.my.cnf </span><br><span class="line"></span><br><span class="line">[root@VM-0-9-centos ~]<span class="comment"># mysql --help|grep 'my.cnf'</span></span><br><span class="line">                      order of preference, my.cnf, <span class="variable">$MYSQL_TCP_PORT</span>,</span><br><span class="line">/etc/my.cnf /etc/mysql/my.cnf /usr/etc/my.cnf ~/.my.cnf</span><br></pre></td></tr></tbody></table></figure>
-
-<p>mysql默认会搜寻my.cnf的目录，顺序排前的优先<br>服务器首先读取的是 /etc/my.cnf 文件，如果前一个文件不存在则继续读 /etc/mysql/my.cnf 文件，依此类推，如若还不存在便会去读~/.my.cnf文件。</p>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ps aux|grep mysql|grep <span class="string">'my.cnf'</span></span><br><span class="line">上面的命令没有输出，表示没有设置使用指定目录的my.cnf</span><br></pre></td></tr></tbody></table></figure>
-
-<p>如果以上文件都不存在，则说明在对mysql编译完成之后你没有对mysql进行配置，<br>启动时没有使用配置文件<br>如果没有设置使用指定目录my.cnf文件及默认读取目录没有my.cnf文件，表示mysql启动时并没有加载配置文件，而是使用默认配置。</p>
-<p>需要修改配置，可以在mysql默认读取的目录中，<br>需要你自己复制一份mysql提供的默认配置文件到上面提到的目录中，然后改名为my.cnf(例如:/etc/my.cnf)，把需要修改的配置内容写入，修改文件的所有者和所属组并赋予执行权限。</p>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mkdir /usr/mysql/etc</span><br><span class="line"></span><br><span class="line">cp /usr/mysql/support-files/my-default.cnf /usr/mysql/etc/my.cnf</span><br><span class="line"></span><br><span class="line">chown -R mysql:mysql /usr/mysql/etc/</span><br><span class="line"></span><br><span class="line">chmod 755 /usr/mysql/etc/my.cnf</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">vim /usr/mysql/etc/my.cnf</span><br><span class="line"></span><br><span class="line">basedir = /usr/mysql              <span class="comment"># 指mysql的安装目录</span></span><br><span class="line">datadir = /usr/mysql/data         <span class="comment"># 指mysql的数据存放目录</span></span><br><span class="line">port = 3306                             <span class="comment"># 指mysql的监听端口</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p>最后重启mysql使配置生效</p>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/mysql/support-files/mysql.server restart</span><br></pre></td></tr></tbody></table></figure>
-
-<p>如果修改my.cnf后mysql启动不了,可以通过如下方式查看错误信息</p>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/mysql/bin/mysqld --verbose --<span class="built_in">help</span> | grep -A 1 <span class="string">'Default options'</span></span><br></pre></td></tr></tbody></table></figure>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {

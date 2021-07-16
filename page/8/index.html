@@ -119,7 +119,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">338</span>
+          <span class="site-state-item-count">339</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -160,6 +160,305 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/05/08/drf-de-api-jie-kou-wen-dang/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/05/08/drf-de-api-jie-kou-wen-dang/" class="post-title-link" itemprop="url">DRF的API接口文档</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-05-07 16:21:41" itemprop="dateCreated datePublished" datetime="2021-05-07T16:21:41Z">2021-05-07</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-06-17 02:33:26" itemprop="dateModified" datetime="2021-06-17T02:33:26Z">2021-06-17</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h3 id="Schemas"><a href="#Schemas" class="headerlink" title="Schemas"></a>Schemas</h3><p>它允许一系列用例，包括生成参考文档，或者驱动可以与 API 交互的动态客户端库。<br>一个 schema 就是一个机器可读的文档，它对可用的 API 端点进行描述，给出它们的 URL，以及支持的操作。</p>
+<p>服务端可以生成 schema 文档，而客户端可以基于该 schema 文档，与服务端交互。</p>
+<h3 id="Core-API"><a href="#Core-API" class="headerlink" title="Core API"></a>Core API</h3><p><a target="_blank" rel="noopener" href="https://www.django-rest-framework.org/coreapi/7-schemas-and-client-libraries/#core-api">https://www.django-rest-framework.org/coreapi/7-schemas-and-client-libraries/#core-api</a></p>
+<p>REST 框架通过 Core API 提供 schema 支持。</p>
+<p>Core API 是一种用于描述 API 的文档标准。在服务端，通过 Core API 可以将 API 呈现成各种支持的 schema 或超媒体格式文件。而在客户端，在获取服务端生成的 schema 文件后，可以与服务端进行交互。</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install coreapi</span><br></pre></td></tr></tbody></table></figure>
+
+<h4 id="生成API接口文档"><a href="#生成API接口文档" class="headerlink" title="生成API接口文档"></a>生成API接口文档</h4><p><a target="_blank" rel="noopener" href="https://www.django-rest-framework.org/topics/documenting-your-api/">https://www.django-rest-framework.org/topics/documenting-your-api/</a><br>ViewSet的格式，更多请看官方文档</p>
+<p>drf文档的优点：</p>
+<ul>
+<li>自动生成的接口文档是继承自APIView及其子类的视图。</li>
+<li>一目了然看到各个模块的所有接口</li>
+<li>文档里可以做交互和测试</li>
+<li>生成Shell、JavaScript和Python等多种测试代码方式。</li>
+<li>权限验证，对于需要验证后才能访问的接口，必须先进行验证，然后才能进行测试，</li>
+</ul>
+<p>设置<code>DEFAULT_SCHEMA_CLASS</code>和<code>docs</code>路由，访问文档页面。</p>
+<p><code>setting.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># DRF 全局配置</span></span><br><span class="line">REST_FRAMEWORK = {</span><br><span class="line">    <span class="string">"DEFAULT_SCHEMA_CLASS"</span>: <span class="string">'rest_framework.schemas.openapi.AutoSchema'</span>,  <span class="comment"># 新版drf schema_class默认用的是</span></span><br><span class="line">    <span class="comment"># 如果报错AttributeError: ‘AutoSchema’ object has no attribute ‘get_link’</span></span><br><span class="line">    <span class="string">'DEFAULT_SCHEMA_CLASS'</span>: <span class="string">'rest_framework.schemas.AutoSchema'</span>,</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>drf_tutorial\urls.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework.documentation <span class="keyword">import</span> include_docs_urls</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    path(<span class="string">"docs/"</span>, include_docs_urls(title=<span class="string">"DRF API文档"</span>, description=<span class="string">"Django REST framework快速入门"</span>)),</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="文档描述说明的定义位置"><a href="#文档描述说明的定义位置" class="headerlink" title="文档描述说明的定义位置"></a>文档描述说明的定义位置</h3><p>对于每种类型的请求，都以固定的格式定义了说明 类定义的注释的内容<code>""" """</code>，</p>
+<p>1） 单一方法的视图，可直接使用类视图的文档字符串，如</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BookListView</span>(<span class="params">generics.ListAPIView</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    返回所有图书信息.</span></span><br><span class="line"><span class="string">    """</span></span><br></pre></td></tr></tbody></table></figure>
+<p>2）包含多个方法的视图，在类视图的文档字符串中，分开方法定义，如</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BookListCreateView</span>(<span class="params">generics.ListCreateAPIView</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    get:</span></span><br><span class="line"><span class="string">    返回所有图书信息.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    post:</span></span><br><span class="line"><span class="string">    新建图书.</span></span><br><span class="line"><span class="string">    """</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>3）对于视图集ViewSet，仍在类视图的文档字符串中封开定义，但是应使用action名称区分，如<br>视图集ViewSet中的retrieve名称，在接口文档网站中叫做read</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BookInfoViewSet</span>(<span class="params">mixins.ListModelMixin, mixins.RetrieveModelMixin, GenericViewSet</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    list:</span></span><br><span class="line"><span class="string">    返回图书列表数据</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    retrieve:</span></span><br><span class="line"><span class="string">    返回图书详情数据</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    latest:</span></span><br><span class="line"><span class="string">    返回最新的图书数据</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    read:</span></span><br><span class="line"><span class="string">    修改图书的阅读量</span></span><br><span class="line"><span class="string">    """</span></span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserFavViewSet</span>(<span class="params">mixins.CreateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin,</span></span></span><br><span class="line"><span class="class"><span class="params">                     mixins.DestroyModelMixin, viewsets.GenericViewSet</span>):</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    list:用户收藏列表</span></span><br><span class="line"><span class="string">    create:</span></span><br><span class="line"><span class="string">        创建添加一条收藏</span></span><br><span class="line"><span class="string">    retrieve:</span></span><br><span class="line"><span class="string">        根据ID查询到用户收藏详情</span></span><br><span class="line"><span class="string">    destroy:</span></span><br><span class="line"><span class="string">        删除用户收藏</span></span><br><span class="line"><span class="string">    '''</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="/2021/05/08/drf-de-api-jie-kou-wen-dang/1.png" alt="description"><br><img src="/2021/05/08/drf-de-api-jie-kou-wen-dang/2.png" alt="description"><br><img src="/2021/05/08/drf-de-api-jie-kou-wen-dang/3.png" alt="description"></p>
+<p>goods文档<br><a target="_blank" rel="noopener" href="http://127.0.0.1:8000/docs/#goods">http://127.0.0.1:8000/docs/#goods</a> 很多字段描述不完整，先进行配置</p>
+<p>Query Parameters<br>The following parameters should be included as part of a URL query string.</p>
+<table>
+<thead>
+<tr>
+<th><strong>Parameter</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>AutoField</code></td>
+<td>自增ID字段</td>
+</tr>
+<tr>
+<td><code>page</code></td>
+<td>A page number within the paginated result set.</td>
+</tr>
+<tr>
+<td><code>page_size</code></td>
+<td>Number of results to return per page.</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td>分类名模糊匹配</td>
+</tr>
+<tr>
+<td><code>pricemin</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>pricemax</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>is_hot</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>is_new</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>top_category</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>search</code></td>
+<td>A search term.</td>
+</tr>
+<tr>
+<td><code>ordering</code></td>
+<td>Which field to use when ordering the results.</td>
+</tr>
+</tbody></table>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GoodsListViewSet</span>(<span class="params">mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet</span>):</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    list:</span></span><br><span class="line"><span class="string">        商品列表页，并实现分页、搜索、过滤、排序</span></span><br><span class="line"><span class="string">    retrieve:</span></span><br><span class="line"><span class="string">        商品详情，并实现热卖商品接口</span></span><br><span class="line"><span class="string">    '''</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>本地化<a target="_blank" rel="noopener" href="http://djangobook.py3k.cn/2.0/chapter19/">http://djangobook.py3k.cn/2.0/chapter19/</a></p>
+<p>分页中文描述<br><code>apps/goods/views.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework.pagination <span class="keyword">import</span> PageNumberPagination</span><br><span class="line"><span class="keyword">from</span> django.utils.translation <span class="keyword">import</span> ugettext_lazy</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GoodsPagination</span>(<span class="params">PageNumberPagination</span>):</span></span><br><span class="line">    page_size = <span class="number">12</span>  <span class="comment"># 默认每页显示的个数</span></span><br><span class="line">    max_page_size = <span class="number">100</span>  <span class="comment"># 最多能显示多少页</span></span><br><span class="line">    page_size_query_param = <span class="string">'page_size'</span>  <span class="comment"># 页面大小对应的查询参数</span></span><br><span class="line">    page_query_param = <span class="string">'page'</span>  <span class="comment"># 页码参数?page=xx</span></span><br><span class="line">    page_query_description = ugettext_lazy(<span class="string">'使用分页后的页码'</span>)  <span class="comment"># 分页文档中文描述</span></span><br><span class="line">    page_size_query_description = ugettext_lazy(<span class="string">'每页返回的结果数'</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<table>
+<thead>
+<tr>
+<th><strong>Parameter</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>AutoField</code></td>
+<td>自增ID字段</td>
+</tr>
+<tr>
+<td><code>page</code></td>
+<td>使用分页后的页码</td>
+</tr>
+<tr>
+<td><code>page_size</code></td>
+<td>每页返回的结果数</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td>分类名模糊匹配</td>
+</tr>
+<tr>
+<td><code>pricemin</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>pricemax</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>is_hot</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>is_new</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>top_category</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>search</code></td>
+<td>A search term.</td>
+</tr>
+<tr>
+<td><code>ordering</code></td>
+<td>Which field to use when ordering the results.</td>
+</tr>
+</tbody></table>
+<p>添加字段参数的Description描述需要<br>在<code>model</code>模型类或<code>serializer</code>序列化器类或<code>filter</code>过滤类的字段中指定<code>help_text</code>属性<br><code>apps/goods/filters.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GoodsFilter</span>(<span class="params">django_filters.rest_framework.FilterSet</span>):</span></span><br><span class="line">    <span class="string">'''商品过滤类'''</span></span><br><span class="line">    <span class="comment"># 两个参数，name是要过滤的字段，lookup是执行的行为，‘小与等于本店价格’</span></span><br><span class="line">    name = django_filters.CharFilter(field_name=<span class="string">"name"</span>, lookup_expr=<span class="string">'contains'</span>, help_text=<span class="string">'分类名模糊匹配'</span>)  <span class="comment"># 包含关系，模糊匹配</span></span><br><span class="line">    pricemin = django_filters.NumberFilter(field_name=<span class="string">"market_price"</span>, lookup_expr=<span class="string">'gte'</span>, help_text=<span class="string">'最低价格'</span>)  <span class="comment"># 自定义字段</span></span><br><span class="line">    pricemax = django_filters.NumberFilter(field_name=<span class="string">"market_price"</span>, lookup_expr=<span class="string">'lte'</span>, help_text=<span class="string">'最高价格'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 自定义过滤，过滤某个一级分类</span></span><br><span class="line">    top_category = django_filters.NumberFilter(method=<span class="string">'top_category_filter'</span>, help_text=<span class="string">'自定义过滤某个一级分类'</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<table>
+<thead>
+<tr>
+<th><strong>Parameter</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>AutoField</code></td>
+<td>自增ID字段</td>
+</tr>
+<tr>
+<td><code>page</code></td>
+<td>使用分页后的页码</td>
+</tr>
+<tr>
+<td><code>page_size</code></td>
+<td>每页返回的结果数</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td>分类名模糊匹配</td>
+</tr>
+<tr>
+<td><code>pricemin</code></td>
+<td>最低价格</td>
+</tr>
+<tr>
+<td><code>pricemax</code></td>
+<td>最高价格</td>
+</tr>
+<tr>
+<td><code>is_hot</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>is_new</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>top_category</code></td>
+<td>自定义过滤某个一级分类</td>
+</tr>
+<tr>
+<td><code>search</code></td>
+<td>A search term.</td>
+</tr>
+<tr>
+<td><code>ordering</code></td>
+<td>Which field to use when ordering the results.</td>
+</tr>
+</tbody></table>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></tbody></table></figure><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1688,128 +1987,6 @@
 <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> user_operation.views <span class="keyword">import</span> AddressViewSet</span><br><span class="line"></span><br><span class="line">router.register(<span class="string">'address'</span>, AddressViewSet)</span><br></pre></td></tr></tbody></table></figure>
 
 <p><img src="/2021/05/06/drf-yong-hu-liu-yan-he-huo-qu-shou-huo-di-zhi/2.png" alt="description"><br><img src="/2021/05/06/drf-yong-hu-liu-yan-he-huo-qu-shou-huo-di-zhi/3.png" alt="description"></p>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/05/06/drf-ding-dan/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/05/06/drf-ding-dan/" class="post-title-link" itemprop="url">drf订单</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-05-05 16:21:41" itemprop="dateCreated datePublished" datetime="2021-05-05T16:21:41Z">2021-05-05</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-06-15 01:50:33" itemprop="dateModified" datetime="2021-06-15T01:50:33Z">2021-06-15</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>用户添加商品到购物车，点去购物车结算，填上地址留言，结算生成订单，在会员中心我的订单里面，可以看到订单列表，点订单可以看到订单的详细信息。</p>
-<p>先看模型</p>
-<p><code>trade/model.py</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">OrderInfo</span>(<span class="params">models.Model</span>):</span></span><br><span class="line">    <span class="string">'''订单信息'''</span></span><br><span class="line">    ORDER_STATUS = (</span><br><span class="line">        (<span class="string">"TRADE_SUCCESS"</span>, <span class="string">"支付成功"</span>),</span><br><span class="line">        (<span class="string">"TRADE_CLOSED"</span>, <span class="string">"交易关闭"</span>),</span><br><span class="line">        (<span class="string">"WAIT_BUYER_PAY"</span>, <span class="string">"交易创建"</span>),</span><br><span class="line">        (<span class="string">"TRADE_FINISHED"</span>, <span class="string">"交易完结"</span>),</span><br><span class="line">    )</span><br><span class="line">    user = models.ForeignKey(User, verbose_name=<span class="string">'用户'</span>, null=<span class="literal">True</span>, on_delete=models.CASCADE)</span><br><span class="line">    <span class="comment"># 订单编号是在提交订单之后生成的，因此在创建记录时应该允许为空</span></span><br><span class="line">    order_sn = models.CharField(max_length=<span class="number">30</span>, unique=<span class="literal">True</span>, null=<span class="literal">True</span>, blank=<span class="literal">True</span>, verbose_name=<span class="string">'订单号'</span>)</span><br><span class="line">    trade_no = models.CharField(max_length=<span class="number">50</span>, unique=<span class="literal">True</span>, null=<span class="literal">True</span>, blank=<span class="literal">True</span>, verbose_name=<span class="string">'交易号'</span>)</span><br><span class="line">    pay_status = models.CharField(max_length=<span class="number">30</span>, default=<span class="string">'WAIT_BUYER_PAY'</span>, choices=ORDER_STATUS, verbose_name=<span class="string">'订单状态'</span>)</span><br><span class="line">    post_script = models.CharField(max_length=<span class="number">11</span>, default=<span class="string">''</span>, null=<span class="literal">True</span>, blank=<span class="literal">True</span>, verbose_name=<span class="string">'订单留言'</span>)</span><br><span class="line">    order_amount = models.FloatField(default=<span class="number">0.0</span>, verbose_name=<span class="string">'订单金额'</span>)</span><br><span class="line">    pay_time = models.DateTimeField(null=<span class="literal">True</span>, blank=<span class="literal">True</span>, verbose_name=<span class="string">'支付时间'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 用户基本信息</span></span><br><span class="line">    <span class="comment"># address不直接使用外键，因为用户如果修改了个人中心的收货地址，订单中地址就会跟着变化</span></span><br><span class="line">    address = models.CharField(max_length=<span class="number">100</span>, default=<span class="string">''</span>, verbose_name=<span class="string">'收货地址'</span>)</span><br><span class="line">    signer_name = models.CharField(max_length=<span class="number">20</span>, default=<span class="string">''</span>, verbose_name=<span class="string">'签收人'</span>)</span><br><span class="line">    signer_mobile = models.CharField(max_length=<span class="number">11</span>, verbose_name=<span class="string">'联系电话'</span>)</span><br><span class="line"></span><br><span class="line">    add_time = models.DateTimeField(auto_now_add=<span class="literal">True</span>, verbose_name=<span class="string">u'添加时间'</span>)</span><br><span class="line">    is_delete = models.BooleanField(default=<span class="literal">False</span>, verbose_name=<span class="string">'是否删除'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        verbose_name = <span class="string">u"订单信息"</span></span><br><span class="line">        verbose_name_plural = verbose_name</span><br><span class="line">        ordering = [<span class="string">'-add_time'</span>]</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__str__</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> str(self.order_sn)</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>order_sn</code>字段能为空，订单号需要由后台生成。但用户点击去结算时，后台需要生成一个订单号，但是如果我们用到<code>CreateModelMixin</code>，这个会对该字段进行验证，在用户界面是不可能post一个订单号到后台，从而导致验证失败，所以该字段增加设置<code>blank=True, null=True</code></p>
-<p><code>pay_status</code>可以设置一个默认值，为待支付状态<code>default='WAIT_BUYER_PAY'</code>，提交订单时，用户也不用指定该字段了。</p>
-<p><code>address</code>不直接使用外键的原因是：用户如果修改了个人中心的收货地址，订单中地址就会跟着变化，显然是不对的，所以订单中的地址就保存一个当时下单的地址组合的字符串。</p>
-<p>对于一个订单，有多个商品，所以需要设置另外一个model，用外键关联。</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">OrderGoods</span>(<span class="params">models.Model</span>):</span></span><br><span class="line">    <span class="string">'''订单商品详情'''</span></span><br><span class="line">    order = models.ForeignKey(OrderInfo, verbose_name=<span class="string">'订单信息'</span>, on_delete=models.CASCADE, related_name=<span class="string">'goods'</span>)</span><br><span class="line">    goods = models.ForeignKey(Goods, verbose_name=<span class="string">'商品'</span>, null=<span class="literal">True</span>, on_delete=models.CASCADE)</span><br><span class="line">    goods_num = models.IntegerField(default=<span class="number">0</span>, verbose_name=<span class="string">'商品数量'</span>)</span><br><span class="line"></span><br><span class="line">    add_time = models.DateTimeField(auto_now_add=<span class="literal">True</span>, verbose_name=<span class="string">u'添加时间'</span>)</span><br><span class="line">    is_delete = models.BooleanField(default=<span class="literal">False</span>, verbose_name=<span class="string">'是否删除'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        verbose_name = <span class="string">'订单商品'</span></span><br><span class="line">        verbose_name_plural = verbose_name</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__str__</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> str(self.order.order_sn)</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>trade/serializer.py</code></p>
-<p>用户添加商品到购物车，点去购物车结算，填上地址留言，结算生成订单，在会员中心我的订单里面，可以看到订单列表，点订单可以看到订单的详细信息。</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> trade.models <span class="keyword">import</span> OrderInfo</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">OrderListSerializer</span>(<span class="params">serializers.ModelSerializer</span>):</span></span><br><span class="line">    <span class="comment"># 表示user为隐藏字段，默认为获取当前登录用户</span></span><br><span class="line">    user = serializers.HiddenField(default=serializers.CurrentUserDefault())</span><br><span class="line">    <span class="comment"># 生成订单的时候这些不能显示给用户修改和post，只能后台去修改</span></span><br><span class="line">    pay_status = serializers.CharField(read_only=<span class="literal">True</span>)</span><br><span class="line">    trade_no = serializers.CharField(read_only=<span class="literal">True</span>)</span><br><span class="line">    order_sn = serializers.CharField(read_only=<span class="literal">True</span>)</span><br><span class="line">    pay_time = serializers.DateTimeField(read_only=<span class="literal">True</span>)</span><br><span class="line">    is_delete = serializers.BooleanField(read_only=<span class="literal">True</span>)</span><br><span class="line">    <span class="comment"># 用于订单创建时，生成支付宝的支付url</span></span><br><span class="line">    alipay_url = serializers.SerializerMethodField(read_only=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_alipay_url</span>(<span class="params">self, obj</span>):</span></span><br><span class="line">        <span class="comment"># 方法命名规则为：get_&lt;field_name&gt;</span></span><br><span class="line">        alipay = AliPay(  <span class="comment"># 创建调用支付宝的对象</span></span><br><span class="line">            appid=settings.ALI_APP_ID,</span><br><span class="line">            app_notify_url=settings.NOTIFY_URL,</span><br><span class="line">            app_private_key_string=open(settings.APP_PRIVATE_KEY_PATH).read(),</span><br><span class="line">            alipay_public_key_string=open(settings.ALIPAY_PUBLIC_KEY_PATH).read(),</span><br><span class="line">            sign_type=<span class="string">"RSA2"</span>,</span><br><span class="line">            debug=settings.DEBUG,</span><br><span class="line">        )</span><br><span class="line">        <span class="comment"># 调用获取支付页面操作</span></span><br><span class="line">        <span class="comment"># 电脑网站支付，需要跳转到：</span></span><br><span class="line">        <span class="comment"># 真实环境：https://openapi.alipay.com/gateway.do? + order_string</span></span><br><span class="line">        <span class="comment"># 沙箱环境：https://openapi.alipaydev.com/gateway.do? + order_string</span></span><br><span class="line">        order_string = alipay.api_alipay_trade_page_pay(</span><br><span class="line">            out_trade_no=obj.order_sn,</span><br><span class="line">            total_amount=obj.order_amount,</span><br><span class="line">            subject=<span class="string">'订单号：%s'</span> % obj.order_sn,</span><br><span class="line">            return_url=settings.RETURN_URL,</span><br><span class="line">            notify_url=settings.NOTIFY_URL</span><br><span class="line">        )</span><br><span class="line">        <span class="comment"># 生成完整的支付页面URL</span></span><br><span class="line">        pay_url = alipay._gateway + <span class="string">'?'</span> + order_string</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> pay_url</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">generate_order_sn</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        生成订单编号=当前时间+userid+随机数</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">'%s%d%d'</span> % (time.strftime(<span class="string">'%Y%m%d%H%M%S'</span>), self.context[<span class="string">'request'</span>].user.id, randint(<span class="number">1000</span>, <span class="number">9999</span>))</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">validate</span>(<span class="params">self, attrs</span>):</span></span><br><span class="line">        <span class="comment"># 数据验证validate成功后，生成一个订单号，</span></span><br><span class="line">        <span class="comment"># 然后在view中就可以perform_create(self, serializer)执行.save()</span></span><br><span class="line">        attrs[<span class="string">'order_sn'</span>] = self.generate_order_sn()</span><br><span class="line">        <span class="keyword">return</span> attrs</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        model = OrderInfo</span><br><span class="line">        fields = <span class="string">'__all__'</span></span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> trade.models <span class="keyword">import</span> OrderInfo, OrderGoods</span><br><span class="line"><span class="keyword">from</span> goods.serializers <span class="keyword">import</span> GoodsSerializer</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">OrderGoodsSerializer</span>(<span class="params">serializers.ModelSerializer</span>):</span></span><br><span class="line">    <span class="string">"""订单中的商品序列化"""</span></span><br><span class="line">    goods = GoodsSerializer(many=<span class="literal">False</span>)  <span class="comment"># 一对一，嵌套商品详情的序列化</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        model = OrderGoods</span><br><span class="line">        fields = <span class="string">'__all__'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">OrderDetailSerializer</span>(<span class="params">serializers.ModelSerializer</span>):</span></span><br><span class="line">    <span class="string">"""订单详情显示"""</span></span><br><span class="line">    goods = OrderGoodsSerializer(many=<span class="literal">True</span>)  <span class="comment"># 为OrderGoods中外键关联字段</span></span><br><span class="line">    <span class="comment"># 在订单详情页也能显示支付的url</span></span><br><span class="line">    alipay_url = serializers.SerializerMethodField(read_only=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_alipay_url</span>(<span class="params">self, obj</span>):</span></span><br><span class="line">        <span class="comment"># 方法命名规则为：get_&lt;field_name&gt;</span></span><br><span class="line">        alipay = AliPay(  <span class="comment"># 创建调用支付宝的对象</span></span><br><span class="line">            appid=settings.ALI_APP_ID,</span><br><span class="line">            app_notify_url=settings.NOTIFY_URL,</span><br><span class="line">            app_private_key_string=open(settings.APP_PRIVATE_KEY_PATH).read(),</span><br><span class="line">            alipay_public_key_string=open(settings.ALIPAY_PUBLIC_KEY_PATH).read(),</span><br><span class="line">            sign_type=<span class="string">"RSA2"</span>,</span><br><span class="line">            debug=settings.DEBUG,  <span class="comment"># 默认False</span></span><br><span class="line">        )</span><br><span class="line">        <span class="comment"># 调用获取支付页面操作</span></span><br><span class="line">        <span class="comment"># 电脑网站支付，需要跳转到：https://openapi.alipay.com/gateway.do? + order_string</span></span><br><span class="line">        order_string = alipay.api_alipay_trade_page_pay(</span><br><span class="line">            out_trade_no=obj.order_sn,</span><br><span class="line">            total_amount=obj.order_amount,</span><br><span class="line">            subject=<span class="string">'订单号：%s'</span> % obj.order_sn,</span><br><span class="line">            return_url=settings.RETURN_URL,</span><br><span class="line">            notify_url=settings.NOTIFY_URL</span><br><span class="line">        )</span><br><span class="line">        <span class="comment"># 生成完整的支付页面URL</span></span><br><span class="line">        pay_url = alipay._gateway + <span class="string">'?'</span> + order_string</span><br><span class="line">        <span class="keyword">return</span> pay_url</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        model = OrderInfo</span><br><span class="line">        fields = <span class="string">'__all__'</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p>对于订单提交，会告诉后台创建一个订单，将购物车<code>ShoppingCart</code>中的该用户对应的单品和数量，添加到订单商品<code>OrderGoods</code>中，然后清空该用户的购物车。</p>
-<p><code>trade/views.py</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">OrderInfoViewSet</span>(<span class="params">mixins.CreateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin,</span></span></span><br><span class="line"><span class="class"><span class="params">                       mixins.DestroyModelMixin,</span></span></span><br><span class="line"><span class="class"><span class="params">                       viewsets.GenericViewSet</span>):</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    订单管理，不能修改，不需要继承自UpdateModelMixin</span></span><br><span class="line"><span class="string">    list:</span></span><br><span class="line"><span class="string">        订单列表</span></span><br><span class="line"><span class="string">    retrieve:</span></span><br><span class="line"><span class="string">        订单详情</span></span><br><span class="line"><span class="string">    delete:</span></span><br><span class="line"><span class="string">        删除订单</span></span><br><span class="line"><span class="string">    create:</span></span><br><span class="line"><span class="string">        新增订单</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    queryset = OrderInfo.objects.all()</span><br><span class="line">    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]  <span class="comment"># 用户必须登录才能访问</span></span><br><span class="line">    authentication_classes = [JWTAuthentication, SessionAuthentication]  <span class="comment"># 配置登录认证：支持JWT认证和DRF基本认证</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># serializer_class = OrderListSerializer</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_queryset</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> OrderInfo.objects.filter(user=self.request.user, is_delete=<span class="literal">False</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_serializer_class</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">if</span> self.action == <span class="string">'retrieve'</span>:</span><br><span class="line">            <span class="keyword">return</span> OrderDetailSerializer</span><br><span class="line">        <span class="keyword">return</span> OrderListSerializer</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">perform_create</span>(<span class="params">self, serializer</span>):</span></span><br><span class="line">        <span class="string">"""在完成创建订单后提交保存之前保存到数据库的OrderInfo对象还需要多两步步骤"""</span></span><br><span class="line">        order = serializer.save()</span><br><span class="line">        shop_carts = ShoppingCart.objects.filter(user=self.request.user, is_delete=<span class="literal">False</span>)</span><br><span class="line">        <span class="keyword">for</span> shop_cart <span class="keyword">in</span> shop_carts:</span><br><span class="line">            <span class="comment"># 将该用户购物车所有商品都取出来保存到订单商品中</span></span><br><span class="line">            OrderGoods.objects.create(</span><br><span class="line">                order=order,</span><br><span class="line">                goods=shop_cart.goods,</span><br><span class="line">                goods_num=shop_cart.nums</span><br><span class="line">            )</span><br><span class="line">            <span class="comment"># 清空该用户购物车</span></span><br><span class="line">            shop_cart.delete()</span><br><span class="line">        <span class="keyword">return</span> order</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>url.py</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> trade.views <span class="keyword">import</span> OrderInfoViewSet</span><br><span class="line"></span><br><span class="line">router.register(<span class="string">'orders'</span>, OrderInfoViewSet)</span><br></pre></td></tr></tbody></table></figure>
-
-<p><img src="/2021/05/06/drf-ding-dan/1.png" alt="description"><br><img src="/2021/05/06/drf-ding-dan/2.png" alt="description"><br><img src="/2021/05/06/drf-ding-dan/3.png" alt="description"><br><img src="/2021/05/06/drf-ding-dan/5.png" alt="description"><br><img src="/2021/05/06/drf-ding-dan/4.png" alt="description"><br><img src="/2021/05/06/drf-ding-dan/6.jpeg" alt="description"><br><img src="/2021/05/06/drf-ding-dan/7.png" alt="description"></p>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
