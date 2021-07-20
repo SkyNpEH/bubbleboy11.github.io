@@ -47,8 +47,8 @@
   <noscript>
     <link rel="stylesheet" href="/css/noscript.css">
   </noscript>
-<link rel="alternate" href="/atom.xml" title="外心人D的博客" type="application/atom+xml">
-<link rel="stylesheet" href="/css/prism.css" type="text/css"></head>
+<link rel="stylesheet" href="/css/prism.css" type="text/css"><link rel="alternate" href="/atom.xml" title="外心人D的博客" type="application/atom+xml">
+</head>
 
 <body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
   <div class="headband"></div>
@@ -169,7 +169,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/07/08/rpc/">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/07/08/go-tong-guo-jie-kou-xie-yi-qu-li-jie-sort-de-ben-zhi/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -182,7 +182,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/07/08/rpc/" class="post-title-link" itemprop="url">RPC</a>
+          <a href="/2021/07/08/go-tong-guo-jie-kou-xie-yi-qu-li-jie-sort-de-ben-zhi/" class="post-title-link" itemprop="url">go通过接口协议去理解sort的本质</a>
         </h2>
 
         <div class="post-meta-container">
@@ -200,7 +200,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-07-11 02:51:39" itemprop="dateModified" datetime="2021-07-11T02:51:39Z">2021-07-11</time>
+        <time title="修改时间：2021-07-09 07:09:55" itemprop="dateModified" datetime="2021-07-09T07:09:55Z">2021-07-09</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -222,7 +222,12 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <script>
+          <figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Sort sorts data.</span></span><br><span class="line"><span class="comment">// It makes one call to data.Len to determine n and O(n*log(n)) calls to</span></span><br><span class="line"><span class="comment">// data.Less and data.Swap. The sort is not guaranteed to be stable.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Sort</span><span class="params">(data Interface)</span></span> {</span><br><span class="line">    n := data.Len()</span><br><span class="line">    quickSort(data, <span class="number">0</span>, n, maxDepth(n))</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// An implementation of Interface can be sorted by the routines in this package.</span></span><br><span class="line"><span class="comment">// The methods refer to elements of the underlying collection by integer index.</span></span><br><span class="line"><span class="keyword">type</span> Interface <span class="keyword">interface</span> {</span><br><span class="line">    <span class="comment">// Len is the number of elements in the collection.</span></span><br><span class="line">    Len() <span class="keyword">int</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// Less reports whether the element with index i</span></span><br><span class="line">    <span class="comment">// must sort before the element with index j.</span></span><br><span class="line">    <span class="comment">//</span></span><br><span class="line">    <span class="comment">// If both Less(i, j) and Less(j, i) are false,</span></span><br><span class="line">    <span class="comment">// then the elements at index i and j are considered equal.</span></span><br><span class="line">    <span class="comment">// Sort may place equal elements in any order in the final result,</span></span><br><span class="line">    <span class="comment">// while Stable preserves the original input order of equal elements.</span></span><br><span class="line">    <span class="comment">//</span></span><br><span class="line">    <span class="comment">// Less must describe a transitive ordering:</span></span><br><span class="line">    <span class="comment">//  - if both Less(i, j) and Less(j, k) are true, then Less(i, k) must be true as well.</span></span><br><span class="line">    <span class="comment">//  - if both Less(i, j) and Less(j, k) are false, then Less(i, k) must be false as well.</span></span><br><span class="line">    <span class="comment">//</span></span><br><span class="line">    <span class="comment">// Note that floating-point comparison (the &lt; operator on float32 or float64 values)</span></span><br><span class="line">    <span class="comment">// is not a transitive ordering when not-a-number (NaN) values are involved.</span></span><br><span class="line">    <span class="comment">// See Float64Slice.Less for a correct implementation for floating-point values.</span></span><br><span class="line">    Less(i, j <span class="keyword">int</span>) <span class="keyword">bool</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// Swap swaps the elements with indexes i and j.</span></span><br><span class="line">    Swap(i, j <span class="keyword">int</span>)</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"fmt"</span></span><br><span class="line">    <span class="string">"sort"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Course <span class="keyword">struct</span> {</span><br><span class="line">    Name  <span class="keyword">string</span></span><br><span class="line">    Price <span class="keyword">int</span></span><br><span class="line">    Url   <span class="keyword">string</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Courses []Course <span class="comment">// 基于slice创建新的类型</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c Courses)</span> <span class="title">Len</span><span class="params">()</span> <span class="title">int</span></span> {</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">len</span>(c)</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c Courses)</span> <span class="title">Less</span><span class="params">(i, j <span class="keyword">int</span>)</span> <span class="title">bool</span></span> {</span><br><span class="line">    <span class="keyword">return</span> c[i].Price &lt; c[j].Price</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c Courses)</span> <span class="title">Swap</span><span class="params">(i, j <span class="keyword">int</span>)</span></span> {</span><br><span class="line">    c[i], c[j] = c[j], c[i]</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="comment">//通过sort来排序</span></span><br><span class="line">    <span class="comment">//让你写一个排序算法， 冒泡 插入 快速 归并 桶排序 算法本质是一样 比较 计数排序</span></span><br><span class="line">    <span class="comment">//你的排序算法是否能应付各种类型的排序</span></span><br><span class="line">    courses := Courses{ <span class="comment">// 切片</span></span><br><span class="line">        Course{<span class="string">"django"</span>, <span class="number">300</span>, <span class="string">""</span>},</span><br><span class="line">        Course{<span class="string">"scrapy"</span>, <span class="number">100</span>, <span class="string">""</span>},</span><br><span class="line">        Course{<span class="string">"go"</span>, <span class="number">400</span>, <span class="string">""</span>},</span><br><span class="line">        Course{<span class="string">"torando"</span>, <span class="number">200</span>, <span class="string">""</span>},</span><br><span class="line">    }</span><br><span class="line">    sort.Sort(courses) <span class="comment">//协议 你的目的不是要告诉别人具体的类型，重要的是你的类型必要提供具体的方法</span></span><br><span class="line">    <span class="keyword">for</span> _, v := <span class="keyword">range</span> courses {</span><br><span class="line">        fmt.Println(v)</span><br><span class="line">    }</span><br><span class="line">    <span class="comment">//{scrapy 100 }</span></span><br><span class="line">    <span class="comment">//{torando 200 }</span></span><br><span class="line">    <span class="comment">//{django 300 }</span></span><br><span class="line">    <span class="comment">//{go 400 }</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+<script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
@@ -266,7 +271,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/07/07/go-de-http/">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/07/08/rpc/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -279,7 +284,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/07/07/go-de-http/" class="post-title-link" itemprop="url">go的http</a>
+          <a href="/2021/07/08/rpc/" class="post-title-link" itemprop="url">RPC</a>
         </h2>
 
         <div class="post-meta-container">
@@ -289,10 +294,16 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">发表于</span>
-      
 
-      <time title="创建时间：2021-07-06 16:21:41 / 修改时间：03:36:02" itemprop="dateCreated datePublished" datetime="2021-07-06T16:21:41Z">2021-07-06</time>
+      <time title="创建时间：2021-07-07 16:21:41" itemprop="dateCreated datePublished" datetime="2021-07-07T16:21:41Z">2021-07-07</time>
     </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-07-11 02:51:39" itemprop="dateModified" datetime="2021-07-11T02:51:39Z">2021-07-11</time>
+      </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
         <i class="far fa-folder"></i>

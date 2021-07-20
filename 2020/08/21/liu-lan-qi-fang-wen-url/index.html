@@ -28,10 +28,8 @@
 <meta property="og:description" content="电脑是如何访问百度的？浏览器输入一个网址url并发送请求到服务器，再到服务器返回浏览器发生了哪些事情？ 可以从以下角度回答问题中间涉及到了哪些过程每个过程包含哪些网络协议每个协议都干了什么？ 知道什么说什么，不要把自己带坑里，熟悉到哪一层协议就说到哪一层） &amp;nbsp; DNS查询—》TCP握手—》HTTP请求—》反向代理Nginx—》uwsgi &#x2F; gunicom—》web app 响应—》TC">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-08-20T16:21:41.000Z">
-<meta property="article:modified_time" content="2021-04-02T12:24:45.435Z">
+<meta property="article:modified_time" content="2021-07-20T11:51:31.346Z">
 <meta property="article:author" content="外心人D">
-<meta property="article:tag" content="Leetcode">
-<meta property="article:tag" content="剑指offer">
 <meta name="twitter:card" content="summary">
 
 
@@ -51,8 +49,8 @@
   <noscript>
     <link rel="stylesheet" href="/css/noscript.css">
   </noscript>
-<link rel="alternate" href="/atom.xml" title="外心人D的博客" type="application/atom+xml">
-<link rel="stylesheet" href="/css/prism.css" type="text/css"></head>
+<link rel="stylesheet" href="/css/prism.css" type="text/css"><link rel="alternate" href="/atom.xml" title="外心人D的博客" type="application/atom+xml">
+</head>
 
 <body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
   <div class="headband"></div>
@@ -97,7 +95,7 @@
 
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-overview-active">
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           文章目录
@@ -110,6 +108,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Web%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86%E5%8F%AF%E4%BB%A5%E7%AE%80%E5%8D%95%E5%9C%B0%E5%BD%92%E7%BA%B3%E4%B8%BA"><span class="nav-text">Web服务器的工作原理可以简单地归纳为</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -205,7 +204,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-02 12:24:45" itemprop="dateModified" datetime="2021-04-02T12:24:45Z">2021-04-02</time>
+        <time title="修改时间：2021-07-20 11:51:31" itemprop="dateModified" datetime="2021-07-20T11:51:31Z">2021-07-20</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -230,9 +229,11 @@
         <p>电脑是如何访问百度的？<br>浏览器输入一个网址url并发送请求到服务器，再到服务器返回浏览器发生了哪些事情？</p>
 <p>可以从以下角度回答问题<br>中间涉及到了哪些过程<br>每个过程包含哪些网络协议<br>每个协议都干了什么？</p>
 <p>知道什么说什么，不要把自己带坑里，熟悉到哪一层协议就说到哪一层）</p>
-<p>&nbsp; DNS查询—》TCP握手—》HTTP请求—》反向代理Nginx—》uwsgi / gunicom—》web app 响应—》TCP握手。<br>&nbsp; &nbsp; &nbsp; &nbsp;当浏览器发起请求的时候其实一开始并不会做DNS查询，而是先去看有没有DNS缓存，如果不在DNS缓存里面并且hosts文件里面也没有的时候，它就会向本地DNS服务器发起一个DNS查询，如果本地DNS没有查到的时候(DNS 查询是一个递归查询)它就会向上层继续查询，一直向域名服务器和根服务器继续进行递归查询。一直到查询完之后返回给我们对应的IP地址，<br>比如：输入<code>www.aliyun.com</code>阿里云就会返回对应的IP地址：106.11.62.15。<br>&nbsp; &nbsp; &nbsp; &nbsp;DNS查询完之后就获取到IP地址，当拿到IP地址之后浏览器就可以调用Socket函数来去发起TCP请求，通过三次握手与并等待服务器的确认。<br>在服务器响应请求后，建立TCP连接。<br>&nbsp; &nbsp; &nbsp; &nbsp;建立起连接之后，发起应用层协议HTTP请求，发起的HTTP请求并不是一开始打到web框架，而是打到Nginx反向代理，很多访问量比较高的网站都会使用nginx来作为反向代理和负载均衡，通过nginx转发到多台服务器上。<br>&nbsp; &nbsp; &nbsp; &nbsp;Nginx反向代理之后就到 WSGI服务器这一层，uwsgi / gunicom作用就是主要兼容web应用(flask/django/tornado)。通过uwsgi 再把请求转发到web应用层(web app响应)也就是web框架层。在web应用层一般就是做一些数据库的增删改查或者发一条消息等，最后把请求response，通过TCP发送给用户。<br>&nbsp; &nbsp; &nbsp; 如果没有其它数据传输的时候，就会执行TCP的四次挥手。</p>
-<p>然后，浏览器向服务器发送HTTP请求，服务器收到请求并返回包含HTML代码的HTTP Response。<br>然后浏览器获取到了HTML，并进行HTML内资源请求，比如里面的CSS,JS，图片等资源。<br>最后浏览器将渲染界面，呈现给用户。</p>
-<p>一、精简回答<br>1.DNS：domain name server，域名解析 用于将域名转化成ip地址的服务器。<br> 就像是查号台、地址簿，会告诉互联网该如何去解读IP地址，譬如将38.160.150.31转换成人能读懂的网址，比如bbc.co.uk，并指出哪条途径可以到达存有这个IP地址的服务器。<br>域名：<a target="_blank" rel="noopener" href="http://www.baidu.com/">www.baidu.com</a><br>DNS服务端：119.29.29.29<br>通过DNS服务器解析119.29.29.29，解析<a target="_blank" rel="noopener" href="http://www.baidu.com/">http://www.baidu.com</a><br>2.访问百度的IP<br>百度IP地址：14.215.177.38<br>通过浏览器方位14.215.177.38:443端口</p>
+<p>&nbsp; DNS查询—》TCP握手—》HTTP请求—》反向代理Nginx—》uwsgi / gunicom—》web app 响应—》TCP握手。<br>浏览器本身是一个客户端，当你输入URL的时候，首先浏览器会去请求DNS服务器，一开始并不会做DNS查询，而是先去看有没有DNS缓存，如果不在DNS缓存里面并且hosts文件里面也没有的时候，<br>它就会向本地DNS服务器发起一个DNS查询，如果本地DNS没有查到的时候(DNS 查询是一个递归查询)它就会向上层继续查询，一直向域名服务器和根服务器继续进行递归查询。<br>一直到查询完之后返回给我们相应的域名对应的IP地址，<br>比如：输入<a href="http://www.aliyun.com阿里云就会返回对应的IP地址：106.11.62.15。">www.aliyun.com阿里云就会返回对应的IP地址：106.11.62.15。</a><br>&nbsp; &nbsp; &nbsp; &nbsp;DNS查询完之后就获取到IP地址，当拿到IP地址之后浏览器就可以调用Socket函数来去发起TCP请求，通过三次握手与并等待服务器的确认。<br>在服务器响应请求后，建立TCP连接。<br>&nbsp; &nbsp; &nbsp; &nbsp;建立起连接之后，发起应用层协议HTTP请求，发起的HTTP请求并不是一开始打到web框架，而是打到Nginx反向代理，很多访问量比较高的网站都会使用nginx来作为反向代理和负载均衡，通过nginx转发到多台服务器上。<br>&nbsp; &nbsp; &nbsp; &nbsp;Nginx反向代理之后就到 WSGI服务器这一层，uwsgi / gunicom作用就是主要兼容web应用(flask/django/tornado)。通过uwsgi 再把请求转发到web应用层(web app响应)也就是web框架层。在web应用层一般就是做一些数据库的增删改查或者发一条消息等，最后把请求response，通过TCP发送给用户。<br>&nbsp; &nbsp; &nbsp; 如果没有其它数据传输的时候，就会执行TCP的四次挥手。</p>
+<p>然后，浏览器向服务器发送HTTP请求，服务器接收到请求包之后才开始处理请求包，服务器调用自身服务，返回HTTP Response（响应）包；包含HTML代码<br>然后浏览器客户端收到来自服务器的响应获取到了HTML，并进行HTML内资源请求，比如里面的CSS,JS，图片等资源。<br>最后浏览器将渲染渲染这个Response包里的主体（body），呈现给用户。等收到全部的内容随后断开与该服务器之间的TCP连接。</p>
+<p>一、精简回答<br>1.DNS：domain name server，域名解析 用于将域名转化成ip地址的服务器。<br>在Internet上域名与IP地址之间是一一对应的，域名虽然便于人们记忆，但机器之间只能互相认识IP地址，<br>就像是查号台、地址簿，会告诉互联网该如何去解读IP地址，<br>它们之间的转换工作称为域名解析，域名解析需要由专门的域名解析服务器来完成，DNS就是进行域名解析的服务器 。</p>
+<p>譬如将38.160.150.31转换成人能读懂的网址，比如bbc.co.uk，并指出哪条途径可以到达存有这个IP地址的服务器。</p>
+<p>域名：<a target="_blank" rel="noopener" href="http://www.baidu.com/">www.baidu.com</a><br>DNS服务端：119.29.29.29<br>通过DNS服务器解析119.29.29.29，解析<a target="_blank" rel="noopener" href="http://www.baidu.com/">http://www.baidu.com</a><br>2.访问百度的IP<br>百度IP地址：14.215.177.38<br>通过浏览器方位14.215.177.38:443端口</p>
 <p>二、详细回答</p>
 <ol>
 <li>如何到达DNS地址：119.29.29.29</li>
@@ -248,7 +249,8 @@
 <li>14.215.177.38:443（百度）发送页面信息给电脑。</li>
 </ol>
 <p>内网公网地址切换，分布式服务器，网关处理</p>
-<p>再浏览器打开网址或者CMD ping </p>
+<p>再浏览器打开网址或者CMD ping</p>
+<h3 id="Web服务器的工作原理可以简单地归纳为"><a href="#Web服务器的工作原理可以简单地归纳为" class="headerlink" title="Web服务器的工作原理可以简单地归纳为"></a>Web服务器的工作原理可以简单地归纳为</h3><p>客户端通过TCP/IP协议建立到服务器的TCP连接<br>客户端向服务器发送HTTP协议请求包，请求服务器里的资源文档<br>服务器向客户端发送HTTP协议应答包，如果请求的资源包含有动态语言的内容，那么服务器会调用动态语言的解释引擎负责处理“动态内容”，并将处理得到的数据返回给客户端<br>客户机与服务器断开。由客户端解释HTML文档，在客户端屏幕上渲染图形结果</p>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -275,10 +277,6 @@
     
 
     <footer class="post-footer">
-          <div class="post-tags">
-              <a href="/tags/Leetcode/" rel="tag"># Leetcode</a>
-              <a href="/tags/%E5%89%91%E6%8C%87offer/" rel="tag"># 剑指offer</a>
-          </div>
 
         
 
