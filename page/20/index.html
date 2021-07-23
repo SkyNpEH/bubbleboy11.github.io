@@ -47,8 +47,8 @@
   <noscript>
     <link rel="stylesheet" href="/css/noscript.css">
   </noscript>
-<link rel="stylesheet" href="/css/prism.css" type="text/css"><link rel="alternate" href="/atom.xml" title="外心人D的博客" type="application/atom+xml">
-</head>
+<link rel="alternate" href="/atom.xml" title="外心人D的博客" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism.css" type="text/css"></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
   <div class="headband"></div>
@@ -200,7 +200,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-07-20 09:50:54" itemprop="dateModified" datetime="2021-07-20T09:50:54Z">2021-07-20</time>
+        <time title="修改时间：2021-07-23 03:05:11" itemprop="dateModified" datetime="2021-07-23T03:05:11Z">2021-07-23</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -340,6 +340,9 @@
 <p>cookie 和 session 区别<br>需要在服务端给用户生成一个标识，然后每次让客户端带过去给后端，识别用户会话。用户会话就是用户识别的一种方式。</p>
 <p>Session“会话控制” 一般是服务器生成之后给客户端 （通过 url参数或cookie）<br>对象存储特定用户会话所需的属性及配置信息。<br>这样，当用户在应用程序的Web页之间跳转时，存储在Session对象中的变量将不会丢失，<br>而是在整个用户会话中一直存在下去。<br>当用户请求来自应用程序的 Web页时，如果该用户还没有会话，<br>则Web服务器将自动创建一个 Session对象。<br>当会话过期或被放弃后，服务器将终止该会话。<br>Session没有大小限制<br>session数据sessionid 识别用户 放在服务器<br>Session 存储安全性较高的数据。</p>
 <p>Cookie 是实现 session 的一种机制，通过 HTTP cookie 字段实现<br>类型为“小型文本文件”，<br>是某些网站为了辨别用户身份，进行Session跟踪而储存在用户浏览器终端上的数据（通常经过加密），由用户客户端计算机暂时或永久保存的信息<br>用来存储用户信息的，每次请求会被携带上发送给对方的 浏览器<br>-要获取登录后才能访问的页面<br>-对方的服务器会通过cookie来判断是我们是一个爬虫<br>Cookie不能存储对象<br>Cookie可能会被浏览器禁用。怎么办<br>客户端禁用cookie采用url重写的方式 ，<br>也就是上面说的将sessionid写在url上，<br>用户登陆之后，需要将用户的信息存到Cookie中，<br>但因为Cookie中只能存储字符串，所以想到了先把用户实体序列化成Json串，存储在Cookie中，用到的时候再拿出来反序列化。<br>在客户端的Cookie 中存储session id，以此来标记服务器的哪个session 文件是当前用户的。（session 文件：session 存储介质视服务器而定）<br>Cookie 减轻服务器存储压力，一般存储安全性要求不高的数据。<br>单个cookie保存的数据不能超过4K，很多浏览器都限制一个站点最多保存20个cookie。<br>前言</p>
+<p>作用：保持会话<br>cookie [A]<br>session [B]<br>用户在【浏览器】当中提交【数据】—》 【服务器】—》 [sessionid]<br>【服务器】—-》 【sessionid]—-》 【浏览器】—-》 cookie[sessionid]<br>【浏览器】-》 cookie[sessionid]—&gt; 【服务器】</p>
+<p>【波哥】-》 【浏览器】打开淘宝网<br>【淘宝服务器】 【波哥的信息】<br>【登陆】=》 【淘宝服务器】 –》 sessionid<br>【淘宝服务器】–》 sessionid—》 【波哥】–》 【浏览器】<br>【波哥】–》 【浏览器】 sessionid+手机的信息—》 【淘宝服务器】</p>
+<p>session cookie：临时cookie，在浏览器被关闭时候自动删除<br>persistent cookie :持久化cookie</p>
 <p>应用场景<br>日常登录一个网站，今天输入用户名密码登录了，第二天再打开很多情况下就直接打开了。这个时候用到的一个机制就是cookie。</p>
 <p>session的一个场景是购物车，添加了商品之后客户端处可以知道添加了哪些商品，而服务器端如何判别呢，所以也需要存储一些信息，这里就用到了session。</p>
 <p>Cookie<br>通俗讲，Cookie是访问某些网站以后在本地存储的一些网站相关的信息，下次再访问的时候减少一些步骤。另外一个更准确的说法是：Cookies是服务器在本地机器上存储的小段文本并随每一个请求发送至同一个服务器，是一种在客户端保持状态的方案。</p>
@@ -350,7 +353,7 @@
 <p>当浏览器 第一次发送请求时，服务器自动生成了一个HashTable和一个Session ID用来唯一标识这个HashTable，并将其通过响应发送到浏览器。当浏览器第二次发送请求，会将前一次服务器响应中的Session ID放在请求中一并发送到服务器上，服务器从请求中提取出Session ID，并和保存的所有Session ID进行对比，找到这个用户对应的HashTable。</p>
 <p>摘自<a target="_blank" rel="noopener" href="http://caibaojian.com/477.html">http://caibaojian.com/477.html</a></p>
 <p>一般这个值会有一个时间限制，超时后毁掉这个值，默认是20分钟。</p>
-<p>Session的实现方式和Cookie有一定关系。试想一下，建立一个连接就生成一个session id，那么打开几个页面就好几个了，这显然不是我们想要的，那么该怎么区分呢？这里就用到了Cookie，我们可以把session id存在Cookie中，然后每次访问的时候将Session id带过去就可以识别了，是不是很方便~</p>
+<p>试想一下，建立一个连接就生成一个session id，那么打开几个页面就好几个了，这显然不是我们想要的，那么该怎么区分呢？这里就用到了Cookie，我们可以把session id存在Cookie中，然后每次访问的时候将Session id带过去就可以识别了，是不是很方便~</p>
 <p>区别<br>通过上面的简单叙述，很容易看出来最明显的不同是一个在客户端一个在服务端。因为Cookie存在客户端所以用户可以看见，所以也可以编辑伪造，不是十分安全。</p>
 <p>Session过多的时候会消耗服务器资源，所以大型网站会有专门的Session服务器，而Cookie存在客户端所以没什么问题。</p>
 <p>域的支持范围不一样，比方说a.com的Cookie在a.com下都能用，而<a target="_blank" rel="noopener" href="http://www.a.com的session在api.a.com下都不能用,解决这个问题的办法是jsonp或者跨域资源共享./">www.a.com的Session在api.a.com下都不能用，解决这个问题的办法是JSONP或者跨域资源共享。</a></p>
@@ -380,7 +383,7 @@
 </li>
 </ul>
 <p>浏览器的一个功能，第一次请求url，服务器端返回的是html页面，然后浏览器开始渲染HTML：当解析到HTML DOM里面的图片连接，css脚本和js脚本的链接，浏览器就会自动发起一个请求静态资源的HTTP请求，获取相对应的静态资源，然后浏览器就会渲染出来，最终将所有资源整合、渲染，完整展现在我们面前的屏幕上。</p>
-<p>网页优化方面有一项措施是减少HTTP请求次数，就是把尽量多的css和js资源合并在一起，目的是尽量减少网页请求静态资源的次数，提高网页加载速度，同时减缓服务器的压力。 </p>
+<p>网页优化方面有一项措施是减少HTTP请求次数，就是把尽量多的css和js资源合并在一起，目的是尽量减少网页请求静态资源的次数，提高网页加载速度，同时减缓服务器的压力。</p>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
