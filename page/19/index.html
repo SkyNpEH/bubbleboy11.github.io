@@ -119,7 +119,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">339</span>
+          <span class="site-state-item-count">341</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -160,6 +160,355 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/django-jie-guo-ji-queryset/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/django-jie-guo-ji-queryset/" class="post-title-link" itemprop="url">django 结果集QuerySet</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-06-30 09:41:07" itemprop="dateModified" datetime="2021-06-30T09:41:07Z">2021-06-30</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>查询条件的使用<br>结果集QuerySet常用方法<br>    Queryset表示从数据库中取出来的对象的集合<br>    它可以含有零个、一个或者多个过滤器（filter）（相当于数据库的where）</p>
+<p>从模型的Manager那里取得QuerySet<br>QuerySet的筛选结果本身还是QuerySet</p>
+<p>注意：对一个QuerySet实例对象，可以继续调用上面所有函数</p>
+<blockquote>
+<p><strong>说明2</strong>：ORM查询多个对象时会返回QuerySet对象，QuerySet使用了<strong>惰性查询</strong>，<br>即在创建QuerySet对象的过程中不涉及任何数据库活动，等真正用到对象时（对QuerySet求值）才向数据库发送SQL语句并获取对应的结果，这一点在实际开发中需要引起注意！<br>不能直接得出数据信息，只有通过循环才能得到结果的具体信息.<br><strong>说明3</strong>：缓存：结果集从数据库操作一次之后，下一次对同一个查询集进行操作不会再进行数据库的查询的，从缓存获取数据</p>
+</blockquote>
+<blockquote>
+<p><strong>说明4</strong>：如果希望更新多条数据，不用先逐一获取模型对象再修改对象属性，可以直接使用QuerySet对象的<code>update()</code>方法一次性更新多条数据。</p>
+</blockquote>
+<ol start="10">
+<li>不要对<code>QuerySet</code>调用<code>len()</code>函数。</li>
+</ol>
+<ul>
+<li><code>filter()</code>——返回筛选出满足条件的数据记录。参数中可以写查询条件。返回值也是QuerySet实例对象。获取不到数据返回一个空列表，不会抛出异常<br>pk=3 的意思是主键 primary key=3，相当于 id=3。</li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查询在2020年1月1日之后创建的数据</span></span><br><span class="line">user_list = WeiboUser.objects.filter(created_at__gt=<span class="string">'2020-1-1'</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<ul>
+<li><code>exclude()</code>——返回不满足条件的数据，和filter相反<br>User.objects.all().exclude(username=’user1’).count()<br>Out[23]: 5</li>
+</ul>
+<p><code>get</code>:返回一条且只能有一条数据，返回值是一个对象，参数可以写查询条件。获取不到数据和查到两条数据会抛出异常。配合<code>try except</code>语句</p>
+<ul>
+<li><code>get_or_create()</code>——有则返回，没有则创建记录，可以实现链式的调用，通过第一次的过滤还可以再过滤<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">obj=User.objects.get_or_create(username=<span class="string">'zhangsan'</span>,password=<span class="string">'123456'</span>,nickname=<span class="string">'张三'</span>)</span><br><span class="line">obj</span><br><span class="line">Out[<span class="number">7</span>]: (&lt;WeiboUser: WeiboUser object&gt;, <span class="literal">False</span>)</span><br><span class="line">obj = User.objects.get_or_create(username=<span class="string">'zhangsan2'</span>,password=<span class="string">'1111'</span>,nickname=<span class="string">'qq'</span>)</span><br><span class="line">obj</span><br><span class="line">Out[<span class="number">9</span>]: (&lt;WeiboUser: WeiboUser object&gt;, <span class="literal">True</span>)</span><br><span class="line">obj = User.objects.get_or_create(username=<span class="string">'zhangsan2'</span>,password=<span class="string">'123456'</span>,nickname=<span class="string">'qq'</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+</li>
+</ul>
+<p><code>bulk_create()</code>——创建/新增多条数据库记录，结果集从数据库中查询出来之后不会再进行数据库的查询的</p>
+<pre><code>user1 = User(username='user1', nickname='用户1', password='123456')
+user2 = User(username='user2', nickname='用户2', password='123456')
+user3 = User(username='user3', nickname='用户3', password='123456')
+User.objects.bulk_create([user1,user2,user3])
+</code></pre>
+<p>QuerySet链式查询方法：</p>
+<ul>
+<li><p><code>first()/last()</code>——返回第一条/最后一条记录<br>User.objects.first()<br>Out[17]: &lt;WeiboUser: WeiboUser object&gt;<br>User.objects.first().username<br>Out[18]: ‘quan’<br>User.objects.last().username<br>Out[19]: ‘user3’</p>
+</li>
+<li><p><code>all()</code>用来查询表中的所有数据，<br>返回值是一个查询集（QuerySet）类型数据，<br>返回模型类对应表的所有数据，<br>用索引下标取出模型类的对象</p>
+</li>
+</ul>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">books=models.Book.objects.all()</span><br><span class="line">print(books,type(books))</span><br><span class="line"><span class="comment">#QuerySet类型，类似于list，访问url时数据显示在命令行窗口中。</span></span><br><span class="line">foriinbooks:</span><br><span class="line">print(i.title)</span><br></pre></td></tr></tbody></table></figure>
+
+<ul>
+<li><code>count()</code>——返回记录行数之和 返回结果集中数据的数目，返回值是一个数字</li>
+</ul>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">User.objects.all().count()</span><br><span class="line">Out[<span class="number">24</span>]: <span class="number">6</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>exists()</code>——结果集是否存在（1条以上）返回值用于<code>if</code>条件。</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">User.objects.filter(username=<span class="string">'zhangsan'</span>).exists()</span><br><span class="line">Out[<span class="number">24</span>]: <span class="number">6</span></span><br><span class="line"></span><br><span class="line">a=User.objects.all().order_by(<span class="string">'id'</span>)[<span class="number">0</span>]</span><br><span class="line">b=User.objects.all().order_by(<span class="string">'-id'</span>)[<span class="number">0</span>]</span><br><span class="line">a</span><br><span class="line">Out[<span class="number">29</span>]: &lt;WeiboUser: WeiboUser object&gt;</span><br><span class="line">a.username</span><br><span class="line">Out[<span class="number">30</span>]: <span class="string">'quan'</span></span><br><span class="line">b.username</span><br><span class="line">Out[<span class="number">31</span>]: <span class="string">'user3'</span></span><br></pre></td></tr></tbody></table></figure>
+
+
+<ul>
+<li><p><code>order_by()</code>——对查询的记录结果排序<br>返回值是QuerySet，参数中写排序的字段<br>  可以写多个字段，默认升序，如果降序，在字段前面加“-”<br>• 参数的字段名要加引号。<br>• b、降序为在字段前面加个负号 -</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">User.objects.all().order_by(<span class="string">'-id'</span>)[<span class="number">0</span>]  倒数第一个</span><br><span class="line">Out[<span class="number">25</span>]:&lt;WeiboUser: User:user3,pk:<span class="number">10</span>, status:<span class="number">1</span>&gt;</span><br><span class="line">User.objects.all().order_by(<span class="string">'id'</span>)[<span class="number">0</span>]   第一个</span><br><span class="line">Out[<span class="number">26</span>]: &lt;WeiboUser: WeiboUser object&gt;</span><br></pre></td></tr></tbody></table></figure>
+</li>
+<li><p><code>none()</code>——创建一个空的结果集</p>
+</li>
+<li><p><code>using()</code>——使用指定的数据库查询(在settings中添加多数据库支持)</p>
+</li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查找xx数据库的全部记录，并将其通过id降序排列</span></span><br><span class="line">User.objects.all().order_by(<span class="string">'-id'</span>).using(<span class="string">'数据库名'</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>分页处理<br>    减少等待时间，提升用户体验<br>    如何进行分页查询：<br>方法一：对查询结果集QuerySet进行分片</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span>    <span class="comment"># 返回前n个对象（LIMIT 5）</span></span><br><span class="line"><span class="number">2</span>    User.objects.all()[:<span class="number">5</span>]</span><br><span class="line"><span class="number">3</span>    <span class="comment"># （offset 5 limit 5）sql中offset偏移的意思</span></span><br><span class="line"><span class="number">4</span>    跳过前<span class="number">5</span>条数据，从第<span class="number">6</span>条数据开始取，取<span class="number">5</span>条数据，第<span class="number">6</span>到第<span class="number">10</span>个对象</span><br><span class="line">    User.objects.all()[<span class="number">5</span>:<span class="number">10</span>]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>for i in range(100):<br>  …:   …:list.append(User(username=’user{0}’.format(i),nickname=’用户{}’.format(i),password=’123456’))</p>
+<p>  …:len(list)<br>Out[7]: 100<br>User.objects.bulk_create(list)</p>
+<p>obj_list = User.objects.all()[50:10]  第五列从第50行开始<br>obj_list<br>Out[10]: &lt;QuerySet []&gt;<br>list_all = User.objects.all()<br>list_all[50:60]<br>`</p>
+<p>方法二：使用<code>django.core.paginator</code>进行分页处理(分页处理器)<br>分页处理相关类：<br>Paginator——分页器<br>Page——某一页对象<br>异常：<br>InvalidPage——无效的页码<br>PageNotAnInteger——页码必须是整数<br>EmptyPage——空页（没有数据）</p>
+<p>分页处理器<br>    步骤一：取得分页器Paginator(objects,page_size)<br>objects——要进行分页的数据，就是我们之前查询获得的结果集<br>page_size——每页的数据放多少<br>Python<br>    1    p = Paginator(objects,2)<br>    分页器的属性：<br>    count——数据记录的总条数<br>    num_pages——总页数（总记录条数/每页大小）<br>    page_range——页码范围<br>    步骤二：取得页面实例page=p.page(page_num)<br>page_num——当前页的页码，如第几页</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">p = Paginator(objects,<span class="number">2</span>)</span><br><span class="line">page = p.page(<span class="number">3</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<h4 id="页面实例的属性："><a href="#页面实例的属性：" class="headerlink" title="页面实例的属性："></a>页面实例的属性：</h4><ul>
+<li>number——当前页的页码</li>
+<li>object_list——当前页的数据列表</li>
+<li>paginator——分页器对象的引用</li>
+</ul>
+<h4 id="页面实例的常用方法："><a href="#页面实例的常用方法：" class="headerlink" title="页面实例的常用方法："></a>页面实例的常用方法：</h4><ul>
+<li>has_next()——是否还有下一页</li>
+<li>has_previous()——是否还有上一页</li>
+<li>has_other_pages()——是否还有其他页（上/下一页）</li>
+<li>next_page_number()——下一页的页码，如果没有，触发InvalidPage异常</li>
+<li>previous_page_number()——上一页的页码，如果没有，触发InvalidPage异常</li>
+</ul>
+<p>Django 3.2 智能分页 <code>get_elided_page_range</code><br>接收3个参数，<br><code>number</code>为当前页码数,<br><code>on_each_side</code>为当前页码左右两边的页数<br><code>on_ends</code>为首尾页码范围。</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Paginator.get_elided_page_range(number, on_each_side=<span class="number">3</span>, on_ends=<span class="number">2</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>如果当前页码为第10页，使用该方法将输出如下页码范围(page_range)。<br>10左右两边各有3页，首尾各有2页，其余页码号码用…代替。<br>将<code>page_range</code>这个变量传递到前端模板进行遍历即可实现智能分页。<br><code>[1, 2, '…', 7, 8, 9, 10, 11, 12, 13, '…', 49, 50]</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">house_filter</span>(<span class="params">request</span>):</span></span><br><span class="line">    qs = House.objects.all()</span><br><span class="line">    paginator = Paginator(qs, <span class="number">1</span>)  <span class="comment"># 每页1条记录</span></span><br><span class="line">    page = request.GET.get(<span class="string">'page'</span>, <span class="number">1</span>)  <span class="comment"># 获取当前page页码，默认为1</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        page_obj = paginator.page(page)  <span class="comment"># 分页</span></span><br><span class="line">    <span class="keyword">except</span> PageNotAnInteger:</span><br><span class="line">        page_obj = paginator.page(<span class="number">1</span>)</span><br><span class="line">    <span class="keyword">except</span> EmptyPage:</span><br><span class="line">        page_obj = paginator.page(paginator.num_pages)</span><br><span class="line">    is_paginated = <span class="literal">True</span> <span class="keyword">if</span> paginator.num_pages &gt; <span class="number">1</span> <span class="keyword">else</span> <span class="literal">False</span></span><br><span class="line">    <span class="comment"># 注意下面一行, 获取智能页码范围，并传递给模板</span></span><br><span class="line">    page_range = paginator.get_elided_page_range(page, on_each_side=<span class="number">3</span>, on_ends=<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">    context = {<span class="string">'page_obj'</span>: page_obj, <span class="string">'paginator'</span>: paginator,</span><br><span class="line">               <span class="string">'is_paginated'</span>: is_paginated, <span class="string">'page_range'</span>: page_range}</span><br><span class="line">    <span class="keyword">return</span> render(request, <span class="string">'house/house_index.html'</span>, context)</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight html"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- Django 3.2之前 --&gt;</span></span><br><span class="line"> {% for i in page_obj.paginator.page_range %}</span><br><span class="line"><span class="comment">&lt;!-- Django 3.2之后 --&gt;</span></span><br><span class="line"> {% for i in page_range %}</span><br></pre></td></tr></tbody></table></figure>
+
+<h5 id="按字段查找可以用的条件的使用"><a href="#按字段查找可以用的条件的使用" class="headerlink" title="按字段查找可以用的条件的使用"></a>按字段查找可以用的条件的使用</h5><p>查询语法：<br>字段名称__查询条件 = “查询内容” 注意是双下划线<br>    相等/等于</p>
+<ol>
+<li><code>exact</code> / <code>iexact</code>：精确匹配/忽略大小写的精确匹配查询 等于xx值（默认的形式）</li>
+</ol>
+<p>如：id_exact=6 或者 id=6<br>如：name_iexact=’zhangsan’<br>    # name LIKE ‘zhangsan’<br>    </p><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">        WeiboUser.objects.filter(username__iexact=<span class="string">'gan'</span>)</span><br><span class="line">    `</span><br><span class="line"><span class="number">2.</span> `contains` / `icontains` / `startswith` / `istartswith` / `endswith` / `iendswith`：基于`like`的模糊查询</span><br><span class="line"></span><br><span class="line">    是否包含xx字符串</span><br><span class="line">contains, icontains——包含xx值</span><br><span class="line">如：name__contains= ‘san’</span><br><span class="line">    以xx开始</span><br><span class="line">startswith、istartswith</span><br><span class="line">    以xx结束</span><br><span class="line">endswith、iendswith</span><br><span class="line"></span><br><span class="line"><span class="number">3.</span> `<span class="keyword">in</span>` ：集合运算</span><br><span class="line">    xx选项__in[列表]或（元组）</span><br><span class="line">status__in=(<span class="number">2</span>,<span class="number">4</span>)</span><br><span class="line"></span><br><span class="line"><span class="number">4.</span> `gt` / `gte` / `lt` / `lte`：大于/大于等于/小于/小于等于关系运算</span><br><span class="line">`isnull`：查询空值（<span class="literal">True</span>）或非空值（<span class="literal">False</span>）</span><br><span class="line"></span><br><span class="line"><span class="number">5.</span> `range`：指定范围查询（SQL中的`between…<span class="keyword">and</span>…`）</span><br><span class="line"></span><br><span class="line"><span class="number">6.</span>  查询时间日期</span><br><span class="line">date 查询条件</span><br><span class="line">`date`/`datetime`——日期</span><br><span class="line">`year`——年</span><br><span class="line">`month`——月份</span><br><span class="line">`day`——天</span><br><span class="line">`hour`/`minute`/`second`——时分秒</span><br><span class="line">`week`/`week_day`——星期</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="number">7.</span> `range`：指定范围查询（SQL中的`between…<span class="keyword">and</span>…`）</span><br><span class="line"><span class="number">8.</span> `search`：基于全文索引的全文检索（一般很少使用）</span><br><span class="line"><span class="number">9.</span> `regex` / `iregex`：基于正则表达式的模糊匹配查询</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">外键关联查询</span><br><span class="line">查询条件是外键的某个属性（字段）</span><br><span class="line"></span><br><span class="line">```Python</span><br><span class="line">    <span class="comment"># 查询外键关联表字段包含'xx'的在本表数据</span></span><br><span class="line">    model.objects.filter(model__column__icontains=<span class="string">'xx'</span>)</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>手动添加微博及评论，然后举例外键关联查询：</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> weibo.models <span class="keyword">import</span> WeiboUser <span class="keyword">as</span> User</span><br><span class="line">user = User.objects.get(pk=<span class="number">4</span>)</span><br><span class="line">user</span><br><span class="line">Out[<span class="number">4</span>]: &lt;WeiboUser: User:zhangsan pk:<span class="number">4</span>,nickname:zhangsan status:<span class="number">1</span>&gt;</span><br><span class="line"><span class="keyword">from</span> weibo.models <span class="keyword">import</span> Weibo</span><br><span class="line"> weibo = Weibo.objects.create(user=user,content=<span class="string">'微博内容'</span>)</span><br><span class="line">weibo.pk</span><br><span class="line">Out[<span class="number">8</span>]: <span class="number">1</span></span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> weibo.models <span class="keyword">import</span> Comment</span><br><span class="line">Comment.objects.create(user=user,weibo=weibo,content=<span class="string">'zhangsan 评论'</span>)</span><br><span class="line">Out[<span class="number">10</span>]: &lt;Comment: Comment object&gt;</span><br><span class="line">Comment.objects.create(user=user,weibo=weibo,content=<span class="string">'zhangsan 评论2'</span>)</span><br><span class="line">Out[<span class="number">11</span>]: &lt;Comment: Comment object&gt;</span><br><span class="line">lisi = User.objects.get(pk=<span class="number">5</span>)</span><br><span class="line">Comment.objects.create(user=lisi,weibo=weibo,content=<span class="string">'lisi评论'</span>)</span><br><span class="line">Out[<span class="number">13</span>]: &lt;Comment: Comment object&gt;</span><br><span class="line">Comment.objects.create(user=lisi,weibo=weibo,content=<span class="string">'lisi评论2'</span>)</span><br><span class="line">Out[<span class="number">14</span>]: &lt;Comment: Comment object&gt;</span><br></pre></td></tr></tbody></table></figure>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/django/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/django/" class="post-title-link" itemprop="url">django</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-06-12 13:21:28" itemprop="dateModified" datetime="2021-06-12T13:21:28Z">2021-06-12</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>Django</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python manage.py // 查看相关命令</span><br></pre></td></tr></tbody></table></figure>
+
+<p>路由规则</p>
+<ul>
+<li>/index/</li>
+<li>/index/\d+</li>
+<li>/index/(\d+)</li>
+<li>/index/?P&lt;name(\d+)&gt;</li>
+<li>include</li>
+<li>反向生成url<ul>
+<li><code>{% url "" %}</code></li>
+<li>reverse(‘a1’,args = (1,2,3))<br>url和path的区别</li>
+</ul>
+</li>
+</ul>
+<p>• Django2.x中的<code>path</code>不支持正则匹配 但在同一目录下的re_path与Django1.x中的url功能大部分相同可以替代url。</p>
+<p>使用到正则匹配路径<code>(^$)</code>的时候，就需要使用<code>re_path</code>,而不能使用<code>path</code>，不然页面会显示404错误，<br>如果未用到正则，那么使用<code>path</code>即可。</p>
+<p>re_path(route, view, kwargs=None, name=None)¶<br>Returns an element for inclusion in urlpatterns. For example:</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.urls <span class="keyword">import</span> include, re_path</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    re_path(<span class="string">r'^index/$'</span>, views.index, name=<span class="string">'index'</span>),</span><br><span class="line">    re_path(<span class="string">r'^bio/(?P&lt;username&gt;\w+)/$'</span>, views.bio, name=<span class="string">'bio'</span>),</span><br><span class="line">    re_path(<span class="string">r'^weblog/'</span>, include(<span class="string">'blog.urls'</span>)),</span><br><span class="line">    ...</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># django 2.x</span></span><br><span class="line"><span class="keyword">from</span> django.urls <span class="keyword">import</span> path, re_path</span><br><span class="line">--------------------------------------------------------------</span><br><span class="line"><span class="comment"># django1.x</span></span><br><span class="line"><span class="keyword">from</span> django.conf.urls <span class="keyword">import</span> url</span><br></pre></td></tr></tbody></table></figure>
+
+<p>• 路由传参</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># django 2.x</span></span><br><span class="line">urlpatterns = [</span><br><span class="line">    path(<span class="string">'order/&lt;int:page&gt;'</span>, UserOrderView.as_view(), name=<span class="string">'order'</span>),</span><br><span class="line">    path(<span class="string">'index/'</span>, views.index, name=<span class="string">'main-view'</span>),</span><br><span class="line">    path(<span class="string">'bio/&lt;username&gt;/'</span>, views.bio, name=<span class="string">'bio'</span>),</span><br><span class="line">    path(<span class="string">'articles/&lt;slug:title&gt;/'</span>, views.article, name=<span class="string">'article-detail'</span>),</span><br><span class="line">    path(<span class="string">'articles/&lt;slug:title&gt;/&lt;int:section&gt;/'</span>, views.section, name=<span class="string">'article-section'</span>),</span><br><span class="line">    path(<span class="string">'weblog/'</span>, include(<span class="string">'blog.urls'</span>)),</span><br><span class="line">]</span><br><span class="line">------------------------------------------------------------------</span><br><span class="line"><span class="comment"># django 1.x</span></span><br><span class="line">urlpatterns=[</span><br><span class="line">    url(<span class="string">r'^order/(?P&lt;page&gt;[0-9]+)$'</span>,UserOrderView.as_view(), name=<span class="string">'order'</span>)</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>• include()函数区别</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 2.x 需要指定两个参数，第二个参数为所在的app名称，不然会报错</span></span><br><span class="line">path(<span class="string">'search/'</span>, include((<span class="string">'haystack.urls'</span>, <span class="string">'haystack'</span>))),</span><br><span class="line">---------------------------------------------------------</span><br><span class="line">url(<span class="string">'search/'</span>, include(<span class="string">'haystack.urls'</span>)),</span><br></pre></td></tr></tbody></table></figure>
+
+
+
+<p>视图函数<br>    请求相关<br>    响应相关</p>
+<p>模板语言<br>    if for<br>    索引<br>    执行：不加括号自动执行函数</p>
+<pre><code>filter和simple_tag
+</code></pre>
+<p>ORM操作<br>    创建表<br>        类  继承 models.Model<br>        字段 Inter Char Foreign MantToMany<br>    操作表<br>        增<br>        删<br>        改<br>        查<br>    补充：<br>        fliter传参：<br>            a=1,b=2<br>            **{}<br>            Q()|Q()<br>         values:<br>         values_list:</p>
+<pre><code>     all/values/values_list:
+     
+ 双下划线跨表查询:
+        正向：
+        反向：
+</code></pre>
+<p>Django的生命周期：</p>
+<p>wsgi协议：web服务网关接口</p>
+<pre><code>模块：wsgiref  uwsgi
+</code></pre>
+<p>路由系统：<br>    /index/  views.func<br>    /index/\d+  views.func<br>    /index/  views.include()</p>
+<p>视图函数：<br>    FBV function based view<br>    CBV class based view</p>
+<p>ORM<br>    models &lt;=&gt; sql</p>
+<p>template<br>    html/css  渲染</p>
+<p>渲染工作在Django中执行完毕之后，字符串返回给浏览器。</p>
+<p>遇到js /css等再发一次请求，不会渲染，仅返回静态文件。</p>
+<p>影响自动生成数据库时间字段；<br><code>USE_TZ=True</code>，创建UTC时间写入到数据库。<br><code>USE_TZ=False</code>，根据TIME_ZONE设置的时区进行创建时间并写入数据库</p>
+<p>USE_I18N=True</p>
+<p>创建你自己的配置文件¶<br>没有什么可以阻止你为你的的 Django 应用创建自己的配置，但请遵循以下原则：<br>所有配置项名称都应<strong>大写</strong>。<br>不要重新设置已存在的配置项。<br>由于配置文件是序列化的，Django 使用列表，但仅是约定俗成。</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -803,7 +1152,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-06-12 04:46:05" itemprop="dateModified" datetime="2021-06-12T04:46:05Z">2021-06-12</time>
+        <time title="修改时间：2021-08-01 03:17:43" itemprop="dateModified" datetime="2021-08-01T03:17:43Z">2021-08-01</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -828,7 +1177,7 @@
           <h2 id="drf认证"><a href="#drf认证" class="headerlink" title="drf认证"></a>drf认证</h2><p>认证:<br>认证可以简单的理解为登录和访问需要登录的接口的认证。<br>只要认证通过了,那么在 request对象(是drf的 request对象)上便有两个属性,<br>一个是 <code>request.user</code>,一个是 <code>request,auth</code>,前者就<br>是 django中的User对象,后者根据不同的认证机制有不同的对象,</p>
 <p>DRF的token登录原理<br>基于DRF的前后端分离登录与单独使用Django登录的原理不同，不再需要CSRF验证，<br>DRF提供了许多开箱即用的身份验证方案，并且还允许实现自定义方案。<br>身份验证始终在视图的最开始处，在进行权限和限制检查之前以及在允许任何其他代码进行之前运行。<br>身份验证方案始终定义为类列表，依赖的是<code>django.contrib</code>的<code>auth</code>，<br>对列表的多个内置认证类，drf会按照从上到下的顺序对对列表中的每个类进行身份认证验证，<br>并使用第一个成功通过的验证类的返回值来设置<code>request.user</code>和<code>request.auth</code></p>
 <p><code>setting.py</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># DRF 全局配置</span></span><br><span class="line">REST_FRAMEWORK = {</span><br><span class="line">    <span class="comment"># 配置默认认证类 authentication: 对用户登录的身份进行校验</span></span><br><span class="line">    <span class="string">"DEFAULT_AUTHENTICATION_CLASSES"</span>: [</span><br><span class="line">        <span class="comment"># 弹出输入用户名密码</span></span><br><span class="line">        <span class="string">"rest_framework.authentication.BasicAuthentication"</span>,</span><br><span class="line">        <span class="string">"rest_framework.authentication.SessionAuthentication"</span>  <span class="comment"># Session用于方便在DRF中调试使用</span></span><br><span class="line">        <span class="comment"># 'rest_framework.authentication.TokenAuthentication',  # TokenAuthentication，取消全局token，放在视图中进行</span></span><br><span class="line">        <span class="comment"># 'rest_framework_simplejwt.authentication.JWTAuthentication',  # djangorestframework_simplejwt 认证 用于前端登录认证</span></span><br><span class="line">    ]</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># DRF 全局配置</span></span><br><span class="line">REST_FRAMEWORK = {</span><br><span class="line">    <span class="comment"># 配置默认认证类 authentication: 对用户登录的身份进行校验</span></span><br><span class="line">    <span class="string">"DEFAULT_AUTHENTICATION_CLASSES"</span>: [</span><br><span class="line">        <span class="comment"># 哪个写在前面，优先使用哪个认证</span></span><br><span class="line">        <span class="string">"rest_framework.authentication.BasicAuthentication"</span>,  <span class="comment"># HTTP Basic authentication against username/password. 弹出输入用户名密码</span></span><br><span class="line">        <span class="string">"rest_framework.authentication.SessionAuthentication"</span>,  <span class="comment"># Use Django's session framework for authentication.</span></span><br><span class="line">        <span class="comment"># 'rest_framework.authentication.TokenAuthentication',  # TokenAuthentication，取消全局token，放在视图中进行</span></span><br><span class="line">        <span class="comment"># 'rest_framework_simplejwt.authentication.JWTAuthentication',  # djangorestframework_simplejwt 认证 用于前端登录认证</span></span><br><span class="line">    ]</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
 
 <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">MIDDLEWARE = [</span><br><span class="line">    <span class="string">'django.contrib.sessions.middleware.SessionMiddleware'</span>,</span><br><span class="line">    <span class="string">'django.contrib.auth.middleware.AuthenticationMiddleware'</span>,</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
 
@@ -862,6 +1211,7 @@
 <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">INSTALLED_APPS = [</span><br><span class="line">    <span class="string">"rest_framework.authtoken"</span>,  <span class="comment"># DRF自带的token认证</span></span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"><span class="comment"># DRF 全局配置</span></span><br><span class="line">REST_FRAMEWORK = {</span><br><span class="line">    <span class="comment"># 配置默认认证类 authentication: 对用户登录的身份进行校验</span></span><br><span class="line">    <span class="string">"DEFAULT_AUTHENTICATION_CLASSES"</span>: [</span><br><span class="line">        <span class="string">"rest_framework.authentication.TokenAuthentication"</span>,</span><br><span class="line">    ]</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
 
 <figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 或者pycharm Tools - Run manage.py Task</span></span><br><span class="line">migrations</span><br><span class="line">migrate</span><br></pre></td></tr></tbody></table></figure>
+
 <p>生成数据表<code>authtoken_token</code>，这个表和用户表是一一对应的。<br><code>user_id</code>是一个外键，指向<code>users_userprofile</code>表，<br>表中的<code>key</code>（即token）和user之间具有一对一的关系。</p>
 <p>如果之前已经创建了用户，在这个token表是没有记录的。<br>创建用户表后需要手动创建token表。<br>当用户注册时，需要调用<code>token = Token.objects.create(user=...)</code>来生成token。</p>
 <p>创建用户默认会生成一个对应的token值会保存到数据中，跟这个用户相关联。<br>其表结构如下：</p>
@@ -893,18 +1243,24 @@
 <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get</span>(<span class="params">self, request</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    :param request:</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    queryset = Course.objects.all()</span><br><span class="line">    s = CourseSerializer(instance=queryset,</span><br><span class="line">                         many=<span class="literal">True</span>)  <span class="comment"># 这里是instance = xx 查询集</span></span><br><span class="line">    print(type(request), type(request.data), type(s), type(s.data))</span><br><span class="line">    <span class="comment"># &lt;class 'rest_framework.request.Request'&gt; &lt;class 'dict'&gt; &lt;class 'rest_framework.serializers.ListSerializer'&gt; &lt;class 'rest_framework.utils.serializer_helpers.ReturnList'&gt;</span></span><br><span class="line">    print(self.request.user, self.request.auth)  <span class="comment"># admin None 默认模式</span></span><br><span class="line">    print(type(self.request.user), type(self.request.auth))</span><br><span class="line">    <span class="comment"># &lt;class 'django.contrib.auth.models.User'&gt; &lt;class 'NoneType'&gt; 默认模式</span></span><br><span class="line">    <span class="comment"># user01 69d53cdb0b395d638b50b51d5f3008f66499b4b8 token模式</span></span><br><span class="line">    <span class="comment"># &lt;class 'django.contrib.auth.models.User'&gt; &lt;class 'rest_framework.authtoken.models.Token'&gt;  token模式</span></span><br><span class="line">    <span class="keyword">return</span> Response(s.data, status=status.HTTP_200_OK)</span><br></pre></td></tr></tbody></table></figure>
 
 <p>认证成功会把<code>request.user</code>设置<code>User</code>类的实例，<code>request.auth</code>设置为数据表<code>authtoken_token</code>的key值<code>69d53cdb0b395d638b50b51d5f3008f66499b4b8</code>，失败会在header添加www-Authentication</p>
-<p>viewsets设置认证类<br>在使用token认证时，如果token不正确，则会抛出异常，<br>并且如果对于本来不需要认证即可访问的公开数据要是再需要正确的token才能访问的话，就会降低项目的友好性，<br>此时可以对token不采用全局设置，在需要配置认证的视图接口中进行<code>authentication_classes</code>认证判断</p>
-<p>分接口配置认证。解决某些接口需要认证才可以访问，某些接口不需要认证就可以访问</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework.authentication <span class="keyword">import</span> TokenAuthentication</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 没有登录打开对应url不会弹出帐密输入框了，因为自定义了认证类不再继承BasicAuthentication</span></span><br><span class="line">    authentication_classes = [TokenAuthentication]</span><br></pre></td></tr></tbody></table></figure>
+<p>在使用token认证时，如果token不正确，则会抛出异常，<br>并且如果对于本来不需要认证即可访问的公开数据要是再需要正确的token才能访问的话，就会降低项目的友好性，此时可以对token不采用全局设置，<br>在需要配置认证的视图分接口中设置<code>authentication_classes</code>认证判断<br>解决某些接口需要认证才可以访问，某些接口不需要认证就可以访问</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework.authentication <span class="keyword">import</span> TokenAuthentication</span><br><span class="line"><span class="keyword">from</span> rest_framework.views <span class="keyword">import</span> APIView</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ExamplAPIView</span>(<span class="params">APIView</span>):</span></span><br><span class="line">    <span class="comment"># 没有登录打开对应url不会弹出帐密输入框了，因为自定义了认证类不再继承BasicAuthentication</span></span><br><span class="line">    authentication_classes = [TokenAuthentication]</span><br></pre></td></tr></tbody></table></figure>
 
 <p>此时再请求<a target="_blank" rel="noopener" href="http://127.0.0.1:8000/mine/">http://127.0.0.1:8000/mine/</a>，request.user即为当前用户admin。</p>
-<h2 id="drf权限"><a href="#drf权限" class="headerlink" title="drf权限"></a>drf权限</h2><p>仅进行身份验证或标识不足以获取信息或代码。为此，请求访问的实体必须具有<strong>授权</strong>。<strong>权限与身份验证和限制</strong>一起，确定是否应准予请求访问或拒绝访问。权限检查始终在视图的开始处运行，然后再允许执行其他任何代码，通常会使用<code>request.user</code>和<code>request.auth</code>属性中的身份验证信息来确定是否应允许传入请求。</p>
+<p>认证失败会有两种可能的返回值：</p>
+<p>401 Unauthorized 未认证<br>403 Permission Denied 权限被禁止</p>
+<h2 id="drf权限"><a href="#drf权限" class="headerlink" title="drf权限"></a>drf权限</h2><p>仅进行身份验证或标识不足以获取信息或代码。为此，请求访问的实体必须具有<strong>授权</strong>。<strong>权限与身份验证和限制</strong>一起，确定是否应准予请求访问或拒绝访问。权限控制可以限制用户对于视图的访问和对于具体数据对象的访问。</p>
+<p>在执行视图的dispatch()方法前，会先进行视图访问权限的检查判断 然后再允许执行其他任何代码，通常会使用<code>request.user</code>和<code>request.auth</code>属性中的身份验证信息来确定是否应允许传入请求。</p>
 <p>权限用于授予或拒绝不同类别的用户对API不同部分的访问，最简单的许可方式是允许访问任何经过身份验证的用户，并拒绝访问任何未经身份验证的用户。</p>
-<p>常见的权限<br><code>from rest_framework.permissions import IsAuthenticated</code> 只有登录才能进行操作，不登录不能进行任何操作 将拒绝任何未经身份验证的用户的权限，否则将允许权限。<br><code>from rest_framework.permissions import AllowAny</code><br><code>from rest_framework.permissions import IsAdminUser</code> 是不是管理员<code>request.user.is_staff</code>员工<br><code>from rest_framework.permissions import IsAuthenticatedOrReadOnly</code></p>
+<p>在通过get_object()获取具体对象时，会进行模型对象访问权限的判断</p>
 <p>常用的权限类设置权限策略<br>如何自定义对象级别权限<br>权限检测后的处理，认证URL设置，全局权限控制与ViewSet的权限。</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># DRF 全局配置</span></span><br><span class="line">REST_FRAMEWORK = {</span><br><span class="line">    <span class="comment"># 配置默认授权类 权限permisson: 对登录验证通过的用户能访问的api和对api能取得的对应级别数据</span></span><br><span class="line">    <span class="string">"DEFAULT_PERMISSION_CLASSES"</span>: [</span><br><span class="line">        <span class="comment"># "rest_framework.permissions.AllowAny",  # 默认，允许所有请求，不需要认证</span></span><br><span class="line">        <span class="string">"rest_framework.permissions.IsAuthenticated"</span></span><br><span class="line">    ]</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework.permissions <span class="keyword">import</span> IsAuthenticated</span><br><span class="line"><span class="keyword">from</span> rest_framework.permissions <span class="keyword">import</span> AllowAny</span><br><span class="line"><span class="keyword">from</span> rest_framework.permissions <span class="keyword">import</span> IsAdminUser</span><br><span class="line"><span class="keyword">from</span> rest_framework.permissions <span class="keyword">import</span> IsAuthenticatedOrReadOnly</span><br><span class="line"></span><br><span class="line"><span class="comment"># DRF 全局配置</span></span><br><span class="line">REST_FRAMEWORK = {</span><br><span class="line">    <span class="comment"># 配置默认授权类 权限permisson: 对登录验证通过的用户能访问的api和对api能取得的对应级别数据</span></span><br><span class="line">    <span class="string">"DEFAULT_PERMISSION_CLASSES"</span>: [</span><br><span class="line">        <span class="comment"># "rest_framework.permissions.AllowAny",  # Allow any access. 默认，允许所有请求</span></span><br><span class="line">        <span class="string">"rest_framework.permissions.IsAuthenticated"</span>,  <span class="comment"># Allows access only to authenticated users. 仅通过登录认证的用户才能进行操作，不登录未经身份验证的用户不能进行任何操作的权限</span></span><br><span class="line">        <span class="string">"rest_framework.permissions.IsAdminUser"</span>,  <span class="comment"># 仅管理员用户（可以通过admin创建一个用户进行测试） `request.user.is_staff`员工</span></span><br><span class="line">        <span class="string">"rest_framework.permissions.IsAuthenticatedOrReadOnly"</span>,  <span class="comment"># The request is authenticated as a user, or is a read-only request.已经登陆认证的用户可以对数据进行增删改操作，没有登陆认证的只能查看数据。</span></span><br><span class="line">    ]</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
 
-<h3 id="DRF自定义BasePermission验证所有者"><a href="#DRF自定义BasePermission验证所有者" class="headerlink" title="DRF自定义BasePermission验证所有者"></a>DRF自定义BasePermission验证所有者</h3><p>DRF也提供了自定义权限功能，要实现自定义权限，覆盖<code>BasePermission</code>并实现以下方法之一或两者都实现：<br><code>.has_permission(self, request, view)</code><br><code>.has_object_permission(self, request, view, obj)</code></p>
+<h3 id="DRF自定义BasePermission验证所有者"><a href="#DRF自定义BasePermission验证所有者" class="headerlink" title="DRF自定义BasePermission验证所有者"></a>DRF自定义BasePermission验证所有者</h3><p>需继承<code>rest_framework.permissions.BasePermission</code>父类并实现以下方法之一或两者都实现：</p>
+<ul>
+<li><code>.has_permission(self, request, view)</code>是否可以访问视图， view表示当前视图对象</li>
+<li><code>.has_object_permission(self, request, view, obj)</code>是否可以访问数据对象， view表示当前视图， obj为数据对象</li>
+</ul>
 <p>如果应该授予请求访问权，则方法应该返回True，否则返回False。</p>
 <p>如果鉴权失败，自定义权限将引发一个PermissionDenied异常。要更改与异常关联的错误消息，直接在自定义权限上实现message属性。否则，将使用PermissionDenied中的default_detail属性。</p>
 <h3 id="设置登录的用户能查看修改自己的信息、收藏等数据，不能修改别人的信息"><a href="#设置登录的用户能查看修改自己的信息、收藏等数据，不能修改别人的信息" class="headerlink" title="设置登录的用户能查看修改自己的信息、收藏等数据，不能修改别人的信息"></a>设置登录的用户能查看修改自己的信息、收藏等数据，不能修改别人的信息</h3><p><a target="_blank" rel="noopener" href="https://www.django-rest-framework.org/tutorial/4-authentication-and-permissions/#object-level-permissions">https://www.django-rest-framework.org/tutorial/4-authentication-and-permissions/#object-level-permissions</a></p>
@@ -915,10 +1271,10 @@
 <p>To do that we’re going to need to create a custom permission.</p>
 <p>In the course app, create a new file,</p>
 <p>把官网的实例，直接复制过来就可以了，把<code>object.owner</code>其中的<code>owner</code>改为<code>user</code><br>同时需要自定义权限来判断要删除的收藏记录是否是当前的用户。</p>
-<p><code>utils/permissions.py</code></p>
+<p>在当前子应用下，创建一个权限文件 <code>utils/permissions.py</code> 中声明自定义权限类</p>
 <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework <span class="keyword">import</span> permissions</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">IsOwnerOrReadOnly</span>(<span class="params">permissions.BasePermission</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    Custom permission to only allow owners of an object to edit it.</span></span><br><span class="line"><span class="string">    自定义所有者权限：只允许对象的所有者能够编辑</span></span><br><span class="line"><span class="string">    Object-level permission to only allow owners of an object to edit it.</span></span><br><span class="line"><span class="string">    Assumes the model instance has an `user` attribute.</span></span><br><span class="line"><span class="string">    对象级别的权限，仅允许对象的所有者对其进行编辑</span></span><br><span class="line"><span class="string">    模型实例有一个 user 属性，指向用户的外键。</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">has_object_permission</span>(<span class="params">self, request, view, obj</span>):</span></span><br><span class="line">        <span class="comment"># Read permissions are allowed to any request,所有的请求都有读权限，</span></span><br><span class="line">        <span class="comment"># so we'll always allow GET, HEAD or OPTIONS requests.，所以我们总是允许GET、HEAD或OPTIONS请求。</span></span><br><span class="line">        <span class="keyword">if</span> request.method <span class="keyword">in</span> permissions.SAFE_METHODS:</span><br><span class="line">            <span class="comment"># SAFE_METHODS = ("GET", "HEAD", "OPTIONS")</span></span><br><span class="line">            <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># Instance must have an attribute named `owner`.</span></span><br><span class="line">        <span class="comment"># 实例必须有一个名为user的属性。</span></span><br><span class="line">        <span class="comment"># 只有当对象的user和当前登录user一样，才返回True，对象的所有者才有权限</span></span><br><span class="line">        <span class="comment"># obj = queryset = Course.objects.all()</span></span><br><span class="line">        <span class="comment"># 这里要把owner改为我们数据库中的user</span></span><br><span class="line">        <span class="keyword">return</span> obj.user == request.user</span><br></pre></td></tr></tbody></table></figure>
 
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> utils.permissions <span class="keyword">import</span> IsOwnerOrReadOnly</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment"># IsAuthenticated：必须登录用户；IsOwnerOrReadOnly：必须是当前登录的用户</span></span><br><span class="line">    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> utils.permissions <span class="keyword">import</span> IsOwnerOrReadOnly</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ExampleView</span>(<span class="params">APIView</span>):</span></span><br><span class="line">    <span class="comment"># IsAuthenticated：必须登录用户；IsOwnerOrReadOnly：必须是当前登录的用户</span></span><br><span class="line">    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]</span><br></pre></td></tr></tbody></table></figure>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -1381,286 +1737,8 @@
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/html/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/html/" class="post-title-link" itemprop="url">HTML</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-05-16 07:53:27" itemprop="dateModified" datetime="2021-05-16T07:53:27Z">2021-05-16</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>html在vscode没有高亮，右下角语言模式把<code>django html</code>切换成<code>html</code><br>live Server可以本地服务器的形式来运行html文件,或者项目,实现边改边在浏览器<br>看见效果。打开浏览器进行预览和调试页面。这个插件就可以实现静态、动态页面的实时预览，保存就能看见页面更新，不需要手动去刷新。</p>
-<p>js中用<code>/**</code>表示方法的注释</p>
-<h1 id="当前页面-当前文档所有内容"><a href="#当前页面-当前文档所有内容" class="headerlink" title="当前页面 * 当前文档所有内容"></a>当前页面 * 当前文档所有内容</h1><p>html的基本结构，</p>
-文档标记，
-头部标记，其中<title></title>属于
-正文标记
-
-<p>⽹⻚中常⽤的块元素有：div、dl、form、h1 – h6、hr、ol、p、pre、table、ul；<br>⽹⻚中常⽤的内联元素有：a、br、img、input、label、q、select、span、strong、textarea； </p>
-⽤来定义表格的表头标签
-是表格中单元格标签
-是表格中定义⾏的标签
-<hr>是水平线
-<b>加粗
-<ins>下划线
-<i>斜体
-<sub>下标
-<p> 换段
-<br> 换行
-在html中，⽆论打多少个空格，在⻚⾯中都只显示⼀个，显然不能正确的表示空格。 
-
-</p><p>什么是转义<br>◆把有特殊意义的字符显示出来<br>在浏览器显示页面时，浏览器会移除源代码中多余的空格和空行，所有连续的空格或空行都会被认为是一个空格。<br>&nbsp;  在⻚⾯表示空格符。<br>&amp;amp  &amp;<br>html标签中的&lt;&gt;—&amp;lt,&gt;<br>&amp;lt；在⻚⾯上表示的是左尖括号&lt;。<br>&amp;gt；在⻚⾯上表示<br>rowspan是跨⾏属性<br>colspan是跨列属性<br>cellspacing是单元格空隙<br>cellpadding是单元格内容与单元格边框空隙。 </p>
-<p>行级元素和其他内元素都会在一条水平线上排列，都在同一行<br>行级元素 a标签 label img span <br><br>标签 <span> 通常作为文本的容器，它没有特定的含义和样式，只有与 CSS 同时使用才可以为指定文本设置样式属性<br>该标签是一个内联元素，他与块级元素相反，内联元素不会自动在前后自动放置换行符，因此内联元素会默认显示在同一行。</span></p>
-<p>lt 是 less than 的缩写，表示（严格）小于；<br>gt 是 greater than 的缩写，表示（严格）大于；<br>le 是 less than or equal 的缩写，表示小于等于<br>ge 是 greater than or equal 的缩写，表示大于等于</p>
-<p>h1~h6 标题<br>&lt;img src=“***”/&gt;   作用在浏览器显示图片<br>示例&lt;img src=”image/logo.jpg” width=”250” height=”250” alt=“**”/&gt;<br>常用属性src、alt、height、width</p>
-<p>href用来设置链接指向的页面的URL，指定要链接内容的地址<br><a>.….</a> 使用超级链接与网络上的另一个文档相连<br><a href="page2.html">打开另一个页面</a><br>外网加上http://<br><a target="_blank" rel="noopener" href="http://www.imooc.com">慕课网</a></p>
-<p>A标签的target属性<br>标签|格式<br>_blank 在新打开、未命名的窗口打开链接<br>_parent 在父窗口打开链接<br>_self 当前窗口打开<br>_top 在框架中打开，目标将会清除所有被包含的frame框架</p>
-<p>target规定在何处打开链接文档。<br>用title属性规定关于元素的额外信息。这些信息通常会在鼠标移到元素上时显示一段工具提示文本（tooltip text）。title 属性常与form以及a元素一同使用，以提供关于输入格式和链接目标的信同时它也是abbr和acronym元素的必需属性。</p>
-<p>锚点标签<a name="ziti">…</a><br>name规定锚的名称。<br>作用同一个文档中创建指向该锚（位置）的链接，保证页面能最后一段是完整的，不能是半页<br>示例<a href="#duanluo">段落标签</a></p>
-<h1>目录</h1><h1>
-</h1><h2><a href="#duanluo">段落标签</a></h2>
-<h2><a href="page1.html#ziti">字体标签</a>有序列表<ol><li>….</li></ol><p></p>
-<p>无序列表</p><ul><li>….</li></ul><br>作用此列项目使用粗体圆点（典型的小黑圆圈）进行标记<br>适用于规律性显示的页面效果，范围和大小可以根据需要和整体宽度来自适应<br>示例<ul><li>我的文件</li></ul><p></p>
-<ul>
-<li>我的文件</li>
-<li>我的图片</li>
-</ul>
-列表项内部可以使用段落、换行符、图片、链接以及其他列表等
-
-<form>标签定义表单，表单本身是不可见的，相当于一个容器
-所有表单元素要放在标签中，<input>、下拉菜单和列表项目分组中每项内容标签<option>，文字域</option><textarea>、可创建单选或多选菜单</textarea><select>等标签，
-form中没有标签。
-
-常见的表单元素◆隐藏表单域◆单行文本框/多行文本框◆表单按钮◆选择(单选、多选、下拉选择)◆文件上传框
-◆ action表单提交的URL地址◆ method表单请求的方式(GET/POST)◆ enctype-请求内容的形式application/x-www-form-urlencodedmultipart/form-data 上传文件，如word excelmethod=”post” enctype=”multipart/form-data”
-</select><input>是表单输入标签,type属性的设置，text是文本域，submit是提交按钮<br>type属性是text的input标签代表文本框 可以接收用户输入<p></p>
-<input type="" value="">
-value 属性对于不同 input 类型，用法也不同：
-定义按钮上的文本： "button"、"reset"、"submit"
- 定义输入字段的初始（默认）值： "text"、"password"、"hidden"隐藏表单域
-多选 "checkbox"、单选"radio"、"image" 类型,<select><option></option></select>下拉选择 - 定义与 input 元素相关的值，当提交表单时该值会发送到表单的 action URL。
-<input type="file"> 文件上传
-<input type="text" size="20"> 
-type="text"是⽤来设置⽂本域的，size属性表示⽂本域的宽 度为多少个英⽂字符
- 时间日期等（date、month、week、time、date、datetime、datetime-local）
-
-
-<p><code>placeholder</code>文本框的输入提示</p>
-<p>以规范实现选择“是”或“否”单选框效果<br>&lt;input type=’radio’name=’radio’ value=’s’/&gt;True<br>&lt;input type=’radio’name=’radio’ value=’f’/&gt;Flase</p>
-<p>开始标签 <option> 与结束标签 </option> 之间的内容是浏览器显示在下拉列表中的内容，而 value 属性中的值是表单提交时被发送到服务器的值。</p>
-<p>注意：如果没有规定 value 属性，选项的值将设置为 <option> 标签中的内容。</option></p>
-<p>CSS Cascading Style Sheets 层叠样式列表<br>·结构与样式分离的方式，便于后期维护与改版<br>·可以用多套样式，使网页有任意样式切换的效果<br>·使页面载入得更快、降低服务器的成本</p>
-<p>CSS规则是由选择器和声明组成。声明要由花括号包围起来；<br>属性和属性值之间用冒号分开；属性值如果有单位，那么数字和单位之间不能有空格；<br>每条声明的结尾用分号结束；</p>
-<p>选择器 作用：用来选择（找到）需要添加样式的位置<br>常用选择器：（归）类选择器</p>
-<p class="title">https://www.imooc.com/</p><p>
-</p><p class="title">你学习的好帮手/</p><p>
-标签选择器 
-<p〉慕课网< p="">
-
-</p〉慕课网<></p><p>CSS中文字字体的设意，<br>CSS中设置文字字体使用的属性是font-family<br>font-size用来设置字体的大小 npx<br>fong-weight是用来设置字体的粗细 normal、bold、100-900<br>font-style用来设置字体的样式 normal、italic、oblique规定斜体文本</p>
-<p>使用内部样式表，完成背景设置<br>背景样式<br>属性|属性值|作用<br>1|background-color 颜色值 颜色作为背景颜色<br>2background-image 图片位置 图片作为背景图片<br>3|background-repeat repeat、repeat-x<br>|repeat-y、no-repeat 背景图片的重复方向<br>4background-attachment scroll、fixed 背景是否随滚动条滚<br>5|background-position 见详细表格 背景图像的起始位置<br>6background 背景样式的值是复合属性值组合<br>top left|如果您仅规定了一个关键词，那么第二个值将是”center”。<br>top center top right 默认值：0%0%。<br>center left center center center right bottom left bottom center bottom right<br>×%y%第一个值是水平位置，第二个值是垂直位置。<br>左上角是0%0%。右下角是100%100%。如果您仅规定了一个值，另一个值将是50%。<br>xpos ypos第一个值是水平位置，第二个值是垂直位置。<br>左上角是00。单位是像素（OpxOpx）或任何其他的CSS单位。<br>如果您仅规定了一个值，另一个值将是50%。<br>您可以混合使用%和position值。</p>
-<p>外部样式表就是新建一个文档，里面全写css，<br>然后再通过link 插入到html代码中<br>作用：使网页的表示层与结构层彻底分离<br>示例：将背景设置，修改为外部样式表<br>&lt;linklrel=”stylesheet”|type=”text/css href=”index.css”&gt;<br>小贴士除了link进行外部样式表的链接，还是其他方法哦</p>
-<p>文本样式</p>
-<p>属性|属性值|作用<br>|1color表示颜色的内容设置文本颜色<br>2direction ltr、rtl文本的方向/书写方向<br>3|letter-spacing npx注：n可以是负数）字符间距<br>4line-height npx行高<br>5text-align |left、right、center、justify 文本对齐方式<br>6 text-decoration none、underline、overline文本的修饰：<br>line-through例如：下划线<br>7text-shadow h-shadow v-shadow blur color 文本设置阴影<br>8 text-transform pone、capitalize、uppercase、y字母/小<br>lowercase<br>9 text-indent npx、nem首行缩进</p>
-<p>伪类：超级链接上设置的样式<br>1、伪类是用在超链接上的效果比较多，但超链接不是伪类。<br>2、伪类是选择器。伪类包含两种：状态伪类和结构性伪类<br>作用：设置超级链接的4种状态<br>属性           作用<br>1|a:link未访问的链接<br>2a:visited已访问的链接<br>3|a:hover鼠标移动到链接上（浮动、悬停）<br>4 a:active向被激活的元素添加样式<br>5|：focus选择拥有键盘输入焦点的元素<br>（结构性）伪类选择器（全部）<br>属性作用<br>|1|：first-child 选择元素的第一个子元素2|：last-child选择某个元素的最后一个子元素3|：nth-child（0选择某个元素的一个或多个特定的子元素4 nth-last-childo选择某个元素的一个或多全特定的子元素，从这个元素的最后一个子元素开始算<br>5|：first-of-type选择一个上级元素下的第一个同类子元素</p>
-<p>伪元素选择器（部分）<br>属性作用<br>::selection选择指定元素中被用户选中的内容<br>::before可以在选定内容之前插入新内容<br>::after可以在选定内容之后插入新内容<br>:after 选择器向的元素之后插入内容。<br>::first-line选择指定选择器的首行<br>::first-letter选择文本的第一个字符</p>
-<p>CSS其他选择器<br>选择器|作用<br>id，*选择指定元素中被用户选中的内容<br>逗号选择器 联合选择器<br>空格选择器 子孙（后代）选择器4</p>
-<blockquote>
-<p>选择器子选择器（不是子孙后代）<br>+选择器相邻兄弟选择器<br>[]属性选择器</p>
-</blockquote>
-<p>CSS选择器优先级<br>选择器<br>1|limportant<br>2行内样式<br>3|ID选择器<br>4类选择器<br>5|标签<br>6通配符<br>7浏览器默认属性</p>
-<div> 和 </div>定义区块， 前后自动放置一个换行符。
-图层，层叠样式表中的定位技术
-
-<p>overflow属性设置<br>属性|作用<br>1|visible 默认值。内容不会被修剪，会呈现在元素框之外。<br>2hidden 超出的部分被隐藏，清除浮动 ，父元素和子元素高度发生联系<br>3|scroll 不论是否需要，都显示滚动条。<br>4 auto按需显示滚动条以便查看其余的内容。</p>
-<p></p></form></h2></sub></i></ins></b><script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/http-huan-cun/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/http-huan-cun/" class="post-title-link" itemprop="url">http缓存</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-27 01:30:19" itemprop="dateModified" datetime="2021-04-27T01:30:19Z">2021-04-27</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Markdown/" itemprop="url" rel="index"><span itemprop="name">Markdown</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/18/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/18/">18</a><span class="page-number current">19</span><a class="page-number" href="/page/20/">20</a><span class="space">&hellip;</span><a class="page-number" href="/page/34/">34</a><a class="extend next" rel="next" href="/page/20/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/18/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/18/">18</a><span class="page-number current">19</span><a class="page-number" href="/page/20/">20</a><span class="space">&hellip;</span><a class="page-number" href="/page/35/">35</a><a class="extend next" rel="next" href="/page/20/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 </div>

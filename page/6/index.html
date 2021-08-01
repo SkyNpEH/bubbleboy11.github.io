@@ -119,7 +119,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">339</span>
+          <span class="site-state-item-count">341</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -160,6 +160,237 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/06/18/beego-pi-liang-fa-song-xiao-xi-jie-kou/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/06/18/beego-pi-liang-fa-song-xiao-xi-jie-kou/" class="post-title-link" itemprop="url">批量发送消息接口</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-06-17 16:21:41" itemprop="dateCreated datePublished" datetime="2021-06-17T16:21:41Z">2021-06-17</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-06-26 01:44:09" itemprop="dateModified" datetime="2021-06-26T01:44:09Z">2021-06-26</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/beego/" itemprop="url" rel="index"><span itemprop="name">beego</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>批量发送消息接口</p>
+<p>接口地址：<code>/send/message</code></p>
+<ul>
+<li><p>接收参数为：<br>uids（用户ID，多个用,链接，1,2,3,4,5）<br>content（消息内容）</p>
+</li>
+<li><p>返回信息：<br>ret返回码 0=正确</p>
+</li>
+<li><p>业务逻辑：</p>
+<ul>
+<li>第一步，保存消息到message表</li>
+<li>第二步，通过英文逗号分隔uids</li>
+<li>第三步，遍历uids，保存每个uid和消息关系到message_user表</li>
+</ul>
+</li>
+</ul>
+<p><img src="/2021/06/18/beego-pi-liang-fa-song-xiao-xi-jie-kou/1.png" alt="description"></p>
+<p><code>models/message.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> models</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"time"</span></span><br><span class="line">    <span class="comment">//"fyoukuApi/services/mq"</span></span><br><span class="line"></span><br><span class="line">    <span class="string">"github.com/beego/beego/v2/client/orm"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Message <span class="keyword">struct</span> {</span><br><span class="line">    Id      <span class="keyword">int</span></span><br><span class="line">    Content <span class="keyword">string</span></span><br><span class="line">    AddTime <span class="keyword">int64</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> MessageUser <span class="keyword">struct</span> {</span><br><span class="line">    Id        <span class="keyword">int</span></span><br><span class="line">    MessageId <span class="keyword">int64</span></span><br><span class="line">    AddTime   <span class="keyword">int64</span></span><br><span class="line">    Status    <span class="keyword">int</span></span><br><span class="line">    UserId    <span class="keyword">int</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">init</span><span class="params">()</span></span> {</span><br><span class="line">    orm.RegisterModel(<span class="built_in">new</span>(Message), <span class="built_in">new</span>(MessageUser))</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="comment">// 保存通知消息</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">SendMessageDo</span><span class="params">(content <span class="keyword">string</span>)</span> <span class="params">(<span class="keyword">int64</span>, error)</span></span> {</span><br><span class="line">    o := orm.NewOrm()</span><br><span class="line">    <span class="keyword">var</span> message Message</span><br><span class="line">    message.Content = content</span><br><span class="line">    message.AddTime = time.Now().Unix()</span><br><span class="line">    messageId, err := o.Insert(&amp;message)</span><br><span class="line">    <span class="keyword">return</span> messageId, err</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="comment">// 保存消息接收人</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">SendMessageUser</span><span class="params">(userId <span class="keyword">int</span>, messageId <span class="keyword">int64</span>)</span> <span class="title">error</span></span> {</span><br><span class="line">    o := orm.NewOrm()</span><br><span class="line">    <span class="keyword">var</span> messageUser MessageUser</span><br><span class="line">    messageUser.UserId = userId</span><br><span class="line">    messageUser.MessageId = messageId</span><br><span class="line">    messageUser.Status = <span class="number">1</span></span><br><span class="line">    messageUser.AddTime = time.Now().Unix()</span><br><span class="line">    _, err := o.Insert(&amp;messageUser)</span><br><span class="line">    <span class="keyword">return</span> err</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>controllers/user.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 批量发送通知消息</span></span><br><span class="line"><span class="comment">// @router /send/message [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *UserController)</span> <span class="title">SendMessageDo</span><span class="params">()</span></span> {</span><br><span class="line">    uids := this.GetString(<span class="string">"uids"</span>)</span><br><span class="line">    content := this.GetString(<span class="string">"content"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> uids == <span class="string">""</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4001</span>, <span class="string">"请填写接收人~"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">if</span> content == <span class="string">""</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4002</span>, <span class="string">"请填写发送内容"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    messageId, err := models.SendMessageDo(content)</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        uidConfig := strings.Split(uids, <span class="string">","</span>)</span><br><span class="line">        <span class="keyword">for</span> _, v := <span class="keyword">range</span> uidConfig {</span><br><span class="line">            userId, _ := strconv.Atoi(v)</span><br><span class="line">            models.SendMessageUser(userId, messageId)</span><br><span class="line">            <span class="comment">// models.SendMessageUserMq(userId, messageId)</span></span><br><span class="line">        }</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnSuccess(<span class="number">0</span>, <span class="string">"发送成功~"</span>, <span class="string">""</span>, <span class="number">1</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">5000</span>, <span class="string">"发送失败，请联系客服~"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="/2021/06/18/beego-pi-liang-fa-song-xiao-xi-jie-kou/2.png" alt="description"></p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/06/18/beego-pi-liang-fa-song-xiao-xi-gai-zao/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/06/18/beego-pi-liang-fa-song-xiao-xi-gai-zao/" class="post-title-link" itemprop="url">批量发送消息改造</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-06-17 16:21:41" itemprop="dateCreated datePublished" datetime="2021-06-17T16:21:41Z">2021-06-17</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-06-26 03:29:27" itemprop="dateModified" datetime="2021-06-26T03:29:27Z">2021-06-26</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/beego/" itemprop="url" rel="index"><span itemprop="name">beego</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>改造批量发送消息功能<br>改造点：假如发送给100万用户，接口实时响应肯定不可能，肯定会超时。必须异步实现。<br>简单模式</p>
+<p><code>models/message.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 保存消息接收人到队列中</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">SendMessageUserMq</span><span class="params">(userId <span class="keyword">int</span>, messageId <span class="keyword">int64</span>)</span></span> {</span><br><span class="line">    <span class="comment">// 把数据转换成json字符串</span></span><br><span class="line">    <span class="keyword">type</span> Data <span class="keyword">struct</span> {</span><br><span class="line">        UserId    <span class="keyword">int</span></span><br><span class="line">        MessageId <span class="keyword">int64</span></span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">var</span> data Data</span><br><span class="line">    data.UserId = userId</span><br><span class="line">    data.MessageId = messageId</span><br><span class="line">    dataJson, _ := json.Marshal(data)</span><br><span class="line">    <span class="comment">// 发送消息 简单模式</span></span><br><span class="line">    mq.Publish(<span class="string">""</span>, <span class="string">"fyouku_send_message_user"</span>, <span class="keyword">string</span>(dataJson))</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>消费发送消息</p>
+<p>mq/send/main.go</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"demo/models"</span></span><br><span class="line">    <span class="string">"demo/services/mq"</span></span><br><span class="line">    <span class="string">"encoding/json"</span></span><br><span class="line">    <span class="string">"fmt"</span></span><br><span class="line"></span><br><span class="line">    <span class="string">"github.com/beego/beego/v2/client/orm"</span></span><br><span class="line">    _ <span class="string">"github.com/go-sql-driver/mysql"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="comment">// 这里不在beego项目中，要加载配置文件</span></span><br><span class="line">    <span class="comment">//web.LoadAppConfig("ini", "../../conf/app.conf")</span></span><br><span class="line">    <span class="comment">//defaultdb := web.AppConfig.String("defaultdb")</span></span><br><span class="line">    orm.RegisterDriver(<span class="string">"mysql"</span>, orm.DRMySQL)</span><br><span class="line">    orm.RegisterDataBase(<span class="string">"default"</span>, <span class="string">"mysql"</span>, <span class="string">"root:156277@(127.0.0.1:3306)/fyouku?charset=utf8"</span>)</span><br><span class="line">    <span class="comment">//orm.RegisterDataBase("default", "mysql", "root:156277@(127.0.0.1:3306)/fyouku?charset=utf8", 30, 30)</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 接收端</span></span><br><span class="line">    mq.Consumer(<span class="string">""</span>, <span class="string">"fyouku_send_message_user"</span>, callback)</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">callback</span><span class="params">(s <span class="keyword">string</span>)</span></span> {</span><br><span class="line">    <span class="keyword">type</span> Data <span class="keyword">struct</span> {</span><br><span class="line">        UserId    <span class="keyword">int</span></span><br><span class="line">        MessageId <span class="keyword">int64</span></span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">var</span> data Data</span><br><span class="line">    err := json.Unmarshal([]<span class="keyword">byte</span>(s), &amp;data)</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        models.SendMessageUser(data.UserId, data.MessageId)</span><br><span class="line">    }</span><br><span class="line">    fmt.Printf(<span class="string">"msg is :%s\n"</span>, s)</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>上面的代码没有守护进程，一次批量发送之后就不会再发送给消息队列了</p>
+<p><code>controllers/user.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 批量发送通知消息</span></span><br><span class="line"><span class="comment">// @router /send/message [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *UserController)</span> <span class="title">SendMessageDo</span><span class="params">()</span></span> {</span><br><span class="line">    uids := this.GetString(<span class="string">"uids"</span>)</span><br><span class="line">    content := this.GetString(<span class="string">"content"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> uids == <span class="string">""</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4001</span>, <span class="string">"请填写接收人~"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">if</span> content == <span class="string">""</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4002</span>, <span class="string">"请填写发送内容"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    messageId, err := models.SendMessageDo(content)</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        uidConfig := strings.Split(uids, <span class="string">","</span>)</span><br><span class="line">        <span class="keyword">for</span> _, v := <span class="keyword">range</span> uidConfig {</span><br><span class="line">            userId, _ := strconv.Atoi(v)</span><br><span class="line">            <span class="comment">// models.SendMessageUser(userId, messageId)</span></span><br><span class="line">            <span class="comment">//不再直接操作数据库，把消息发送到队列，异步消费这些消息</span></span><br><span class="line">            models.SendMessageUserMq(userId, messageId)</span><br><span class="line">        }</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnSuccess(<span class="number">0</span>, <span class="string">"发送成功~"</span>, <span class="string">""</span>, <span class="number">1</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">5000</span>, <span class="string">"发送失败，请联系客服~"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+
+<p><img src="/2021/06/18/beego-pi-liang-fa-song-xiao-xi-gai-zao/1.png" alt="description"><br><img src="/2021/06/18/beego-pi-liang-fa-song-xiao-xi-gai-zao/2.png" alt="description"></p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1202,251 +1433,8 @@
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/06/16/drf-fan-xu-lie-hua-bao-cun-huo-geng-xin/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/06/16/drf-fan-xu-lie-hua-bao-cun-huo-geng-xin/" class="post-title-link" itemprop="url">未命名</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-06-16 15:36:31" itemprop="dateCreated datePublished" datetime="2021-06-16T15:36:31Z">2021-06-16</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-06-17 08:17:27" itemprop="dateModified" datetime="2021-06-17T08:17:27Z">2021-06-17</time>
-      </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p><a target="_blank" rel="noopener" href="https://www.django-rest-framework.org/api-guide/serializers/#saving-instances">https://www.django-rest-framework.org/api-guide/serializers/#saving-instances</a></p>
-<p>如果在验证成功后，想要基于validated_data完成数据对象的创建，</p>
-<p>序列化器重写<code>create(self, validated_data)</code> <code>def update(self, instance, validated_data):</code><br>视图调用</p>
-<p>如果创建序列化器对象的时候，</p>
-<ul>
-<li>没有传递instance实例，则调用<code>save()</code>方法的时候，<code>create()</code>被调用，</li>
-<li>相反，如果传递了instance实例，则调用<code>save()</code>方法的时候，<code>update()</code>被调用。</li>
-</ul>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BaseSerializer</span>(<span class="params">Field</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, instance=None, data=empty, **kwargs</span>):</span></span><br><span class="line">        self.instance = instance</span><br><span class="line">        <span class="keyword">if</span> data <span class="keyword">is</span> <span class="keyword">not</span> empty:</span><br><span class="line">            self.initial_data = data</span><br><span class="line">        self.partial = kwargs.pop(<span class="string">'partial'</span>, <span class="literal">False</span>)</span><br><span class="line">        self._context = kwargs.pop(<span class="string">'context'</span>, {})</span><br><span class="line">        kwargs.pop(<span class="string">'many'</span>, <span class="literal">None</span>)</span><br><span class="line">        super().__init__(**kwargs)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">update</span>(<span class="params">self, instance, validated_data</span>):</span></span><br><span class="line">        <span class="keyword">raise</span> NotImplementedError(<span class="string">'`update()` must be implemented.'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">create</span>(<span class="params">self, validated_data</span>):</span></span><br><span class="line">        <span class="keyword">raise</span> NotImplementedError(<span class="string">'`create()` must be implemented.'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">save</span>(<span class="params">self, **kwargs</span>):</span></span><br><span class="line"></span><br><span class="line">        validated_data = {**self.validated_data, **kwargs}</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> self.instance <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:  <span class="comment"># instance不为空修改</span></span><br><span class="line">            self.instance = self.update(self.instance, validated_data)</span><br><span class="line">            <span class="keyword">assert</span> self.instance <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>, (</span><br><span class="line">                <span class="string">'`update()` did not return an object instance.'</span></span><br><span class="line">            )</span><br><span class="line">        <span class="keyword">else</span>:  <span class="comment"># instance为空创建</span></span><br><span class="line">            self.instance = self.create(validated_data)</span><br><span class="line">            <span class="keyword">assert</span> self.instance <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>, (</span><br><span class="line">                <span class="string">'`create()` did not return an object instance.'</span></span><br><span class="line">            )</span><br></pre></td></tr></tbody></table></figure>
-
-
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ShoppingCartSerializer</span>(<span class="params">serializers.Serializer</span>):</span></span><br><span class="line">    <span class="comment"># 表示user为隐藏字段，默认为获取当前登录用</span></span><br><span class="line">    user = serializers.HiddenField(default=serializers.CurrentUserDefault())</span><br><span class="line">    nums = serializers.IntegerField(required=<span class="literal">True</span>, min_value=<span class="number">1</span>, label=<span class="string">'数量'</span>,</span><br><span class="line">                                    error_messages={</span><br><span class="line">                                        <span class="string">'required'</span>: <span class="string">'请选择商品数量'</span>,</span><br><span class="line">                                        <span class="string">'min_value'</span>: <span class="string">'商品数量至少为1'</span></span><br><span class="line">                                    })</span><br><span class="line">    <span class="comment"># 这里是继承Serializer，必须指定queryset对象，如果继承ModelSerializer则不需要指定</span></span><br><span class="line">    <span class="comment"># goods是一个外键，可以通过这方法获取goods object中所有的值</span></span><br><span class="line">    goods = serializers.PrimaryKeyRelatedField(required=<span class="literal">True</span>, queryset=Goods.objects.filter(is_delete=<span class="literal">False</span>))</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">create</span>(<span class="params">self, validated_data</span>):</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        反序列化保存数据</span></span><br><span class="line"><span class="string">        :param validated_data:上方定义的字段传过来之前已经验证过的dict类型数据</span></span><br><span class="line"><span class="string">        :return:</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        <span class="comment"># 获取当前用户</span></span><br><span class="line">        <span class="comment"># view中:self.request.user；</span></span><br><span class="line">        <span class="comment"># serizlizer中:self.context["request"].user</span></span><br><span class="line">        user = self.context[<span class="string">'request'</span>].user</span><br><span class="line">        nums = validated_data[<span class="string">'nums'</span>]</span><br><span class="line">        goods = validated_data[<span class="string">'goods'</span>]</span><br><span class="line">        existed = ShoppingCart.objects.filter(is_delete=<span class="literal">False</span>, user=user, goods=goods)</span><br><span class="line">        <span class="keyword">if</span> existed:  <span class="comment"># 如果购物车中有记录</span></span><br><span class="line">            existed = existed[<span class="number">0</span>]</span><br><span class="line">            existed.nums += nums</span><br><span class="line">            existed.save()  <span class="comment"># queryset结果集的save方法</span></span><br><span class="line">        <span class="keyword">else</span>:  <span class="comment"># 如果购物车车没有记录，添加到购物车保存到数据库</span></span><br><span class="line">            existed = ShoppingCart.objects.create(**validated_data)</span><br><span class="line">        <span class="keyword">return</span> existed</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">update</span>(<span class="params">self, instance, validated_data</span>):</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        修改购物车商品数量</span></span><br><span class="line"><span class="string">        :param instance: 要更新的对象实例</span></span><br><span class="line"><span class="string">        :param validated_data: </span></span><br><span class="line"><span class="string">        :return: </span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        instance.nums = validated_data[<span class="string">'nums'</span>]</span><br><span class="line">        instance.save()  <span class="comment"># 模型类对象的save方法</span></span><br><span class="line">        <span class="keyword">return</span> instance</span><br></pre></td></tr></tbody></table></figure><script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/06/10/drf-gou-wu-che/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/06/10/drf-gou-wu-che/" class="post-title-link" itemprop="url">drf购物车</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-06-09 16:21:41" itemprop="dateCreated datePublished" datetime="2021-06-09T16:21:41Z">2021-06-09</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-06-17 07:28:50" itemprop="dateModified" datetime="2021-06-17T07:28:50Z">2021-06-17</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>商品详情页添加商品到购物车，就可以把商品加入到数据库【创建】。<br>对于购物车已存在的商品，如果将商品重复加入购物车，或者减少商品数量，就将它的数量进行加减【更新】。<br>购物车也支持对商品进行删除【删除】，以及列表展示【查询】。</p>
-<p>综上，购物车就需要用到mixins中的所有功能。</p>
-<p>修改购物车数量功能实现</p>
-<p>如果用户对某个商品添加到购物车，之后再对该商品进行重复添加，再向购物车添加同一个商品，不希望得到验证说这个商品已经存在，而是希望在当前数量上加1，那么是需要将购物车中的数据进行修改，也就是当前用户的购物车中的每一种商品都是唯一的，那么修改一下models，为其增加联合唯一的限定。</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ShoppingCart</span>(<span class="params">models.Model</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    购物车</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    user = models.ForeignKey(User, verbose_name=<span class="string">'用户'</span>, help_text=<span class="string">'用户'</span>, on_delete=models.CASCADE, related_name=<span class="string">'shopping_carts'</span>)</span><br><span class="line">    goods = models.ForeignKey(Goods, verbose_name=<span class="string">'商品'</span>, help_text=<span class="string">'商品'</span>, on_delete=models.CASCADE)</span><br><span class="line">    nums = models.IntegerField(default=<span class="number">0</span>, verbose_name=<span class="string">'购买数量'</span>, help_text=<span class="string">'购买数量'</span>)</span><br><span class="line">    add_time = models.DateTimeField(auto_now_add=<span class="literal">True</span>, verbose_name=<span class="string">'添加时间'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        verbose_name_plural = verbose_name = <span class="string">'购物车'</span></span><br><span class="line">        unique_together = [<span class="string">'user'</span>, <span class="string">'goods'</span>]  <span class="comment"># 用户和商品联合唯一</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p>如果使用的是<code>serializers.ModelSerializer</code>，<br>模型中定义了<code>unique_together = ['user', 'goods']</code>，进行validate时就会抛出异常，<br>就算是重写<code>def create(self, validated_data)</code>方法也是无效的，因为在进行该方法前，就已经进行了validate。<br><code>ShoppingCartViewSet</code>继承的是<code>viewsets.ModelViewSet</code>，在这里面有个<code>mixins.CreateModelMixin</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CreateModelMixin</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    Create a model instance.</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">create</span>(<span class="params">self, request, *args, **kwargs</span>):</span></span><br><span class="line">        serializer = self.get_serializer(data=request.data)</span><br><span class="line">        serializer.is_valid(raise_exception=<span class="literal">True</span>)</span><br><span class="line">        self.perform_create(serializer)</span><br><span class="line">        headers = self.get_success_headers(serializer.data)</span><br><span class="line">        <span class="keyword">return</span> Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">perform_create</span>(<span class="params">self, serializer</span>):</span></span><br><span class="line">        serializer.save()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_success_headers</span>(<span class="params">self, data</span>):</span></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            <span class="keyword">return</span> {<span class="string">'Location'</span>: str(data[api_settings.URL_FIELD_NAME])}</span><br><span class="line">        <span class="keyword">except</span> (TypeError, KeyError):</span><br><span class="line">            <span class="keyword">return</span> {}</span><br></pre></td></tr></tbody></table></figure>
-
-<p>这个<code>CreateModelMixin</code>在<code>create</code>的时候首先会调用<code>serializer.is_valid(raise_exception=True)</code>，<br>接下来会调用<code>self.perform_create(serializer)</code>执行数据保存<code>serializer.save()</code>，<br>因为在<code>ModelSerializer</code>中的<code>create()</code>方法会因为插入数据时重复而验证不通过导致抛出异常，无法继续执行，所以是无法保存成功的。</p>
-<p>当然，我们也可以重写<code>CreateModelMixin</code>中的<code>create</code>的方法，就可以控制该方法的所有步骤。<br>如果不用<code>serializer</code>，那么它的验证功能就享受不到了，不用<code>serializer</code>做，就需要在views中去完成；另外生成文档的时候，字段是从<code>serializer</code>中取得，如果不用那么文档的功能就缺失了。</p>
-<p>在定义序列化的<code>ShoppingCartSerializer</code>继承自<code>Serializer</code>而不能继承自<code>ModelSerializer</code>，自己来做validate，自己重写<code>create()</code>实现<code>save</code>功能，</p>
-<p>用户在添加购物车时，也就是在数据库中添加一条记录。还要分为两种情况，<br>当购物车数据库中没有这个商品时，执行添加；<br>当已存在该商品时，执行数量更新。</p>
-<p><code>validated_data</code>也就是上方定义的字段传过来之前已经处理好的数据，例如，<code>nums</code>如果数量为负数，那么该数据到不了<code>create()</code>方法。</p>
-<p>而Serializer又继承自<code>BaseSerializer</code>，<code>BaseSerializer</code>中声明了<code>update(instance, validated_data)</code>方法但是直接抛出异常，</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 源码：rest_framework.serializers.BaseSerializer#update</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">update</span>(<span class="params">self, instance, validated_data</span>):</span></span><br><span class="line">        <span class="keyword">raise</span> NotImplementedError(<span class="string">'`update()` must be implemented.'</span>)</span><br></pre></td></tr></tbody></table></figure>
-
-<p>并且Serializer中并未重写<code>update()</code>方法，因此如果在<code>ShoppingCartSerializer</code>中不重写该方法会导致在修改购物车详情时会抛出上面的异常，如果继承自<code>ModelSerializer</code>则有该方法不需要重写，在<code>ShoppingCartSerializer</code>中重写<code>update(instance, validated_data)</code>方法</p>
-<p><code>trade/serializer.py</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework <span class="keyword">import</span> serializers</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> .models <span class="keyword">import</span> ShoppingCart</span><br><span class="line"><span class="keyword">from</span> goods.models <span class="keyword">import</span> Goods</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ShoppingCartSerializer</span>(<span class="params">serializers.Serializer</span>):</span></span><br><span class="line">    <span class="comment"># 表示user为隐藏字段，默认为获取当前登录用</span></span><br><span class="line">    user = serializers.HiddenField(default=serializers.CurrentUserDefault())</span><br><span class="line">    nums = serializers.IntegerField(required=<span class="literal">True</span>, min_value=<span class="number">1</span>, label=<span class="string">'数量'</span>,</span><br><span class="line">                                    error_messages={</span><br><span class="line">                                        <span class="string">'required'</span>: <span class="string">'请选择商品数量'</span>,</span><br><span class="line">                                        <span class="string">'min_value'</span>: <span class="string">'商品数量至少为1'</span></span><br><span class="line">                                    })</span><br><span class="line">    <span class="comment"># 这里是继承Serializer，必须指定queryset对象，如果继承ModelSerializer则不需要指定</span></span><br><span class="line">    <span class="comment"># goods是一个外键，可以通过这方法获取goods object中所有的值</span></span><br><span class="line">    goods = serializers.PrimaryKeyRelatedField(required=<span class="literal">True</span>, queryset=Goods.objects.filter(is_delete=<span class="literal">False</span>))</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">create</span>(<span class="params">self, validated_data</span>):</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        反序列化保存数据</span></span><br><span class="line"><span class="string">        :param validated_data:上方定义的字段传过来之前已经验证过的dict类型数据</span></span><br><span class="line"><span class="string">        :return:</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        <span class="comment"># 获取当前用户</span></span><br><span class="line">        <span class="comment"># view中:self.request.user；</span></span><br><span class="line">        <span class="comment"># serizlizer中:self.context["request"].user</span></span><br><span class="line">        user = self.context[<span class="string">'request'</span>].user</span><br><span class="line">        nums = validated_data[<span class="string">'nums'</span>]</span><br><span class="line">        goods = validated_data[<span class="string">'goods'</span>]</span><br><span class="line">        existed = ShoppingCart.objects.filter(is_delete=<span class="literal">False</span>, user=user, goods=goods)</span><br><span class="line">        <span class="keyword">if</span> existed:  <span class="comment"># 如果购物车中有记录</span></span><br><span class="line">            existed = existed[<span class="number">0</span>]</span><br><span class="line">            existed.nums += nums</span><br><span class="line">            existed.save()  <span class="comment"># queryset结果集的save方法</span></span><br><span class="line">        <span class="keyword">else</span>:  <span class="comment"># 如果购物车车没有记录，添加到购物车</span></span><br><span class="line">            existed = ShoppingCart.objects.create(**validated_data)</span><br><span class="line">        <span class="keyword">return</span> existed</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">update</span>(<span class="params">self, instance, validated_data</span>):</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        修改购物车商品数量</span></span><br><span class="line"><span class="string">        :param instance: 要更新的对象实例</span></span><br><span class="line"><span class="string">        :param validated_data: </span></span><br><span class="line"><span class="string">        :return: </span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        instance.nums = validated_data[<span class="string">'nums'</span>]</span><br><span class="line">        instance.save()  <span class="comment"># 模型类对象的save方法</span></span><br><span class="line">        <span class="keyword">return</span> instance</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ShoppingCartListSerializer</span>(<span class="params">serializers.ModelSerializer</span>):</span></span><br><span class="line">    <span class="comment"># 购物车中除了有商品的id，但要显示商品的图片、名称、单价等信息。</span></span><br><span class="line">    goods = GoodsSerializer(many=<span class="literal">False</span>)  <span class="comment"># 一个购物车对应一个商品，默认many=False，也就是可以不写</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        model = ShoppingCart</span><br><span class="line">        fields = <span class="string">'__all__'</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>apps/trade/views.py</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework <span class="keyword">import</span> viewsets</span><br><span class="line"><span class="keyword">from</span> rest_framework.permissions <span class="keyword">import</span> IsAuthenticated</span><br><span class="line"><span class="keyword">from</span> rest_framework_simplejwt.authentication <span class="keyword">import</span> JWTAuthentication</span><br><span class="line"><span class="keyword">from</span> rest_framework.authentication <span class="keyword">import</span> SessionAuthentication</span><br><span class="line"><span class="keyword">from</span> .serializers <span class="keyword">import</span> ShopCartSerializer</span><br><span class="line"><span class="keyword">from</span> .models <span class="keyword">import</span> ShoppingCart</span><br><span class="line"><span class="keyword">from</span> utils.permissions <span class="keyword">import</span> IsOwnerOrReadOnly</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ShoppingCartViewSet</span>(<span class="params">viewsets.ModelViewSet</span>):</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    list:</span></span><br><span class="line"><span class="string">        获取购物车列表</span></span><br><span class="line"><span class="string">    create:</span></span><br><span class="line"><span class="string">        添加商品到购物车</span></span><br><span class="line"><span class="string">    update:</span></span><br><span class="line"><span class="string">        更新购物车商品数量</span></span><br><span class="line"><span class="string">    delete:</span></span><br><span class="line"><span class="string">        从购物车中删除商品</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    queryset = ShoppingCart.objects.filter(is_delete=<span class="literal">False</span>)</span><br><span class="line">    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]  <span class="comment"># 用户必须登录才能访问</span></span><br><span class="line">    authentication_classes = [JWTAuthentication, SessionAuthentication]  <span class="comment"># 配置登录认证：支持JWT认证和DRF基本认证</span></span><br><span class="line">    <span class="comment"># serializer_class = ShoppingCartSerializer  # 使用get_serializer_class()，这个就不需要了</span></span><br><span class="line">    lookup_field = <span class="string">'goods_id'</span>  <span class="comment"># 单个模型实例的对象查找的模型字段，即查询单一数据库对象时使用的条件字段，默认为pk，即主键，并根据该字段进行查询就可以获取到该记录。</span></span><br><span class="line">    <span class="comment"># 不再是根据ShoppingCart的主键id进行查找，</span></span><br><span class="line">    <span class="comment"># 由于每个用户的购物车商品都是唯一的，</span></span><br><span class="line">    <span class="comment"># 在数据接口中直接传入商品id</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_serializer_class</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">if</span> self.action == <span class="string">'list'</span>:</span><br><span class="line">            <span class="comment"># 当获取购物车列表时，使用ModelSerializer，可以显示购物车商品详情</span></span><br><span class="line">            <span class="keyword">return</span> ShoppingCartListSerializer</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">return</span> ShoppingCartSerializer</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_queryset</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="comment"># 只能显示当前用户的购物车列表</span></span><br><span class="line">        <span class="keyword">return</span> ShoppingCart.objects.filter(user=self.request.user, is_delete=<span class="literal">False</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">perform_create</span>(<span class="params">self, serializer</span>):</span></span><br><span class="line">        <span class="string">'''创建购物车更新库存量'''</span></span><br><span class="line">        shop_cart = serializer.save()</span><br><span class="line">        goods = shop_cart.goods</span><br><span class="line">        goods.goods_num -= shop_cart.nums</span><br><span class="line">        goods.save()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">perform_destroy</span>(<span class="params">self, instance</span>):</span></span><br><span class="line">        <span class="string">'''删除购物车更新库存量'''</span></span><br><span class="line">        goods = instance.goods</span><br><span class="line">        goods.goods_num += instance.nums</span><br><span class="line">        goods.save()</span><br><span class="line">        instance.delete()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">perform_update</span>(<span class="params">self, serializer</span>):</span></span><br><span class="line">        <span class="string">'''修改购物车更新库存量'''</span></span><br><span class="line">        existed_record = ShoppingCart.objects.filter(is_delete=<span class="literal">False</span>).get(id=serializer.instance.id)</span><br><span class="line">        existed_nums = existed_record.nums</span><br><span class="line">        saved_record = serializer.save()</span><br><span class="line">        nums = saved_record.nums - existed_nums</span><br><span class="line">        goods = saved_record.goods</span><br><span class="line">        goods.goods_num -= nums</span><br><span class="line">        goods.save()</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>url.py</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">router.register(<span class="string">'shopcarts'</span>, ShoppingCartViewSet)</span><br></pre></td></tr></tbody></table></figure>
-
-<p><img src="/2021/06/10/drf-gou-wu-che/0.jpeg" alt="description"><br><img src="/2021/06/10/drf-gou-wu-che/1.png" alt="description"><br><img src="/2021/06/10/drf-gou-wu-che/2.png" alt="description"><br><img src="/2021/06/10/drf-gou-wu-che/3.png" alt="description"><br><img src="/2021/06/10/drf-gou-wu-che/4.png" alt="description"><br><img src="/2021/06/10/drf-gou-wu-che/5.png" alt="description"><br><img src="/2021/06/10/drf-gou-wu-che/6.png" alt="description"></p>
-<h2 id="商品库存数量"><a href="#商品库存数量" class="headerlink" title="商品库存数量"></a>商品库存数量</h2><p>商品库存数量的行为：</p>
-<ul>
-<li>新增商品到购物车</li>
-<li>修改购物车数量</li>
-<li>删除购物车记录</li>
-<li>订单取消，库存增加</li>
-</ul>
-<p>新增商品到购物车重写<code>CreateModelMixin</code>类的<code>perform_create(serializer)</code>方法，<br>修改购物车数量重写<code>UpdateModelMixin</code>类的<code>perform_update(serializer)</code>方法，<br>删除购物车记录重写<code>DestroyModelMixin</code>类的<code>perform_destroy(instance)</code>方法，如下：</p>
-<p><code>trade/views.py</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ShoppingCartViewSet</span>(<span class="params">viewsets.ModelViewSet</span>):</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    list:</span></span><br><span class="line"><span class="string">        获取购物车列表</span></span><br><span class="line"><span class="string">    create:</span></span><br><span class="line"><span class="string">        添加商品到购物车</span></span><br><span class="line"><span class="string">    update:</span></span><br><span class="line"><span class="string">        更新购物车商品数量</span></span><br><span class="line"><span class="string">    delete:</span></span><br><span class="line"><span class="string">        从购物车中删除商品</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    queryset = ShoppingCart.objects.filter(is_delete=<span class="literal">False</span>)</span><br><span class="line">    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]  <span class="comment"># 用户必须登录才能访问</span></span><br><span class="line">    authentication_classes = [JWTAuthentication, SessionAuthentication]  <span class="comment"># 配置登录认证：支持JWT认证和DRF基本认证</span></span><br><span class="line">    <span class="comment"># serializer_class = ShoppingCartSerializer  # 使用get_serializer_class()，这个就不需要了</span></span><br><span class="line">    lookup_field = <span class="string">'goods_id'</span>  <span class="comment"># 单个模型实例的对象查找的模型字段，即查询单一数据库对象时使用的条件字段，默认为pk，即主键</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 不再是根据ShoppingCart的主键id进行查找，</span></span><br><span class="line">    <span class="comment"># 在数据接口中就可以直接传入商品id并根据该字段进行查询</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_serializer_class</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">if</span> self.action == <span class="string">'list'</span>:</span><br><span class="line">            <span class="comment"># 当获取购物车列表时，使用ModelSerializer，可以显示购物车商品详情</span></span><br><span class="line">            <span class="keyword">return</span> ShoppingCartListSerializer</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">return</span> ShoppingCartSerializer</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_queryset</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="comment"># 只能显示当前用户的购物车列表</span></span><br><span class="line">        <span class="keyword">return</span> ShoppingCart.objects.filter(user=self.request.user, is_delete=<span class="literal">False</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">perform_create</span>(<span class="params">self, serializer</span>):</span></span><br><span class="line">        <span class="string">'''添加到购物车，库存量减少'''</span></span><br><span class="line">        shop_cart = serializer.save()</span><br><span class="line">        goods = shop_cart.goods</span><br><span class="line">        goods.goods_num -= shop_cart.nums</span><br><span class="line">        goods.save()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">perform_destroy</span>(<span class="params">self, instance</span>):</span></span><br><span class="line">        <span class="string">'''删除购物车，库存量增加'''</span></span><br><span class="line">        goods = instance.goods</span><br><span class="line">        goods.goods_num += instance.nums</span><br><span class="line">        goods.save()</span><br><span class="line">        instance.delete()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">perform_update</span>(<span class="params">self, serializer</span>):</span></span><br><span class="line">        <span class="string">'''修改购物车更新库存量'''</span></span><br><span class="line">        existed_record = ShoppingCart.objects.filter(is_delete=<span class="literal">False</span>).get(id=serializer.instance.id)</span><br><span class="line">        <span class="comment"># 获取购物车中该商品修改之前的库存数量</span></span><br><span class="line">        existed_nums = existed_record.nums</span><br><span class="line">        saved_record = serializer.save()</span><br><span class="line">        <span class="comment"># 现在的数量减去以前的数量</span></span><br><span class="line">        diff_nums = saved_record.nums - existed_nums</span><br><span class="line">        goods = saved_record.goods</span><br><span class="line">        <span class="comment"># 得到商品对象，更改库存量</span></span><br><span class="line">        goods.goods_num -= diff_nums</span><br><span class="line">        goods.save()</span><br></pre></td></tr></tbody></table></figure>
-
-<p><img src="/2021/06/10/drf-gou-wu-che/7.png" alt="description"><br>添加3个到购物车<br><img src="/2021/06/10/drf-gou-wu-che/8.png" alt="description"><br><img src="/2021/06/10/drf-gou-wu-che/9.png" alt="description"><br><img src="/2021/06/10/drf-gou-wu-che/10.png" alt="description"><br>修改购物车中的数量</p>
-<p>从购物车删除该商品<br>库存量恢复到10<br><img src="/2021/06/10/drf-gou-wu-che/11.png" alt="description"></p>
-<p>用户下单后，将购物车中的商品放到订单商品中。订单一旦取消，商品并未返回购物车，所以，需要将库存数量修改。</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">OrderInfoViewSet</span>(<span class="params">mixins.CreateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin,</span></span></span><br><span class="line"><span class="class"><span class="params">                       mixins.DestroyModelMixin,</span></span></span><br><span class="line"><span class="class"><span class="params">                       viewsets.GenericViewSet</span>):</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    订单管理，不能修改，不需要继承自UpdateModelMixin</span></span><br><span class="line"><span class="string">    list:</span></span><br><span class="line"><span class="string">        订单列表</span></span><br><span class="line"><span class="string">    retrieve:</span></span><br><span class="line"><span class="string">        订单详情</span></span><br><span class="line"><span class="string">    delete:</span></span><br><span class="line"><span class="string">        删除订单</span></span><br><span class="line"><span class="string">    create:</span></span><br><span class="line"><span class="string">        新增订单</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    queryset = OrderInfo.objects.all()</span><br><span class="line">    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]  <span class="comment"># 用户必须登录才能访问</span></span><br><span class="line">    authentication_classes = [JWTAuthentication, SessionAuthentication]  <span class="comment"># 配置登录认证：支持JWT认证和DRF基本认证</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># serializer_class = OrderListSerializer</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_queryset</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> OrderInfo.objects.filter(user=self.request.user, is_delete=<span class="literal">False</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_serializer_class</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">if</span> self.action == <span class="string">'retrieve'</span>:</span><br><span class="line">            <span class="keyword">return</span> OrderDetailSerializer</span><br><span class="line">        <span class="keyword">return</span> OrderListSerializer</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">perform_destroy</span>(<span class="params">self, instance</span>):</span></span><br><span class="line">        <span class="comment"># 取消（删除）商品库存量增加</span></span><br><span class="line">        <span class="keyword">for</span> order_goods <span class="keyword">in</span> instance.goods.all():</span><br><span class="line">            goods = order_goods.goods</span><br><span class="line">            <span class="comment"># 获取订单商品的数量，修改库存量</span></span><br><span class="line">            goods.goods_num += order_goods.goods_num</span><br><span class="line">            goods.save()</span><br><span class="line">        instance.delete()</span><br></pre></td></tr></tbody></table></figure>
-
-<h2 id="商品销量"><a href="#商品销量" class="headerlink" title="商品销量"></a>商品销量</h2><p>只有在支付成功后才会更新</p>
-<p><code>trade/views.py</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AliPayView</span>(<span class="params">APIView</span>):</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    通知验证 支付宝的返回</span></span><br><span class="line"><span class="string">    get:</span></span><br><span class="line"><span class="string">        处理支付宝return_url请求</span></span><br><span class="line"><span class="string">    post:</span></span><br><span class="line"><span class="string">        处理支付宝notify_url请求</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">post</span>(<span class="params">self, request</span>):</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        处理支付宝的notify_url 验签处理订单状态</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="comment"># 请求参数（假设是POST请求）中包括订单号、支付流水号、交易金额和签名</span></span><br><span class="line">        data = dict(request.POST.items())</span><br><span class="line">        <span class="comment"># 把sign pop掉，文档有说明</span></span><br><span class="line">        signature = data.pop(<span class="string">"sign"</span>, <span class="literal">None</span>)</span><br><span class="line">        <span class="comment"># 调用验证操作</span></span><br><span class="line">        success = self.alipay.verify(data, signature)</span><br><span class="line">        order_sn = data.get(<span class="string">'out_trade_no'</span>, <span class="literal">None</span>)  <span class="comment"># 原支付请求的商户订单号</span></span><br><span class="line">        trade_status = self.alipay.api_alipay_trade_query(out_trade_no=order_sn).get(<span class="string">"trade_status"</span>, <span class="literal">None</span>)</span><br><span class="line">        <span class="keyword">if</span> success <span class="keyword">and</span> trade_status <span class="keyword">in</span> (<span class="string">"TRADE_SUCCESS"</span>, <span class="string">"TRADE_FINISHED"</span>):</span><br><span class="line">            trade_no = data.get(<span class="string">'trade_no'</span>, <span class="literal">None</span>)  <span class="comment"># 支付宝交易凭证号</span></span><br><span class="line">            <span class="comment"># 订单商品</span></span><br><span class="line">            existed_orders = OrderInfo.objects.filter(order_sn=order_sn, is_delete=<span class="literal">False</span>)</span><br><span class="line">            print(len(existed_orders))</span><br><span class="line">            <span class="keyword">if</span> existed_orders:</span><br><span class="line">                <span class="keyword">for</span> order <span class="keyword">in</span> existed_orders:</span><br><span class="line">                    order_goods = order.goods.all()</span><br><span class="line">                    <span class="comment"># 商品销量增加订单中数值</span></span><br><span class="line">                    <span class="keyword">for</span> order_good <span class="keyword">in</span> order_goods:</span><br><span class="line">                        <span class="comment"># 获取订单中商品</span></span><br><span class="line">                        goods = order_good.goods</span><br><span class="line">                        <span class="comment"># 销量根据订单商品数量增加增加</span></span><br><span class="line">                        goods.sold_num += order_good.goods_num</span><br><span class="line">                        goods.save()</span><br><span class="line">                    <span class="comment"># 更新数据库订单状态</span></span><br><span class="line">                    order.pay_status = trade_status</span><br><span class="line">                    order.trade_no = trade_no</span><br><span class="line">                    order.pay_time = datetime.now()</span><br><span class="line">                    order.save()</span><br><span class="line">                response = HttpResponseRedirect(<span class="string">'http://127.0.0.1:8080/#/app/home/member/order'</span>)</span><br><span class="line">                response.set_cookie(<span class="string">'nextPath'</span>, <span class="string">'pay'</span>, max_age=<span class="number">2</span>)</span><br><span class="line">                print(<span class="string">'cookie'</span>, response.cookies)</span><br><span class="line">                <span class="keyword">return</span> response</span><br><span class="line">        <span class="keyword">return</span> HttpResponseRedirect(<span class="string">'http://127.0.0.1:8080/#/app/shoppingcart/cart'</span>)</span><br></pre></td></tr></tbody></table></figure>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/5/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/page/7/">7</a><span class="space">&hellip;</span><a class="page-number" href="/page/34/">34</a><a class="extend next" rel="next" href="/page/7/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/5/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/page/7/">7</a><span class="space">&hellip;</span><a class="page-number" href="/page/35/">35</a><a class="extend next" rel="next" href="/page/7/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 </div>
