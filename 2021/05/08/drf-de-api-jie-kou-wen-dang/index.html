@@ -31,7 +31,7 @@
 <meta property="og:image" content="https://bubbleboy11.github.io/2021/05/08/drf-de-api-jie-kou-wen-dang/2.png">
 <meta property="og:image" content="https://bubbleboy11.github.io/2021/05/08/drf-de-api-jie-kou-wen-dang/3.png">
 <meta property="article:published_time" content="2021-05-07T16:21:41.000Z">
-<meta property="article:modified_time" content="2021-06-17T02:33:26.024Z">
+<meta property="article:modified_time" content="2021-08-02T09:58:43.090Z">
 <meta property="article:author" content="外心人D">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://bubbleboy11.github.io/2021/05/08/drf-de-api-jie-kou-wen-dang/1.png">
@@ -132,7 +132,7 @@
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
-        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-count">24</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -208,7 +208,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-06-17 02:33:26" itemprop="dateModified" datetime="2021-06-17T02:33:26Z">2021-06-17</time>
+        <time title="修改时间：2021-08-02 09:58:43" itemprop="dateModified" datetime="2021-08-02T09:58:43Z">2021-08-02</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -240,7 +240,8 @@
 <h4 id="生成API接口文档"><a href="#生成API接口文档" class="headerlink" title="生成API接口文档"></a>生成API接口文档</h4><p><a target="_blank" rel="noopener" href="https://www.django-rest-framework.org/topics/documenting-your-api/">https://www.django-rest-framework.org/topics/documenting-your-api/</a><br>ViewSet的格式，更多请看官方文档</p>
 <p>drf文档的优点：</p>
 <ul>
-<li>自动生成的接口文档是继承自APIView及其子类的视图。</li>
+<li>自动生成的接口文档是继承自<code>APIView</code>及其子类的视图</li>
+<li>以网页的方式呈现</li>
 <li>一目了然看到各个模块的所有接口</li>
 <li>文档里可以做交互和测试</li>
 <li>生成Shell、JavaScript和Python等多种测试代码方式。</li>
@@ -250,17 +251,18 @@
 <p><code>setting.py</code></p>
 <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># DRF 全局配置</span></span><br><span class="line">REST_FRAMEWORK = {</span><br><span class="line">    <span class="string">"DEFAULT_SCHEMA_CLASS"</span>: <span class="string">'rest_framework.schemas.openapi.AutoSchema'</span>,  <span class="comment"># 新版drf schema_class默认用的是</span></span><br><span class="line">    <span class="comment"># 如果报错AttributeError: ‘AutoSchema’ object has no attribute ‘get_link’</span></span><br><span class="line">    <span class="string">'DEFAULT_SCHEMA_CLASS'</span>: <span class="string">'rest_framework.schemas.AutoSchema'</span>,</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
 
-<p><code>drf_tutorial\urls.py</code></p>
+<p>在总路由 <code>drf_tutorial\urls.py</code> 中添加接口文档路径。</p>
 <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework.documentation <span class="keyword">import</span> include_docs_urls</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    path(<span class="string">"docs/"</span>, include_docs_urls(title=<span class="string">"DRF API文档"</span>, description=<span class="string">"Django REST framework快速入门"</span>)),</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
 
 <h3 id="文档描述说明的定义位置"><a href="#文档描述说明的定义位置" class="headerlink" title="文档描述说明的定义位置"></a>文档描述说明的定义位置</h3><p>对于每种类型的请求，都以固定的格式定义了说明 类定义的注释的内容<code>""" """</code>，</p>
-<p>1） 单一方法的视图，可直接使用类视图的文档字符串，如</p>
+<p>1） 单一方法的视图，可直接使用类视图的文档字符串，如<br>这是在类中声明的注释，如果在方法中你声明了其他注释，会覆盖这个注释的</p>
 <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BookListView</span>(<span class="params">generics.ListAPIView</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    返回所有图书信息.</span></span><br><span class="line"><span class="string">    """</span></span><br></pre></td></tr></tbody></table></figure>
+
 <p>2）包含多个方法的视图，在类视图的文档字符串中，分开方法定义，如</p>
 <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BookListCreateView</span>(<span class="params">generics.ListCreateAPIView</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    get:</span></span><br><span class="line"><span class="string">    返回所有图书信息.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    post:</span></span><br><span class="line"><span class="string">    新建图书.</span></span><br><span class="line"><span class="string">    """</span></span><br></pre></td></tr></tbody></table></figure>
 
-<p>3）对于视图集ViewSet，仍在类视图的文档字符串中封开定义，但是应使用action名称区分，如<br>视图集ViewSet中的retrieve名称，在接口文档网站中叫做read</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BookInfoViewSet</span>(<span class="params">mixins.ListModelMixin, mixins.RetrieveModelMixin, GenericViewSet</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    list:</span></span><br><span class="line"><span class="string">    返回图书列表数据</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    retrieve:</span></span><br><span class="line"><span class="string">    返回图书详情数据</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    latest:</span></span><br><span class="line"><span class="string">    返回最新的图书数据</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    read:</span></span><br><span class="line"><span class="string">    修改图书的阅读量</span></span><br><span class="line"><span class="string">    """</span></span><br></pre></td></tr></tbody></table></figure>
+<p>3）对于视图集ViewSet，仍在类视图的文档字符串中分开定义，但是应使用action名称区分，如<br>视图集ViewSet中的retrieve名称，在接口文档网站中叫做read</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GoodsListViewSet</span>(<span class="params">mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet</span>):</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    list:</span></span><br><span class="line"><span class="string">        商品列表页，并实现分页、搜索、过滤、排序</span></span><br><span class="line"><span class="string">    retrieve:</span></span><br><span class="line"><span class="string">        商品详情，并实现热卖商品接口</span></span><br><span class="line"><span class="string">    '''</span></span><br></pre></td></tr></tbody></table></figure>
 
 <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserFavViewSet</span>(<span class="params">mixins.CreateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin,</span></span></span><br><span class="line"><span class="class"><span class="params">                     mixins.DestroyModelMixin, viewsets.GenericViewSet</span>):</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    list:用户收藏列表</span></span><br><span class="line"><span class="string">    create:</span></span><br><span class="line"><span class="string">        创建添加一条收藏</span></span><br><span class="line"><span class="string">    retrieve:</span></span><br><span class="line"><span class="string">        根据ID查询到用户收藏详情</span></span><br><span class="line"><span class="string">    destroy:</span></span><br><span class="line"><span class="string">        删除用户收藏</span></span><br><span class="line"><span class="string">    '''</span></span><br></pre></td></tr></tbody></table></figure>
 
@@ -319,8 +321,6 @@
 <td>Which field to use when ordering the results.</td>
 </tr>
 </tbody></table>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GoodsListViewSet</span>(<span class="params">mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet</span>):</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    list:</span></span><br><span class="line"><span class="string">        商品列表页，并实现分页、搜索、过滤、排序</span></span><br><span class="line"><span class="string">    retrieve:</span></span><br><span class="line"><span class="string">        商品详情，并实现热卖商品接口</span></span><br><span class="line"><span class="string">    '''</span></span><br></pre></td></tr></tbody></table></figure>
-
 <p>本地化<a target="_blank" rel="noopener" href="http://djangobook.py3k.cn/2.0/chapter19/">http://djangobook.py3k.cn/2.0/chapter19/</a></p>
 <p>分页中文描述<br><code>apps/goods/views.py</code></p>
 <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework.pagination <span class="keyword">import</span> PageNumberPagination</span><br><span class="line"><span class="keyword">from</span> django.utils.translation <span class="keyword">import</span> ugettext_lazy</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GoodsPagination</span>(<span class="params">PageNumberPagination</span>):</span></span><br><span class="line">    page_size = <span class="number">12</span>  <span class="comment"># 默认每页显示的个数</span></span><br><span class="line">    max_page_size = <span class="number">100</span>  <span class="comment"># 最多能显示多少页</span></span><br><span class="line">    page_size_query_param = <span class="string">'page_size'</span>  <span class="comment"># 页面大小对应的查询参数</span></span><br><span class="line">    page_query_param = <span class="string">'page'</span>  <span class="comment"># 页码参数?page=xx</span></span><br><span class="line">    page_query_description = ugettext_lazy(<span class="string">'使用分页后的页码'</span>)  <span class="comment"># 分页文档中文描述</span></span><br><span class="line">    page_size_query_description = ugettext_lazy(<span class="string">'每页返回的结果数'</span>)</span><br></pre></td></tr></tbody></table></figure>
@@ -377,7 +377,8 @@
 <td>Which field to use when ordering the results.</td>
 </tr>
 </tbody></table>
-<p>添加字段参数的Description描述需要<br>在<code>model</code>模型类或<code>serializer</code>序列化器类或<code>filter</code>过滤类的字段中指定<code>help_text</code>属性<br><code>apps/goods/filters.py</code></p>
+<p>添加字段参数的Description描述需要在<code>model</code>模型类或<code>serializer</code>序列化器类或<code>filter</code>过滤类的字段中指定<code>help_text</code>属性</p>
+<p><code>apps/goods/filters.py</code></p>
 <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GoodsFilter</span>(<span class="params">django_filters.rest_framework.FilterSet</span>):</span></span><br><span class="line">    <span class="string">'''商品过滤类'''</span></span><br><span class="line">    <span class="comment"># 两个参数，name是要过滤的字段，lookup是执行的行为，‘小与等于本店价格’</span></span><br><span class="line">    name = django_filters.CharFilter(field_name=<span class="string">"name"</span>, lookup_expr=<span class="string">'contains'</span>, help_text=<span class="string">'分类名模糊匹配'</span>)  <span class="comment"># 包含关系，模糊匹配</span></span><br><span class="line">    pricemin = django_filters.NumberFilter(field_name=<span class="string">"market_price"</span>, lookup_expr=<span class="string">'gte'</span>, help_text=<span class="string">'最低价格'</span>)  <span class="comment"># 自定义字段</span></span><br><span class="line">    pricemax = django_filters.NumberFilter(field_name=<span class="string">"market_price"</span>, lookup_expr=<span class="string">'lte'</span>, help_text=<span class="string">'最高价格'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 自定义过滤，过滤某个一级分类</span></span><br><span class="line">    top_category = django_filters.NumberFilter(method=<span class="string">'top_category_filter'</span>, help_text=<span class="string">'自定义过滤某个一级分类'</span>)</span><br></pre></td></tr></tbody></table></figure>
 
 <table>
@@ -432,7 +433,9 @@
 <td>Which field to use when ordering the results.</td>
 </tr>
 </tbody></table>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></tbody></table></figure><script>
+<p>多个应用使用同一个序列化器，可能会导致help_text的内容显示有些问题</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">StudentSerializer</span>(<span class="params">serializers.ModelSerializer</span>):</span></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        model = Student</span><br><span class="line">        fields = <span class="string">"__all__"</span></span><br><span class="line">        extra_kwargs = {</span><br><span class="line">            <span class="string">'age'</span>: {</span><br><span class="line">                <span class="string">'required'</span>: <span class="literal">True</span>,</span><br><span class="line">                <span class="string">'help_text'</span>: <span class="string">'年龄'</span></span><br><span class="line">            }</span><br><span class="line">        }</span><br></pre></td></tr></tbody></table></figure>
+<script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
