@@ -119,7 +119,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">341</span>
+          <span class="site-state-item-count">342</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -160,6 +160,122 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/django-shi-wu/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/django-shi-wu/" class="post-title-link" itemprop="url">django事务</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-05-30 15:04:44" itemprop="dateModified" datetime="2021-05-30T15:04:44Z">2021-05-30</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>需要事务控制的情况：<br>对多个ORM模型操作时（比如：用户信息表和用户详细信息表，必须一致）<br>对结果要求严格一致（要么成功，要么失败）</p>
+<p>在django中使用事务：<br>    一：加装饰器自动提交</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.db <span class="keyword">import</span> transaction</span><br><span class="line"><span class="meta">@transaction.atomic</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">viewfunc</span>(<span class="params">request</span>):</span></span><br><span class="line"><span class="comment"># 事务内的代码</span></span><br><span class="line">do_stuff()</span><br></pre></td></tr></tbody></table></figure>
+
+<p>atomic自动提交过程解析<br>a. 进入到最外层的atomic代码块时会打开一个事务<br>b. 进入到内层atomic代码块时会创建一个标记<br>c. 退出内部块时会释放或回滚至标记<br>d. 退出外部块时提交或回退事务</p>
+<p>手动提交和回滚</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.db <span class="keyword">import</span> transaction</span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line"><span class="comment"># 放弃自动提交</span></span><br><span class="line">transaction.set_autocommit(<span class="literal">False</span>)</span><br><span class="line">a.save()</span><br><span class="line">b.save()</span><br><span class="line">transaction.commit() <span class="comment"># 提交事务</span></span><br><span class="line"><span class="keyword">except</span>:</span><br><span class="line">transaction.rollback() <span class="comment"># 回滚</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>举例：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.db <span class="keyword">import</span> transaction</span><br><span class="line"></span><br><span class="line"><span class="meta">@transaction.atomic()</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">trans</span>(<span class="params">request</span>):</span></span><br><span class="line"><span class="string">""" 事务练习：用户发布微博时候，顺便发布一条评论，只能同时成功，否则发生回滚 """</span></span><br><span class="line"><span class="comment"># 获得一个用户</span></span><br><span class="line">user = WeiboUser.objects.get(pk=<span class="number">3</span>)</span><br><span class="line"><span class="comment"># 发布一条微博和评论</span></span><br><span class="line">weibo = Weibo.objects.create(user=user, content=<span class="string">'事务练习'</span>, source=<span class="string">'other'</span>)</span><br><span class="line">WeiboComment.objects.create(user=user, content=<span class="string">'事务练习'</span>, weibo=<span class="literal">None</span>)</span><br><span class="line"><span class="keyword">return</span> HttpResponse(<span class="string">'ojbk'</span>)</span><br></pre></td></tr></tbody></table></figure>
+<p>上例中会weibo不能为空值，会触发回滚机制，若事务机制不存在，则只会将weibo对象创建成功<br>通过with来完成自动的事务提交：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">transaction_with</span>(<span class="params">request</span>):</span></span><br><span class="line"><span class="string">""" 事务练习：用户发布微博时候，顺便发布一条评论，只能同时成功，否则发生回滚 """</span></span><br><span class="line"><span class="comment"># 获得一个用户</span></span><br><span class="line">user = WeiboUser.objects.get(pk=<span class="number">3</span>)</span><br><span class="line"><span class="keyword">with</span> transaction.atomic():</span><br><span class="line"><span class="comment"># 发布一条微博和评论</span></span><br><span class="line">weibo = Weibo.objects.create(user=user, content=<span class="string">'事务练习_with'</span>, source=<span class="string">'other'</span>)</span><br><span class="line">WeiboComment.objects.create(user=user, content=<span class="string">'事务练习_with'</span>, weibo=<span class="literal">None</span>)</span><br><span class="line"><span class="keyword">return</span> HttpResponse(<span class="string">'ojbk'</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>手动提交事务</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">transaction_hand</span>(<span class="params">request</span>):</span></span><br><span class="line"><span class="string">""" 事务练习：用户发布微博时候，顺便发布一条评论，只能同时成功，否则发生回滚 """</span></span><br><span class="line"><span class="comment"># 获得一个用户</span></span><br><span class="line">user = WeiboUser.objects.get(pk=<span class="number">3</span>)</span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line"><span class="comment"># 放弃自动提交</span></span><br><span class="line">transaction.set_autocommit(<span class="literal">False</span>)</span><br><span class="line"><span class="comment"># 发布一条微博和评论</span></span><br><span class="line">weibo = Weibo.objects.create(user=user, content=<span class="string">'事务练习_hand'</span>, source=<span class="string">'other'</span>)</span><br><span class="line">WeiboComment.objects.create(user=user, content=<span class="string">'事务练习_hand'</span>, weibo=<span class="literal">None</span>)</span><br><span class="line">transaction.commit()</span><br><span class="line"><span class="keyword">except</span>:</span><br><span class="line">transaction.rollback()</span><br><span class="line"><span class="keyword">return</span> HttpResponse(<span class="string">'ojbk'</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>atomic()</code> 在<code>with</code>语句结束时，会自动进行提交，或当数据库代码出错时，自动进行回滚</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.db <span class="keyword">import</span> transaction</span><br><span class="line"><span class="keyword">with</span> transaction.atomic():</span><br><span class="line"><span class="comment"># with 语句下面的代码，凡是涉及到数据库操作的代码，</span></span><br><span class="line"><span class="comment"># 在进行数据库操作时，都会放在同一个事物中。</span></span><br><span class="line">    p1 = transaction.savepoint（）</span><br><span class="line">    <span class="comment"># 在进行数据库操作时，设置事物保存点</span></span><br><span class="line">    ..................</span><br><span class="line">    transaction.savepoint_rollback（p1）</span><br><span class="line">    <span class="comment"># 在进行数据库操作时，回滚到指定的保存点</span></span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.db <span class="keyword">import</span> transaction</span><br><span class="line"></span><br><span class="line"><span class="meta">    @transaction.atomic</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">post</span>(<span class="params">self, request, *args, **kwargs</span>):</span></span><br></pre></td></tr></tbody></table></figure><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1195,121 +1311,6 @@
 
 <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> calc.add <span class="keyword">import</span> add1</span><br><span class="line"><span class="keyword">from</span> calc <span class="keyword">import</span> add</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sub</span>(<span class="params">x: int, y:int</span>) -&gt; int :</span></span><br><span class="line">    print(add1(x, y))</span><br><span class="line">    print(add.add1(x, y))</span><br><span class="line">    <span class="keyword">return</span> x - y</span><br><span class="line"></span><br><span class="line"><span class="comment">#每多一个文件就多了一个package</span></span><br><span class="line"></span><br><span class="line">print(sub(<span class="number">1</span>,<span class="number">2</span>))</span><br></pre></td></tr></tbody></table></figure>
 <script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/06/30/hai-xiang-yun-suan-fu/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/06/30/hai-xiang-yun-suan-fu/" class="post-title-link" itemprop="url">海象运算符</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-06-29 16:21:41" itemprop="dateCreated datePublished" datetime="2020-06-29T16:21:41Z">2020-06-29</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-07-31 07:56:45" itemprop="dateModified" datetime="2021-07-31T07:56:45Z">2021-07-31</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>python3.8提供了一个新的运算符 - 海象运算符 Assignment Expresions ，<br>即 赋值表达式。</p>
-<p>由一个 : 和 一个 = 组成，即：<code>:=</code> 。我们一般称作 walrus operator（海象运算符），因为它看起来就是一个海象旋转 90° 而成。</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(variable_name := expression <span class="keyword">or</span> value)</span><br></pre></td></tr></tbody></table></figure>
-
-<p>即一个变量名后跟一个表达式或者一个值，这个和赋值运算符 = 类似，可以看作是一种新的赋值运算符。<br>可以将两行代码变成一行</p>
-<h4 id="用于-if-else-条件表达式"><a href="#用于-if-else-条件表达式" class="headerlink" title="用于 if-else 条件表达式"></a>用于 if-else 条件表达式</h4><figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">course_list = [<span class="string">"django"</span>, <span class="string">"scrapy"</span>, <span class="string">"tornado"</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment"># len(course_list)要执行两次</span></span><br><span class="line"><span class="keyword">if</span> len(course_list) &gt;= <span class="number">3</span>:</span><br><span class="line">    print(<span class="string">"课程较多， 课程数量： {}"</span>.format(len(course_list)))</span><br><span class="line">    <span class="comment"># 课程较多， 课程数量： 3</span></span><br><span class="line"></span><br><span class="line">course_size = len(course_list)  <span class="comment"># 多了一行</span></span><br><span class="line"><span class="keyword">if</span> course_size &gt;= <span class="number">3</span>:</span><br><span class="line">    print(<span class="string">"课程较多， 课程数量： {}"</span>.format(course_size))</span><br><span class="line">    <span class="comment"># 课程较多， 课程数量： 3</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> course_size := len(course_list) &gt;= <span class="number">3</span>:</span><br><span class="line">    <span class="comment"># if course_size := (len(course_list) &gt;= 3): 因为&gt;=的优先级高于:=</span></span><br><span class="line">    print(<span class="string">"课程较多， 课程数量： {}"</span>.format(course_size))</span><br><span class="line">    <span class="comment"># 课程较多， 课程数量： True</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (course_size := len(course_list)) &gt;= <span class="number">3</span>:</span><br><span class="line">    print(<span class="string">"课程较多， 课程数量： {}"</span>.format(course_size))</span><br><span class="line">    <span class="comment"># 课程较多， 课程数量： 3</span></span><br><span class="line"></span><br><span class="line">course_size = len(course_list)</span><br><span class="line">powers = [course_size, course_size**<span class="number">2</span>, course_size**<span class="number">3</span>]</span><br><span class="line">print(powers)  <span class="comment"># [3, 9, 27]</span></span><br><span class="line"></span><br><span class="line">powers = [course_size := len(course_list), course_size**<span class="number">2</span>, course_size**<span class="number">3</span>]</span><br><span class="line">print(powers)  <span class="comment"># [3, 9, 27]</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"></span><br><span class="line">desc = <span class="string">"bobby:18"</span></span><br><span class="line"></span><br><span class="line">m = re.match(<span class="string">"bobby:(.*)"</span>, desc)</span><br><span class="line"><span class="keyword">if</span> m:</span><br><span class="line">    age = m.group(<span class="number">1</span>)</span><br><span class="line">    print(age)  <span class="comment"># 18</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> m := re.match(<span class="string">"bobby:(.*)"</span>, desc):</span><br><span class="line">    age = m.group(<span class="number">1</span>)</span><br><span class="line">    print(age)  <span class="comment"># 18</span></span><br><span class="line"></span><br><span class="line">age = <span class="number">18</span></span><br><span class="line"><span class="comment"># 海象运算符不能赋值，go可以</span></span><br><span class="line"><span class="comment"># age := 18  # SyntaxError: invalid syntax</span></span><br><span class="line">age += <span class="number">5</span></span><br><span class="line"><span class="comment"># 海象运算符不能加减，go可以</span></span><br><span class="line"><span class="comment"># age :+= 5  # SyntaxError: invalid syntax</span></span><br></pre></td></tr></tbody></table></figure>
-
-<h4 id="用于-while-循环"><a href="#用于-while-循环" class="headerlink" title="用于 while 循环"></a>用于 while 循环</h4><p>常规写法：</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">n = <span class="number">6</span></span><br><span class="line"><span class="keyword">while</span> n:</span><br><span class="line">    print(<span class="string">'hello word!'</span>)</span><br><span class="line">    n -= <span class="number">1</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p>海象运算符：</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">n = <span class="number">6</span></span><br><span class="line"><span class="keyword">while</span> (n := n - <span class="number">1</span>) + <span class="number">1</span>: <span class="comment"># 需要加1是因为执行输出前n就减1了</span></span><br><span class="line">    print(<span class="string">'hello word!'</span>)</span><br></pre></td></tr></tbody></table></figure>
-
-<p>读取文件：</p>
-<p>常规写法：</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">fp = open(<span class="string">"test.txt"</span>, <span class="string">"r"</span>)</span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    line = fp.readline()</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> line:</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">    print(line.strip())</span><br><span class="line">fp.close()</span><br></pre></td></tr></tbody></table></figure>
-
-<p>海象运算符：</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">fp = open(<span class="string">"test.txt"</span>, <span class="string">"r"</span>)</span><br><span class="line"><span class="keyword">while</span> line := fp.readline():</span><br><span class="line">    print(line.strip())</span><br></pre></td></tr></tbody></table></figure><script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
