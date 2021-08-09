@@ -169,6 +169,110 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/06/18/beego-wo-de-shi-pin-guan-li-gong-neng/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/06/18/beego-wo-de-shi-pin-guan-li-gong-neng/" class="post-title-link" itemprop="url">beego我的视频管理功能</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-06-17 16:21:41" itemprop="dateCreated datePublished" datetime="2021-06-17T16:21:41Z">2021-06-17</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-06-20 01:30:37" itemprop="dateModified" datetime="2021-06-20T01:30:37Z">2021-06-20</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/beego/" itemprop="url" rel="index"><span itemprop="name">beego</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><code>models\video.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 根据用户ID获取用户相关数据</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">GetUserVideo</span><span class="params">(uid <span class="keyword">int</span>)</span> <span class="params">(<span class="keyword">int64</span>, []VideoData, error)</span></span> {</span><br><span class="line">    o := orm.NewOrm()</span><br><span class="line">    <span class="keyword">var</span> videos []VideoData</span><br><span class="line">    num, err := o.Raw(<span class="string">"SELECT id,title,sub_title,img,img1,add_time,episodes_count, is_end FROM video WHERE user_id=? ORDER BY add_time DESC"</span>, uid).QueryRows(&amp;videos)</span><br><span class="line">    <span class="keyword">return</span> num, videos, err</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>controllers\video.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//我的视频管理</span></span><br><span class="line"><span class="comment">// @router /user/video [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *VideoController)</span> <span class="title">UserVideo</span><span class="params">()</span></span> {</span><br><span class="line">    uid, _ := this.GetInt(<span class="string">"uid"</span>)</span><br><span class="line">    <span class="keyword">if</span> uid == <span class="number">0</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4001</span>, <span class="string">"必须指定用户"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    num, videos, err := models.GetUserVideo(uid)</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnSuccess(<span class="number">0</span>, <span class="string">"success"</span>, videos, num)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4004</span>, <span class="string">"没有相关内容"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="/2021/06/18/beego-wo-de-shi-pin-guan-li-gong-neng/1.png" alt="description"></p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
     <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/06/18/beego-pi-liang-fa-song-xiao-xi-jie-kou/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1264,139 +1368,6 @@
 <p>自带http服务，不需要nginx和appche</p>
 <p>◆线上环境检查,上传文件部署</p>
 <p>配置访问域名，测试功能</p>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/06/17/social-django-di-san-fang-deng-lu/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/06/17/social-django-di-san-fang-deng-lu/" class="post-title-link" itemprop="url">social_django第三方登录</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-      
-
-      <time title="创建时间：2021-06-16 16:21:41 / 修改时间：08:43:24" itemprop="dateCreated datePublished" datetime="2021-06-16T16:21:41Z">2021-06-16</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h3 id="申请应用"><a href="#申请应用" class="headerlink" title="申请应用"></a>申请应用</h3><p>进入微博开放平台，首先要经过认证，然后才可以创建应用</p>
-<p> 地址：<a target="_blank" rel="noopener" href="http://open.weibo.com/authentication">http://open.weibo.com/authentication</a></p>
-<h3 id="创建应用"><a href="#创建应用" class="headerlink" title="创建应用"></a>创建应用</h3><p>微链接-网站接入-写上应用的名字，创建好后，会有个“App Key”,</p>
-<p>OAuth2.0 授权设置</p>
-<p>正常情况下，必须经过审核才可以让第三方登录，我们可以先用测试模式来完成。</p>
-<p>（1）添加测试用户，可以测试登录<br> （2）高级信息</p>
-<h3 id="第三方登录"><a href="#第三方登录" class="headerlink" title="第三方登录"></a>第三方登录</h3><p><a target="_blank" rel="noopener" href="https://github.com/python-social-auth/social-app-django">https://github.com/python-social-auth/social-app-django</a></p>
-<p>Python Social Auth is an easy to setup social authentication/registration mechanism with support for several frameworks and auth providers.<br>Python Social Auth是一种易于设置的社交认证/注册机制，支持多个框架和auth提供程序。</p>
-<p>This is the Django component of the python-social-auth ecosystem, it implements the needed functionality to integrate social-auth-core in a Django based project.<br>这是python-social-auth生态系统的Django组件，它实现了在基于Django的项目中集成social-auth-core所需的功能。</p>
-<p><a target="_blank" rel="noopener" href="https://python-social-auth.readthedocs.io/en/latest/">https://python-social-auth.readthedocs.io/en/latest/</a></p>
-<p>Python Social Auth aims to be an easy-to-setup social authentication and authorization mechanism for Python projects supporting protocols like OAuth (1 and 2), OpenID and others.<br>Python Social Auth旨在为支持OAuth（1和2），OpenId等协议的Python项目提供易于设置的社交认证和授权机制。</p>
-<p>The initial codebase is derived from django-social-auth with the idea of generalizing the process to suit the different frameworks around, providing the needed tools to bring support to new frameworks.<br>初始代码库源自django-social-auth，其思想是将流程概括为适应不同的框架，提供所需的工具来为新框架提供支持。</p>
-<p>django-social-auth itself was a product of modified code from django-twitter-oauth and django-openid-auth projects.<br>django-social-auth本身是来自django-twitter-oauth和django-openid-auth项目的修改代码的产物。</p>
-<p>The project is now split into smaller modules to isolate and reduce responsibilities and improve reusability.<br>该项目现在分为较小的模块，以隔离和减少责任并提高可重用性。</p>
-<p><a target="_blank" rel="noopener" href="https://python-social-auth.readthedocs.io/en/latest/configuration/django.html">https://python-social-auth.readthedocs.io/en/latest/configuration/django.html</a></p>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install social-auth-app-django</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">INSTALLED_APPS = [</span><br><span class="line">    <span class="string">'social_django'</span>,  <span class="comment"># 添加Django联合登录</span></span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
-
-<p>将social_django添加到已安装的应用程序后，需要同步数据库以创建所需的模型：<br>做migrate数据库中多了五张social表，因为migration的文件已经生成好了<br><img src="/2021/06/17/social-django-di-san-fang-deng-lu/1.png" alt="description"></p>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">python manage.py migrate</span><br><span class="line">Tracking file by folder pattern:  migrations</span><br><span class="line">Operations to perform:</span><br><span class="line">  Apply all migrations: admin, auth, authtoken, contenttypes, goods, sessions, social_django, trade, user_operation, users</span><br><span class="line">Running migrations:</span><br><span class="line">  Applying social_django.0001_initial... OK</span><br><span class="line">  Applying social_django.0002_add_related_name... OK</span><br><span class="line">  Applying social_django.0003_alter_email_max_length... OK</span><br><span class="line">  Applying social_django.0004_auto_20160423_0400... OK</span><br><span class="line">  Applying social_django.0005_auto_20160727_2333... OK</span><br><span class="line">  Applying social_django.0006_partial... OK</span><br><span class="line">  Applying social_django.0007_code_timestamp... OK</span><br><span class="line">  Applying social_django.0008_partial_timestamp... OK</span><br></pre></td></tr></tbody></table></figure>
-
-<h4 id="身份验证后端配置"><a href="#身份验证后端配置" class="headerlink" title="身份验证后端配置"></a>身份验证后端配置</h4><figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">AUTHENTICATION_BACKENDS = (</span><br><span class="line">    <span class="string">'users.views.CustomBackend'</span>,  <span class="comment"># 设置邮箱和用户名和手机号均可登录</span></span><br><span class="line">    <span class="string">'social_core.backends.weibo.WeiboOAuth2'</span>,</span><br><span class="line">    <span class="string">'social_core.backends.qq.QQOAuth2'</span>,</span><br><span class="line">    <span class="string">'social_core.backends.weixin.WeixinOAuth2'</span>,</span><br><span class="line">    <span class="string">'django.contrib.auth.backends.ModelBackend'</span>,  <span class="comment"># 使用了`django.contrib.auth`应用程序，支持帐密认证</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 第三方登录，里面的值是你的开放平台对应的值</span></span><br><span class="line">SOCIAL_AUTH_WEIBO_KEY = <span class="string">'224188xxxx'</span></span><br><span class="line">SOCIAL_AUTH_WEIBO_SECRET = <span class="string">'76daf2e9xxxxx'</span></span><br><span class="line"></span><br><span class="line">SOCIAL_AUTH_QQ_KEY = <span class="string">'xxxxxxx'</span></span><br><span class="line">SOCIAL_AUTH_QQ_SECRET = <span class="string">'xxxxxxx'</span></span><br><span class="line"></span><br><span class="line">SOCIAL_AUTH_WEIXIN_KEY = <span class="string">'xxxxxxx'</span></span><br><span class="line">SOCIAL_AUTH_WEIXIN_SECRET = <span class="string">'xxxxxxx'</span></span><br><span class="line"><span class="comment"># 登录成功后跳转到首页</span></span><br><span class="line">SOCIAL_AUTH_LOGIN_REDIRECT_URL = <span class="string">'/index/'</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p>考虑到后端必须在<code>AUTHENTICATION_BACKENDS</code>中定义，否则Django在尝试验证用户时不会选择它们。</p>
-<p>如果使用<code>django.contrib.auth</code>应用程序，不要忘记添加<code>django.contrib.auth.backends.ModelBackend</code>，否则用户将无法通过用户名/密码方法登录。</p>
-<p>示例中，支持的认证类有OpenIdAuth、GoogleOAuth2等，想要查看其他支持的类型，可以访问安装库的位置<code>*PATH*/site-packages/social_core/backends</code>查看。</p>
-<h4 id="添加认证URL"><a href="#添加认证URL" class="headerlink" title="添加认证URL"></a>添加认证URL</h4><figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">urlpatterns = [</span><br><span class="line">    <span class="comment"># ...省略其他path</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># social_django认证第三方登录</span></span><br><span class="line">    path(<span class="string">''</span>, include(<span class="string">'social_django.urls'</span>, namespace=<span class="string">'social'</span>))</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
-
-<p>查看social_django.urls的源码如下：</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"""URLs module"""</span></span><br><span class="line"><span class="keyword">from</span> django.conf <span class="keyword">import</span> settings</span><br><span class="line"><span class="keyword">from</span> django.conf.urls <span class="keyword">import</span> url</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> social_core.utils <span class="keyword">import</span> setting_name</span><br><span class="line"><span class="keyword">from</span> . <span class="keyword">import</span> views</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">extra = getattr(settings, setting_name(<span class="string">'TRAILING_SLASH'</span>), <span class="literal">True</span>) <span class="keyword">and</span> <span class="string">'/'</span> <span class="keyword">or</span> <span class="string">''</span></span><br><span class="line"></span><br><span class="line">app_name = <span class="string">'social'</span></span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    <span class="comment"># authentication / association</span></span><br><span class="line">    url(<span class="string">r'^login/(?P&lt;backend&gt;[^/]+){0}$'</span>.format(extra), views.auth,</span><br><span class="line">        name=<span class="string">'begin'</span>),</span><br><span class="line">    url(<span class="string">r'^complete/(?P&lt;backend&gt;[^/]+){0}$'</span>.format(extra), views.complete,</span><br><span class="line">        name=<span class="string">'complete'</span>),</span><br><span class="line">    <span class="comment"># disconnection</span></span><br><span class="line">    url(<span class="string">r'^disconnect/(?P&lt;backend&gt;[^/]+){0}$'</span>.format(extra), views.disconnect,</span><br><span class="line">        name=<span class="string">'disconnect'</span>),</span><br><span class="line">    url(<span class="string">r'^disconnect/(?P&lt;backend&gt;[^/]+)/(?P&lt;association_id&gt;\d+){0}$'</span></span><br><span class="line">        .format(extra), views.disconnect, name=<span class="string">'disconnect_individual'</span>),</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
-
-<p>这里面<code>backend</code>代表认证后端py文件名，比如<code>'social_core.backends.weibo.WeiboOAuth2'</code>就是weibo，<code>'social_core.backends.qq.QQOAuth2'</code>就是qq，其他类推。</p>
-<p>这里面和之前手写的微博授权登陆逻辑类似。</p>
-<h4 id="Template-Context-Processors-模板上下文处理器"><a href="#Template-Context-Processors-模板上下文处理器" class="headerlink" title="Template Context Processors  模板上下文处理器"></a>Template Context Processors  模板上下文处理器</h4><p>There’s a context processor that will add backends and associations data to template context:<br>有一个上下文处理器，它将后端和关联数据添加到模板上下文：</p>
-<p>添加<code>'social_django.context_processors.backends',</code>和<code>'social_django.context_processors.login_redirect',</code>到<code>context_processors</code>中：</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">TEMPLATES = [</span><br><span class="line">    {</span><br><span class="line">        <span class="string">'OPTIONS'</span>: {</span><br><span class="line">            <span class="string">'context_processors'</span>: [</span><br><span class="line">                <span class="comment"># 添加下面2条social_django上下文处理器</span></span><br><span class="line">                <span class="string">'social_django.context_processors.backends'</span>,</span><br><span class="line">                <span class="string">'social_django.context_processors.login_redirect'</span>,</span><br><span class="line">            ],</span><br><span class="line">        },</span><br><span class="line">    },</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
-
-<h4 id="测试social-django登录"><a href="#测试social-django登录" class="headerlink" title="测试social_django登录"></a>测试social_django登录</h4><p>由于是Django2.2+版本了， DjangoOnlineFreshSupermarket/urls.py 中的<code>path('login/', simplejwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),  # 登录一般是login</code>和 PATH/site-packages/social_django/urls.py 中的 <code>url(r'^login/(?P&lt;backend&gt;[^/]+){0}$'.format(extra), views.auth, name='begin'),</code> ，虽然同为<code>/login/</code>，但是不会冲突的，不用担心。</p>
-<p>接口<br> 在微博开放平台里面设置回调url，调试的时候设置成本地的就可以了，上线的时候改成服务器的ip地址</p>
-<p>浏览器访问：<a target="_blank" rel="noopener" href="http://127.0.0.1:8000/login/weibo,%E5%B0%B1%E5%8F%AF%E4%BB%A5%E7%99%BB%E5%BD%95%E4%BA%86%EF%BC%8C%E7%99%BB%E5%BD%95%E6%88%90%E5%8A%9F%E5%90%8E%E8%B7%B3%E8%BD%AC%E5%88%B0%E9%A6%96%E9%A1%B5">http://127.0.0.1:8000/login/weibo,就可以登录了，登录成功后跳转到首页</a></p>
-<p>登录成功跳到首页，发现还处于未登录状态</p>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
