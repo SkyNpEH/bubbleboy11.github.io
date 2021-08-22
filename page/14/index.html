@@ -119,7 +119,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">343</span>
+          <span class="site-state-item-count">344</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -160,6 +160,173 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/04/11/jie-shi-qi-cpython-gil/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/04/11/jie-shi-qi-cpython-gil/" class="post-title-link" itemprop="url">解释器 CPython GIL</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-04-10 16:21:41" itemprop="dateCreated datePublished" datetime="2021-04-10T16:21:41Z">2021-04-10</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-06-01 14:41:53" itemprop="dateModified" datetime="2021-06-01T14:41:53Z">2021-06-01</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>写在源文件中的源代码是人类可读的源。<br>它需要”编译”，高级语言翻译成计算机能识别的语言，这样 CPU 可以按给定二进制指令执行程序。</p>
+<p>go语言直接编译成二进制</p>
+<h1 id="解释器的作用"><a href="#解释器的作用" class="headerlink" title="解释器的作用"></a>解释器的作用</h1><p>Python解释器/java虚拟机作用：运行文件</p>
+<p>当我们编写Python代码时，我们得到的是一个包含Python代码的以.py为扩展名的文本文件。要运行代码，就需要Python解释器去执行.py文件。由于整个Python语言从规范到解释器都是开源的，所以理论上，只要水平够高，任何人都可以编写Python解释器来执行Python代码（当然难度很大）。事实上，确实存在多种Python解释器。</p>
+<h3 id="Python解释器种类"><a href="#Python解释器种类" class="headerlink" title="Python解释器种类"></a>Python解释器种类</h3><ul>
+<li><p>CPython，C语言开发的解释器[官方]，应用广泛的解释器。  当我们从Python官方网站下载并安装好Python，获得了一个官方版本的解释器：<br>在命令行下运行python就是启动CPython解释器。教程的所有代码也都在CPython下执行。</p>
+</li>
+<li><p>IPython，基于CPython的一种交互式解释器。IPython只是在交互方式上有所增强，但是执行Python代码的功能和CPython是完全一样的。好比很多国产浏览器虽然外观不同，但内核其实都是调用了IE。<br>   CPython用&gt;&gt;&gt;作为提示符，而IPython用In [序号]:作为提示符。</p>
+</li>
+<li><p>PyPy，基于Python语言开发的解释器。     PyPy是另一个Python解释器，它的目标是执行速度。PyPy采用JIT技术，对Python代码进行动态编译（注意不是解释），所以可以显著提高Python代码的执行速度。<br>  绝大部分Python代码都可以在PyPy下运行，但是PyPy和CPython有一些是不同的，这就导致相同的Python代码在两种解释器下执行可能会有不同的结果。如果你的代码要放到PyPy下执行，就需要了解PyPy和CPython的不同点。</p>
+</li>
+<li><p>Jython，运行在Java平台的解释器，直接把Python代码编译成Java字节码执行。</p>
+</li>
+<li><p>IronPython，只运行在微软.Net平台上的Python解释器，可以直接把Python代码编译成.Net的字节码。 </p>
+</li>
+</ul>
+<p>如果要和Java或.Net平台交互，最好的办法不是用Jython或IronPython，<br>而是通过网络调用来交互，确保各程序之间的独立性。</p>
+<hr>
+<p>在其他语言当中，一个进程里面开启多个线程，每个线程都可以给一个cpu去使用，<br>比如我现在开启了一个进程，这个进程当中含有几个线程，如果我现在有多个cpu，每一个线程是可以对应相应的CPU的。在多CPU系统中，为了最大限度的利用多核，可以开启多个线程。</p>
+<h3 id="GIL-Global-Interpreter-Lock-全局解释器锁"><a href="#GIL-Global-Interpreter-Lock-全局解释器锁" class="headerlink" title="GIL Global Interpreter Lock (全局解释器锁)"></a>GIL Global Interpreter Lock (全局解释器锁)</h3><ul>
+<li>这个GIL并不是python的特性，他是在Cpython解释器里引入的一个概念，而在其他的语言编写的解释器里就没有这个GIL</li>
+<li>CPython GIL 就是 Cpython解释器的全局解释锁进程内有一条主线程，以及多条用户程序的执行线程。</li>
+<li>多个线程不能同时并行执行，即使在多核CPU平台也不能利用 多个CPU核心执行 的优势，只在单核CPU系统中工作，不存在真正的并发</li>
+</ul>
+<h4 id="全局锁是主要的作用影响"><a href="#全局锁是主要的作用影响" class="headerlink" title="全局锁是主要的作用影响"></a>全局锁是主要的作用影响</h4><ul>
+<li><p>因为多线程的编程方式，使得线程之间数据的一致性和状态同步难以把控，为了解决数据不能同步的问题，设计了GIL全局解释器锁。</p>
+</li>
+<li><p>由于官方的Cpython解释器的内存管理并不是线程安全的（如果有多个线程话它可能会同时去修改同一个对象，这样可能会出现一些问题），因此为了支持多线程编程。</p>
+</li>
+<li><p>保护多线程情况下对Python对象的访问</p>
+</li>
+<li><p>Python 官方解释器 的每个线程要获得执行权限</p>
+</li>
+<li><p>有了GIL，<strong>保证在同一时刻，一个解释器进程下只有一个线程在运行、执行字节码</strong>。<br>Cpython使用简单的锁机制避免多线程同时执行字节码</p>
+</li>
+<li><p>在Cpython解释器中，同一进程中假如有多个线程运行，当python代码有一个最高优先级的线程开始访问解释器的时候，一个线程在运行python程序的时候会霸占python解释器（加了一把锁），GIL会把这个线程给锁上，<br>此时此刻使该进程内的其他线程无法运行，无法对解释器的资源进行访问，需要等这个线程分配的时间到了、该线程运行完后这个线程把GIL释放掉，其他线程才能运行。<br>如果线程运行过程中遇到耗时操作，则解释器锁解开，使其他线程运行。<br>所以在多线程中，线程的运行只能由操作系统负责线程优先级的排序，并不是同时进行，用户无法控制线程的选择</p>
+</li>
+</ul>
+<p>这类似于给线程加锁 <code>threading.Lock().acquire()</code>，解锁 <code>threading.Lock().release()</code> 一样。</p>
+<ul>
+<li>单个进程内的并发任务：如果你需要在单个进程内继续使用并发的特性，可以考虑使用<code>threading</code>模块，不能利用多核CPU，<br>如果想要充分地使用多核CPU的资源，在python中大部分情况需要使用多进程<code>multiprocessing</code>模块。</li>
+</ul>
+<h4 id="首先区分CPU和IO密集程序"><a href="#首先区分CPU和IO密集程序" class="headerlink" title="首先区分CPU和IO密集程序"></a>首先区分CPU和IO密集程序</h4><ul>
+<li>一般程序分为CPU密集还有IO密集<ul>
+<li>CPU密集：把大量时间花在计算上面， 对视频进行高清解码，难以利用多核优势，任务越多， 花在任务切换的时间就越多， CPU执行任务的效率就越低，</li>
+<li>IO密集：把大量时间花费在了等待上面。(比如网络传输、文件操作，磁盘硬盘读写)<br>在等待时间中CPU是不需要工作的，那你在此期间提供双CPU资源也是利用不上的，那么为什么多线程会对IO密集型代码有用呢？这时因为python碰到等待会释放GIL供新的线程使用，实现了线程间的切换。<br>IO期间会释放GIL，对IO密集程序影响不大<br>解释图：这个图里面有三个线程Thread1，Thread2，Thread3，在处理网络请求的过程中，虽然一个时间只能执行一个线程，但是在等待网络请求的时候来释放全局解释锁切换到不同线程Run运行，这就是对IO密集的程序会小一些。</li>
+</ul>
+</li>
+</ul>
+<h3 id="如何规避GIL影响"><a href="#如何规避GIL影响" class="headerlink" title="如何规避GIL影响"></a>如何规避GIL影响</h3><ul>
+<li>CPU密集可以使用多进程+进程池来充分利用多核，2个CPU干活肯定比一个CPU快很多。<br>用cython编写一些扩展来转换成cython代码。用C语言编写。</li>
+<li>（cython不是Cpython解释器，它是一个用来把python程序转换成C代码一个扩展）</li>
+<li>IO密集型任务：使用多线程 / 协程。原因是一个线程在IO时被阻塞，会被切换到另一个线程，线程切换后，I/O 操作仍然在进行，线程 1 在进行 I/O 操作时，线程 2 可以获得 CPU 资源进行计算，虽然增加了切换成本，却提高了效率。</li>
+<li>通过<code>pypy</code>解释器来执行python脚本不含有GIL</li>
+</ul>
+<h3 id="GIL实现"><a href="#GIL实现" class="headerlink" title="GIL实现"></a>GIL实现</h3><p>解释图：每隔一段时间我们尝试去释放当前线程的锁，然后让其它线程尝试去获取锁并且去执行</p>
+<h3 id="GIL执行顺序"><a href="#GIL执行顺序" class="headerlink" title="GIL执行顺序"></a>GIL执行顺序</h3><ol>
+<li>设置GIL</li>
+<li>切换进一个线程去运行</li>
+<li>执行下面操作之一：</li>
+</ol>
+<ul>
+<li>指定数量的字节码指令</li>
+<li>线程主动让出控制权（可以调用<code>time.sleep(0)</code>来完成）</li>
+</ul>
+<ol start="4">
+<li>把线程设置回睡眠状态（切换出线程）</li>
+<li>解锁GIL</li>
+<li>重复上述步骤</li>
+</ol>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">from</span> threading <span class="keyword">import</span> Thread</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 单线程版</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">CountDown</span>(<span class="params">n</span>):</span></span><br><span class="line">    <span class="keyword">while</span> n &gt; <span class="number">0</span>:</span><br><span class="line">        n -= <span class="number">1</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    n = <span class="number">3000000</span></span><br><span class="line">    start_time = time.perf_counter()</span><br><span class="line">    CountDown(n)</span><br><span class="line">    end_time = time.perf_counter()</span><br><span class="line">    print(<span class="string">"n = {}，单线程版耗时{}"</span>.format(n, end_time - start_time))</span><br><span class="line">    <span class="comment"># 多线程版</span></span><br><span class="line">    start_time = time.perf_counter()</span><br><span class="line">    t1 = Thread(target=CountDown, args=[n // <span class="number">2</span>])</span><br><span class="line">    t2 = Thread(target=CountDown, args=[n // <span class="number">2</span>])</span><br><span class="line">    t1.start()</span><br><span class="line">    t2.start()</span><br><span class="line">    t1.join()</span><br><span class="line">    t2.join()</span><br><span class="line">    end_time = time.perf_counter()</span><br><span class="line">    print(<span class="string">"n = {}，多线程版耗时{}"</span>.format(n, end_time - start_time))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 对象引用计数</span></span><br><span class="line">    <span class="keyword">for</span> k <span class="keyword">in</span> range(<span class="number">100</span>):</span><br><span class="line">        a = []</span><br><span class="line">        b = a</span><br><span class="line">        print(sys.getrefcount(a))</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 线程安全</span></span><br><span class="line">        n = <span class="number">0</span></span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">foo</span>():</span></span><br><span class="line">            <span class="keyword">global</span> n</span><br><span class="line">            n += <span class="number">1</span></span><br><span class="line"></span><br><span class="line">        threads = []</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">100</span>):</span><br><span class="line">            t = threading.Thread(target=foo)</span><br><span class="line">            threads.append(t)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> t <span class="keyword">in</span> threads:</span><br><span class="line">            t.start()</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> t <span class="keyword">in</span> threads:</span><br><span class="line">            t.join()</span><br><span class="line"></span><br><span class="line">        print(n)</span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1518,129 +1685,6 @@
 <p>consumer线程是在producer线程运行之后才运行，即等待生产者生产数据。</p>
 <p>用<code>event</code>实现一个生产线程和消费线程的通信：</p>
 <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">product_event = threading.Event()</span><br><span class="line">print(<span class="string">f"product_event state: <span class="subst">{product_event.is_set()}</span>"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">produce</span>():</span></span><br><span class="line">    print(<span class="string">"start produce ..."</span>)</span><br><span class="line">    time.sleep(<span class="number">5</span>)</span><br><span class="line">    print(<span class="string">"product produced."</span>)</span><br><span class="line">    product_event.set()</span><br><span class="line">    print(<span class="string">f"product_event state: <span class="subst">{product_event.is_set()}</span>"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">consume</span>():</span></span><br><span class="line">    print(<span class="string">"consumer start wait ..."</span>)</span><br><span class="line">    product_event.wait(timeout=<span class="number">10</span>)</span><br><span class="line">    print(<span class="string">f"product_event state: <span class="subst">{product_event.is_set()}</span>"</span>)</span><br><span class="line">    product_event.clear()</span><br><span class="line">    print(<span class="string">"product consumed."</span>)</span><br><span class="line">    print(<span class="string">f"product_event state: <span class="subst">{product_event.is_set()}</span>"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">t_pro = threading.Thread(name=<span class="string">"producer"</span>, target=produce)</span><br><span class="line">t_con = threading.Thread(name=<span class="string">"consumer"</span>, target=consume)</span><br><span class="line"></span><br><span class="line">t_pro.start()</span><br><span class="line">t_con.start()</span><br><span class="line"><span class="comment"># product_event state: False</span></span><br><span class="line"><span class="comment"># start produce ...</span></span><br><span class="line"><span class="comment"># consumer start wait ...</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 等待10秒</span></span><br><span class="line"><span class="comment"># product produced.</span></span><br><span class="line"><span class="comment"># product_event state: True</span></span><br><span class="line"><span class="comment"># product_event state: True</span></span><br><span class="line"><span class="comment"># product consumed.</span></span><br><span class="line"><span class="comment"># product_event state: False</span></span><br></pre></td></tr></tbody></table></figure><script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/04/05/dai-kan/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/04/05/dai-kan/" class="post-title-link" itemprop="url">带看</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-04-04 16:21:41" itemprop="dateCreated datePublished" datetime="2021-04-04T16:21:41Z">2021-04-04</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-06-30 03:02:11" itemprop="dateModified" datetime="2021-06-30T03:02:11Z">2021-06-30</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <ol>
-<li>链表</li>
-</ol>
-<p>206，翻转链表，206. Reverse Linked List：</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">reverseList</span>(<span class="params">head</span>):</span></span><br><span class="line">    cur, prev = head, <span class="literal">None</span></span><br><span class="line">    <span class="keyword">while</span> cur:</span><br><span class="line">        cur.next, prev, cur = prev, cur, cur.next</span><br><span class="line">    <span class="keyword">return</span> prev</span><br><span class="line">            <span class="comment"># 跳出while循环时，cur 为 None</span></span><br></pre></td></tr></tbody></table></figure>
-<p>141，检测链表是否有环：Linked List Cycle</p>
-<p>链表不可能有多个环，因为一个节点不能有两个后继指针；<br>可行方案：<br>1、遍历是否能够出现 NIL 空指针；<br>2、使用 Set 存储已访问过的节点，如果当前待遍历的节点已存储在Set集合中，则证明有环；<br>3、快慢指针：慢指针一次走一步，快指针一次走两步，如果有环，两者一定会相遇；<br>def hasCycle(head):<br>    slow = fast  = head<br>    while slow and fast and fast.next:<br>        slow = slow.next<br>        fast = fast.next.next<br>        if slow == fast:<br>            return True<br>    return False</p>
-<ol start="2">
-<li><p>使用装饰器实现统计函数执行时间import time</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">time_counter</span>(<span class="params">func</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">wrapper</span>():</span></span><br><span class="line">        start_time = time.time()</span><br><span class="line">        func()</span><br><span class="line">        end_time = time.time()</span><br><span class="line">        running_time = end_time - start_time</span><br><span class="line">        print(<span class="string">"func running time is {}"</span>.format(running_time))</span><br><span class="line">        <span class="keyword">return</span> running_time</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> wrapper</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@time_counter</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">some_func</span>():</span>  <span class="comment"># 需要被统计运行时间的函数, some_func = time_counter(some_func)</span></span><br><span class="line">    <span class="comment"># do something</span></span><br><span class="line">    time.sleep(<span class="number">1.11</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">some_func()</span><br></pre></td></tr></tbody></table></figure>
-</li>
-<li><p>输入一个ip地址，返回下一个连续的ip地址.例如：输入192.168.1.23，返回192.168.1.24MAX_IP = ‘255.255.255.255’</p>
-</li>
-</ol>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_next_valid_ip</span>(<span class="params">ip</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    ip字符串 --&gt; 二进制数字 --&gt; 十进制数字</span></span><br><span class="line"><span class="string">            --&gt; 十进制数字 + 1 --&gt; next_ip字符串</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    current_ip = ip.strip()[:]</span><br><span class="line">    <span class="keyword">if</span> current_ip == MAX_IP:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">'0.0.0.0'</span></span><br><span class="line"></span><br><span class="line">    ip = ip.split(<span class="string">'.'</span>)</span><br><span class="line">    <span class="comment"># 判断是否存在非法ip数字</span></span><br><span class="line">    invalid_ip_nums = [i <span class="keyword">for</span> i <span class="keyword">in</span> ip <span class="keyword">if</span> (int(i) &gt; <span class="number">2</span> ** <span class="number">8</span> - <span class="number">1</span>) <span class="keyword">or</span> (int(i) &lt; <span class="number">0</span>)]</span><br><span class="line">    <span class="keyword">if</span> invalid_ip_nums:</span><br><span class="line">        <span class="comment"># print("{} is invalid ip, please check".format(current_ip))</span></span><br><span class="line">        <span class="keyword">raise</span> Exception(<span class="string">"{} is invalid ip, please check"</span>.format(current_ip))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 转为二进制数字</span></span><br><span class="line">    old_ip = [bin(int(i)) <span class="keyword">for</span> i <span class="keyword">in</span> ip[:]]</span><br><span class="line">    <span class="keyword">for</span> i, value <span class="keyword">in</span> enumerate(old_ip):  <span class="comment"># 补齐八位</span></span><br><span class="line">        length = len(value)</span><br><span class="line">        <span class="keyword">if</span> length != <span class="number">10</span>:</span><br><span class="line">            old_ip[i] = <span class="string">'0b'</span> + <span class="string">''</span>.join([<span class="string">'0'</span> <span class="keyword">for</span> _ <span class="keyword">in</span> range(<span class="number">0</span>, <span class="number">10</span>-length)]) + old_ip[i][<span class="number">2</span>:]</span><br><span class="line">    <span class="comment"># 转为十进制数字</span></span><br><span class="line">    old_ip_binary = old_ip[<span class="number">0</span>] + <span class="string">''</span>.join([i[<span class="number">2</span>:] <span class="keyword">for</span> i <span class="keyword">in</span> old_ip[<span class="number">1</span>:<span class="number">4</span>]])</span><br><span class="line">    old_ip_decimal = int(old_ip_binary, <span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 十进制数字加1获得下一个ip</span></span><br><span class="line">    next_ip_decimal = old_ip_decimal + <span class="number">1</span></span><br><span class="line">    <span class="comment"># 十进制转为二进制</span></span><br><span class="line">    next_ip_binary = bin(next_ip_decimal)[<span class="number">2</span>:]</span><br><span class="line">    <span class="comment"># 以步长为8进行切割</span></span><br><span class="line">    next_ip_binary_list = [<span class="string">'0b'</span> + next_ip_binary[<span class="number">8</span>*i:<span class="number">8</span>*(i+<span class="number">1</span>)] <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">0</span>,<span class="number">4</span>)]</span><br><span class="line">    <span class="comment"># 二进制转为十进制</span></span><br><span class="line">    next_ip_decimal_list = [int(i, <span class="number">2</span>) <span class="keyword">for</span> i <span class="keyword">in</span> next_ip_binary_list]</span><br><span class="line">    next_ip = <span class="string">'.'</span>.join([str(i) <span class="keyword">for</span> i <span class="keyword">in</span> next_ip_decimal_list])</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> next_ip</span><br></pre></td></tr></tbody></table></figure>
-
-
-<ol start="5">
-<li>假如有以下函数def return_list(val, list=[]):<br> list.append(val)<br> return list<br>（1）写出相应的运行结果，并解释为什么<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">print(return_list(<span class="number">1</span>))</span><br><span class="line">print(return_list(<span class="number">2</span>, []))</span><br><span class="line">print(return_list(<span class="number">3</span>))</span><br><span class="line"><span class="comment"># [1]</span></span><br><span class="line"><span class="comment"># [2]</span></span><br><span class="line"><span class="comment"># [1, 3]</span></span><br></pre></td></tr></tbody></table></figure>
-<h1 id="使用可变对象为默认参数时，只会初始化一次"><a href="#使用可变对象为默认参数时，只会初始化一次" class="headerlink" title="使用可变对象为默认参数时，只会初始化一次"></a>使用可变对象为默认参数时，只会初始化一次</h1>(2)如果希望预期输出如下，应该怎么修改？ 预期结果[1]<br>[2]<br>[3]<br>代码修改：</li>
-</ol>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">return_list</span>(<span class="params">val, lists=None</span>):</span></span><br><span class="line">     <span class="keyword">if</span> <span class="keyword">not</span> lists:</span><br><span class="line">          lists = []</span><br><span class="line">     lists.append(val)</span><br><span class="line">     <span class="keyword">return</span> lists</span><br></pre></td></tr></tbody></table></figure>
-
-<p>给定一个有序（非降序）数组A，可含有重复元素。找到大于target（目标值）的最小元素位置，目标不存在则返回-1</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">nums = list(map(int,input().split()))</span><br><span class="line">target = int(input())</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">searchRange</span>(<span class="params">nums,target</span>):</span></span><br><span class="line">    n = len(nums)</span><br><span class="line">    <span class="keyword">if</span> n&gt;=<span class="number">1</span>:</span><br><span class="line">        v = n//<span class="number">2</span></span><br><span class="line">        <span class="keyword">if</span> nums[v] == target :</span><br><span class="line">            <span class="keyword">return</span> v</span><br><span class="line">        <span class="keyword">elif</span> target&lt;nums[v]:</span><br><span class="line">            <span class="keyword">return</span> searchRange(nums[:v],target)</span><br><span class="line">        <span class="keyword">elif</span> target&gt;nums[v]:</span><br><span class="line">            <span class="keyword">return</span> searchRange(nums[v+<span class="number">1</span>:],target)</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span></span><br><span class="line"></span><br><span class="line">print(searchRange(nums,target))</span><br></pre></td></tr></tbody></table></figure>
-<p>二分查找最优时间复杂度O(1)，最坏时间复杂度O(N)</p>
-<script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
