@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css" integrity="sha256-2H3fkXt6FEmrReK448mDVGKb3WW2ZZw35gI7vqHOE4Y=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"bubbleboy11.github.io","root":"/","images":"/images","scheme":"Muse","version":"8.6.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="多路通道在真实的世界中，还有一种消息传递场景，那就是消费者有多个消费来源，只要有一个来源生产了数据，消费者就可以读这个数据进行消费。这时候可以将多个来源通道的数据汇聚到目标通道，然后统一在目标通道进行消费。 123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525">
+<meta property="og:type" content="article">
+<meta property="og:title" content="go的select">
+<meta property="og:url" content="https://bubbleboy11.github.io/2021/08/23/go-de-select/index.html">
+<meta property="og:site_name" content="外心人D的博客">
+<meta property="og:description" content="多路通道在真实的世界中，还有一种消息传递场景，那就是消费者有多个消费来源，只要有一个来源生产了数据，消费者就可以读这个数据进行消费。这时候可以将多个来源通道的数据汇聚到目标通道，然后统一在目标通道进行消费。 123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-08-22T16:21:41.000Z">
+<meta property="article:modified_time" content="2021-08-28T02:38:24.557Z">
+<meta property="article:author" content="外心人D">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://bubbleboy11.github.io/2021/08/23/go-de-select/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://bubbleboy11.github.io/2021/08/23/go-de-select/","path":"2021/08/23/go-de-select/","title":"go的select"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>go的select | 外心人D的博客</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="外心人D的博客" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">外心人D的博客</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A4%9A%E8%B7%AF%E9%80%9A%E9%81%93"><span class="nav-text">多路通道</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-overview">
+            <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">外心人D</p>
+  <div class="site-description" itemprop="description">本博客大多内容为慕课和网上博客，并非原创</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">347</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+          </div>
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/08/23/go-de-select/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          go的select
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-08-22 16:21:41" itemprop="dateCreated datePublished" datetime="2021-08-22T16:21:41Z">2021-08-22</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-08-28 02:38:24" itemprop="dateModified" datetime="2021-08-28T02:38:24Z">2021-08-28</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/go/" itemprop="url" rel="index"><span itemprop="name">go</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h4 id="多路通道"><a href="#多路通道" class="headerlink" title="多路通道"></a>多路通道</h4><p>在真实的世界中，还有一种消息传递场景，那就是消费者有多个消费来源，只要有一个来源生产了数据，消费者就可以读这个数据进行消费。这时候可以将多个来源通道的数据汇聚到目标通道，然后统一在目标通道进行消费。</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"fmt"</span></span><br><span class="line">    <span class="string">"time"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 每隔一会生产一个数</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">send</span><span class="params">(ch <span class="keyword">chan</span> <span class="keyword">int</span>, gap time.Duration)</span></span> {</span><br><span class="line">    i := <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> {</span><br><span class="line">        i++</span><br><span class="line">        ch &lt;- i</span><br><span class="line">        time.Sleep(gap)</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="comment">// 将多个原通道内容拷贝到单一的目标通道</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">collect</span><span class="params">(source <span class="keyword">chan</span> <span class="keyword">int</span>, target <span class="keyword">chan</span> <span class="keyword">int</span>)</span></span> {</span><br><span class="line">    <span class="keyword">for</span> v := <span class="keyword">range</span> source {</span><br><span class="line">        target &lt;- v</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="comment">// 从目标通道消费数据</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">recv</span><span class="params">(ch <span class="keyword">chan</span> <span class="keyword">int</span>)</span></span> {</span><br><span class="line">    <span class="keyword">for</span> v := <span class="keyword">range</span> ch {</span><br><span class="line">        fmt.Printf(<span class="string">"receive %d\n"</span>, v)</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="keyword">var</span> ch1 = <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>)</span><br><span class="line">    <span class="keyword">var</span> ch2 = <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>)</span><br><span class="line">    <span class="keyword">var</span> ch3 = <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>)</span><br><span class="line">    <span class="keyword">go</span> send(ch1, time.Second)</span><br><span class="line">    <span class="keyword">go</span> send(ch2, <span class="number">2</span>*time.Second)</span><br><span class="line">    <span class="keyword">go</span> collect(ch1, ch3)</span><br><span class="line">    <span class="keyword">go</span> collect(ch2, ch3)</span><br><span class="line">    recv(ch3)</span><br><span class="line">}</span><br><span class="line">---------</span><br><span class="line">receive <span class="number">1</span></span><br><span class="line">receive <span class="number">1</span></span><br><span class="line">receive <span class="number">2</span></span><br><span class="line">receive <span class="number">2</span></span><br><span class="line">receive <span class="number">3</span></span><br><span class="line">receive <span class="number">4</span></span><br><span class="line">receive <span class="number">3</span></span><br><span class="line">receive <span class="number">5</span></span><br><span class="line">receive <span class="number">6</span></span><br><span class="line">receive <span class="number">4</span></span><br><span class="line">receive <span class="number">7</span></span><br><span class="line">receive <span class="number">8</span></span><br><span class="line">receive <span class="number">5</span></span><br><span class="line">receive <span class="number">9</span></span><br><span class="line">....</span><br></pre></td></tr></tbody></table></figure>
+
+<p>但是上面这种形式比较繁琐，需要为每一种消费来源都单独启动一个汇聚协程。Go 语言为这种使用场景带来了「多路复用」语法糖，也就是下面要讲的 select 语句，它可以同时管理多个通道读写，如果所有通道都不能读写，它就整体阻塞，只要有一个通道可以读写，它就会继续。下面我们使用 select 语句来简化上面的逻辑</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">"fmt"</span></span><br><span class="line"><span class="keyword">import</span> <span class="string">"time"</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">send</span><span class="params">(ch <span class="keyword">chan</span> <span class="keyword">int</span>, gap time.Duration)</span></span> {</span><br><span class="line">    i := <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> {</span><br><span class="line">        i++</span><br><span class="line">        ch &lt;- i</span><br><span class="line">        time.Sleep(gap)</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">recv</span><span class="params">(ch1 <span class="keyword">chan</span> <span class="keyword">int</span>, ch2 <span class="keyword">chan</span> <span class="keyword">int</span>)</span></span> {</span><br><span class="line">    <span class="keyword">for</span> {</span><br><span class="line">        <span class="keyword">select</span> {</span><br><span class="line">        <span class="keyword">case</span> v := &lt;-ch1:</span><br><span class="line">            fmt.Printf(<span class="string">"recv %d from ch1\n"</span>, v)</span><br><span class="line">        <span class="keyword">case</span> v := &lt;-ch2:</span><br><span class="line">            fmt.Printf(<span class="string">"recv %d from ch2\n"</span>, v)</span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="keyword">var</span> ch1 = <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>)</span><br><span class="line">    <span class="keyword">var</span> ch2 = <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>)</span><br><span class="line">    <span class="keyword">go</span> send(ch1, time.Second)</span><br><span class="line">    <span class="keyword">go</span> send(ch2, <span class="number">2</span>*time.Second)</span><br><span class="line">    recv(ch1, ch2)</span><br><span class="line">}</span><br><span class="line">------------</span><br><span class="line">recv <span class="number">1</span> from ch2</span><br><span class="line">recv <span class="number">1</span> from ch1</span><br><span class="line">recv <span class="number">2</span> from ch1</span><br><span class="line">recv <span class="number">3</span> from ch1</span><br><span class="line">recv <span class="number">2</span> from ch2</span><br><span class="line">recv <span class="number">4</span> from ch1</span><br><span class="line">recv <span class="number">3</span> from ch2</span><br><span class="line">recv <span class="number">5</span> from ch1</span><br><span class="line">...</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>select</code>语句选择一组可能的send操作和receive操作去处理。<br>它类似<code>switch</code>，但是只是用来处理通讯(communication)操作。<br>它的<code>case</code>可以是send语句，也可以是receive语句，亦或者default。</p>
+<p><code>receive</code>语句可以将值赋值给一个或者两个变量。它必须是一个receive操作。</p>
+<p>最多允许有一个<code>default case</code>，它可以放在case列表的任何位置，尽管我们大部分会将它放在最后。</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"fmt"</span></span><br><span class="line">    <span class="string">"strconv"</span></span><br><span class="line">    <span class="string">"time"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">collector</span><span class="params">(c <span class="keyword">chan</span> <span class="keyword">string</span>, n <span class="keyword">int</span>)</span></span>{</span><br><span class="line">    <span class="keyword">for</span> {</span><br><span class="line">        time.Sleep(time.Second*<span class="number">1</span>)</span><br><span class="line">        c &lt;- <span class="string">"imooc"</span>+strconv.Itoa(n)</span><br><span class="line">        <span class="comment">//fmt.Println(fmt.Sprintf("%d 获取到了数据"))</span></span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span>{</span><br><span class="line">    msg1 := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">string</span>)</span><br><span class="line">    msg2 := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">string</span>)</span><br><span class="line">    <span class="keyword">go</span> collector(msg1, <span class="number">1</span>)</span><br><span class="line">    <span class="keyword">go</span> collector(msg2, <span class="number">2</span>)</span><br><span class="line">    <span class="comment">//for{</span></span><br><span class="line">    <span class="comment">//    data, ok := &lt;-msg1</span></span><br><span class="line">    <span class="comment">//    if ok {</span></span><br><span class="line">    <span class="comment">//        fmt.Println(data)</span></span><br><span class="line">    <span class="comment">//    }</span></span><br><span class="line">    <span class="comment">//    data, ok = &lt;-msg2</span></span><br><span class="line">    <span class="comment">//    if ok {</span></span><br><span class="line">    <span class="comment">//        fmt.Println(data)</span></span><br><span class="line">    <span class="comment">//    }</span></span><br><span class="line">    <span class="comment">//}</span></span><br><span class="line">    <span class="keyword">for</span>{</span><br><span class="line">        <span class="keyword">select</span> {</span><br><span class="line">        <span class="keyword">case</span> data1 := &lt;- msg1:</span><br><span class="line">            fmt.Println(data1)</span><br><span class="line">        <span class="keyword">case</span> data2 := &lt;- msg2:</span><br><span class="line">            fmt.Println(data2)</span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line">---</span><br><span class="line">imooc1</span><br><span class="line">imooc2</span><br><span class="line">imooc1</span><br><span class="line">imooc2</span><br><span class="line">imooc2</span><br><span class="line">imooc1</span><br><span class="line">imooc1</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">"fmt"</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">fibonacci</span><span class="params">(c, quit <span class="keyword">chan</span> <span class="keyword">int</span>)</span></span> {</span><br><span class="line">    x, y := <span class="number">0</span>, <span class="number">1</span></span><br><span class="line">    <span class="keyword">for</span> {</span><br><span class="line">        <span class="keyword">select</span> {</span><br><span class="line">        <span class="keyword">case</span> c &lt;- x:</span><br><span class="line">            x, y = y, x+y</span><br><span class="line">        <span class="keyword">case</span> &lt;-quit:</span><br><span class="line">            fmt.Println(<span class="string">"quit"</span>)</span><br><span class="line">            <span class="keyword">return</span></span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    c := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>)</span><br><span class="line">    quit := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>)</span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> {</span><br><span class="line">        <span class="keyword">for</span> i := <span class="number">0</span>; i &lt; <span class="number">10</span>; i++ {</span><br><span class="line">            fmt.Println(&lt;-c)</span><br><span class="line">        }</span><br><span class="line">        quit &lt;- <span class="number">0</span></span><br><span class="line">    }()</span><br><span class="line">    fibonacci(c, quit)</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>如果有同时多个case去处理，比如同时有多个channel可以接收数据，那么Go会伪随机的选择一个case处理(pseudo-random)。<br>如果没有case需要处理，则会选择<code>default</code>去处理，如果<code>default case</code>存在的情况下。<br>如果没有<code>default case</code>，则<code>select</code>语句会阻塞，直到某个case需要处理。</p>
+<p>需要注意的是，nil channel上的操作会一直被阻塞，如果没有<code>default case</code>，只有nil channel的select会一直被阻塞。</p>
+<p><code>select</code>语句和<code>switch</code>语句一样，它不是循环，它只会选择一个case来处理，如果想一直处理channel，你可以在外面加一个无限的for循环：</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> {</span><br><span class="line">    <span class="keyword">select</span> {</span><br><span class="line">    <span class="keyword">case</span> c &lt;- x:</span><br><span class="line">        x, y = y, x+y</span><br><span class="line">    <span class="keyword">case</span> &lt;-quit:</span><br><span class="line">        fmt.Println(<span class="string">"quit"</span>)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">    ch1 := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>, <span class="number">1</span>)</span><br><span class="line">    ch2 := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>, <span class="number">1</span>)</span><br><span class="line">    ch1 &lt;- <span class="number">1</span></span><br><span class="line">    ch2 &lt;- <span class="number">2</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">select</span> {</span><br><span class="line">    <span class="keyword">case</span> data := &lt;- ch1:</span><br><span class="line">        fmt.Println(data)</span><br><span class="line">    <span class="keyword">case</span> data := &lt;- ch2:</span><br><span class="line">        fmt.Println(data)</span><br><span class="line">    }</span><br><span class="line">--</span><br><span class="line">随机打印<span class="number">1</span> or <span class="number">2</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>select有很重要的一个应用场景就是处理超时 timeout。<br> 因为上面我们提到，如果没有case需要处理，select语句就会一直阻塞着。这时候我们可能就需要一个超时操作，用来处理超时的情况。<br>下面这个例子我们会在2秒后往channel c1中发送一个数据，但是select设置为1秒超时，因此我们会打印出timeout 1，而不是result 1。</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    c1 := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">string</span>, <span class="number">1</span>)</span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> {</span><br><span class="line">        time.Sleep(time.Second * <span class="number">2</span>)</span><br><span class="line">        c1 &lt;- <span class="string">"result 1"</span></span><br><span class="line">    }()</span><br><span class="line">    <span class="keyword">select</span> {</span><br><span class="line">    <span class="keyword">case</span> res := &lt;-c1:</span><br><span class="line">        fmt.Println(res)</span><br><span class="line">    <span class="keyword">case</span> &lt;-time.After(time.Second * <span class="number">1</span>):</span><br><span class="line">        fmt.Println(<span class="string">"timeout 1"</span>)</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line">---</span><br><span class="line">timeout <span class="number">1</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>其实它利用的是<code>time.After</code>方法，它返回一个类型为<code>&lt;-chan Time</code>的单向的channel，在指定的时间发送一个当前时间给返回的channel中。</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">    timeout := <span class="literal">false</span></span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> {</span><br><span class="line">        <span class="comment">// 该groutine如果执行的间超过了1s，那么就报告给主的 goroutine</span></span><br><span class="line">        time.Sleep(time.Second * <span class="number">2</span>)</span><br><span class="line">        timeout = <span class="literal">true</span></span><br><span class="line">    }()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> {</span><br><span class="line">        <span class="keyword">if</span> timeout {</span><br><span class="line">            fmt.Println(<span class="string">"end"</span>)</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        }</span><br><span class="line">        time.Sleep(time.Millisecond * <span class="number">10</span>)</span><br><span class="line">    }</span><br><span class="line">----</span><br><span class="line">end</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">timeout := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">bool</span>, <span class="number">1</span>)</span><br><span class="line"><span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="comment">// 该groutine如果执行的间超过了1s，那么就报告给主的 goroutine</span></span><br><span class="line">    time.Sleep(time.Second * <span class="number">2</span>)</span><br><span class="line">    timeout &lt;- <span class="literal">true</span></span><br><span class="line">}()</span><br><span class="line"></span><br><span class="line">fmt.Println(&lt;-timeout) <span class="comment">// true</span></span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">    timeout := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">bool</span>, <span class="number">1</span>)</span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> {</span><br><span class="line">        <span class="comment">// 该groutine如果执行的间超过了1s，那么就报告给主的 goroutine</span></span><br><span class="line">        time.Sleep(time.Second * <span class="number">2</span>)</span><br><span class="line">        timeout &lt;- <span class="literal">true</span></span><br><span class="line">    }()</span><br><span class="line">    <span class="keyword">select</span> {</span><br><span class="line">    <span class="keyword">case</span>  &lt;-timeout: <span class="comment">// 没有取值阻塞的方式判断timeout</span></span><br><span class="line">        fmt.Println(<span class="string">"timeout"</span>)</span><br><span class="line">    }</span><br><span class="line">----</span><br><span class="line">timeout</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    timeout := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">bool</span>, <span class="number">2</span>)</span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> {</span><br><span class="line">        <span class="comment">// 该groutine如果执行的间超过了1s，那么就报告给主的 goroutine</span></span><br><span class="line">        time.Sleep(time.Second * <span class="number">5</span>)</span><br><span class="line">        timeout &lt;- <span class="literal">true</span></span><br><span class="line">    }()</span><br><span class="line">    timeout2 := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">bool</span>, <span class="number">2</span>)</span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> {</span><br><span class="line">        <span class="comment">// 该groutine如果执行的间超过了1s，那么就报告给主的 goroutine</span></span><br><span class="line">        time.Sleep(time.Second * <span class="number">1</span>)</span><br><span class="line">        timeout2 &lt;- <span class="literal">true</span></span><br><span class="line">    }()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">select</span> {</span><br><span class="line">    <span class="keyword">case</span> &lt;-timeout:</span><br><span class="line">        fmt.Println(<span class="string">"timeout 5"</span>)</span><br><span class="line">    <span class="keyword">case</span> &lt;-timeout2:</span><br><span class="line">        fmt.Println(<span class="string">"timeout 1"</span>)</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line">----</span><br><span class="line">timeout <span class="number">1</span></span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    timeout := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">bool</span>, <span class="number">2</span>)</span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> {</span><br><span class="line">        <span class="comment">// 该groutine如果执行的间超过了1s，那么就报告给主的 goroutine</span></span><br><span class="line">        time.Sleep(time.Second * <span class="number">5</span>)</span><br><span class="line">        timeout &lt;- <span class="literal">true</span></span><br><span class="line">    }()</span><br><span class="line">    timeout2 := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">bool</span>, <span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> {</span><br><span class="line">        <span class="comment">// 该groutine如果执行的间超过了1s，那么就报告给主的 goroutine</span></span><br><span class="line">        time.Sleep(time.Second * <span class="number">1</span>)</span><br><span class="line">        timeout2 &lt;- <span class="literal">true</span></span><br><span class="line">    }()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">select</span> {</span><br><span class="line">    <span class="keyword">case</span> &lt;-timeout:</span><br><span class="line">        fmt.Println(<span class="string">"timeout"</span>)</span><br><span class="line">    <span class="keyword">case</span> &lt;-timeout2:</span><br><span class="line">        fmt.Println(<span class="string">"timeout"</span>)</span><br><span class="line">    <span class="keyword">default</span>:</span><br><span class="line">        fmt.Println(<span class="string">"one more time"</span>)</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line">----</span><br><span class="line">one more time</span><br></pre></td></tr></tbody></table></figure>
+
+<p>Timer和Ticker</p>
+<p>我们看一下关于时间的两个Channel。<br>timer是一个定时器，代表未来的一个单一事件，你可以告诉timer你要等待多长时间，它提供一个Channel，在将来的那个时间那个Channel提供了一个时间值。下面的例子中第二行会阻塞2秒钟左右的时间，直到时间到了才会继续执行。</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">timer1 := time.NewTimer(time.Second * <span class="number">2</span>)</span><br><span class="line">&lt;-timer1.C</span><br><span class="line">fmt.Println(<span class="string">"Timer 1 expired"</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>当然如果你只是想单纯的等待的话，可以使用time.Sleep来实现。<br>你还可以使用timer.Stop来停止计时器。</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">timer2 := time.NewTimer(time.Second)</span><br><span class="line"><span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> {</span><br><span class="line">    &lt;-timer2.C</span><br><span class="line">    fmt.Println(<span class="string">"Timer 2 expired"</span>)</span><br><span class="line">}()</span><br><span class="line">stop2 := timer2.Stop()</span><br><span class="line"><span class="keyword">if</span> stop2 {</span><br><span class="line">    fmt.Println(<span class="string">"Timer 2 stopped"</span>)</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>ticker是一个定时触发的计时器，它会以一个间隔(interval)往Channel发送一个事件(当前时间)，而Channel的接收者可以以固定的时间间隔从Channel中读取事件。下面的例子中ticker每500毫秒触发一次，你可以观察输出的时间。</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ticker := time.NewTicker(time.Millisecond * <span class="number">500</span>)</span><br><span class="line"><span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="keyword">for</span> t := <span class="keyword">range</span> ticker.C {</span><br><span class="line">        fmt.Println(<span class="string">"Tick at"</span>, t)</span><br><span class="line">    }</span><br><span class="line">}()</span><br></pre></td></tr></tbody></table></figure>
+
+<p>类似timer, ticker也可以通过Stop方法来停止。一旦它停止，接收者不再会从channel中接收数据了。</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/08/23/go-de-context/" rel="prev" title="go的context">
+                  <i class="fa fa-chevron-left"></i> go的context
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">外心人D</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

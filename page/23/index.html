@@ -119,7 +119,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">344</span>
+          <span class="site-state-item-count">347</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -160,6 +160,352 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/socket/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/socket/" class="post-title-link" itemprop="url">socket</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-05-10 02:48:35" itemprop="dateModified" datetime="2021-05-10T02:48:35Z">2021-05-10</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>socket 模拟 文件下载器</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">send_file_2_client</span>(<span class="params">conn, addr</span>):</span></span><br><span class="line">    <span class="comment"># 1.读取客户端请求</span></span><br><span class="line">    file_name = conn.recv(<span class="number">1024</span>).decode(<span class="string">'utf-8'</span>)</span><br><span class="line">    print(<span class="string">'客户端[%s]要下载的文件名：%s'</span> % (str(addr[<span class="number">0</span>]), file_name))</span><br><span class="line">    file_content = <span class="literal">None</span></span><br><span class="line">    <span class="comment"># 2.打开文件读取数据</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        f = open(file_name, <span class="string">'rb'</span>)</span><br><span class="line">        file_content = f.read()</span><br><span class="line">        f.close()</span><br><span class="line">    <span class="keyword">except</span>:</span><br><span class="line">        print(<span class="string">'文件不存在'</span>)</span><br><span class="line">    <span class="comment"># 3.发送文件给客户端</span></span><br><span class="line">    <span class="keyword">if</span> file_content:</span><br><span class="line">        conn.send(file_content)</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span>():</span></span><br><span class="line">    <span class="comment"># 1.创建套接字</span></span><br><span class="line">    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)</span><br><span class="line">    <span class="comment"># 2.绑定监听</span></span><br><span class="line">    server.bind((<span class="string">'127.0.0.1'</span>, <span class="number">9999</span>))</span><br><span class="line">    server.listen(<span class="number">128</span>)</span><br><span class="line">    print(<span class="string">'------服务器连接成功------'</span>)</span><br><span class="line">    <span class="comment"># 3.接收数据，生成新的套接字</span></span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        conn, addr = server.accept()</span><br><span class="line">        print(addr)</span><br><span class="line">        <span class="comment"># 4.调用发送文件函数</span></span><br><span class="line">        send_file_2_client(conn, addr)</span><br><span class="line">        <span class="comment"># 5.关闭套接字</span></span><br><span class="line">        conn.close()</span><br><span class="line">    server.close()</span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></tbody></table></figure>
+<p>客户端代码</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span>():</span></span><br><span class="line">    <span class="comment"># 1.创建套接字</span></span><br><span class="line">    client = socket.socket(socket.AF_INET,socket.SOCK_STREAM)</span><br><span class="line">    <span class="comment"># 2.获取服务器ip port 并连接</span></span><br><span class="line">    client.connect((<span class="string">'127.0.0.1'</span>,<span class="number">9999</span>))</span><br><span class="line">    print(<span class="string">'-------连接成功-------'</span>)</span><br><span class="line">    <span class="comment"># 3.获取下载文件的名字并发送给服务器</span></span><br><span class="line">    file_name = input(<span class="string">'请输入要下载的文件名：'</span>)</span><br><span class="line">    client.send(file_name.encode(<span class="string">'utf-8'</span>))</span><br><span class="line">    <span class="comment"># 4.接收文件中的数据</span></span><br><span class="line">    recv_data = client.recv(<span class="number">1024</span>)</span><br><span class="line">    <span class="comment"># 5.保存接收到的数据并保存到文件中</span></span><br><span class="line">    <span class="keyword">if</span> recv_data:</span><br><span class="line">        <span class="keyword">with</span> open(<span class="string">'new'</span>+file_name,<span class="string">'wb'</span>) <span class="keyword">as</span> f:</span><br><span class="line">            f.write(recv_data)</span><br><span class="line">    <span class="comment"># 6.关闭套接字</span></span><br><span class="line">    client.close()</span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></tbody></table></figure>
+<p>同级目录下先准备好一个文件当作服务端文件，下载本地后拼接新的名字，如果要下载的文件不存在会提示报错！</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/sort-sorted/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/sort-sorted/" class="post-title-link" itemprop="url">sort sorted</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-07-09 04:08:15" itemprop="dateModified" datetime="2021-07-09T04:08:15Z">2021-07-09</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="list-sort"><a href="#list-sort" class="headerlink" title="list.sort()"></a><code>list.sort()</code></h1><p>只是为列表定义的，返回的是对已经存在的列表进行操作，没有新建列表</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">a = [<span class="number">5</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">1</span>, <span class="number">4</span>]</span><br><span class="line">a.sort()  <span class="comment"># sort返回的是对已经存在的列表进行操作</span></span><br><span class="line">print(a)  <span class="comment"># [1, 2, 3, 4, 5]</span></span><br><span class="line">print([<span class="number">5</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">1</span>, <span class="number">4</span>].sort())  <span class="comment"># None sort返回的是对已经存在的列表进行操作，没有新建列表</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>sorted(iterable, key=None, reverse=False)</code><br>返回的是一个新的对所有可迭代的对象进行排序操作的列表，而不是在原来的基础上进行的操作。<br>iterable – 可迭代对象。<br>key – 用来进行比较的元素，只有一个参数，具体的函数的参数就是取自于可迭代对象中，<br>指定可迭代对象中的一个元素来进行排序。<br>Key参数/键函数<br>从python2.4开始，list.sort()和sorted()函数增加了key参数来指定在进行比较前要在每个列表元素上调用的函数（或其他可调用对象）。<br>key 形参的值应该是个函数（或其他可调用对象），它接受一个参数并返回一个用于排序的键。 这种机制速度很快，因为对于每个输入记录只会调用一次键函数。</p>
+<p>reverse – 排序规则，reverse = True 降序 ，reverse = False 升序（默认）。</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">example_list = [<span class="number">5</span>, <span class="number">0</span>, <span class="number">6</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">7</span>, <span class="number">3</span>, <span class="number">4</span>]</span><br><span class="line">result_list = sorted(example_list)</span><br><span class="line">print(result_list)</span><br><span class="line"><span class="comment"># [0, 1, 2, 3, 4, 5, 6, 7]默认升序</span></span><br><span class="line">result_list = sorted(example_list, reverse=<span class="literal">True</span>)</span><br><span class="line">print(result_list)</span><br><span class="line"><span class="comment"># [7, 6, 5, 4, 3, 2, 1, 0] 反转降序</span></span><br><span class="line">result_list = sorted(example_list, key=<span class="keyword">lambda</span> x: x * <span class="number">-1</span>)</span><br><span class="line">print(result_list)</span><br><span class="line"><span class="comment"># [7, 6, 5, 4, 3, 2, 1, 0]</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="将列表-1-2-3-4-5-6-7-8-9-按照元素与5距离从小到大进行排序"><a href="#将列表-1-2-3-4-5-6-7-8-9-按照元素与5距离从小到大进行排序" class="headerlink" title="将列表[1, 2, 3, 4, 5, 6, 7, 8, 9]按照元素与5距离从小到大进行排序"></a>将列表[1, 2, 3, 4, 5, 6, 7, 8, 9]按照元素与5距离从小到大进行排序</h2><p>法一</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">print(sorted([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>], key=<span class="keyword">lambda</span> x: abs(<span class="number">5</span> - x)))  </span><br><span class="line"><span class="comment"># [5, 4, 6, 3, 7, 2, 8, 1, 9]</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>法二</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">list = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">run</span>(<span class="params">x</span>):</span></span><br><span class="line">    <span class="keyword">return</span> abs(<span class="number">5</span> - x)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">print(sorted(list, key=run))  <span class="comment"># [5, 4, 6, 3, 7, 2, 8, 1, 9]</span></span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">print(sorted({<span class="number">1</span>: <span class="string">'D'</span>, <span class="number">2</span>: <span class="string">'B'</span>, <span class="number">3</span>: <span class="string">'B'</span>, <span class="number">4</span>: <span class="string">'E'</span>, <span class="number">5</span>: <span class="string">'A'</span>}))</span><br><span class="line"><span class="comment"># [1, 2, 3, 4, 5]</span></span><br><span class="line">print(sorted({<span class="number">1</span>: <span class="string">'D'</span>, <span class="number">2</span>: <span class="string">'B'</span>, <span class="number">3</span>: <span class="string">'B'</span>, <span class="number">4</span>: <span class="string">'E'</span>, <span class="number">5</span>: <span class="string">'A'</span>}, key=<span class="keyword">lambda</span> x: x * <span class="number">-1</span>))</span><br><span class="line"><span class="comment"># [5, 4, 3, 2, 1]</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>通过key指定的内置函数来</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 按照小写字母排序</span></span><br><span class="line">print(sorted(<span class="string">"This is a test string from Andrew"</span>.split(), key=str.lower))</span><br><span class="line"><span class="comment"># ['a', 'Andrew', 'from', 'is', 'string', 'test', 'This']</span></span><br><span class="line"></span><br><span class="line">print(sorted([<span class="string">"adf"</span>, <span class="string">"Adfdg"</span>, <span class="string">"aDfgbdfafg"</span>, <span class="string">"Gahgfh"</span>], key = str.lower)) <span class="comment">#输出 ['adf', 'Adfdg', 'aDfgbdfafg', 'Gahgfh']</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 把数组按照长度大小进行排序，只需设置key等于一个函数即可</span></span><br><span class="line">sorted([<span class="string">"adf"</span>, <span class="string">"Adfdg"</span>, <span class="string">"aDfgbdfafg"</span>, <span class="string">"Gahgfh"</span>], key = len) </span><br><span class="line"><span class="comment">#输出 ['adf', 'adfdg', 'gahgfh', 'adfgbdfafg']</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>一种常见的模式是使用对象的一些索引作为键对复杂对象进行排序。例如：</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>student_tuples = [</span><br><span class="line">        (<span class="string">'john'</span>, <span class="string">'A'</span>, <span class="number">15</span>),</span><br><span class="line">        (<span class="string">'jane'</span>, <span class="string">'B'</span>, <span class="number">12</span>),</span><br><span class="line">        (<span class="string">'dave'</span>, <span class="string">'B'</span>, <span class="number">10</span>),</span><br><span class="line">]</span><br><span class="line"><span class="comment"># sort by age</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>sorted(student_tuples, key=<span class="keyword">lambda</span> student: student[<span class="number">2</span>])</span><br><span class="line">[(<span class="string">'dave'</span>, <span class="string">'B'</span>, <span class="number">10</span>), (<span class="string">'jane'</span>, <span class="string">'B'</span>, <span class="number">12</span>), (<span class="string">'john'</span>, <span class="string">'A'</span>, <span class="number">15</span>)]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>同样的技术也适用拥有命名属性的对象，例如：</p>
+<p>在排序时, 可以用lambda表达式将对象map成keys<br>亦可以使用operator包中的attrgetter和itemgetter函数以提高效率</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Student</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, name, grade, age</span>):</span></span><br><span class="line">        self.name = name</span><br><span class="line">        self.grade = grade</span><br><span class="line">        self.age = age</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> repr((self.name, self.grade, self.age))</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__str__</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"{}-{}-{}"</span>.format(self.name, self.grade, self.age)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 建立一组Student对象</span></span><br><span class="line">students = [</span><br><span class="line">    Student(<span class="string">'jane'</span>, <span class="string">'B'</span>, <span class="number">12</span>),</span><br><span class="line">    Student(<span class="string">'john'</span>, <span class="string">'A'</span>, <span class="number">15</span>),</span><br><span class="line">    Student(<span class="string">'dave'</span>, <span class="string">'B'</span>, <span class="number">10</span>),</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">print(sorted(students, key=<span class="keyword">lambda</span> o: o.age))</span><br><span class="line"><span class="comment"># [('dave', 'B', 10), ('jane', 'B', 12), ('john', 'A', 15)]</span></span><br><span class="line"></span><br><span class="line">students.sort(key=<span class="keyword">lambda</span> x: x.age)</span><br><span class="line"><span class="keyword">for</span> item <span class="keyword">in</span> students:</span><br><span class="line">    print(item)</span><br><span class="line"><span class="comment"># dave-B-10</span></span><br><span class="line"><span class="comment"># jane-B-12</span></span><br><span class="line"><span class="comment"># john-A-15</span></span><br><span class="line"></span><br><span class="line">students.sort(key=<span class="keyword">lambda</span> x: x.grade)</span><br><span class="line"><span class="keyword">for</span> item <span class="keyword">in</span> students:</span><br><span class="line">    print(item)</span><br><span class="line"><span class="comment"># john-A-15</span></span><br><span class="line"><span class="comment"># dave-B-10</span></span><br><span class="line"><span class="comment"># jane-B-12</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> operator <span class="keyword">import</span> itemgetter, attrgetter</span><br><span class="line"></span><br><span class="line">print(sorted(students, key=itemgetter(<span class="number">2</span>)))</span><br><span class="line"><span class="comment"># TypeError: 'Student' object is not subscriptable</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 对students按照年龄排序</span></span><br><span class="line">print(sorted(students, key=attrgetter(<span class="string">'age'</span>)))</span><br><span class="line"><span class="comment"># [('dave', 'B', 10), ('jane', 'B', 12), ('john', 'A', 15)]</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Operator 模块功能允许多级排序。 先按age再按grade排序</span></span><br><span class="line">print(sorted(students, key=attrgetter(<span class="string">'age'</span>, <span class="string">'grade'</span>)))</span><br><span class="line"><span class="comment"># [('dave', 'B', 10), ('jane', 'B', 12), ('john', 'A', 15)]</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 例如，要按 grade 降序然后 age 升序对学生数据进行排序，请先 age 排序，然后再使用 grade 排序：</span></span><br><span class="line"><span class="comment"># sort on secondary key</span></span><br><span class="line">s = sorted(students, key=attrgetter(<span class="string">'age'</span>))</span><br><span class="line"><span class="comment"># now sort on primary key, descending</span></span><br><span class="line">print(sorted(s, key=attrgetter(<span class="string">'grade'</span>), reverse=<span class="literal">True</span>))</span><br><span class="line"><span class="comment"># [('dave', 'B', 10), ('jane', 'B', 12), ('john', 'A', 15)]</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 抽象为一个包装函数，该函数能接受一个列表以及字段和顺序的元组，以对它们进行多重排序。</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">multisort</span>(<span class="params">xs, specs</span>):</span></span><br><span class="line">    <span class="keyword">for</span> key, reverse <span class="keyword">in</span> reversed(specs):</span><br><span class="line">        xs.sort(key=attrgetter(key), reverse=reverse)</span><br><span class="line">    <span class="keyword">return</span> xs</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">print(multisort(list(students), ((<span class="string">'grade'</span>, <span class="literal">True</span>), (<span class="string">'age'</span>, <span class="literal">False</span>))))</span><br><span class="line"><span class="comment"># [('dave', 'B', 10), ('jane', 'B', 12), ('john', 'A', 15)]</span></span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> operator <span class="keyword">import</span> itemgetter, attrgetter</span><br><span class="line"></span><br><span class="line">__author__ = <span class="string">'blackmatrix'</span></span><br><span class="line"></span><br><span class="line">get_name = <span class="keyword">lambda</span> user: user[<span class="string">'name'</span>]</span><br><span class="line"></span><br><span class="line">get_address = <span class="keyword">lambda</span> user: getattr(user, <span class="string">'address'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">User</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, name, address</span>):</span></span><br><span class="line">        self.name = name</span><br><span class="line">        self.address = address</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">laowang = {<span class="string">'name'</span>: <span class="string">'老王'</span>, <span class="string">'address'</span>: <span class="string">'隔壁'</span>}</span><br><span class="line">laoli = User(<span class="string">'老李'</span>, <span class="string">'楼下'</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    <span class="comment"># itemgetter('name') 和 get_name 作用是相同的</span></span><br><span class="line">    <span class="comment"># 都是接受一个对象，获取对象key为name的值</span></span><br><span class="line">    <span class="comment"># 主要用来替代只是为了获取value的lambda函数</span></span><br><span class="line">    print(itemgetter(<span class="string">'name'</span>)(laowang))  <span class="comment"># 老王</span></span><br><span class="line">    print(itemgetter(<span class="string">'address'</span>)(laowang))  <span class="comment"># 隔壁</span></span><br><span class="line">    print(get_name(laowang))  <span class="comment"># 老王</span></span><br><span class="line">    <span class="comment"># print(get_address(laowang))  # 'dict' object has no attribute 'address'  </span></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    <span class="comment"># 同样的，attrgetter('address')也是等同于get_address</span></span><br><span class="line">    <span class="comment"># 用来替代只为了获取attr的lambda函数</span></span><br><span class="line">    print(attrgetter(<span class="string">'address'</span>)(laoli))  <span class="comment"># 楼下</span></span><br><span class="line">    print(get_address(laoli))  <span class="comment"># 楼下</span></span><br></pre></td></tr></tbody></table></figure>
+
+
+<p>多字段排序<br>按照第一个数从小到大排序，如果第一个数相同，就按第二个数从大到小。</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a = [[<span class="number">2</span>,<span class="number">3</span>],[<span class="number">4</span>,<span class="number">1</span>],(<span class="number">2</span>,<span class="number">8</span>),(<span class="number">2</span>,<span class="number">1</span>),(<span class="number">3</span>,<span class="number">4</span>)]</span><br><span class="line">sorted(a, key = <span class="keyword">lambda</span> x: (x[<span class="number">0</span>], -x[<span class="number">1</span>]))</span><br><span class="line"><span class="comment"># [(2, 8), [2, 3], (2, 1), (3, 4), [4, 1]]</span></span><br></pre></td></tr></tbody></table></figure>
+<p>其实掌握自定义规则排序，多字段排序也就会了，因为它是自定义排序的子集！</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line">array = [{</span><br><span class="line">    <span class="string">"age"</span>: <span class="number">20</span>,</span><br><span class="line">    <span class="string">"name"</span>: <span class="string">"a"</span></span><br><span class="line">}, {</span><br><span class="line">    <span class="string">"age"</span>: <span class="number">25</span>,</span><br><span class="line">    <span class="string">"name"</span>: <span class="string">"b"</span></span><br><span class="line">}, {</span><br><span class="line">    <span class="string">"age"</span>: <span class="number">10</span>,</span><br><span class="line">    <span class="string">"name"</span>: <span class="string">"c"</span></span><br><span class="line">}]</span><br><span class="line"><span class="comment"># 法一</span></span><br><span class="line">array = sorted(array, key=<span class="keyword">lambda</span> x: x[<span class="string">"age"</span>])</span><br><span class="line">print(array)</span><br><span class="line"><span class="comment"># [{'age': 10, 'name': 'c'}, {'age': 20, 'name': 'a'}, {'age': 25, 'name': 'b'}]</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 法二</span></span><br><span class="line"><span class="comment"># def by_age(info):</span></span><br><span class="line"><span class="comment">#     array = [{"age": 20, "name": "a"}, {"age": 25, "name": "b"}, {"age": 10, "name": "c"}]</span></span><br><span class="line"><span class="comment">#     return array.</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># l1 = sorted(array, key=by_age)</span></span><br><span class="line"><span class="comment"># print('***')</span></span><br><span class="line"><span class="comment"># print(l1)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 多列排序</span></span><br><span class="line"><span class="comment"># 先按照成绩降序排序，相同成绩的按照名字升序排序：</span></span><br><span class="line">d1 = [{</span><br><span class="line">    <span class="string">'name'</span>: <span class="string">'alice'</span>,</span><br><span class="line">    <span class="string">'score'</span>: <span class="number">38</span></span><br><span class="line">}, {</span><br><span class="line">    <span class="string">'name'</span>: <span class="string">'bob'</span>,</span><br><span class="line">    <span class="string">'score'</span>: <span class="number">18</span></span><br><span class="line">}, {</span><br><span class="line">    <span class="string">'name'</span>: <span class="string">'darl'</span>,</span><br><span class="line">    <span class="string">'score'</span>: <span class="number">28</span></span><br><span class="line">}, {</span><br><span class="line">    <span class="string">'name'</span>: <span class="string">'christ'</span>,</span><br><span class="line">    <span class="string">'score'</span>: <span class="number">28</span></span><br><span class="line">}]</span><br><span class="line">l = sorted(d1, key=<span class="keyword">lambda</span> x: (-x[<span class="string">'score'</span>], x[<span class="string">'name'</span>]))</span><br><span class="line">print(l)</span><br><span class="line"><span class="comment"># 输出结果：</span></span><br><span class="line"><span class="comment"># [{'name': 'alice', 'score': 38}, {'name': 'christ', 'score': 28}, {'name': 'darl', 'score': 28}, {'name': 'bob', 'score': 18}]</span></span><br><span class="line"></span><br><span class="line">dictionary = {<span class="string">'name'</span>: <span class="string">'Ashe'</span>, <span class="string">'age'</span>: <span class="number">18</span>, <span class="string">'city'</span>: <span class="string">'Guilin'</span>, <span class="string">'tel'</span>: <span class="string">'110'</span>}</span><br><span class="line">print(<span class="string">'---------'</span>)</span><br><span class="line"><span class="comment"># dict.items()结果是键值对元组</span></span><br><span class="line">print(dictionary.items())</span><br><span class="line"><span class="comment"># dict_items([('name', 'Ashe'), ('age', 18), ('city', 'Guilin'), ('tel', '110')])</span></span><br><span class="line"><span class="comment"># i[0]表示key i[1]表示value</span></span><br><span class="line">list = sorted(dictionary.items(), key=<span class="keyword">lambda</span> i: i[<span class="number">0</span>], reverse=<span class="literal">False</span>)  <span class="comment"># 不反转，即升序</span></span><br><span class="line">print(<span class="string">'sorted根据字典key排序'</span>, list)</span><br><span class="line">print(<span class="string">'-----'</span>)</span><br><span class="line">new_dict = {}</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> list:</span><br><span class="line">    new_dict[i[<span class="number">0</span>]] = i[<span class="number">1</span>]</span><br><span class="line">print(<span class="string">'new dict'</span>, new_dict)</span><br><span class="line">print(<span class="string">'***'</span>)</span><br><span class="line"><span class="comment"># list = sorted(dictionary.items(), key=lambda i: i[1], reverse=False)</span></span><br><span class="line"><span class="comment"># print('sorted根据字典value排序', list)</span></span><br><span class="line"><span class="comment"># new_dict = {}</span></span><br><span class="line"><span class="comment"># for i in list:</span></span><br><span class="line"><span class="comment">#     new_dict[i[0]] = i[1]</span></span><br><span class="line"><span class="comment"># print('***')</span></span><br><span class="line"><span class="comment"># print('new dict', new_dict)</span></span><br></pre></td></tr></tbody></table></figure>
+
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">L = [(<span class="string">'Bob'</span>, <span class="number">75</span>), (<span class="string">'Adam'</span>, <span class="number">92</span>), (<span class="string">'Bart'</span>, <span class="number">66</span>), (<span class="string">'Lisa'</span>, <span class="number">88</span>)]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">by_name</span>(<span class="params">info</span>):</span>  <span class="comment"># 名字排序</span></span><br><span class="line">    <span class="comment"># print(info[0])</span></span><br><span class="line">    <span class="keyword">return</span> info[<span class="number">0</span>]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">by_grade</span>(<span class="params">info</span>):</span>  <span class="comment"># 成绩排序</span></span><br><span class="line">    <span class="keyword">return</span> info[<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">L1 = sorted(L, key=by_name)</span><br><span class="line">L2 = sorted(L, key=by_name, reverse=<span class="literal">True</span>)</span><br><span class="line">L3 = sorted(L, key=by_grade)</span><br><span class="line">L4 = sorted(L, key=by_grade, reverse=<span class="literal">True</span>)</span><br><span class="line">print(L1)</span><br><span class="line">print(L2)</span><br><span class="line">print(L3)</span><br><span class="line">print(L4)</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight scheme"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[(<span class="symbol">'Adam</span>', <span class="number">92</span>), (<span class="symbol">'Bart</span>', <span class="number">66</span>), (<span class="symbol">'Bob</span>', <span class="number">75</span>), (<span class="symbol">'Lisa</span>', <span class="number">88</span>)]</span><br><span class="line">[(<span class="symbol">'Lisa</span>', <span class="number">88</span>), (<span class="symbol">'Bob</span>', <span class="number">75</span>), (<span class="symbol">'Bart</span>', <span class="number">66</span>), (<span class="symbol">'Adam</span>', <span class="number">92</span>)]</span><br><span class="line">[(<span class="symbol">'Bart</span>', <span class="number">66</span>), (<span class="symbol">'Bob</span>', <span class="number">75</span>), (<span class="symbol">'Lisa</span>', <span class="number">88</span>), (<span class="symbol">'Adam</span>', <span class="number">92</span>)]</span><br><span class="line">[(<span class="symbol">'Adam</span>', <span class="number">92</span>), (<span class="symbol">'Lisa</span>', <span class="number">88</span>), (<span class="symbol">'Bob</span>', <span class="number">75</span>), (<span class="symbol">'Bart</span>', <span class="number">66</span>)]</span><br></pre></td></tr></tbody></table></figure><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/turtle/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/turtle/" class="post-title-link" itemprop="url">turtle</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-04-02 12:24:45" itemprop="dateModified" datetime="2021-04-02T12:24:45Z">2021-04-02</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>turtle在屏幕上绘制图形<br>1.画布(canvas)<br>画布就是turtle为我们展开用于绘图区域默认大小(400, 300)，我们可以设置它的大小和初始位置。</p>
+<p>2.画笔（pen）<br>2.1画笔的状态<br>在画布上，默认有一个坐标原点为画布中心的坐标轴，坐标原点上有一只面朝x轴正方向小乌龟。这里我们描述小乌龟时使用了两个词语：坐标原点(位置)，面朝x轴正方向(方向)， turtle绘图中，就是使用位置方向描述小乌龟(画笔)的状态。</p>
+<p>2.2 画笔的属性<br>画笔(画笔的属性，颜色、画线的宽度等)</p>
+<p>turtle.pensize()：设置画笔的宽度；<br>turtle.pencolor()：没有参数传入，返回当前画笔颜色，传入参数设置画笔颜色，可以是字符串如”green”,&nbsp;“red”,也可以是RGB&nbsp;3元组。<br>turtle.speed(speed)：设置画笔移动速度，画笔绘制的速度范围[0,10]整数，数字越大越快。<br>2.3 绘图命令<br>操纵海龟绘图有着许多的命令，这些命令可以划分为3种：一种为运动命令，一种为画笔控制命令，还有一种是全局控制命令。</p>
+<p>2.3.1 画笔运动命令:</p>
+<p>命令    说明<br>turtle.home()    将turtle移动到起点（0,0）和向东<br>turtle.speed(speed)    画笔绘制的速度范围[0,10]整数<br>turtle.forward(distance)    向当前画笔方向移动distance像素长<br>turtle.backward(distance)    向当前画笔相反方向移动distance像素长度<br>turtle.right(degree)    顺时针移动degree°<br>turtle.left(degree)    逆时针移动degree°<br>turtle.pendown()    移动时绘制图形放下笔,,默认绘制<br>turtle.penup()    移动时不绘制图形,提起笔，用于另起一个地方绘制时用<br>turtle.circle(r,extent,step)    绘制一个指定半径、弧度范围、阶数(正多边形)的圆<br>turtle.dot(diameter,color)    绘制一个指定直径和颜色的圆</p>
+<p>绘制长方形</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> turtle</span><br><span class="line"></span><br><span class="line">turtle.pensize(<span class="number">4</span>)</span><br><span class="line">turtle.pencolor(<span class="string">'red'</span>)</span><br><span class="line"></span><br><span class="line">turtle.forward(<span class="number">100</span>)</span><br><span class="line">turtle.right(<span class="number">90</span>)</span><br><span class="line">turtle.forward(<span class="number">100</span>)</span><br><span class="line">turtle.right(<span class="number">90</span>)</span><br><span class="line">turtle.forward(<span class="number">100</span>)</span><br><span class="line">turtle.right(<span class="number">90</span>)</span><br><span class="line">turtle.forward(<span class="number">100</span>)</span><br><span class="line"></span><br><span class="line">turtle.mainloop()</span><br></pre></td></tr></tbody></table></figure>
+
+<p>绘制奥运五环</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> turtle</span><br><span class="line">turtle.width(<span class="number">10</span>)</span><br><span class="line">turtle.color(<span class="string">"blue"</span>)</span><br><span class="line">turtle.circle(<span class="number">50</span>)</span><br><span class="line">turtle.color(<span class="string">"black"</span>)</span><br><span class="line">turtle.penup()</span><br><span class="line">turtle.goto(<span class="number">120</span>, <span class="number">0</span>)</span><br><span class="line">turtle.pendown()</span><br><span class="line">turtle.circle(<span class="number">50</span>)</span><br><span class="line">turtle.color(<span class="string">"red"</span>)</span><br><span class="line">turtle.penup()</span><br><span class="line">turtle.goto(<span class="number">240</span>, <span class="number">0</span>)</span><br><span class="line">turtle.pendown()</span><br><span class="line">turtle.circle(<span class="number">50</span>)</span><br><span class="line">turtle.color(<span class="string">"yellow"</span>)</span><br><span class="line">turtle.penup()</span><br><span class="line">turtle.goto(<span class="number">60</span>, <span class="number">-50</span>)</span><br><span class="line">turtle.pendown()</span><br><span class="line">turtle.circle(<span class="number">50</span>)</span><br><span class="line">turtle.color(<span class="string">"green"</span>)</span><br><span class="line">turtle.penup()</span><br><span class="line">turtle.goto(<span class="number">180</span>, <span class="number">-50</span>)</span><br><span class="line">turtle.pendown()</span><br><span class="line">turtle.circle(<span class="number">50</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> turtle <span class="comment">#导入 turtle 模块</span></span><br><span class="line">turtle.showturtle() <span class="comment">#显示箭头</span></span><br><span class="line">turtle.write(<span class="string">"xy"</span>) <span class="comment">#写字符串</span></span><br><span class="line">turtle.forward(<span class="number">300</span>) <span class="comment">#前进 300 像素</span></span><br><span class="line">turtle.color(<span class="string">"red"</span>) <span class="comment">#画笔颜色改为 red</span></span><br><span class="line">turtle.left(<span class="number">90</span>) <span class="comment">#箭头左转 90 度</span></span><br><span class="line">turtle.forward(<span class="number">300</span>)</span><br><span class="line">turtle.goto(<span class="number">0</span>,<span class="number">50</span>) <span class="comment">#去坐标（0,50）</span></span><br><span class="line">turtle.goto(<span class="number">0</span>,<span class="number">0</span>)</span><br><span class="line">turtle.penup() <span class="comment">#抬笔。这样，路径就不会画出来</span></span><br><span class="line">turtle.goto(<span class="number">0</span>,<span class="number">300</span>)</span><br><span class="line">turtle.pendown() <span class="comment">#下笔。这样，路径就会画出来</span></span><br><span class="line">turtle.circle(<span class="number">100</span>) <span class="comment">#画圆</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>pentagram</p>
+<figure class="highlight less"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">import</span> <span class="selector-tag">turtle</span></span><br><span class="line"><span class="selector-tag">import</span> <span class="selector-tag">time</span></span><br><span class="line"></span><br><span class="line"><span class="selector-tag">turtle</span><span class="selector-class">.pensize</span>(<span class="number">5</span>)</span><br><span class="line"><span class="selector-tag">turtle</span><span class="selector-class">.pencolor</span>(<span class="string">"yellow"</span>)</span><br><span class="line"><span class="selector-tag">turtle</span><span class="selector-class">.fillcolor</span>(<span class="string">"red"</span>)</span><br><span class="line"></span><br><span class="line"><span class="selector-tag">turtle</span><span class="selector-class">.begin_fill</span>()</span><br><span class="line"><span class="selector-tag">for</span> <span class="selector-tag">_</span> <span class="selector-tag">in</span> <span class="selector-tag">range</span>(<span class="number">5</span>):</span><br><span class="line">    <span class="selector-tag">turtle</span><span class="selector-class">.forward</span>(<span class="number">200</span>)</span><br><span class="line">    <span class="selector-tag">turtle</span><span class="selector-class">.right</span>(<span class="number">144</span>)</span><br><span class="line"><span class="selector-tag">turtle</span><span class="selector-class">.end_fill</span>()</span><br><span class="line"><span class="selector-tag">time</span><span class="selector-class">.sleep</span>(<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line"><span class="selector-tag">turtle</span><span class="selector-class">.penup</span>()</span><br><span class="line"><span class="selector-tag">turtle</span><span class="selector-class">.goto</span>(-<span class="number">150</span>, -<span class="number">120</span>)</span><br><span class="line"><span class="selector-tag">turtle</span><span class="selector-class">.color</span>(<span class="string">"violet"</span>)</span><br><span class="line"><span class="selector-tag">turtle</span><span class="selector-class">.write</span>(<span class="string">"Done"</span>, font=(<span class="string">'Arial'</span>, <span class="number">40</span>, <span class="string">'normal'</span>))</span><br><span class="line"></span><br><span class="line"><span class="selector-tag">turtle</span><span class="selector-class">.mainloop</span>()</span><br></pre></td></tr></tbody></table></figure><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1085,320 +1431,6 @@ def __new__(*args, **kwargs):
 <figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#  计算200内所有奇数的平分根是整数，需要使用filter函数</span></span><br><span class="line"><span class="comment"># filter 函数传入两个参数，第一个参入的是lambda函数，第二个参数是一到两百的列表</span></span><br><span class="line">f2 = filter(<span class="keyword">lambda</span> x: <span class="keyword">not</span> x &amp; <span class="number">1</span> <span class="keyword">and</span> pow(int(x**<span class="number">0.5</span>), <span class="number">2</span>) == x, range(<span class="number">1</span>, <span class="number">201</span>))</span><br><span class="line"><span class="comment"># not x&amp;1 计算出一到两百所有奇数</span></span><br><span class="line"><span class="comment"># x**0.5计算平分根</span></span><br><span class="line"><span class="comment"># print(pow(3, 2) == 3**2 == 9)  # True</span></span><br><span class="line"><span class="comment"># pow(int(x**0.5), 2) 计算平分根的正整数的平方</span></span><br><span class="line"><span class="comment"># pow(int(x**0.5), 2) == x  平分根的正整数的平方是否等于自己x,x&gt;0,平方根不是整数平方后都变小</span></span><br><span class="line">x = <span class="number">2</span></span><br><span class="line">print(pow(int(x**<span class="number">0.5</span>), <span class="number">2</span>) == x)  <span class="comment"># False 平分根的正整数的平方是否等于自己x</span></span><br><span class="line">print(f2)  <span class="comment"># &lt;filter object at 0x000001C27B350B80&gt;</span></span><br><span class="line">print(list(f2))  <span class="comment"># [4, 16, 36, 64, 100, 144, 196]</span></span><br></pre></td></tr></tbody></table></figure>
 
 <script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/han-shu-shi-bian-cheng-map/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/han-shu-shi-bian-cheng-map/" class="post-title-link" itemprop="url">函数式编程 map</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-05-09 12:27:01" itemprop="dateModified" datetime="2021-05-09T12:27:01Z">2021-05-09</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h3 id="Python支持部分函数式编程特性"><a href="#Python支持部分函数式编程特性" class="headerlink" title="Python支持部分函数式编程特性"></a>Python支持部分函数式编程特性</h3><ul>
-<li>把电脑的运算视作数学上的函数计算（lambda 演算）</li>
-<li>高阶函数：map / reduce / filter</li>
-<li>无副作用，相同的参数调用始终产生同样的结果，可以减少代码出错的几率</li>
-<li>推荐尽量使用列表推导式代替函数式编程</li>
-</ul>
-<h3 id="map-函数应用"><a href="#map-函数应用" class="headerlink" title="map()函数应用"></a>map()函数应用</h3><p>map(function, iterable, …) –&gt; map object<br>func：表示函数。以参数序列中的每一个元素调用 function 函数，<br>*iterables：可以多个可迭代对象。</p>
-<p>让每一个可迭代对象都去应用一下func函数<br>根据提供的函数对指定序列做映射。<br>python2.x版本返回的是列表，而python3.x返回的是迭代器。</p>
-<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>map(<span class="keyword">lambda</span> x:x*<span class="number">2</span>, range(<span class="number">10</span>))</span><br><span class="line">&lt;map object at <span class="number">0x0000029809EAB400</span>&gt;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>list(map(<span class="keyword">lambda</span> x:x*<span class="number">2</span>, range(<span class="number">10</span>)))   <span class="comment"># 每个元素乘以2</span></span><br><span class="line">[<span class="number">0</span>, <span class="number">2</span>, <span class="number">4</span>, <span class="number">6</span>, <span class="number">8</span>, <span class="number">10</span>, <span class="number">12</span>, <span class="number">14</span>, <span class="number">16</span>, <span class="number">18</span>]</span><br><span class="line"><span class="comment"># 推荐列表推导代理 map</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>[i*<span class="number">2</span> <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10</span>)]</span><br><span class="line">[<span class="number">0</span>, <span class="number">2</span>, <span class="number">4</span>, <span class="number">6</span>, <span class="number">8</span>, <span class="number">10</span>, <span class="number">12</span>, <span class="number">14</span>, <span class="number">16</span>, <span class="number">18</span>]</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span>(<span class="params">num</span>):</span></span><br><span class="line">    <span class="keyword">return</span> num * num</span><br><span class="line"></span><br><span class="line">res = map(test, [<span class="number">1</span>, <span class="number">23</span>])</span><br><span class="line">print(list(res))  <span class="comment"># [1, 529]</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># map最终得到结果的元素个数，取决于此三者最短长度</span></span><br><span class="line">list_x = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>]</span><br><span class="line">list_y = [<span class="number">2</span>, <span class="number">4</span>, <span class="number">6</span>, <span class="number">8</span>, <span class="number">9</span>]</span><br><span class="line">list_z = [<span class="number">2</span>, <span class="number">4</span>, <span class="number">6</span>, <span class="number">8</span>, <span class="number">9</span>]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># def函数</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">square</span>(<span class="params">x, y, z</span>):</span></span><br><span class="line">    <span class="keyword">return</span> x * x + y + z</span><br><span class="line"></span><br><span class="line"><span class="comment"># map函数</span></span><br><span class="line">m1 = map(square, list_x, list_y, list_z)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 匿名函数</span></span><br><span class="line">m2 = map(<span class="keyword">lambda</span> x, y, z: x * x + y + z, list_x, list_y, list_z)</span><br><span class="line"></span><br><span class="line">print(list(m1))  <span class="comment"># [5, 12, 21, 32]</span></span><br><span class="line">print(list(m2))  <span class="comment"># [5, 12, 21, 32]</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用map函数将[1，2，3，4]处理成[1,0,1,0]</span></span><br><span class="line">a1 = list(map(<span class="keyword">lambda</span> x: x % <span class="number">2</span>, [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>]))  <span class="comment"># 取余数</span></span><br><span class="line">print(a1)  <span class="comment"># [1, 0, 1, 0]</span></span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 请将列表[1,2,3,4,5]转变成[1,4,9,16,25]。然后提取大于10的数，最终输出[16,25]</span></span><br><span class="line">a = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>]</span><br><span class="line"></span><br><span class="line">print(<span class="string">'-------'</span>)</span><br><span class="line"><span class="comment"># 方法一</span></span><br><span class="line">b = list()</span><br><span class="line">c = list()</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> a:</span><br><span class="line">    b.append(i * i)</span><br><span class="line">print(b)  <span class="comment"># [1, 4, 9, 16, 25]  # 第一步</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> b:</span><br><span class="line">    <span class="keyword">if</span> i &gt; <span class="number">10</span>:</span><br><span class="line">        c.append(i)</span><br><span class="line">print(c)  <span class="comment"># [16, 25]  # 第二步</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 方法二</span></span><br><span class="line">x = list(map(<span class="keyword">lambda</span> x: x * x, a))  <span class="comment"># 第一步 [1, 4, 9, 16, 25]</span></span><br><span class="line">print(x)</span><br><span class="line"></span><br><span class="line">y = [i <span class="keyword">for</span> i <span class="keyword">in</span> map(<span class="keyword">lambda</span> x: x * x, a) <span class="keyword">if</span> i &gt; <span class="number">10</span>]</span><br><span class="line">print(y)  <span class="comment"># [6]: [16, 25]  # 第二步</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 方法三 列表推导式</span></span><br><span class="line">print(<span class="string">'---方法三----'</span>)</span><br><span class="line">print([x**<span class="number">2</span> <span class="keyword">for</span> x <span class="keyword">in</span> [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>] <span class="keyword">if</span> x**<span class="number">2</span> &gt; <span class="number">10</span>])</span><br><span class="line"></span><br><span class="line"><span class="comment"># 方法四</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">fn</span>(<span class="params">x</span>):</span></span><br><span class="line">    <span class="keyword">return</span> x**<span class="number">2</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">print(<span class="string">'==方法四==='</span>)</span><br><span class="line">res = map(fn, a)</span><br><span class="line"><span class="comment"># for x in res:</span></span><br><span class="line"><span class="comment">#     print(x)</span></span><br><span class="line">res = [i <span class="keyword">for</span> i <span class="keyword">in</span> res <span class="keyword">if</span> i &gt; <span class="number">10</span>]</span><br><span class="line">print(res)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 方法五</span></span><br><span class="line">print(<span class="string">'----'</span>)</span><br><span class="line">a = list(map(<span class="keyword">lambda</span> x: pow(x, <span class="number">2</span>), a))  <span class="comment"># 第一步</span></span><br><span class="line">print(a)  <span class="comment"># [1, 4, 9, 16, 25]</span></span><br><span class="line"></span><br><span class="line">b = [i <span class="keyword">for</span> i <span class="keyword">in</span> map(<span class="keyword">lambda</span> x: pow(x, <span class="number">2</span>), a) <span class="keyword">if</span> i &gt; <span class="number">10</span>]</span><br><span class="line">print(b)  <span class="comment"># [16, 25]  # 第二步</span></span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></tbody></table></figure>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/han-shu-shi-bian-cheng-reduce/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/han-shu-shi-bian-cheng-reduce/" class="post-title-link" itemprop="url">函数式编程 reduce</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-14 07:32:41" itemprop="dateModified" datetime="2021-04-14T07:32:41Z">2021-04-14</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h3 id="reduce-函数应用"><a href="#reduce-函数应用" class="headerlink" title="reduce()函数应用"></a>reduce()函数应用</h3><figure class="highlight plain"><figcaption><span>sequence[, initial])``` -&gt; value 归约，前面的结果每次都应用到后面去。</span></figcaption><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line">function：函数。sequence：序列。initial：初始值。</span><br><span class="line"></span><br><span class="line">py2中是自带函数，py3转移到functools里面</span><br><span class="line"></span><br><span class="line">功能：对参数序列中元素进行累积</span><br><span class="line">注意：参数函数应至少有两个参数</span><br><span class="line">reduce把一个函数作用在一个序列[x1, x2, x3, ...]上，</span><br><span class="line">reduce把结果继续和序列的下一个元素做累积计算</span><br><span class="line">给mul传入参数的过程是这样的。</span><br><span class="line">先从有序列表中取前两个，传入函数进行计算，会得到一个结果，</span><br><span class="line">这时再从列表中取出一个还未计算过的值与这个函数的计算结果，</span><br><span class="line">再次传入函数计算。重复此过程，直到所有的列表元素都参与计算，</span><br><span class="line">以此来完成类似累加累乘这样的操作,函数可以大大减少代码量</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">```python</span><br><span class="line">from functools import reduce </span><br><span class="line"></span><br><span class="line">DIGITS = {</span><br><span class="line">    '0': 0,</span><br><span class="line">    '1': 1,</span><br><span class="line">    '2': 2,</span><br><span class="line">    '3': 3,</span><br><span class="line">    '4': 4,</span><br><span class="line">    '5': 5,</span><br><span class="line">    '6': 6,</span><br><span class="line">    '7': 7,</span><br><span class="line">    '8': 8,</span><br><span class="line">    '9': 9</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def char2num(s):</span><br><span class="line">    return DIGITS[s]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def str2int(s):</span><br><span class="line">    return reduce(lambda x, y: x * 10 + y, map(char2num, s))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">s = '67373'</span><br><span class="line">print(type(map(char2num, s)))  # &lt;class 'map'&gt;</span><br><span class="line">print(list(map(char2num, s)))  # [6, 7, 3, 7, 3]</span><br><span class="line"></span><br><span class="line">print(str2int(s))  # 67373</span><br><span class="line">print(type(str2int(s)))  # &lt;class 'int'&gt;</span><br><span class="line"></span><br><span class="line">list_x = ['1', '2', '3', '4', '5']</span><br><span class="line">print(reduce(lambda x, y: x + y, list_x))  # 12345 字符串相加，不是数字相加</span><br><span class="line"># x = '1' </span><br><span class="line"># y = '2'</span><br><span class="line"># return '12'</span><br><span class="line"># x = 'hello1' </span><br><span class="line"># y = '2'</span><br><span class="line"># return 'hello11'</span><br><span class="line">print(type(reduce(lambda x, y: x + y, list_x)))  # &lt;class 'str'&gt;</span><br><span class="line">print(reduce(lambda x, y: x + y, list_x, 'hello'))  # hello12345</span><br><span class="line"># x = 'hello' </span><br><span class="line"># y = '1'</span><br><span class="line"># return 'hello1'</span><br><span class="line"># x = 'hello1' </span><br><span class="line"># y = '2'</span><br><span class="line"># return 'hello11'</span><br><span class="line"></span><br><span class="line">print(type(reduce(lambda x, y: x + y, list_x, 'hello')))  # &lt;class 'str'&gt;</span><br><span class="line"></span><br><span class="line">list_y = [1, 2, 3, 4, 5]</span><br><span class="line">print(reduce(lambda x, y: x + y, list_y))  </span><br><span class="line"># 15 数字相加 ((((1+2)+3)+4)+5)，最后把和返回</span><br><span class="line">print(type(reduce(lambda x, y: x + y, list_y)))  </span><br><span class="line"># &lt;class 'int'&gt;</span><br></pre></td></tr></tbody></table></figure>
-
-<p>模拟计算器，整数计算的整数，小数计算得小数</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> functools <span class="keyword">import</span> reduce</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">str2num</span>(<span class="params">s</span>):</span></span><br><span class="line">    <span class="keyword">return</span> eval(s)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">calc</span>(<span class="params">exp</span>):</span></span><br><span class="line">    ss = exp.split(<span class="string">'+'</span>)</span><br><span class="line">    ns = map(str2num, ss)</span><br><span class="line">    <span class="keyword">return</span> reduce(<span class="keyword">lambda</span> acc, x: acc + x, ns)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">r = calc(<span class="string">'100 + 200 + 345'</span>)</span><br><span class="line">print(<span class="string">'100 + 200 + 345 ='</span>, r)</span><br><span class="line"><span class="comment"># 100 + 200 + 345 = 645</span></span><br><span class="line">r = calc(<span class="string">'99 + 88 + 7.6'</span>)</span><br><span class="line">print(<span class="string">'99 + 88 + 7.6 ='</span>, r)</span><br><span class="line"><span class="comment"># 99 + 88 + 7.6 = 194.6</span></span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> functools <span class="keyword">import</span> reduce</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">str2num</span>(<span class="params">s</span>):</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        <span class="keyword">return</span> int(s)</span><br><span class="line">    <span class="keyword">except</span>:</span><br><span class="line">        <span class="keyword">return</span> float(s)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">calc</span>(<span class="params">exp</span>):</span></span><br><span class="line">    ss = exp.split(<span class="string">'+'</span>)</span><br><span class="line">    ns = map(str2num, ss)</span><br><span class="line">    <span class="keyword">return</span> reduce(<span class="keyword">lambda</span> acc, x: acc + x, ns)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span>():</span></span><br><span class="line">    r = calc(<span class="string">'100 + 200 + 345'</span>)</span><br><span class="line">    print(<span class="string">'100 + 200 + 345 ='</span>, r)</span><br><span class="line">    r = calc(<span class="string">'99 + 88 + 7.6'</span>)</span><br><span class="line">    print(<span class="string">'99 + 88 + 7.6 ='</span>, r)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">main()</span><br></pre></td></tr></tbody></table></figure>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/qie-pian/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/qie-pian/" class="post-title-link" itemprop="url">python 切片</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-23 09:11:29" itemprop="dateModified" datetime="2021-04-23T09:11:29Z">2021-04-23</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Markdown/" itemprop="url" rel="index"><span itemprop="name">Markdown</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>切片 冒号适用于列表、字符串<br>切片[][1:3]还是list<br>[起始位置，长度]；<br>截取从起始位置，长度个字符；<br>长度负数表示删除从字符串末尾往前数的字符个数；<br>长度省略表示到末尾； 长度要是超过可截取的位数，以可截取的位数为标准；<br>单一的字符串索引操作得到的是字符串，<br>但是一个列表的切片操作得到的是一个列表</p>
-<p>a=range（100）<br>range(start, end, step)，start：起始值；end：终值；step：步长，默认为1。<br>a：0、1、2、3、4、5、……99。<br>所以，<br>正索引范围为：a[0] -a[end-1]，<br>即 a[0] = 0，a[1] = 1，……，依次类推；<br>负索引范围为：a[-1] -a[-end]，<br>即 a[-1] = 99，a[-2] = 98，……，依次类推。</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">a = range(<span class="number">100</span>)</span><br><span class="line">print(a[<span class="number">-3</span>])  <span class="comment"># 97 a[-3]倒数第三个数</span></span><br><span class="line">print(a[<span class="number">2</span> - <span class="number">3</span>])  <span class="comment"># 倒数第一个数 99</span></span><br><span class="line">print(a[<span class="number">-1</span>])  <span class="comment"># 倒数第一个数 99</span></span><br><span class="line">print(a[::<span class="number">3</span>])  <span class="comment"># range(0, 100, 3) start0 end99 step3 依次是0 3 6 9一直到99 步长为3</span></span><br><span class="line">print(a[<span class="number">2</span>:<span class="number">13</span>])  <span class="comment"># range(2, 13) 从a[2]到a[12] 不包括13，前闭后开</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">a = [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>]</span><br><span class="line"><span class="comment"># 有1位</span></span><br><span class="line">print(a[<span class="number">-1</span>])  <span class="comment"># 5 读取倒数第一个元素</span></span><br><span class="line"><span class="comment"># 有2位</span></span><br><span class="line">print(a[:<span class="number">1</span>])  <span class="comment"># [0] </span></span><br><span class="line">print(a[<span class="number">-1</span>:])  <span class="comment"># [5]</span></span><br><span class="line">print(a[<span class="number">-3</span>:])  <span class="comment"># [3, 4, 5]</span></span><br><span class="line">print(a[<span class="number">-3</span>:<span class="number">-1</span>])  <span class="comment"># [3, 4]</span></span><br><span class="line">print(a[:<span class="number">-1</span>])  <span class="comment"># [0, 1, 2, 3, 4]</span></span><br><span class="line"><span class="comment"># 有第三位，正号从左到右，符号从右到左，绝对值是跳的间隔</span></span><br><span class="line">print(a[::<span class="number">2</span>])  <span class="comment"># [0, 2, 4]</span></span><br><span class="line">print(a[::<span class="number">-1</span>])  <span class="comment"># [5, 4, 3, 2, 1, 0]</span></span><br><span class="line">print(a[:<span class="number">3</span>:<span class="number">-1</span>])  <span class="comment"># [5, 4]</span></span><br><span class="line">print(a[<span class="number">3</span>::<span class="number">-1</span>])  <span class="comment"># [3, 2, 1, 0] 从下标为3（从0开始）的元素开始翻转读取</span></span><br><span class="line">print(a[<span class="number">3</span>:<span class="number">1</span>:<span class="number">-1</span>])  <span class="comment"># [3, 2]</span></span><br><span class="line">print(a[<span class="number">3</span>:<span class="number">1</span>:<span class="number">-2</span>])  <span class="comment"># [3]</span></span><br><span class="line"></span><br><span class="line">s = <span class="string">'123.456'</span></span><br><span class="line"><span class="comment"># print(s[4:0:-1])</span></span><br><span class="line"><span class="comment"># print(s[5:0:-1])</span></span><br><span class="line"><span class="comment"># print(s[:1:-1])</span></span><br><span class="line">print(s[:<span class="number">2</span>:<span class="number">-1</span>])</span><br><span class="line">print(s[:<span class="number">3</span>:<span class="number">-1</span>])</span><br><span class="line">print(s[:<span class="number">4</span>:<span class="number">-1</span>])</span><br><span class="line">print(s[:<span class="number">5</span>:<span class="number">-1</span>])</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">output = [[<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>],</span><br><span class="line">          [<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>],</span><br><span class="line">          [<span class="number">2</span>, <span class="number">5</span>, <span class="number">6</span>]]</span><br><span class="line">print(output[<span class="number">-1</span>])  * [<span class="number">2</span>, <span class="number">5</span>, <span class="number">6</span>]</span><br><span class="line"></span><br><span class="line">s=<span class="string">'123.456'</span></span><br><span class="line">print(s[:<span class="number">2</span>:<span class="number">-1</span>])</span><br><span class="line"><span class="number">654.</span></span><br></pre></td></tr></tbody></table></figure><script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
