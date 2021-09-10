@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css" integrity="sha256-2H3fkXt6FEmrReK448mDVGKb3WW2ZZw35gI7vqHOE4Y=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"bubbleboy11.github.io","root":"/","images":"/images","scheme":"Muse","version":"8.6.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="由空地和墙组成的迷宫中有一个球。球可以向上下左右四个方向滚动，但在遇到墙壁前不会停止滚动。当球停下时，可以选择下一个方向。 给定球的起始位置，目的地和迷宫，判断球能否在目的地停下。 迷宫由一个0和1的二维数组表示。 1表示墙壁，0表示空地。你可以假定迷宫的边缘都是墙壁。起始位置和目的地的坐标通过行号和列号给出。 123&#96;&#96;&#96;&#96;&#96;&#96;go   12345678910111213141516171819">
+<meta property="og:type" content="article">
+<meta property="og:title" content="迷宫">
+<meta property="og:url" content="https://bubbleboy11.github.io/2020/08/21/mi-gong/index.html">
+<meta property="og:site_name" content="外心人D的博客">
+<meta property="og:description" content="由空地和墙组成的迷宫中有一个球。球可以向上下左右四个方向滚动，但在遇到墙壁前不会停止滚动。当球停下时，可以选择下一个方向。 给定球的起始位置，目的地和迷宫，判断球能否在目的地停下。 迷宫由一个0和1的二维数组表示。 1表示墙壁，0表示空地。你可以假定迷宫的边缘都是墙壁。起始位置和目的地的坐标通过行号和列号给出。 123&#96;&#96;&#96;&#96;&#96;&#96;go   12345678910111213141516171819">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-08-20T16:21:41.000Z">
+<meta property="article:modified_time" content="2021-09-08T03:25:47.173Z">
+<meta property="article:author" content="外心人D">
+<meta property="article:tag" content="数据结构与算法">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://bubbleboy11.github.io/2020/08/21/mi-gong/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://bubbleboy11.github.io/2020/08/21/mi-gong/","path":"2020/08/21/mi-gong/","title":"迷宫"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>迷宫 | 外心人D的博客</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="外心人D的博客" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">外心人D的博客</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-overview-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-overview">
+            <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">外心人D</p>
+  <div class="site-description" itemprop="description">本博客大多内容为慕课和网上博客，并非原创</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">351</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+          </div>
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/mi-gong/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          迷宫
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-09-08 03:25:47" itemprop="dateModified" datetime="2021-09-08T03:25:47Z">2021-09-08</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>由空地和墙组成的迷宫中有一个球。球可以向上下左右四个方向滚动，但在遇到墙壁前不会停止滚动。当球停下时，可以选择下一个方向。</p>
+<p>给定球的起始位置，目的地和迷宫，判断球能否在目的地停下。</p>
+<p>迷宫由一个0和1的二维数组表示。 1表示墙壁，0表示空地。你可以假定迷宫的边缘都是墙壁。起始位置和目的地的坐标通过行号和列号给出。</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">``</span><span class="string">`</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">`</span><span class="string">``</span><span class="keyword">go</span></span><br></pre></td></tr></tbody></table></figure>
+
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">``</span><span class="string">`</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">`</span><span class="string">``</span>py</span><br><span class="line">class Solution:</span><br><span class="line">    def hasPath(self, maze: List[List[<span class="keyword">int</span>]], start: List[<span class="keyword">int</span>], destination: List[<span class="keyword">int</span>]) -&gt; <span class="keyword">bool</span>:</span><br><span class="line">        visited = set()</span><br><span class="line">        dirs = [<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">-1</span>, <span class="number">0</span>]</span><br><span class="line">        row, col = <span class="built_in">len</span>(maze), <span class="built_in">len</span>(maze[<span class="number">0</span>])</span><br><span class="line"></span><br><span class="line">        # DFS</span><br><span class="line">        def dfs(i, j):</span><br><span class="line">            <span class="keyword">if</span> i == destination[<span class="number">0</span>] and j == destination[<span class="number">1</span>]:</span><br><span class="line">                <span class="keyword">return</span> True</span><br><span class="line">            <span class="keyword">for</span> k in <span class="keyword">range</span>(<span class="number">4</span>):</span><br><span class="line">                move_i, move_j = i, j</span><br><span class="line">                while <span class="number">0</span> &lt;= (t1 := move_i + dirs[k]) &lt; row and <span class="number">0</span> &lt;= (t2 := move_j + dirs[k + <span class="number">1</span>]) &lt; col and maze[t1][t2] != <span class="number">1</span>:</span><br><span class="line">                    move_i, move_j = t1, t2</span><br><span class="line">                <span class="keyword">if</span> i == move_i and j == move_j: <span class="keyword">continue</span></span><br><span class="line">                <span class="keyword">if</span> (move_i, move_j) not in visited:</span><br><span class="line">                    visited.add((move_i, move_j))</span><br><span class="line">                    <span class="keyword">if</span> dfs(move_i, move_j): <span class="keyword">return</span> True</span><br><span class="line">            <span class="keyword">return</span> False</span><br><span class="line"></span><br><span class="line">        # DFS</span><br><span class="line">        def bfs(i, j):</span><br><span class="line">            queue = collections.deque([[i, j]])</span><br><span class="line">            visited.add((i, j))</span><br><span class="line">            while queue:</span><br><span class="line">                i, j = queue.pop()</span><br><span class="line">                <span class="keyword">if</span> [i, j] == destination: <span class="keyword">return</span> True</span><br><span class="line">                <span class="keyword">for</span> k in <span class="keyword">range</span>(<span class="number">4</span>):</span><br><span class="line">                    move_i, move_j = i, j</span><br><span class="line">                    while <span class="number">0</span> &lt;= (t1 := move_i + dirs[k]) &lt; row and <span class="number">0</span> &lt;= (t2 := move_j + dirs[k + <span class="number">1</span>]) &lt; col and maze[t1][t2] != <span class="number">1</span>:</span><br><span class="line">                        move_i, move_j = t1, t2</span><br><span class="line">                    <span class="keyword">if</span> move_i == i and move_j == j: <span class="keyword">continue</span></span><br><span class="line">                    <span class="keyword">if</span> (move_i, move_j) not in visited:</span><br><span class="line">                        visited.add((move_i, move_j))</span><br><span class="line">                        queue.appendleft([move_i, move_j])</span><br><span class="line">            <span class="keyword">return</span> False</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> dfs(start[<span class="number">0</span>], start[<span class="number">1</span>]) # bfs(start[<span class="number">0</span>], start[<span class="number">1</span>])</span><br></pre></td></tr></tbody></table></figure>
+
+
+<hr>
+<p>设有一个6行5列的迷宫，从左上角出发到达右下角，只能横向或纵向走，1为墙，0为出路，问如何走出去</p>
+<p>maze.in</p>
+<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">0 1 0 0 0</span><br><span class="line">0 0 0 1 0</span><br><span class="line">0 1 0 1 0</span><br><span class="line">1 1 1 0 0</span><br><span class="line">0 1 0 0 1</span><br><span class="line">0 1 0 0 0</span><br></pre></td></tr></tbody></table></figure>
+
+<p>广度优先搜索走迷宫</p>
+<ul>
+<li>用循环创建二维 slice</li>
+<li>使用 slice 来实现队列</li>
+<li>用 Fscanf 读取文件</li>
+<li>对 Point 的抽象</li>
+</ul>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"fmt"</span></span><br><span class="line">    <span class="string">"os"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 从文件中读出迷宫</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">readMaze</span><span class="params">(filename <span class="keyword">string</span>)</span> [][]<span class="title">int</span></span> {</span><br><span class="line">    file, err := os.Open(filename)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">        <span class="built_in">panic</span>(err) <span class="comment">// 这里先不做处理</span></span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">var</span> row, col <span class="keyword">int</span> <span class="comment">// 行 列</span></span><br><span class="line">    <span class="comment">// 第一行，读出值返回</span></span><br><span class="line">    fmt.Fscanf(file, <span class="string">"%d %d"</span>, &amp;row, &amp;col) <span class="comment">// 这里要给row col赋值，所以取地址 从文件读取数据</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 读出迷宫所在的行，6行5列</span></span><br><span class="line">    maze := <span class="built_in">make</span>([][]<span class="keyword">int</span>, row) <span class="comment">// 二维数组：slice的元素是 装int的slice</span></span><br><span class="line">    <span class="keyword">for</span> i := <span class="keyword">range</span> maze { <span class="comment">// row行</span></span><br><span class="line">        maze[i] = <span class="built_in">make</span>([]<span class="keyword">int</span>, col) <span class="comment">// 每行col个</span></span><br><span class="line">        <span class="keyword">for</span> j := <span class="keyword">range</span> maze[i] { <span class="comment">// 赋值</span></span><br><span class="line">            fmt.Fscanf(file, <span class="string">"%d"</span>, &amp;maze[i][j])</span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> maze</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> point <span class="keyword">struct</span> {</span><br><span class="line">    i, j <span class="keyword">int</span> <span class="comment">// 和y轴方向不一样</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> dirs = [<span class="number">4</span>]point{ <span class="comment">// 初始位置0，0的上左下右四周点位</span></span><br><span class="line">    {<span class="number">-1</span>, <span class="number">0</span>}, {<span class="number">0</span>, <span class="number">-1</span>}, {<span class="number">1</span>, <span class="number">0</span>}, {<span class="number">0</span>, <span class="number">1</span>},</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="comment">// 从当前位置向周围走一步</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(p point)</span> <span class="title">add</span><span class="params">(r point)</span> <span class="title">point</span></span> {</span><br><span class="line">    <span class="keyword">return</span> point{p.i + r.i, p.j + r.j}</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(p point)</span> <span class="title">at</span><span class="params">(grid [][]<span class="keyword">int</span>)</span> <span class="params">(<span class="keyword">int</span>, <span class="keyword">bool</span>)</span></span> {</span><br><span class="line">    <span class="keyword">if</span> p.i &lt; <span class="number">0</span> || p.i &gt;= <span class="built_in">len</span>(grid) { <span class="comment">// 往上， 往下越界</span></span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>, <span class="literal">false</span></span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> p.j &lt; <span class="number">0</span> || p.j &gt;= <span class="built_in">len</span>(grid[p.i]) { <span class="comment">// 往左， 往右越界</span></span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>, <span class="literal">false</span></span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> grid[p.i][p.j], <span class="literal">true</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">walk</span><span class="params">(maze [][]<span class="keyword">int</span>, start, end point)</span> [][]<span class="title">int</span></span> {</span><br><span class="line">    steps := <span class="built_in">make</span>([][]<span class="keyword">int</span>, <span class="built_in">len</span>(maze))</span><br><span class="line">    <span class="keyword">for</span> i := <span class="keyword">range</span> steps {</span><br><span class="line">        steps[i] = <span class="built_in">make</span>([]<span class="keyword">int</span>, <span class="built_in">len</span>(maze[i])) <span class="comment">// 每个元素初始为0</span></span><br><span class="line">    }</span><br><span class="line">    Q := []point{start} <span class="comment">// 队列 并且把那个起点放进去</span></span><br><span class="line">    <span class="keyword">for</span> <span class="built_in">len</span>(Q) &gt; <span class="number">0</span> {</span><br><span class="line">        cur := Q[<span class="number">0</span>] <span class="comment">// 取出队列头的数据</span></span><br><span class="line">        Q = Q[<span class="number">1</span>:]</span><br><span class="line">        <span class="keyword">if</span> cur == end {</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        }</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> _, dir := <span class="keyword">range</span> dirs {</span><br><span class="line">            next := cur.add(dir)</span><br><span class="line"></span><br><span class="line">            val, ok := next.at(maze)</span><br><span class="line">            <span class="keyword">if</span> !ok || val == <span class="number">1</span> { <span class="comment">// maze.val = 0 可以走</span></span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line">            }</span><br><span class="line"></span><br><span class="line">            val, ok = next.at(steps)</span><br><span class="line">            <span class="keyword">if</span> !ok || val != <span class="number">0</span> { <span class="comment">// steps.val = 0从来没走过</span></span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line">            }</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> next == start { <span class="comment">// next != start 没有回到了起点</span></span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line">            }</span><br><span class="line"></span><br><span class="line">            curSteps, _ := cur.at(steps)</span><br><span class="line">            steps[next.i][next.j] = curSteps + <span class="number">1</span></span><br><span class="line">            Q = <span class="built_in">append</span>(Q, next)</span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> steps</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    maze := readMaze(<span class="string">"lang/maze/maze.in"</span>)</span><br><span class="line"></span><br><span class="line">    steps := walk(maze, point{<span class="number">0</span>, <span class="number">0</span>},</span><br><span class="line">        point{<span class="built_in">len</span>(maze) - <span class="number">1</span>, <span class="built_in">len</span>(maze[<span class="number">0</span>]) - <span class="number">1</span>})</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> _, row := <span class="keyword">range</span> steps {</span><br><span class="line">        <span class="keyword">for</span> _, val := <span class="keyword">range</span> row {</span><br><span class="line">            fmt.Printf(<span class="string">"%3d"</span>, val) <span class="comment">// 3 位右对齐</span></span><br><span class="line">        }</span><br><span class="line">        fmt.Println()</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> construct path from steps</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">  0  0  4  5  6</span></span><br><span class="line"><span class="comment">  1  2  3  0  7</span></span><br><span class="line"><span class="comment">  2  0  4  0  8</span></span><br><span class="line"><span class="comment">  0  0  0 10  9</span></span><br><span class="line"><span class="comment">  0  0 12 11  0</span></span><br><span class="line"><span class="comment">  0  0 13 12 13</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>调试</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" rel="tag"># 数据结构与算法</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/06/30/hai-xiang-yun-suan-fu/" rel="prev" title="海象运算符">
+                  <i class="fa fa-chevron-left"></i> 海象运算符
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/08/21/python-bao/" rel="next" title="python包">
+                  python包 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">外心人D</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
