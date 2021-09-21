@@ -119,7 +119,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">351</span>
+          <span class="site-state-item-count">354</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -160,6 +160,503 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/call/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/call/" class="post-title-link" itemprop="url">HTML</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-04-02 12:24:45" itemprop="dateModified" datetime="2021-04-02T12:24:45Z">2021-04-02</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Markdown/" itemprop="url" rel="index"><span itemprop="name">Markdown</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>模拟可调用对象</p>
+<figure class="highlight plain"><figcaption><span>args...])``` 此方法会在实例作为一个函数被“调用”时被调用；如果定义了此方法，则 ```x(arg1, arg2, ...)``` 就相当于 ```x.__call__(arg1, arg2, ...)``` 的快捷方式。 也就是说在类被实例化成对象后，对象可以像函数一样被调用。</span></figcaption><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">我们可以将它们作为输入传递到其他的函数/方法中并调用它们,正如我们调用一个正常的函数那样。而类中的call()函数的意义正在于此.为了将一个类实例当作函数调用,我们需要再类中事先call()方法.假设x是X类的一个实例.调用x.__call__(1,2)等同于调用x(1,2).这个实例本身在这里相当于一个函数.</span><br><span class="line"></span><br><span class="line">下述用例可以通过，这里我定义了__call__方法，如果sorted函数生效时调用了__call__方法，那上述写法一定会出错。</span><br><span class="line"></span><br><span class="line">```python</span><br><span class="line">class LargerNumKey:</span><br><span class="line">    def __init__(self, value):</span><br><span class="line">        self.value = value</span><br><span class="line"></span><br><span class="line">    def __lt__(self, other):</span><br><span class="line">        return self.value + other.value &gt; other.value + self.value</span><br><span class="line"></span><br><span class="line">    def __call__(self, *args, **kwargs):</span><br><span class="line">        print('call')</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class Solution:</span><br><span class="line">    def largestNumber(self, nums):</span><br><span class="line">        ans = ''.join(sorted(map(str, nums), key=LargerNumKey))</span><br><span class="line">        return '0' if ans[0] == '0' else ans</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">if __name__ == "__main__":</span><br><span class="line">    arr = [10, 3, 20]</span><br><span class="line">    sl = Solution()</span><br><span class="line">    l = LargerNumKey(3)</span><br><span class="line">    l1 = l()</span><br><span class="line">    print(l == l1)</span><br><span class="line">    print(sl.largestNumber(arr))</span><br><span class="line">    # call</span><br><span class="line">    # False</span><br><span class="line">    # 32010</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight angelscript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">arr = [<span class="number">10</span>, <span class="number">3</span>, <span class="number">20</span>]</span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/dango-auth/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/dango-auth/" class="post-title-link" itemprop="url">django-auth</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-06-17 08:40:57" itemprop="dateModified" datetime="2021-06-17T08:40:57Z">2021-06-17</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h3 id="django-auth模块"><a href="#django-auth模块" class="headerlink" title="django-auth模块"></a>django-auth模块</h3><p>django-auth用户认证组件(重点)<br>实现用户注册、登录及权限验证，<br>通过取表单数据跟数据库对应表存储的值做比对<br>用于判断当前的用户是否合法，并跳转到登陆成功或失败页面。<br>功能主要有：</p>
+<h3 id="自带用户认证授权系统"><a href="#自带用户认证授权系统" class="headerlink" title="自带用户认证授权系统"></a>自带用户认证授权系统</h3><ul>
+<li>用户：记录用户的登录账号密码等信息</li>
+<li>权限：用户是否有权限访问某一资源（执行操作）</li>
+<li>组：对多个用户进行权限管理<br>登录密码：加密后的密码存储<br>自带后台管理</li>
+</ul>
+<h4 id="安装及配置"><a href="#安装及配置" class="headerlink" title="安装及配置"></a>安装及配置</h4><p><code>setting.py</code></p>
+<ul>
+<li>第一步：INSTALLED_APPS安装应用</li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">INSTALLED_APPS = [</span><br><span class="line">    <span class="string">'django.contrib.auth'</span>,</span><br><span class="line">    <span class="string">'django.contrib.contenttypes'</span>,</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
+
+<ul>
+<li>第二步：MIDDLEWARE中间件配置</li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">MIDDLEWARE = [</span><br><span class="line">    <span class="string">'django.contrib.sessions.middleware.SessionMiddleware'</span>,  <span class="comment"># 用户登录</span></span><br><span class="line">    <span class="string">'django.contrib.auth.middleware.AuthenticationMiddleware'</span>,</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
+
+<ul>
+<li><p>第三步：migrate同步模型到数据库</p>
+</li>
+<li><p>用户模型</p>
+</li>
+<li><p>用户认证、登录、退出等<br>分为两种用户</p>
+<ul>
+<li>游客(AnonymousUser )</li>
+<li>注册用户（User） </li>
+</ul>
+</li>
+</ul>
+<p>User常用属性<br><code>auth_user</code>表格字段含义 对应ORM的模型或数据库中的一条记录<br>属性    描述<br><code>username</code>    用户名<br><code>password</code>    登录密码<br>email    电子邮箱<br><code>is_staff</code>    是否为内部员工，true可以登录django后台管理系统<br><code>is_active</code>    是否为激活用户，true可以登录系统<br><code>is_superuser</code>    是否为超级管理员，可以在线管理所有的数据表<br><code>is_authenticated</code> 用户是否已登录<br><code>is_anonymous</code>    用户登录是否已失效<br><code>last_login</code>    最后登录时间<br><code>date_joined</code>    注册时间<br><code>groups</code>    用户组多对多关系<br><code>user_permissions</code>    用户权限多对多关系</p>
+<ul>
+<li>创建普通用户 命令行输入命令</li>
+</ul>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python manage.py shell  // django控制台</span><br></pre></td></tr></tbody></table></figure>
+<p>或者pycharm的<code>python Console</code></p>
+<p>引入用户</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.contrib.auth.models <span class="keyword">import</span> User</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">user = User.objects.create_user(<span class="string">'john'</span>,<span class="string">'john@example.com'</span>,<span class="string">'johnpassword'</span>)</span><br><span class="line">user = User.objects.create_user(<span class="string">'zhangsan'</span>,<span class="string">'zhangsan@example.com'</span>,<span class="string">'123456'</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>能在<code>auth_user</code>表格中看到新加的用户，<code>is_staff</code>和<code>is_superuser</code>都是0</p>
+<ul>
+<li>使用命令行创建超级管理员</li>
+</ul>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt;python manage.py createsuperuser</span><br></pre></td></tr></tbody></table></figure>
+
+<p>能在<code>auth_user</code>表格中看到新加的用户，<code>is_staff</code>和<code>is_superuser</code>都是1</p>
+<ul>
+<li><p>在<code>auth_user</code>表格修改<code>is_staff</code>和<code>is_superuser</code>切换超级管理员和普通用户</p>
+</li>
+<li><p>获取用户对象</p>
+</li>
+</ul>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; from django.contrib.auth.models import User</span><br><span class="line">&gt;&gt;&gt; u = User.objects.get(username=<span class="string">'john'</span>)</span><br><span class="line">&gt;&gt;&gt; u = User.objects.get(id=2)</span><br><span class="line">user = User.objects.get(username=<span class="string">'admin'</span>)</span><br><span class="line">`</span><br><span class="line"></span><br><span class="line">- 设置、修改用户的密码</span><br><span class="line">```bash</span><br><span class="line">&gt;&gt;python manage.py changepassword</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; u.set_password(<span class="string">'new password'</span>)</span><br><span class="line">&gt;&gt;&gt; u.set_password(<span class="string">'12345678'</span>)</span><br><span class="line">&gt;&gt;&gt; u.save()</span><br></pre></td></tr></tbody></table></figure>
+
+<ul>
+<li>检查用户的密码是否正确<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; u.check_password(<span class="string">'my password'</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+</li>
+</ul>
+<figure class="highlight ruby"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;</span>python manage.py clearsessions 清除过期会话</span><br><span class="line"><span class="meta">&gt;&gt;</span>python manage.py collectstatic 收集依赖中的静态文件</span><br></pre></td></tr></tbody></table></figure>
+
+<ul>
+<li><p>后台管理<br>浏览器<code>http://127.0.0.1:8000/admin/</code></p>
+</li>
+<li><p>切换超级管理员和普通用户</p>
+</li>
+<li><p>用户管理、权限分配<br>普通用户名zhangsan-permission-group</p>
+</li>
+</ul>
+<p><img src="/2020/08/21/dango-auth/user_permissons.png"><br><img src="/2020/08/21/dango-auth/user_permissons.png"></p>
+<ul>
+<li>判断用户是否具备某权限</li>
+</ul>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">request.user.has_perm(<span class="string">'foo.add_bar'</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<ul>
+<li><p>强制权限验证</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@permission_required('foo.add_bar')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">my_view</span>(<span class="params">request</span>):</span></span><br><span class="line">  <span class="keyword">pass</span></span><br></pre></td></tr></tbody></table></figure>
+</li>
+<li><p>命令行工具</p>
+</li>
+</ul>
+<p>用户退出：<br>使用logout函数退出当前登录用户<br>Username (leave blank to use ‘rose’): admin<br>Email address: <a href="mailto:admin@exaple.com">admin@exaple.com</a><br>为了让 admin 界面管理某个数据模型，我们需要先注册该数据模型到 admin。<br>比如，我们之前在 TestModel 中已经创建了模型 Test 。</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.contrib.auth <span class="keyword">import</span> logout</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">logout_view</span>(<span class="params">request</span>):</span></span><br><span class="line">logout(request)</span><br><span class="line"><span class="comment"># 执行后面的操作</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>user</code>是一个<code>django.contrib.auth.models.User</code> 对象，代表当前登录的用户。<br>如果访问用户当前没有登录，<code>user</code>将被初始化为<code>django.contrib.auth.models.AnonymousUser</code>的实例。<br>你可以通过<code>user</code>的<code>is_authenticated()</code>方法来辨别用户是否登录：</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> request.user.is_authenticated():</span><br><span class="line">    <span class="comment"># Do something for logged-in users.</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    <span class="comment"># Do something for anonymous users.</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>只有激活Django中的AuthenticationMiddleware时该属性才可用</p>
+<p>登录及退出<br>步骤一：认证验证用户名和密码是否匹配</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">user = authenticate(username=<span class="string">'john'</span>,password=<span class="string">'secret'</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>步骤二：判断认证后的用户是否为None，不为None则表示用户认证通过<br>步骤三：调用login函数登录用户<br><code>login(request,user,backend=None)</code></p>
+<ul>
+<li><p>在视图中获取当前用户<code>request.user</code> 不必再次调用sql</p>
+</li>
+<li><p>需要登录才可以访问的视图</p>
+</li>
+</ul>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@login_required</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">my_view</span>(<span class="params">request</span>):</span></span><br><span class="line">  <span class="keyword">pass</span></span><br></pre></td></tr></tbody></table></figure><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/django-jie-guo-ji-queryset/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/django-jie-guo-ji-queryset/" class="post-title-link" itemprop="url">django 结果集QuerySet</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-08-01 12:41:07" itemprop="dateModified" datetime="2021-08-01T12:41:07Z">2021-08-01</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>查询条件的使用<br>结果集QuerySet常用方法<br>Queryset表示从数据库中取出来的对象的集合<br>它可以含有零个、一个或者多个过滤器（filter）（相当于数据库的where）</p>
+<p>从模型的Manager那里取得QuerySet<br>QuerySet的筛选结果本身还是QuerySet</p>
+<p>注意：对一个QuerySet实例对象，可以继续调用上面所有函数</p>
+<blockquote>
+<p><strong>说明2</strong>：ORM查询多个对象时会返回QuerySet对象，QuerySet使用了<strong>惰性查询</strong>，<br>即在创建QuerySet对象的过程中不涉及任何数据库活动，等真正用到对象时（对QuerySet求值）才向数据库发送SQL语句并获取对应的结果，这一点在实际开发中需要引起注意！<br>不能直接得出数据信息，只有通过循环才能得到结果的具体信息.<br><strong>说明3</strong>：缓存：结果集从数据库操作一次之后，下一次对同一个查询集进行操作不会再进行数据库的查询的，从缓存获取数据<br><strong>说明4</strong>：如果希望更新多条数据，不用先逐一获取模型对象再修改对象属性，可以直接使用QuerySet对象的<code>update()</code>方法一次性更新多条数据。</p>
+</blockquote>
+<p>不要对<code>QuerySet</code>调用<code>len()</code>函数。</p>
+<ul>
+<li><code>filter()</code>——返回筛选出满足条件的数据记录。参数中可以写查询条件。返回值也是QuerySet实例对象。获取不到数据返回一个空列表，不会抛出异常<br>pk=3 的意思是主键 primary key=3，相当于 id=3。</li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查询在2020年1月1日之后创建的数据</span></span><br><span class="line">user_list = WeiboUser.objects.filter(created_at__gt=<span class="string">'2020-1-1'</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<ul>
+<li><code>exclude()</code>——返回不满足条件的数据，和filter相反<br>User.objects.all().exclude(username=’user1’).count()<br>Out[23]: 5</li>
+</ul>
+<p><code>get</code>:返回一条且只能有一条数据，返回值是一个对象，参数可以写查询条件。获取不到数据和查到两条数据会抛出异常。配合<code>try except</code>语句</p>
+<ul>
+<li><code>get_or_create()</code>——有则返回，没有则创建记录，可以实现链式的调用，通过第一次的过滤还可以再过滤</li>
+</ul>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">obj=User.objects.get_or_create(username=<span class="string">'zhangsan'</span>,password=<span class="string">'123456'</span>,nickname=<span class="string">'张三'</span>)</span><br><span class="line">obj</span><br><span class="line">Out[<span class="number">7</span>]: (&lt;WeiboUser: WeiboUser object&gt;, <span class="literal">False</span>)</span><br><span class="line">obj = User.objects.get_or_create(username=<span class="string">'zhangsan2'</span>,password=<span class="string">'1111'</span>,nickname=<span class="string">'qq'</span>)</span><br><span class="line">obj</span><br><span class="line">Out[<span class="number">9</span>]: (&lt;WeiboUser: WeiboUser object&gt;, <span class="literal">True</span>)</span><br><span class="line">obj = User.objects.get_or_create(username=<span class="string">'zhangsan2'</span>,password=<span class="string">'123456'</span>,nickname=<span class="string">'qq'</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>bulk_create()</code>——创建/新增多条数据库记录，结果集从数据库中查询出来之后不会再进行数据库的查询的</p>
+<pre><code>user1 = User(username='user1', nickname='用户1', password='123456')
+user2 = User(username='user2', nickname='用户2', password='123456')
+user3 = User(username='user3', nickname='用户3', password='123456')
+User.objects.bulk_create([user1,user2,user3])
+</code></pre>
+<p>QuerySet链式查询方法：</p>
+<ul>
+<li><code>first()/last()</code>——返回第一条/最后一条记录</li>
+</ul>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">User.objects.first()</span><br><span class="line">Out[<span class="number">17</span>]: &lt;WeiboUser: WeiboUser object&gt;</span><br><span class="line">User.objects.first().username</span><br><span class="line">Out[<span class="number">18</span>]: <span class="string">'quan'</span></span><br><span class="line">User.objects.last().username</span><br><span class="line">Out[<span class="number">19</span>]: <span class="string">'user3'</span></span><br></pre></td></tr></tbody></table></figure>
+
+<ul>
+<li><code>all()</code>用来查询表中的所有数据，<br>返回值是一个查询集（QuerySet）类型数据，<br>返回模型类对应表的所有数据，<br>用索引下标取出模型类的对象</li>
+</ul>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">books = models.Book.objects.all()</span><br><span class="line">print(books, type(books))</span><br><span class="line"><span class="comment"># QuerySet类型，类似于list，访问url时数据显示在命令行窗口中。</span></span><br><span class="line">foriinbooks:</span><br><span class="line">print(i.title)</span><br></pre></td></tr></tbody></table></figure>
+
+<ul>
+<li><code>count()</code>——返回记录行数之和 返回结果集中数据的数目，返回值是一个数字</li>
+</ul>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">User.objects.all().count()</span><br><span class="line">Out[<span class="number">24</span>]: <span class="number">6</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>exists()</code>——结果集是否存在（1条以上）返回值用于<code>if</code>条件。</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">User.objects.filter(username=<span class="string">'zhangsan'</span>).exists()</span><br><span class="line">Out[<span class="number">24</span>]: <span class="number">6</span></span><br><span class="line"></span><br><span class="line">a=User.objects.all().order_by(<span class="string">'id'</span>)[<span class="number">0</span>]</span><br><span class="line">b=User.objects.all().order_by(<span class="string">'-id'</span>)[<span class="number">0</span>]</span><br><span class="line">a</span><br><span class="line">Out[<span class="number">29</span>]: &lt;WeiboUser: WeiboUser object&gt;</span><br><span class="line">a.username</span><br><span class="line">Out[<span class="number">30</span>]: <span class="string">'quan'</span></span><br><span class="line">b.username</span><br><span class="line">Out[<span class="number">31</span>]: <span class="string">'user3'</span></span><br></pre></td></tr></tbody></table></figure>
+
+<ul>
+<li><code>order_by()</code>——对查询的记录结果排序<br>返回值是QuerySet，参数中写排序的字段<br>可以写多个字段，默认升序，如果降序，在字段前面加“-”<br>• 参数的字段名要加引号。<br>• 降序为在字段前面加个负号</li>
+</ul>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">User.objects.all().order_by(<span class="string">'-id'</span>)[<span class="number">0</span>]  倒数第一个</span><br><span class="line">Out[<span class="number">25</span>]:&lt;WeiboUser: User:user3,pk:<span class="number">10</span>, status:<span class="number">1</span>&gt;</span><br><span class="line">User.objects.all().order_by(<span class="string">'id'</span>)[<span class="number">0</span>]   第一个</span><br><span class="line">Out[<span class="number">26</span>]: &lt;WeiboUser: WeiboUser object&gt;</span><br></pre></td></tr></tbody></table></figure>
+
+<ul>
+<li><code>none()</code>——创建一个空的结果集</li>
+<li><code>using()</code>——使用指定的数据库查询(在settings中添加多数据库支持)</li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查找xx数据库的全部记录，并将其通过id降序排列</span></span><br><span class="line">User.objects.all().order_by(<span class="string">'-id'</span>).using(<span class="string">'数据库名'</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>分页处理</p>
+<ul>
+<li>减少等待时间，提升用户体验</li>
+<li>如何进行分页查询：</li>
+</ul>
+<p>方法一：对查询结果集QuerySet进行分片</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 返回前n个对象（LIMIT 5）</span></span><br><span class="line">User.objects.all()[:<span class="number">5</span>]</span><br><span class="line"><span class="comment"># （offset 5 limit 5）sql中offset偏移的意思</span></span><br><span class="line">跳过前<span class="number">5</span>条数据，从第<span class="number">6</span>条数据开始取，取<span class="number">5</span>条数据，第<span class="number">6</span>到第<span class="number">10</span>个对象</span><br><span class="line">User.objects.all()[<span class="number">5</span>:<span class="number">10</span>]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>for i in range(100):<br>  …:   …:list.append(User(username=’user{0}’.format(i),nickname=’用户{}’.format(i),password=’123456’))</p>
+<p>  …:len(list)<br>Out[7]: 100<br>User.objects.bulk_create(list)</p>
+<p>obj_list = User.objects.all()[50:10]  第五列从第50行开始<br>obj_list<br>Out[10]: &lt;QuerySet []&gt;<br>list_all = User.objects.all()<br>list_all[50:60]<br>`</p>
+<p>方法二：使用<code>django.core.paginator</code>进行分页处理(分页处理器)<br>分页处理相关类：<br>Paginator——分页器<br>Page——某一页对象<br>异常：<br>InvalidPage——无效的页码<br>PageNotAnInteger——页码必须是整数<br>EmptyPage——空页（没有数据）</p>
+<p>分页处理器<br>    步骤一：取得分页器Paginator(objects,page_size)<br>objects——要进行分页的数据，就是我们之前查询获得的结果集<br>page_size——每页的数据放多少<br>Python<br>    1    p = Paginator(objects,2)<br>    分页器的属性：<br>    count——数据记录的总条数<br>    num_pages——总页数（总记录条数/每页大小）<br>    page_range——页码范围<br>    步骤二：取得页面实例page=p.page(page_num)<br>page_num——当前页的页码，如第几页</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">p = Paginator(objects,<span class="number">2</span>)</span><br><span class="line">page = p.page(<span class="number">3</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<h4 id="页面实例的属性："><a href="#页面实例的属性：" class="headerlink" title="页面实例的属性："></a>页面实例的属性：</h4><ul>
+<li>number——当前页的页码</li>
+<li>object_list——当前页的数据列表</li>
+<li>paginator——分页器对象的引用</li>
+</ul>
+<h4 id="页面实例的常用方法："><a href="#页面实例的常用方法：" class="headerlink" title="页面实例的常用方法："></a>页面实例的常用方法：</h4><ul>
+<li>has_next()——是否还有下一页</li>
+<li>has_previous()——是否还有上一页</li>
+<li>has_other_pages()——是否还有其他页（上/下一页）</li>
+<li>next_page_number()——下一页的页码，如果没有，触发InvalidPage异常</li>
+<li>previous_page_number()——上一页的页码，如果没有，触发InvalidPage异常</li>
+</ul>
+<p>Django 3.2 智能分页 <code>get_elided_page_range</code><br>接收3个参数，<br><code>number</code>为当前页码数,<br><code>on_each_side</code>为当前页码左右两边的页数<br><code>on_ends</code>为首尾页码范围。</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Paginator.get_elided_page_range(number, on_each_side=<span class="number">3</span>, on_ends=<span class="number">2</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>如果当前页码为第10页，使用该方法将输出如下页码范围(page_range)。<br>10左右两边各有3页，首尾各有2页，其余页码号码用…代替。<br>将<code>page_range</code>这个变量传递到前端模板进行遍历即可实现智能分页。<br><code>[1, 2, '…', 7, 8, 9, 10, 11, 12, 13, '…', 49, 50]</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">house_filter</span>(<span class="params">request</span>):</span></span><br><span class="line">    qs = House.objects.all()</span><br><span class="line">    paginator = Paginator(qs, <span class="number">1</span>)  <span class="comment"># 每页1条记录</span></span><br><span class="line">    page = request.GET.get(<span class="string">'page'</span>, <span class="number">1</span>)  <span class="comment"># 获取当前page页码，默认为1</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        page_obj = paginator.page(page)  <span class="comment"># 分页</span></span><br><span class="line">    <span class="keyword">except</span> PageNotAnInteger:</span><br><span class="line">        page_obj = paginator.page(<span class="number">1</span>)</span><br><span class="line">    <span class="keyword">except</span> EmptyPage:</span><br><span class="line">        page_obj = paginator.page(paginator.num_pages)</span><br><span class="line">    is_paginated = <span class="literal">True</span> <span class="keyword">if</span> paginator.num_pages &gt; <span class="number">1</span> <span class="keyword">else</span> <span class="literal">False</span></span><br><span class="line">    <span class="comment"># 注意下面一行, 获取智能页码范围，并传递给模板</span></span><br><span class="line">    page_range = paginator.get_elided_page_range(page, on_each_side=<span class="number">3</span>, on_ends=<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">    context = {<span class="string">'page_obj'</span>: page_obj, <span class="string">'paginator'</span>: paginator,</span><br><span class="line">               <span class="string">'is_paginated'</span>: is_paginated, <span class="string">'page_range'</span>: page_range}</span><br><span class="line">    <span class="keyword">return</span> render(request, <span class="string">'house/house_index.html'</span>, context)</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight html"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- Django 3.2之前 --&gt;</span></span><br><span class="line"> {% for i in page_obj.paginator.page_range %}</span><br><span class="line"><span class="comment">&lt;!-- Django 3.2之后 --&gt;</span></span><br><span class="line"> {% for i in page_range %}</span><br></pre></td></tr></tbody></table></figure>
+
+<h5 id="按字段查找可以用的条件的使用"><a href="#按字段查找可以用的条件的使用" class="headerlink" title="按字段查找可以用的条件的使用"></a>按字段查找可以用的条件的使用</h5><p>查询语法：<br>字段名称__查询条件 = “查询内容” 注意是双下划线<br>    相等/等于</p>
+<ol>
+<li><code>exact</code> / <code>iexact</code>：精确匹配/忽略大小写的精确匹配查询 等于xx值（默认的形式）</li>
+</ol>
+<p>如：id_exact=6 或者 id=6<br>如：name_iexact=’zhangsan’<br>    # name LIKE ‘zhangsan’<br>    </p><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">        WeiboUser.objects.filter(username__iexact=<span class="string">'gan'</span>)</span><br><span class="line">    `</span><br><span class="line"><span class="number">2.</span> `contains` / `icontains` / `startswith` / `istartswith` / `endswith` / `iendswith`：基于`like`的模糊查询</span><br><span class="line"></span><br><span class="line">    是否包含xx字符串</span><br><span class="line">contains, icontains——包含xx值</span><br><span class="line">如：name__contains= ‘san’</span><br><span class="line">    以xx开始</span><br><span class="line">startswith、istartswith</span><br><span class="line">    以xx结束</span><br><span class="line">endswith、iendswith</span><br><span class="line"></span><br><span class="line"><span class="number">3.</span> `<span class="keyword">in</span>` ：集合运算</span><br><span class="line">    xx选项__in[列表]或（元组）</span><br><span class="line">status__in=(<span class="number">2</span>,<span class="number">4</span>)</span><br><span class="line"></span><br><span class="line"><span class="number">4.</span> `gt` / `gte` / `lt` / `lte`：大于/大于等于/小于/小于等于关系运算</span><br><span class="line">`isnull`：查询空值（<span class="literal">True</span>）或非空值（<span class="literal">False</span>）</span><br><span class="line"></span><br><span class="line"><span class="number">5.</span> `range`：指定范围查询（SQL中的`between…<span class="keyword">and</span>…`）</span><br><span class="line"></span><br><span class="line"><span class="number">6.</span>  查询时间日期</span><br><span class="line">date 查询条件</span><br><span class="line">`date`/`datetime`——日期</span><br><span class="line">`year`——年</span><br><span class="line">`month`——月份</span><br><span class="line">`day`——天</span><br><span class="line">`hour`/`minute`/`second`——时分秒</span><br><span class="line">`week`/`week_day`——星期</span><br><span class="line"></span><br><span class="line">`range`：指定范围查询（SQL中的`between…<span class="keyword">and</span>…`）</span><br><span class="line">`search`：基于全文索引的全文检索（一般很少使用）</span><br><span class="line">`regex` / `iregex`：基于正则表达式的模糊匹配查询</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">外键关联查询</span><br><span class="line">查询条件是外键的某个属性（字段）</span><br><span class="line"></span><br><span class="line">```Python</span><br><span class="line">    <span class="comment"># 查询外键关联表字段包含'xx'的在本表数据</span></span><br><span class="line">    model.objects.filter(model__column__icontains=<span class="string">'xx'</span>)</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p>手动添加微博及评论，然后举例外键关联查询：</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> weibo.models <span class="keyword">import</span> WeiboUser <span class="keyword">as</span> User</span><br><span class="line">user = User.objects.get(pk=<span class="number">4</span>)</span><br><span class="line">user</span><br><span class="line">Out[<span class="number">4</span>]: &lt;WeiboUser: User:zhangsan pk:<span class="number">4</span>,nickname:zhangsan status:<span class="number">1</span>&gt;</span><br><span class="line"><span class="keyword">from</span> weibo.models <span class="keyword">import</span> Weibo</span><br><span class="line"> weibo = Weibo.objects.create(user=user,content=<span class="string">'微博内容'</span>)</span><br><span class="line">weibo.pk</span><br><span class="line">Out[<span class="number">8</span>]: <span class="number">1</span></span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> weibo.models <span class="keyword">import</span> Comment</span><br><span class="line">Comment.objects.create(user=user,weibo=weibo,content=<span class="string">'zhangsan 评论'</span>)</span><br><span class="line">Out[<span class="number">10</span>]: &lt;Comment: Comment object&gt;</span><br><span class="line">Comment.objects.create(user=user,weibo=weibo,content=<span class="string">'zhangsan 评论2'</span>)</span><br><span class="line">Out[<span class="number">11</span>]: &lt;Comment: Comment object&gt;</span><br><span class="line">lisi = User.objects.get(pk=<span class="number">5</span>)</span><br><span class="line">Comment.objects.create(user=lisi,weibo=weibo,content=<span class="string">'lisi评论'</span>)</span><br><span class="line">Out[<span class="number">13</span>]: &lt;Comment: Comment object&gt;</span><br><span class="line">Comment.objects.create(user=lisi,weibo=weibo,content=<span class="string">'lisi评论2'</span>)</span><br><span class="line">Out[<span class="number">14</span>]: &lt;Comment: Comment object&gt;</span><br></pre></td></tr></tbody></table></figure>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1285,409 +1782,6 @@
     <div class="post-body" itemprop="articleBody">
           <p>setting.通用的配置</p>
 <script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/ftp/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/ftp/" class="post-title-link" itemprop="url">ftp</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-14 07:34:15" itemprop="dateModified" datetime="2021-04-14T07:34:15Z">2021-04-14</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">计算机网络</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>FTP是应用层的一个文件传输协议。其主要作用是在服务器和客户端之间实现文件的传输和共享。FTP协议运行在TCP连接上,保证了文件传输的可靠性。<br>FTP支持两种方式的传输:</p>
-<ul>
-<li>文本方式</li>
-<li>二进制方式</li>
-</ul>
-<p>FTP有两种传输模式:</p>
-<ul>
-<li>主动模式的核心是TFP客户端告诉服务端自己开发那个端口作为数据端口,然后让服务端来连接自己 </li>
-<li>和被动模式 连接的核心是控制连接请求和数据连接请求都是由客户端发起。</li>
-</ul>
-<p>FTP局限性:当客户端用户数量不断增多,FTP服务器所要维持的会话总数,也会迅速增长。<br>会大大限制FTP服务器的性能。</p>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/hexo-chang-yong-ming-ling/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/hexo-chang-yong-ming-ling/" class="post-title-link" itemprop="url">hexo 常用命令</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-02 15:48:20" itemprop="dateModified" datetime="2021-04-02T15:48:20Z">2021-04-02</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/hexo/" itemprop="url" rel="index"><span itemprop="name">hexo</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></tbody></table></figure>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo s</span><br></pre></td></tr></tbody></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></tbody></table></figure>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo g</span><br></pre></td></tr></tbody></table></figure>
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></tbody></table></figure>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo d</span><br></pre></td></tr></tbody></table></figure>
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-<h3 id="clean-to-remote-sites"><a href="#clean-to-remote-sites" class="headerlink" title="clean to remote sites"></a>clean to remote sites</h3><figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo clean</span><br></pre></td></tr></tbody></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/html/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/html/" class="post-title-link" itemprop="url">HTML</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-05-16 07:53:27" itemprop="dateModified" datetime="2021-05-16T07:53:27Z">2021-05-16</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>html在vscode没有高亮，右下角语言模式把<code>django html</code>切换成<code>html</code><br>live Server可以本地服务器的形式来运行html文件,或者项目,实现边改边在浏览器<br>看见效果。打开浏览器进行预览和调试页面。这个插件就可以实现静态、动态页面的实时预览，保存就能看见页面更新，不需要手动去刷新。</p>
-<p>js中用<code>/**</code>表示方法的注释</p>
-<h1 id="当前页面-当前文档所有内容"><a href="#当前页面-当前文档所有内容" class="headerlink" title="当前页面 * 当前文档所有内容"></a>当前页面 * 当前文档所有内容</h1><p>html的基本结构，</p>
-文档标记，
-头部标记，其中<title></title>属于
-正文标记
-
-<p>⽹⻚中常⽤的块元素有：div、dl、form、h1 – h6、hr、ol、p、pre、table、ul；<br>⽹⻚中常⽤的内联元素有：a、br、img、input、label、q、select、span、strong、textarea； </p>
-⽤来定义表格的表头标签
-是表格中单元格标签
-是表格中定义⾏的标签
-<hr>是水平线
-<b>加粗
-<ins>下划线
-<i>斜体
-<sub>下标
-<p> 换段
-<br> 换行
-在html中，⽆论打多少个空格，在⻚⾯中都只显示⼀个，显然不能正确的表示空格。 
-
-</p><p>什么是转义<br>◆把有特殊意义的字符显示出来<br>在浏览器显示页面时，浏览器会移除源代码中多余的空格和空行，所有连续的空格或空行都会被认为是一个空格。<br>&nbsp;  在⻚⾯表示空格符。<br>&amp;amp  &amp;<br>html标签中的&lt;&gt;—&amp;lt,&gt;<br>&amp;lt；在⻚⾯上表示的是左尖括号&lt;。<br>&amp;gt；在⻚⾯上表示<br>rowspan是跨⾏属性<br>colspan是跨列属性<br>cellspacing是单元格空隙<br>cellpadding是单元格内容与单元格边框空隙。 </p>
-<p>行级元素和其他内元素都会在一条水平线上排列，都在同一行<br>行级元素 a标签 label img span <br><br>标签 <span> 通常作为文本的容器，它没有特定的含义和样式，只有与 CSS 同时使用才可以为指定文本设置样式属性<br>该标签是一个内联元素，他与块级元素相反，内联元素不会自动在前后自动放置换行符，因此内联元素会默认显示在同一行。</span></p>
-<p>lt 是 less than 的缩写，表示（严格）小于；<br>gt 是 greater than 的缩写，表示（严格）大于；<br>le 是 less than or equal 的缩写，表示小于等于<br>ge 是 greater than or equal 的缩写，表示大于等于</p>
-<p>h1~h6 标题<br>&lt;img src=“***”/&gt;   作用在浏览器显示图片<br>示例&lt;img src=”image/logo.jpg” width=”250” height=”250” alt=“**”/&gt;<br>常用属性src、alt、height、width</p>
-<p>href用来设置链接指向的页面的URL，指定要链接内容的地址<br><a>.….</a> 使用超级链接与网络上的另一个文档相连<br><a href="page2.html">打开另一个页面</a><br>外网加上http://<br><a target="_blank" rel="noopener" href="http://www.imooc.com">慕课网</a></p>
-<p>A标签的target属性<br>标签|格式<br>_blank 在新打开、未命名的窗口打开链接<br>_parent 在父窗口打开链接<br>_self 当前窗口打开<br>_top 在框架中打开，目标将会清除所有被包含的frame框架</p>
-<p>target规定在何处打开链接文档。<br>用title属性规定关于元素的额外信息。这些信息通常会在鼠标移到元素上时显示一段工具提示文本（tooltip text）。title 属性常与form以及a元素一同使用，以提供关于输入格式和链接目标的信同时它也是abbr和acronym元素的必需属性。</p>
-<p>锚点标签<a name="ziti">…</a><br>name规定锚的名称。<br>作用同一个文档中创建指向该锚（位置）的链接，保证页面能最后一段是完整的，不能是半页<br>示例<a href="#duanluo">段落标签</a></p>
-<h1>目录</h1><h1>
-</h1><h2><a href="#duanluo">段落标签</a></h2>
-<h2><a href="page1.html#ziti">字体标签</a>有序列表<ol><li>….</li></ol><p></p>
-<p>无序列表</p><ul><li>….</li></ul><br>作用此列项目使用粗体圆点（典型的小黑圆圈）进行标记<br>适用于规律性显示的页面效果，范围和大小可以根据需要和整体宽度来自适应<br>示例<ul><li>我的文件</li></ul><p></p>
-<ul>
-<li>我的文件</li>
-<li>我的图片</li>
-</ul>
-列表项内部可以使用段落、换行符、图片、链接以及其他列表等
-
-<form>标签定义表单，表单本身是不可见的，相当于一个容器
-所有表单元素要放在标签中，<input>、下拉菜单和列表项目分组中每项内容标签<option>，文字域</option><textarea>、可创建单选或多选菜单</textarea><select>等标签，
-form中没有标签。
-
-常见的表单元素◆隐藏表单域◆单行文本框/多行文本框◆表单按钮◆选择(单选、多选、下拉选择)◆文件上传框
-◆ action表单提交的URL地址◆ method表单请求的方式(GET/POST)◆ enctype-请求内容的形式application/x-www-form-urlencodedmultipart/form-data 上传文件，如word excelmethod=”post” enctype=”multipart/form-data”
-</select><input>是表单输入标签,type属性的设置，text是文本域，submit是提交按钮<br>type属性是text的input标签代表文本框 可以接收用户输入<p></p>
-<input type="" value="">
-value 属性对于不同 input 类型，用法也不同：
-定义按钮上的文本： "button"、"reset"、"submit"
- 定义输入字段的初始（默认）值： "text"、"password"、"hidden"隐藏表单域
-多选 "checkbox"、单选"radio"、"image" 类型,<select><option></option></select>下拉选择 - 定义与 input 元素相关的值，当提交表单时该值会发送到表单的 action URL。
-<input type="file"> 文件上传
-<input type="text" size="20"> 
-type="text"是⽤来设置⽂本域的，size属性表示⽂本域的宽 度为多少个英⽂字符
- 时间日期等（date、month、week、time、date、datetime、datetime-local）
-
-
-<p><code>placeholder</code>文本框的输入提示</p>
-<p>以规范实现选择“是”或“否”单选框效果<br>&lt;input type=’radio’name=’radio’ value=’s’/&gt;True<br>&lt;input type=’radio’name=’radio’ value=’f’/&gt;Flase</p>
-<p>开始标签 <option> 与结束标签 </option> 之间的内容是浏览器显示在下拉列表中的内容，而 value 属性中的值是表单提交时被发送到服务器的值。</p>
-<p>注意：如果没有规定 value 属性，选项的值将设置为 <option> 标签中的内容。</option></p>
-<p>CSS Cascading Style Sheets 层叠样式列表<br>·结构与样式分离的方式，便于后期维护与改版<br>·可以用多套样式，使网页有任意样式切换的效果<br>·使页面载入得更快、降低服务器的成本</p>
-<p>CSS规则是由选择器和声明组成。声明要由花括号包围起来；<br>属性和属性值之间用冒号分开；属性值如果有单位，那么数字和单位之间不能有空格；<br>每条声明的结尾用分号结束；</p>
-<p>选择器 作用：用来选择（找到）需要添加样式的位置<br>常用选择器：（归）类选择器</p>
-<p class="title">https://www.imooc.com/</p><p>
-</p><p class="title">你学习的好帮手/</p><p>
-标签选择器 
-<p〉慕课网< p="">
-
-</p〉慕课网<></p><p>CSS中文字字体的设意，<br>CSS中设置文字字体使用的属性是font-family<br>font-size用来设置字体的大小 npx<br>fong-weight是用来设置字体的粗细 normal、bold、100-900<br>font-style用来设置字体的样式 normal、italic、oblique规定斜体文本</p>
-<p>使用内部样式表，完成背景设置<br>背景样式<br>属性|属性值|作用<br>1|background-color 颜色值 颜色作为背景颜色<br>2background-image 图片位置 图片作为背景图片<br>3|background-repeat repeat、repeat-x<br>|repeat-y、no-repeat 背景图片的重复方向<br>4background-attachment scroll、fixed 背景是否随滚动条滚<br>5|background-position 见详细表格 背景图像的起始位置<br>6background 背景样式的值是复合属性值组合<br>top left|如果您仅规定了一个关键词，那么第二个值将是”center”。<br>top center top right 默认值：0%0%。<br>center left center center center right bottom left bottom center bottom right<br>×%y%第一个值是水平位置，第二个值是垂直位置。<br>左上角是0%0%。右下角是100%100%。如果您仅规定了一个值，另一个值将是50%。<br>xpos ypos第一个值是水平位置，第二个值是垂直位置。<br>左上角是00。单位是像素（OpxOpx）或任何其他的CSS单位。<br>如果您仅规定了一个值，另一个值将是50%。<br>您可以混合使用%和position值。</p>
-<p>外部样式表就是新建一个文档，里面全写css，<br>然后再通过link 插入到html代码中<br>作用：使网页的表示层与结构层彻底分离<br>示例：将背景设置，修改为外部样式表<br>&lt;linklrel=”stylesheet”|type=”text/css href=”index.css”&gt;<br>小贴士除了link进行外部样式表的链接，还是其他方法哦</p>
-<p>文本样式</p>
-<p>属性|属性值|作用<br>|1color表示颜色的内容设置文本颜色<br>2direction ltr、rtl文本的方向/书写方向<br>3|letter-spacing npx注：n可以是负数）字符间距<br>4line-height npx行高<br>5text-align |left、right、center、justify 文本对齐方式<br>6 text-decoration none、underline、overline文本的修饰：<br>line-through例如：下划线<br>7text-shadow h-shadow v-shadow blur color 文本设置阴影<br>8 text-transform pone、capitalize、uppercase、y字母/小<br>lowercase<br>9 text-indent npx、nem首行缩进</p>
-<p>伪类：超级链接上设置的样式<br>1、伪类是用在超链接上的效果比较多，但超链接不是伪类。<br>2、伪类是选择器。伪类包含两种：状态伪类和结构性伪类<br>作用：设置超级链接的4种状态<br>属性           作用<br>1|a:link未访问的链接<br>2a:visited已访问的链接<br>3|a:hover鼠标移动到链接上（浮动、悬停）<br>4 a:active向被激活的元素添加样式<br>5|：focus选择拥有键盘输入焦点的元素<br>（结构性）伪类选择器（全部）<br>属性作用<br>|1|：first-child 选择元素的第一个子元素2|：last-child选择某个元素的最后一个子元素3|：nth-child（0选择某个元素的一个或多个特定的子元素4 nth-last-childo选择某个元素的一个或多全特定的子元素，从这个元素的最后一个子元素开始算<br>5|：first-of-type选择一个上级元素下的第一个同类子元素</p>
-<p>伪元素选择器（部分）<br>属性作用<br>::selection选择指定元素中被用户选中的内容<br>::before可以在选定内容之前插入新内容<br>::after可以在选定内容之后插入新内容<br>:after 选择器向的元素之后插入内容。<br>::first-line选择指定选择器的首行<br>::first-letter选择文本的第一个字符</p>
-<p>CSS其他选择器<br>选择器|作用<br>id，*选择指定元素中被用户选中的内容<br>逗号选择器 联合选择器<br>空格选择器 子孙（后代）选择器4</p>
-<blockquote>
-<p>选择器子选择器（不是子孙后代）<br>+选择器相邻兄弟选择器<br>[]属性选择器</p>
-</blockquote>
-<p>CSS选择器优先级<br>选择器<br>1|limportant<br>2行内样式<br>3|ID选择器<br>4类选择器<br>5|标签<br>6通配符<br>7浏览器默认属性</p>
-<div> 和 </div>定义区块， 前后自动放置一个换行符。
-图层，层叠样式表中的定位技术
-
-<p>overflow属性设置<br>属性|作用<br>1|visible 默认值。内容不会被修剪，会呈现在元素框之外。<br>2hidden 超出的部分被隐藏，清除浮动 ，父元素和子元素高度发生联系<br>3|scroll 不论是否需要，都显示滚动条。<br>4 auto按需显示滚动条以便查看其余的内容。</p>
-<p></p></form></h2></sub></i></ins></b><script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }

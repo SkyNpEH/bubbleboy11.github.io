@@ -119,7 +119,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">351</span>
+          <span class="site-state-item-count">354</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -160,6 +160,385 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/gunicorn/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/gunicorn/" class="post-title-link" itemprop="url">Gunicorn</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-04-14 07:34:08" itemprop="dateModified" datetime="2021-04-14T07:34:08Z">2021-04-14</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>Gunicorn：Python WSGI HTTP Server.<br>纯 Python 编写的高性能的 WSGI Server</p>
+<p>pre-fork 预先分配多个 worker 进程处理请求(master-slave)。master-slave方式：一个master负责去管理多个worker进程，比如那个worker超时了把它重启，worker负责处理客服端的用户请求。</p>
+<p>多钟 worker 支持：Sync 同步worker / Async(Gevent) 基于gevent的异步worker/ Tornado / AsyncIO。一般需要支持比较高的并发的时候，可以采用基于gevent的异步worker。</p>
+<p>图解：使用Gunicorn来去部署 web的一种方式，首先客户端的请求先到Nginx这一层，Nginx负责反向代理，它就又把请求直接转发给Gunicorn。Gunicorn通过Pre-fork预先fork一堆worker进程，然后把请求转给worker进程处理请求。master进程它不会负责去处理请求，它只是负责监控和重启worker进程。</p>
+<p>2.Gunicorn的代码示例</p>
+<figure class="highlight cmake"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ pip <span class="keyword">install</span> gunicorn     <span class="comment"># 安装gunicorn</span></span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建文件 myapp.py, 添加内容如下</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">app</span>(<span class="params">environ, start_response</span>):</span>  <span class="comment"># 一个web应用</span></span><br><span class="line">    data = <span class="string">b'Hello, World!\n'</span></span><br><span class="line">    start_response( <span class="string">"200 OK"</span>, [</span><br><span class="line">        (<span class="string">"Content-Type"</span>, <span class="string">"text/plain"</span>),</span><br><span class="line">        (<span class="string">"Content-Length"</span>, str(len(data))</span><br><span class="line">    ])</span><br><span class="line">    <span class="keyword">return</span> iter([data])</span><br><span class="line">``` </span><br><span class="line">```shell </span><br><span class="line">$ gunicorn -w <span class="number">4</span> myapp:app  <span class="comment"># 使用gunicorn指定4个worker启动 web应用</span></span><br></pre></td></tr></tbody></table></figure>
+<p>由于gunicorn部署个启动都非常容易，所以很多公司都使用 Gunicorn来作为 WSGI server。</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/http-fang-fa/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/http-fang-fa/" class="post-title-link" itemprop="url">HTTP 方法</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-07-20 08:50:14" itemprop="dateModified" datetime="2021-07-20T08:50:14Z">2021-07-20</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">计算机网络</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>常见的 HTTP 方法、接口的分类： </p>
+<p>GET 请求</p>
+<ul>
+<li><p>可以用浏览器地址栏直接输入网址访问</p>
+</li>
+<li><p>请求参数直接放在URL后面，明文传递明文显示</p>
+</li>
+<li><p>请求访问已被 URI 识别的资源。指定的资源经服务器端解析后返回响应内容。</p>
+</li>
+</ul>
+<ul>
+<li>可以用来提交表单和其他数据，会带来安全问题，比如一个登录页面，通过GET方式提交数据时，用户名和密码将出现在URL上，如果页面可以被缓存或者其他人可以访问这台机器，就可以从历史记录获得该用户的账号和密码<br>GET 方法是从指定的资源请求数据<br>GET 请求所包含的参数会被缓存(浏览器cache)，而post不会<br>GET 请求保留在浏览器历史记录中<br>GET 请求可被收藏为书签 get的url能被存为标签，post不会<br>get只能被url编码，而post可以被多种编码<br>get只接受ASCII字符，而post没有限制<br>get后退无害，而post后退会再次发送请求<br>GET 请求不应在处理敏感数据时使用<br>GET提交的数据大小有限制（因为浏览器对URL的长度有限制），<br>请求只应当用于取回数据</li>
+</ul>
+<p>POST请求</p>
+<ul>
+<li>不能使用浏览器地址栏直接输入网址访问</li>
+<li>传输实体的主体。</li>
+<li>主要目的不是获取响应主体的内容。</li>
+</ul>
+<ul>
+<li>放在Http报文实体的主体请求体，更安全。</li>
+</ul>
+<ul>
+<li>可以用来上传文件、登录注册等需求</li>
+<li>通过 request body 传递参数，加密传递数据</li>
+</ul>
+<p>幂等性(Idempotent): 发送一次和多次请求引起的边界效应是一致的，都得到相同请求结果的 HTTP 方法<br>幂等的方法客户端可以安全地重新请求，因为不会对服务器上的数据造成什么影响。<br>例如：a = 4 是幂等的，但是 a += 4 就是非幂等的</p>
+<p>GET 是幂等的，就是对服务器没有副作用；<br>POST 非幂等，就是每一次创建一个新的东西会影响数据库的数据。<br>PUT是幂等的，将PUT方法用作传输资源。更新：从客户端向服务器传送的数据取代指定的文档的内容。</p>
+<p>我们可以看到GET请求消息体为空没有请求体，POST请求带有消息体。</p>
+<p>POST方法提交的数据没有限制。<br>post请求携带的数据量比get请求多，常用于传输大文本的时候<br>从客户端向服务器传送的数据取代指定的文档的内容。</p>
+<p>高级区别：<br>HTTP的底层是TCP/IP。所以GET和POST的底层也是TCP/IP，也就是说，GET/POST都是TCP链接。<br>GET和POST能做的事情是一样一样的。你要给GET加上request body，给POST带上url参数，技术上是完全行的通的。<br>    • get产生一个tcp数据包，post产生两个数据包。<br>对于GET方式的请求，浏览器会把http header和data一并发送出去，服务器响应200（返回数据）；<br>而对于POST，浏览器先发送header，服务器响应100 continue，浏览器再发送data，服务器响应200 ok（返回数据）。</p>
+<p>也就是说，GET只需要汽车跑一趟就把货送到了，而POST得跑两趟，第一趟，先去和服务器打个招呼“嗨，我等下要送一批货来，你们打开门迎接我”，然后再回头把货送过去。</p>
+<p>因为POST需要两步，时间上消耗的要多一点，看起来GET比POST更有效。因此Yahoo团队有推荐用GET替换POST来优化网站性能。但这是一个坑！跳入需谨慎。为什么？</p>
+<ol>
+<li>GET与POST都有自己的语义，不能随便混用。</li>
+<li>据研究，在网络环境好的情况下，发一次包的时间和发两次包的时间差别基本可以无视。而在网络环境差的情况下，两次包的TCP在验证数据包完整性上，有非常大的优点。</li>
+<li>并不是所有浏览器都会在POST中发送两次包，Firefox就只发送一次。</li>
+</ol>
+<p>（1）web开发中 Post 和 Get 有哪些区别，各适合用于什么情况 ？<br> ① 功能差异：<br>    get ：获取数据，客户端去向服务器请求取数据资源<br>    post：提交数据，从客户端向服务器送处上传数据。<br>② 数据传输：<br>   get：通过URL里面加上参数去把数据传输给服务器端，然后服务器端根据发送过来参数返回对应内容。<br>   get把请求的数据拼接在URL后面，在地址栏里提交<br>   浏览器的地址栏会显示出来当前URL，get会把所有的数据放到url部分，数据会以明文显示对于用户来说是可见的，并且浏览器会有历史记录的功能。</p>
+<p>  post：URL唯一标识，通过唯一标识向唯一标识路径下提交一些数据，<br>  Post把所有请求的数据放到Body里面不在URL里，页面里面通过form表单或者Ajax等方式发送一个请求给服务器端,服务器会把Body(消息主体)里面的数据存储到服务器端数据库。<br>地址栏也是无法直接发送一个post请求，post把所有数据放到Body部分对于用户来说是不可见的 浏览器无法记录，</p>
+<p>③ 安全性：post相对于get更安全。安全指的是是否会修改数据。<br>安全性：GET,HEAD 和 OPTIONS 均被认为是安全的方法，因为它们旨在实现对数据的获取，并不具有’边界效应(side effect)’<br>无论是get还是post如果传输的数据未经过加密，通过第三方抓包工具依然是可以把数据抓取到的，一旦抓取到数据还是可以看到传输的数据内容都包含哪些。<br>为了保证传输的内容安全，一般对关键信息或者敏感信息都会采用这种加密的形式。</p>
+<p>GET提交的数据会放在URL之后，以?分割URL和传输数据，参数之间以&amp;相连，如EditPosts.aspx?name=test1&amp;id=123456。POST方法是把提交的数据放在HTTP包的body中。</p>
+<p>POST 方法向指定资源提交要被处理的数据<br>POST 请求不会被缓存<br>POST 请求不会保留在浏览器历史记录中<br>POST 不能被收藏为书签</p>
+<p>HEAD 类似于 GET 请求，返回的响应中没有具体的内容，用于获取资源的报头元数据<br>⑤ DELETE 请求服务器删除指定的资源<br>⑥ OPTIONS 用来查询针对请求 URI 指定的资源支持的方法，获取信息，关于资源的哪些属性是客户端可以改变的</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">[root@VM-0-9-centos ~]<span class="comment"># curl -X OPTIONS http://www.baidu.com -i</span></span><br><span class="line">HTTP/1.1 302 Found</span><br><span class="line">Connection: keep-alive</span><br><span class="line">Content-Length: 17931</span><br><span class="line">Content-Type: text/html</span><br><span class="line">Date: Tue, 27 Apr 2021 04:11:06 GMT</span><br><span class="line">Etag: <span class="string">"54d97487-460b"</span></span><br><span class="line">Server: bfe/1.0.8.18</span><br><span class="line"></span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">&lt;meta http-equiv=<span class="string">"content-type"</span> content=<span class="string">"text/html;charset=utf-8"</span>&gt;</span><br><span class="line"></span><br><span class="line">&lt;meta http-equiv=<span class="string">"X-UA-Compatible"</span> content=<span class="string">"IE=Edge"</span>&gt;</span><br><span class="line">&lt;title&gt;页面不存在_百度搜索&lt;/title&gt;</span><br><span class="line"></span><br><span class="line">&lt;/head&gt;</span><br><span class="line"></span><br><span class="line">&lt;body link=<span class="string">"#0000cc"</span>&gt;</span><br><span class="line">&lt;div id=<span class="string">"wrapper"</span> style=<span class="string">""</span> class=<span class="string">"wrapper_s"</span>&gt;</span><br><span class="line"></span><br><span class="line"> &lt;div id=<span class="string">"head"</span>&gt; &lt;div class=<span class="string">"head_wrapper"</span>&gt; &lt;div class=<span class="string">"s_form"</span>&gt; &lt;div class=<span class="string">"s_form_wrapper"</span>&gt; &lt;div id=<span class="string">"lg"</span>&gt; &lt;img hidefocus=<span class="string">"true"</span> src=<span class="string">"//www.baidu.com/img/bd_logo1.png"</span> width=<span class="string">"270"</span> height=<span class="string">"129"</span>&gt; &lt;/div&gt; &lt;a href=<span class="string">"/"</span> id=<span class="string">"result_logo"</span> onmousedown=<span class="string">"return c({'fm':'tab','tab':'logo'})"</span>&gt; &lt;img src=<span class="string">"//www.baidu.com/img/baidu_jgylogo3.gif"</span> alt=<span class="string">"到百度首页"</span> title=<span class="string">"到百度首页"</span>&gt; &lt;/a&gt; &lt;form id=<span class="string">"form"</span> name=<span class="string">"f"</span> action=<span class="string">"/s"</span> class=<span class="string">"fm"</span>&gt; &lt;input <span class="built_in">type</span>=<span class="string">"hidden"</span> name=<span class="string">"ie"</span> value=<span class="string">"utf-8"</span>&gt; &lt;input <span class="built_in">type</span>=<span class="string">"hidden"</span> name=<span class="string">"f"</span> value=<span class="string">"8"</span>&gt; &lt;input <span class="built_in">type</span>=<span class="string">"hidden"</span> name=<span class="string">"rsv_bp"</span> value=<span class="string">"1"</span>&gt; &lt;input <span class="built_in">type</span>=<span class="string">"hidden"</span> name=<span class="string">"rsv_idx"</span> value=<span class="string">"1"</span>&gt; &lt;input <span class="built_in">type</span>=<span class="string">"hidden"</span> name=<span class="string">"ch"</span> value=<span class="string">""</span>&gt; &lt;input <span class="built_in">type</span>=<span class="string">"hidden"</span> name=<span class="string">"tn"</span> value=<span class="string">"baiduerr"</span>&gt; &lt;input <span class="built_in">type</span>=<span class="string">"hidden"</span> name=<span class="string">"bar"</span> value=<span class="string">""</span>&gt; &lt;span class=<span class="string">"bg s_ipt_wr"</span>&gt; &lt;input id=<span class="string">"kw_tip"</span> unselectable=<span class="string">"on"</span> onselectstart=<span class="string">"return false;"</span> class=<span class="string">"s_ipt s_ipt_tip"</span> disabled=<span class="string">""</span> autocomplete=<span class="string">"off"</span> value=<span class="string">""</span> maxlength=<span class="string">"100"</span> style=<span class="string">"display: none;"</span>&gt; &lt;input id=<span class="string">"kw"</span> name=<span class="string">"wd"</span> class=<span class="string">"s_ipt"</span> value=<span class="string">""</span> maxlength=<span class="string">"100"</span> autocomplete=<span class="string">"off"</span>&gt; &lt;/span&gt;&lt;span class=<span class="string">"bg s_btn_wr"</span>&gt; &lt;input <span class="built_in">type</span>=<span class="string">"submit"</span> id=<span class="string">"su"</span> value=<span class="string">"百度一下"</span> class=<span class="string">"bg s_btn"</span>&gt; &lt;/span&gt;&lt;span class=<span class="string">"tools"</span>&gt; &lt;span id=<span class="string">"mHolder"</span>&gt; &lt;div id=<span class="string">"mCon"</span>&gt; &lt;span&gt;输入法&lt;/span&gt; &lt;/div&gt; &lt;ul id=<span class="string">"mMenu"</span>&gt; &lt;li&gt;&lt;a href=<span class="string">"javascript:;"</span> name=<span class="string">"ime_hw"</span>&gt;手写&lt;/a&gt; &lt;/li&gt; &lt;li&gt;&lt;a href=<span class="string">"javascript:;"</span> name=<span class="string">"ime_py"</span>&gt;拼音&lt;/a&gt; &lt;/li&gt; &lt;li class=<span class="string">"ln"</span>&gt;&lt;/li&gt; &lt;li&gt;&lt;a href=<span class="string">"javascript:;"</span> name=<span class="string">"ime_cl"</span>&gt;关闭&lt;/a&gt; &lt;/li&gt; &lt;/ul&gt; &lt;/span&gt; &lt;span class=<span class="string">"shouji"</span> style=<span class="string">"display: none;"</span>&gt;&lt;a href=<span class="string">"http://w.x.baidu.com/go/mini/8/10000020"</span> onmousedown=<span class="string">"return ns_c({'fm':'behs','tab':'bdbrowser'})"</span>&gt;百度浏览器，打开网页快2秒！&lt;/a&gt; &lt;/span&gt; &lt;/span&gt; &lt;input <span class="built_in">type</span>=<span class="string">"hidden"</span> name=<span class="string">"rn"</span> value=<span class="string">""</span>&gt; &lt;input <span class="built_in">type</span>=<span class="string">"hidden"</span> name=<span class="string">"rsv_enter"</span> value=<span class="string">"1"</span>&gt; &lt;/form&gt; &lt;div id=<span class="string">"m"</span>&gt;&lt;/div&gt; &lt;/div&gt;&lt;/div&gt; &lt;/div&gt;&lt;/div&gt; &lt;div class=<span class="string">"s_tab"</span> id=<span class="string">"s_tab"</span>&gt; &lt;b&gt;网页&lt;/b&gt; &lt;a href=<span class="string">"http://news.baidu.com/ns?cl=2&amp;amp;rn=20&amp;amp;tn=news&amp;amp;word="</span> wdfield=<span class="string">"word"</span> onmousedown=<span class="string">"return c({'fm':'tab','tab':'news'})"</span>&gt;新闻&lt;/a&gt;&lt;a href=<span class="string">"http://tieba.baidu.com/f?kw=&amp;amp;fr=wwwt"</span> wdfield=<span class="string">"kw"</span> onmousedown=<span class="string">"return c({'fm':'tab','tab':'tieba'})"</span>&gt;贴吧&lt;/a&gt;&lt;a href=<span class="string">"http://zhidao.baidu.com/q?ct=17&amp;amp;pn=0&amp;amp;tn=ikaslist&amp;amp;rn=10&amp;amp;word=&amp;amp;fr=wwwt"</span> wdfield=<span class="string">"word"</span> onmousedown=<span class="string">"return c({'fm':'tab','tab':'zhidao'})"</span>&gt;知道&lt;/a&gt;&lt;a href=<span class="string">"http://music.baidu.com/search?fr=ps&amp;amp;key="</span> wdfield=<span class="string">"key"</span> onmousedown=<span class="string">"return c({'fm':'tab','tab':'music'})"</span>&gt;音乐&lt;/a&gt;&lt;a href=<span class="string">"http://image.baidu.com/i?tn=baiduimage&amp;amp;ps=1&amp;amp;ct=201326592&amp;amp;lm=-1&amp;amp;cl=2&amp;amp;nc=1&amp;amp;word="</span> wdfield=<span class="string">"word"</span> onmousedown=<span class="string">"return c({'fm':'tab','tab':'pic'})"</span>&gt;图片&lt;/a&gt;&lt;a href=<span class="string">"http://v.baidu.com/v?ct=301989888&amp;amp;rn=20&amp;amp;pn=0&amp;amp;db=0&amp;amp;s=25&amp;amp;word="</span> wdfield=<span class="string">"word"</span> onmousedown=<span class="string">"return c({'fm':'tab','tab':'video'})"</span>&gt;视频&lt;/a&gt;&lt;a href=<span class="string">"http://map.baidu.com/m?word=&amp;amp;fr=ps01000"</span> wdfield=<span class="string">"word"</span> onmousedown=<span class="string">"return c({'fm':'tab','tab':'map'})"</span>&gt;地图&lt;/a&gt;&lt;a href=<span class="string">"http://wenku.baidu.com/search?word=&amp;amp;lm=0&amp;amp;od=0"</span> wdfield=<span class="string">"word"</span> onmousedown=<span class="string">"return c({'fm':'tab','tab':'wenku'})"</span>&gt;文库&lt;/a&gt;&lt;a href=<span class="string">"//www.baidu.com/more/"</span> onmousedown=<span class="string">"return c({'fm':'tab','tab':'more'})"</span>&gt;更多»&lt;/a&gt; &lt;/div&gt;</span><br><span class="line">&lt;div id=<span class="string">"ftCon"</span>&gt;&lt;div id=<span class="string">"ftConw"</span>&gt;&lt;p id=<span class="string">"lh"</span>&gt; &lt;a id=<span class="string">"seth"</span> onclick=<span class="string">"h(this)"</span> href=<span class="string">"/"</span> onmousedown=<span class="string">"return ns_c({'fm':'behs','tab':'homepage','pos':0})"</span>&gt;把百度设为主页&lt;/a&gt;&lt;a id=<span class="string">"setf"</span> href=<span class="string">"http://www.baidu.com/cache/sethelp/index.html"</span> onmousedown=<span class="string">"return ns_c({'fm':'behs','tab':'favorites','pos':0})"</span> target=<span class="string">"_blank"</span> style=<span class="string">"display: inline;"</span>&gt;把百度设为主页&lt;/a&gt;&lt;a onmousedown=<span class="string">"return ns_c({'fm':'behs','tab':'tj_about'})"</span> href=<span class="string">"http://home.baidu.com"</span>&gt;关于百度&lt;/a&gt;&lt;a onmousedown=<span class="string">"return ns_c({'fm':'behs','tab':'tj_about_en'})"</span> href=<span class="string">"http://ir.baidu.com"</span>&gt;About Baidu&lt;/a&gt; &lt;/p&gt; &lt;p id=<span class="string">"cp"</span>&gt;©2014&amp;nbsp;Baidu&amp;nbsp;&lt;a href=<span class="string">"/duty/"</span> name=<span class="string">"tj_duty"</span>&gt;使用百度前必读&lt;/a&gt;&amp;nbsp;京ICP证030173号&amp;nbsp;&lt;i class=<span class="string">"c-icon-icrlogo"</span>&gt;&lt;/i&gt; &lt;/p&gt; &lt;/div&gt; &lt;/div&gt;</span><br><span class="line">&lt;div id=<span class="string">"wrapper_wrapper"</span> style=<span class="string">"display: block;"</span>&gt;</span><br><span class="line">        &lt;div id=<span class="string">"content_left"</span>&gt;</span><br><span class="line">                &lt;div class=<span class="string">"nors"</span>&gt;</span><br><span class="line">                        &lt;div class=<span class="string">"norsSuggest"</span>&gt;</span><br><span class="line">                                &lt;h3 class=<span class="string">"norsTitle"</span>&gt;很抱歉，您要访问的页面不存在！&lt;/h3&gt;</span><br><span class="line">                                &lt;p class=<span class="string">"norsTitle2"</span>&gt;温馨提示：&lt;/p&gt;</span><br><span class="line">                                &lt;ol&gt;</span><br><span class="line">                                        &lt;li&gt;请检查您访问的网址是否正确&lt;/li&gt; </span><br><span class="line">                                        &lt;li&gt;如果您不能确认访问的网址，请浏览&lt;a href=<span class="string">"http://www.baidu.com/more/index.html"</span>&gt;百度更多&lt;/a&gt;页面查看更多网址。&lt;/li&gt;</span><br><span class="line">                                        &lt;li&gt;回到顶部重新发起搜索&lt;/li&gt;</span><br><span class="line">                                        &lt;li&gt;如有任何意见或建议，请及时&lt;a href=<span class="string">"http://qingting.baidu.com/index"</span>&gt;反馈给我们&lt;/a&gt;。&lt;/li&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">                                &lt;/ol&gt;</span><br><span class="line">                        &lt;/div&gt;</span><br><span class="line">                &lt;/div&gt;</span><br><span class="line">        &lt;/div&gt;</span><br><span class="line"></span><br><span class="line">&lt;div id=<span class="string">"foot"</span>&gt;&lt;span class=<span class="string">"foot_c"</span>&gt;©2015&amp;nbsp;Baidu&amp;nbsp;&lt;span&gt;此内容系百度根据您的指令自动搜索的结果，不代表百度赞成被搜索网站的内容或立场&lt;/span&gt;&lt;/span&gt;</span><br><span class="line">&lt;span id=<span class="string">"help"</span>&gt;&lt;a href=<span class="string">"http://www.baidu.com/search/jubao.html"</span> target=<span class="string">"_blank"</span>&gt;举报&lt;/a&gt;&lt;/span&gt;&lt;/div&gt;</span><br><span class="line"></span><br><span class="line">&lt;div class=<span class="string">"c-tips-container"</span> id=<span class="string">"c-tips-container"</span>&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=<span class="string">"c-tips-container"</span> id=<span class="string">"c-tips-container"</span>&gt;&lt;/div&gt;</span><br></pre></td></tr></tbody></table></figure>
+
+<p>TRACE： 回显服务器收到的请求，主要用于测试或诊断。<br>CONNECT：开启一个客户端与所请求资源之间的双向沟通的通道。它可以用来创建隧道</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/io-duo-lu-fu-yong/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/io-duo-lu-fu-yong/" class="post-title-link" itemprop="url">HTML</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-04-05 14:11:43" itemprop="dateModified" datetime="2021-04-05T14:11:43Z">2021-04-05</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Markdown/" itemprop="url" rel="index"><span itemprop="name">Markdown</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>Unix网络编程中提到了5种网络模型</p>
+<ul>
+<li>Blocking IO 阻塞式IO，一次只能处理一个请求。</li>
+<li>Noblocking IO 非阻塞式IO</li>
+<li>IO multiplexing IO多路复用（高并发框架使用）</li>
+<li>Signal Driven IO 信号驱动的IO</li>
+<li>Asynchronous IO 异步IO</li>
+</ul>
+<p>现在服务器基本使用 IO多路复用，实现单进程同时处理多个 socket 请求。</p>
+<h3 id="IO多路复用？"><a href="#IO多路复用？" class="headerlink" title="IO多路复用？"></a>IO多路复用？</h3><p>IO多路复用就是操作系统提供的同时监听多个 socket 的机制</p>
+<ul>
+<li>为了实现高并发需要一种机制并发处理多个 socket</li>
+<li>Linux 常见的是 select / poll / epoll 系统调用</li>
+<li>可以使用单线程单进程处理多个 socket<br>为什么 select 就能实现高并发呢？<br>select 可以同时处理多个 socket，有一个就绪应用程序代码就可以处理它<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 使用IO复用代码格式</span></span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    events = sel.select()    <span class="comment"># 系统阻塞在select，直到有一个socket就绪</span></span><br><span class="line">    <span class="keyword">for</span> key,mask <span class="keyword">in</span> events:   <span class="comment"># 当socket就绪之后就遍历事件</span></span><br><span class="line">        callback = key.data</span><br><span class="line">        callback(key.fileobj, mask)</span><br></pre></td></tr></tbody></table></figure>
+
+</li>
+</ul>
+<p>重点是索引就绪文件的时间复杂度，一般优先使用epoll,O(1)</p>
+<p>Python 封装了操作系统的IO多路复用<br>Python 的IO多路复用基于操作系统实现( select / poll / epoll )<br>Python2 select 模块<br>Python3 selectors 模块<br>selectors模块<br>事件类型: </p>
+<ul>
+<li>EVENT_READ 表示socket可读，</li>
+<li>EVENT_WRITE 表示socket可写</li>
+</ul>
+<p>Default selector:自动根据平台选取合适的o模型</p>
+<ul>
+<li>register(fileobj, events, data=None)</li>
+<li>unregister(fileobj)</li>
+<li>modify(fileobj, events, data=None)</li>
+<li>select(timeout=None): returns[(key, events)]</li>
+<li>close()</li>
+</ul>
+<p>下面是一个简单的echo服务器实现 ：异步的TCP回显,它能够并发的处理客户端请求，把客户端发的再发回去，这就是TCP回显服务器。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> selectors</span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"> </span><br><span class="line">sel = selectors.DefaultSelector()</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">accept</span>(<span class="params">sock, mask</span>):</span></span><br><span class="line">    conn, addr = sock.accept()  <span class="comment"># Should be ready</span></span><br><span class="line">    print(<span class="string">'accepted'</span>, conn, <span class="string">'from'</span>, addr)</span><br><span class="line">    conn.setblocking(<span class="literal">False</span>)</span><br><span class="line">    sel.register(conn, selectors.EVENT_READ, read)  <span class="comment"># 注册read回调</span></span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">read</span>(<span class="params">conn, mask</span>):</span></span><br><span class="line">    data = conn.recv(<span class="number">1000</span>)  <span class="comment"># Should be ready</span></span><br><span class="line">    <span class="keyword">if</span> data:</span><br><span class="line">        print(<span class="string">'echoing'</span>, repr(data), <span class="string">'to'</span>, conn)</span><br><span class="line">        conn.send(data)  <span class="comment"># Hope it won't block</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        print(<span class="string">'closing'</span>, conn)</span><br><span class="line">        sel.unregister(conn)</span><br><span class="line">        conn.close()</span><br><span class="line"> </span><br><span class="line"><span class="comment"># 服务端</span></span><br><span class="line">sock = socket.socket()</span><br><span class="line">sock.bind((<span class="string">'localhost'</span>, <span class="number">1234</span>))</span><br><span class="line">sock.listen(<span class="number">100</span>)</span><br><span class="line">sock.setblocking(<span class="literal">False</span>)</span><br><span class="line">sel.register(sock, selectors.EVENT_READ, accept) <span class="comment"># 注册accept回调</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:       <span class="comment"># 事件循环</span></span><br><span class="line">    events = sel.select()</span><br><span class="line">    <span class="keyword">for</span> key, mask <span class="keyword">in</span> events:</span><br><span class="line">        callback = key.data</span><br><span class="line">        callback(key.fileobj, mask)</span><br></pre></td></tr></tbody></table></figure><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1097,338 +1476,6 @@
 
 <p>欧拉公式</p>
 <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> cmath</span><br><span class="line"></span><br><span class="line">print(cmath.exp(<span class="number">1j</span> * cmath.pi) + <span class="number">1</span>)  <span class="comment"># 1.2246467991473532e-16j</span></span><br><span class="line">print(<span class="string">"%3f"</span>,cmath.exp(<span class="number">1j</span> * cmath.pi) + <span class="number">1</span>)  <span class="comment"># 1.2246467991473532e-16j</span></span><br></pre></td></tr></tbody></table></figure>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/smtp-fa-song-you-jian/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/smtp-fa-song-you-jian/" class="post-title-link" itemprop="url">SMTP发送邮件</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-02 12:24:46" itemprop="dateModified" datetime="2021-04-02T12:24:46Z">2021-04-02</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>SMTP发送邮件<br>SMTP（Simple Mail Transfer Protocol）即简单邮件传输协议,它是一组用于由源地址到目的地址传送邮件的规则，由它来控制信件的中转方式。</p>
-<p>python的smtplib提供了一种很方便的途径发送电子邮件。它对smtp协议进行了简单的封装。</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> smtplib</span><br><span class="line"></span><br><span class="line">smtpObj = smtplib.SMTP( [host [, port [, local_hostname]]] )</span><br></pre></td></tr></tbody></table></figure>
-
-<p>host: SMTP 服务器主机。 你可以指定主机的ip地址或者域名如: runoob.com，这个是可选参数。<br>port: 如果你提供了 host 参数, 你需要指定 SMTP 服务使用的端口号，一般情况下 SMTP 端口号为25。<br>local_hostname: 如果 SMTP 在你的本机上，你只需要指定服务器地址为 localhost 即可。<br>Python SMTP 对象使用 sendmail 方法发送邮件，语法如下：</p>
-<p>SMTP.sendmail(from_addr, to_addrs, msg[, mail_options, rcpt_options])<br>参数说明：</p>
-<p>from_addr: 邮件发送者地址。<br>to_addrs: 字符串列表，邮件发送地址。<br>msg: 发送消息<br>这里要注意一下第三个参数，msg 是字符串，表示邮件。我们知道邮件一般由标题，发信人，收件人，邮件内容，附件等构成，发送邮件的时候，要注意 msg 的格式。这个格式就是 smtp 协议中定义的格式。</p>
-<p>实例<br>以下执行实例需要你本机已安装了支持 SMTP 的服务，如：sendmail。</p>
-<p>以下是一个使用 Python 发送邮件简单的实例：</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> smtplib</span><br><span class="line"><span class="keyword">from</span> email.mime.text <span class="keyword">import</span> MIMEText</span><br><span class="line"><span class="keyword">from</span> email.header <span class="keyword">import</span> Header</span><br><span class="line"> </span><br><span class="line">sender = <span class="string">'from@runoob.com'</span></span><br><span class="line">receivers = [<span class="string">'429240967@qq.com'</span>]  <span class="comment"># 接收邮件，可设置为你的QQ邮箱或者其他邮箱</span></span><br><span class="line"> </span><br><span class="line"><span class="comment"># 三个参数：第一个为文本内容，第二个 plain 设置文本格式，第三个 utf-8 设置编码</span></span><br><span class="line">message = MIMEText(<span class="string">'Python 邮件发送测试...'</span>, <span class="string">'plain'</span>, <span class="string">'utf-8'</span>)</span><br><span class="line">message[<span class="string">'From'</span>] = Header(<span class="string">"菜鸟教程"</span>, <span class="string">'utf-8'</span>)   <span class="comment"># 发送者</span></span><br><span class="line">message[<span class="string">'To'</span>] =  Header(<span class="string">"测试"</span>, <span class="string">'utf-8'</span>)        <span class="comment"># 接收者</span></span><br><span class="line"> </span><br><span class="line">subject = <span class="string">'Python SMTP 邮件测试'</span></span><br><span class="line">message[<span class="string">'Subject'</span>] = Header(subject, <span class="string">'utf-8'</span>)</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    smtpObj = smtplib.SMTP(<span class="string">'localhost'</span>)</span><br><span class="line">    smtpObj.sendmail(sender, receivers, message.as_string())</span><br><span class="line">    print(<span class="string">"邮件发送成功"</span>)</span><br><span class="line">    server.quit()</span><br><span class="line"><span class="keyword">except</span> smtplib.SMTPException:</span><br><span class="line">    print(<span class="string">"Error: 无法发送邮件"</span>)</span><br><span class="line">    <span class="comment"># 邮件发送成功</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p>我们使用三个引号来设置邮件信息，标准邮件需要三个头部信息： From, To, 和 Subject ，每个信息直接使用空行分割。</p>
-<p>我们通过实例化 smtplib 模块的 SMTP 对象 smtpObj 来连接到 SMTP 访问，并使用 sendmail 方法来发送信息。</p>
-<p>执行以上程序，如果你本机安装 sendmail（邮件传输代理程序），就会输出：</p>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/tcp-socket-bian-cheng/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/tcp-socket-bian-cheng/" class="post-title-link" itemprop="url">TCP socket 编程原理</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-02 12:24:45" itemprop="dateModified" datetime="2021-04-02T12:24:45Z">2021-04-02</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h3 id="了解TCP-socket-编程原理"><a href="#了解TCP-socket-编程原理" class="headerlink" title="了解TCP socket 编程原理"></a>了解TCP socket 编程原理</h3><p>如何使用 socket 模块<br>如何建立TCP socket 客户端和服务端<br>客户端和服务端之间的通信</p>
-<p>本质传输字节。所有网络通信都基于socket</p>
-<p>socket建立连接的过程？<br>服务器建立监听，socket，bind，listen<br>客户端发送请求，connect，send<br>连接确认，accept，response</p>
-<p>首先在服务器端建立监听；然后客户端发起连接，同时发送数据( request )；<br>服务器端收到连接请求之后accept接受建立连接，同时对发送过来的请求做出响应( response)。</p>
-<p>服务端要先启动，然后再启动客户端。<br>不要在ide里同时执行服务端和客户端，<br>如果你在同一个IDEL里开服务和客户端就会出那个问题，<br>因为开一个就要把另一个停了。<br>最好打开两个cmd窗口，以此执行服务端和客户端。<br>两个程序都执行才有结果，通信两个人都接受发送信息</p>
-<p>编写代码与网络交互的时候都需要把参数变成字节，处理的时候都需要转换成Unicode(py3为str)</p>
-<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 客户端 tcp_server.py</span></span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建socket对象，第一个参数协议族，第二个参数是类型，TCP还是UDP</span></span><br><span class="line"><span class="comment"># AF_INET是IPV4，SOCK_STREAM是TCP</span></span><br><span class="line">s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)</span><br><span class="line"><span class="comment"># 连接服务端</span></span><br><span class="line">s.connect((<span class="string">"127.0.0.1"</span>, <span class="number">6666</span>))  <span class="comment"># 参数是一个tuple对象,ip和端口</span></span><br><span class="line"><span class="comment"># 发送数据</span></span><br><span class="line">s.sendall(<span class="string">b'Hello World'</span>)</span><br><span class="line"><span class="comment"># 接收数据</span></span><br><span class="line">data = s.recv(<span class="number">1024</span>)  <span class="comment"># 1024字节数</span></span><br><span class="line">print(data.decode())</span><br><span class="line"><span class="comment"># 关闭客户端</span></span><br><span class="line">s.close()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 客户端输出结果：</span></span><br><span class="line"><span class="comment"># Tue Dec 15 11:54:43 2020</span></span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 服务端 tcp_client.py</span></span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建socket对象</span></span><br><span class="line">s = socket.socket()</span><br><span class="line"><span class="comment"># 绑定端口</span></span><br><span class="line">s.bind((<span class="string">"127.0.0.1"</span>, <span class="number">6666</span>))  <span class="comment"># 参数是一个tuple对象，hostname和port</span></span><br><span class="line"><span class="comment"># s.bind(("DESKTOP-3VCRA3T", 6666))  # 参数是一个tuple对象，hostname和port</span></span><br><span class="line"><span class="comment"># 监听</span></span><br><span class="line">s.listen()</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    <span class="comment"># 如果请求到来就接受</span></span><br><span class="line">    client, addr = s.accept()  <span class="comment"># return conn, addr</span></span><br><span class="line">    print(client)</span><br><span class="line">    timestr = time.ctime(time.time()) + <span class="string">'\r\n'</span>  <span class="comment"># 返回当前的时间戳</span></span><br><span class="line">    <span class="comment"># 发送数据</span></span><br><span class="line">    client.send(timestr.encode())  <span class="comment"># 把send 里面参数encode('utf8')成字节</span></span><br><span class="line">    <span class="comment"># 关闭socket</span></span><br><span class="line">    client.close()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 服务端输出结果：</span></span><br><span class="line"><span class="comment"># &lt;socket.socket fd=344, family=AddressFamily.AF_INET, </span></span><br><span class="line"><span class="comment"># type=SocketKind.SOCK_STREAM, proto=0, </span></span><br><span class="line"><span class="comment"># laddr=('127.0.0.1', 6666), raddr=('127.0.0.1', 51620)&gt;</span></span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> socket  <span class="comment"># 导入 socket 模块</span></span><br><span class="line"></span><br><span class="line">s = socket.socket()  <span class="comment"># 创建 socket 对象</span></span><br><span class="line">host = socket.gethostname()  <span class="comment"># 获取本地主机名</span></span><br><span class="line">print(<span class="string">'当前主机名称为: '</span> + host)</span><br><span class="line">port = <span class="number">42683</span>  <span class="comment"># 设置端口</span></span><br><span class="line">s.bind((host, port))  <span class="comment"># 绑定端口</span></span><br><span class="line"></span><br><span class="line">s.listen(<span class="number">5</span>)  <span class="comment"># 监听连接,传入连接请求的最大数5</span></span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    c, addr = s.accept()  <span class="comment"># 建立客户端连接。</span></span><br><span class="line">    print(<span class="string">'连接地址：'</span>, addr)</span><br><span class="line">    data = <span class="string">'hello word,你好，世界！'</span></span><br><span class="line">    c.send(data.encode())</span><br><span class="line">    c.close()  <span class="comment"># 关闭连接</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 当前主机名称为: DESKTOP-3VCRA3T</span></span><br><span class="line"><span class="comment"># 连接地址： ('192.168.110.248', 50733)</span></span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> socket  <span class="comment"># 导入 socket 模块</span></span><br><span class="line"></span><br><span class="line">s = socket.socket()  <span class="comment"># 创建 socket 对象</span></span><br><span class="line">host = socket.gethostname()  <span class="comment"># 获取本地主机名</span></span><br><span class="line">port = <span class="number">42683</span>  <span class="comment"># 设置端口号</span></span><br><span class="line"></span><br><span class="line">s.connect((host, port))</span><br><span class="line">print(s.recv(<span class="number">1024</span>).decode())</span><br><span class="line">s.close()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 输出</span></span><br><span class="line"><span class="comment"># hello word,你好，世界！</span></span><br></pre></td></tr></tbody></table></figure>
-
-<h3 id="如何使用-socket-发送HTTP请求"><a href="#如何使用-socket-发送HTTP请求" class="headerlink" title="如何使用 socket 发送HTTP请求"></a>如何使用 socket 发送HTTP请求</h3><p>使用 socket 接口发送 HTTP请求</p>
-<p>HTTP建立在TCP基础之上的一个应用层协议</p>
-<p>HTTP是基于文本的协议<br>发送GET请求的数据格式：</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socket.sendall(<span class="string">b'GET /index/?name=aa&amp;sex=bb http1.1\r\nAccept:text/html\r\nAccept-Encoding:gzip, deflate\r\n\r\n'</span>)</span><br></pre></td></tr></tbody></table></figure>
-<p>浏览器发送POST请求的数据格式：POST请求也可以在url上传参</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">​socket.sendall(<span class="string">b'GET /index/?name=aa&amp;sex=bb http1.1\r\nAccept:text/html\r\nAccept-Encoding:gzip, deflate\r\n\r\na1=1&amp;a2=2&amp;a3=3'</span>)</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># socket_send_http.py</span></span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"> </span><br><span class="line">s = socket.socket()</span><br><span class="line"><span class="comment"># 连接到百度的主机</span></span><br><span class="line">s.connect((<span class="string">'www.baidu.com'</span>, <span class="number">80</span>))</span><br><span class="line"><span class="comment"># 发送HTTP请求体</span></span><br><span class="line">http = <span class="string">b"GET / HTTP/1.1\r\nHost: www.baidu.com\r\n\r\n"</span></span><br><span class="line">s.sendall(http)</span><br><span class="line"><span class="comment"># 接收响应内容</span></span><br><span class="line">buf = s.recv(<span class="number">1024</span>)</span><br><span class="line">print(buf)</span><br><span class="line"><span class="comment"># 关闭socket</span></span><br><span class="line">s.close()</span><br></pre></td></tr></tbody></table></figure>
-<p>输出内容：</p>
-<figure class="highlight apache"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">b</span>'HTTP/<span class="number">1</span>.<span class="number">1</span> <span class="number">200</span> OK\r\nAccept-Ranges: bytes\r\nCache-Control: no-cache\r\nConnection: keep-alive\r\nContent-Length: <span class="number">14615</span>\r\nContent-Type: text/html\r\nDate: </span><br><span class="line"><span class="attribute">Tue</span>, <span class="number">15</span> Dec <span class="number">2020</span> <span class="number">14</span>:<span class="number">44</span>:<span class="number">38</span> GMT\r\nP<span class="number">3</span>p: CP=<span class="string">" OTI DSP COR IVA OUR IND COM "</span>\r\nP<span class="number">3</span>p: CP=<span class="string">" OTI DSP COR IVA OUR IND COM "</span>\r\nPragma: no-cache\r\nServer: BWS/<span class="number">1</span>.<span class="number">1</span>\r\nSet-Cookie: BAIDUID=DF<span class="number">34</span>EFEBEB<span class="number">41</span>F<span class="number">49</span>B<span class="number">4169</span>B<span class="number">86013</span>EDC<span class="number">8</span>FA:FG=<span class="number">1</span>; expires=Thu, <span class="number">31</span>-Dec-<span class="number">37</span> <span class="number">23</span>:<span class="number">55</span>:<span class="number">55</span> GMT; max-age=<span class="number">2147483647</span>; path=/; domain=.baidu.com\r\nSet-Cookie: BIDUPSID=DF<span class="number">34</span>EFEBEB<span class="number">41</span>F<span class="number">49</span>B<span class="number">4169</span>B<span class="number">86013</span>EDC<span class="number">8</span>FA; expires=Thu, <span class="number">31</span>-Dec-<span class="number">37</span> <span class="number">23</span>:<span class="number">55</span>:<span class="number">55</span> GMT; max-age=<span class="number">2147483647</span>; path=/; domain=.baidu.com\r\nSet-Cookie: PSTM=<span class="number">1608043478</span>; expires=Thu, <span class="number">31</span>-Dec-<span class="number">37</span> <span class="number">23</span>:<span class="number">55</span>:<span class="number">55</span> GMT; max-age=<span class="number">2147483647</span>; path=/; domain=.baidu.com\r\nSet-Cookie: BAIDUID=DF<span class="number">34</span>EFEBEB<span class="number">41</span>F<span class="number">49</span>B<span class="number">93</span>C<span class="number">5</span>DFE<span class="number">6</span>A<span class="number">700898</span>F:FG=<span class="number">1</span>; max-age=<span class="number">31536000</span>; expires=Wed, <span class="number">15</span>-Dec-<span class="number">21</span> <span class="number">14</span>:<span class="number">44</span>:<span class="number">38</span> GMT; domain=.baidu.com; path=/; version=<span class="number">1</span>; comment=bd\r\nTraceid: <span class="number">1608043478045537332210543503774960632313</span>\r\nVary: Accept-Encoding\r\nX-Ua-Compatible: IE=Edge,chrome=<span class="number">1</span>\r\n\r\n&lt;!DOCTYPE html&gt;&lt;!--STATUS OK--&gt;\r\n&lt;html&gt;\r\n&lt;head&gt;\r\n\t&lt;meta http-equ'</span><br></pre></td></tr></tbody></table></figure>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/url/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/url/" class="post-title-link" itemprop="url">URL Uniform Resource Locator</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-07-20 11:49:02" itemprop="dateModified" datetime="2021-07-20T11:49:02Z">2021-07-20</time>
-      </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>URL Uniform Resource Locator 统一资源定位符）是对可以从互联网上得到对资源位置和访问方法对一种简洁的表示，是互联网上标准资源的地址。<br>⼀般统⼀资源定位符的开始标志着⼀个计算机⽹络所使⽤的⽹络协议<br>互联网上的每个文件都有一个唯一的URL，且⼀个URL指向⼀个数据资源⽂件的路径</p>
-<p>URL是通过HTTP协议存取资源的Internet路径，</p>
-<p>URL是URI的子集，URI还包括URN，在互联网中，我们一般的网页链接、网址可以被称为URL或者URI，大多数人称为URL。</p>
-<p>用于描述一个网络上的资源, 基本格式如下<br>基本URL包含模式（或称协议）、服务器名称（或IP地址）、文件所在路径和文件名<br>scheme://host[:port#]/path/…/[;url-params][?query-string][#anchor]</p>
-<p>URL格式 <code>http://host[:port][path]</code></p>
-<p>scheme         指定底层使用的协议(例如：http, https, ftp)</p>
-<p>host           HTTP服务器的合法的Internet主机域名或IP地址</p>
-<p>port#          HTTP服务器的默认端口是80，这种情况下端口号可以省略。如果使用了别的端口，必须指明，例如 <a target="_blank" rel="noopener" href="http://www.luboke.com/">http://www.luboke.com:80</a></p>
-<p>path：请求访问资源的路径</p>
-<p>query-string   发送给http服务器的数据</p>
-<p>anchor         锚</p>
-<p>代理服务器位于客户端和真正的服务器之间，充当一个中间人的角色。当跟客户端交互的时候，是服务器。跟服务器交互的时候，又充当客户端，</p>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {

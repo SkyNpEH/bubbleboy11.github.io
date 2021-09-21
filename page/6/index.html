@@ -119,7 +119,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">351</span>
+          <span class="site-state-item-count">354</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -169,6 +169,231 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/06/26/beego-pai-xing-bang-gai-zao/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/06/26/beego-pai-xing-bang-gai-zao/" class="post-title-link" itemprop="url">beego排行榜改造</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-06-25 16:21:41" itemprop="dateCreated datePublished" datetime="2021-06-25T16:21:41Z">2021-06-25</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-06-26 03:29:08" itemprop="dateModified" datetime="2021-06-26T03:29:08Z">2021-06-26</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/beego/" itemprop="url" rel="index"><span itemprop="name">beego</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>改造评论功能<br>改造点：发送评论后更新排行榜的数据。<br>排行榜没有实时跟新的要求。<br>更新排行榜可能造成评论接口响应时间边长。造成用户体验差<br>可以用MQ实现解耦。增加用户体验</p>
+<p>更新排行榜往MQ推送消息。简单模式</p>
+<p>models/comment.go</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">SaveComment</span><span class="params">(content <span class="keyword">string</span>, uid <span class="keyword">int</span>, episodesId <span class="keyword">int</span>, videoId <span class="keyword">int</span>)</span> <span class="title">error</span></span> {</span><br><span class="line">    o := orm.NewOrm()</span><br><span class="line">    <span class="keyword">var</span> comment Comment</span><br><span class="line">    comment.Content = content</span><br><span class="line">    comment.UserId = uid</span><br><span class="line">    comment.EpisodesId = episodesId</span><br><span class="line">    comment.VideoId = videoId</span><br><span class="line">    comment.Stamp = <span class="number">0</span></span><br><span class="line">    comment.Status = <span class="number">1</span></span><br><span class="line">    comment.AddTime = time.Now().Unix()</span><br><span class="line">    _, err := o.Insert(&amp;comment)</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        <span class="comment">// 修改视频的总评论数</span></span><br><span class="line">        o.Raw(<span class="string">"UPDATE video SET comment=comment+1 WHERE id=?"</span>, videoId).Exec()</span><br><span class="line">        <span class="comment">// 修改视频剧集的评论数</span></span><br><span class="line">        o.Raw(<span class="string">"UPDATE video_episodes SET comment=comment+1 WHERE id=?"</span>, episodesId).Exec()</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 更新redis排行榜 - 通过MQ来实现</span></span><br><span class="line">        <span class="comment">// 把要传递的数据转换为json字符串</span></span><br><span class="line">        videoObj := <span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">int</span>{</span><br><span class="line">            <span class="string">"VideoId"</span>: videoId,</span><br><span class="line">        }</span><br><span class="line">        videoJson, _ := json.Marshal(videoObj)</span><br><span class="line">        <span class="comment">// 创建一个简单模式的MQ 简单模式</span></span><br><span class="line">        mq.Publish(<span class="string">""</span>, <span class="string">"fyouku_top"</span>, <span class="keyword">string</span>(videoJson))</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> err</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>消费消息更新排行榜</p>
+<p><code>mq\top\main.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"demo/models"</span></span><br><span class="line">    redisClient <span class="string">"demo/services/redis"</span></span><br><span class="line">    <span class="string">"encoding/json"</span></span><br><span class="line">    <span class="string">"fmt"</span></span><br><span class="line">    <span class="string">"strconv"</span></span><br><span class="line"></span><br><span class="line">    <span class="string">"demo/services/mq"</span></span><br><span class="line"></span><br><span class="line">    <span class="string">"github.com/beego/beego/v2/client/orm"</span></span><br><span class="line">    _ <span class="string">"github.com/go-sql-driver/mysql"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="comment">//beego.LoadAppConfig("ini", "../../conf/app.conf")</span></span><br><span class="line">    <span class="comment">//defaultdb := beego.AppConfig.String("defaultdb")</span></span><br><span class="line">    orm.RegisterDriver(<span class="string">"mysql"</span>, orm.DRMySQL)</span><br><span class="line">    orm.RegisterDataBase(<span class="string">"default"</span>, <span class="string">"mysql"</span>, <span class="string">"root:123456@(127.0.0.1:3306)/fyouku?charset=utf8"</span>)</span><br><span class="line">    <span class="comment">//orm.RegisterDataBase("default", "mysql", "root:123456@(127.0.0.1:3306)/fyouku?charset=utf8", 30, 30)</span></span><br><span class="line"></span><br><span class="line">    mq.Consumer(<span class="string">""</span>, <span class="string">"fyouku_top"</span>, callback)</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">callback</span><span class="params">(s <span class="keyword">string</span>)</span></span> {</span><br><span class="line">    <span class="keyword">type</span> Data <span class="keyword">struct</span> {</span><br><span class="line">        VideoId <span class="keyword">int</span></span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">var</span> data Data</span><br><span class="line">    err := json.Unmarshal([]<span class="keyword">byte</span>(s), &amp;data)</span><br><span class="line">    videoInfo, err := models.RedisGetVideoInfo(data.VideoId)</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        conn := redisClient.PoolConnect()</span><br><span class="line">        <span class="keyword">defer</span> conn.Close()</span><br><span class="line">        <span class="comment">// 更新排行榜 获取ChannelId是通过上面的VideoId获取视频信息</span></span><br><span class="line">        redisChannelKey := <span class="string">"video:top:channel:channelId:"</span> + strconv.Itoa(videoInfo.ChannelId)</span><br><span class="line">        redisTypeKey := <span class="string">"video:top:type:typeId:"</span> + strconv.Itoa(videoInfo.TypeId)</span><br><span class="line">        conn.Do(<span class="string">"zincrby"</span>, redisChannelKey, <span class="number">1</span>, data.VideoId)</span><br><span class="line">        conn.Do(<span class="string">"zincrby"</span>, redisTypeKey, <span class="number">1</span>, data.VideoId)</span><br><span class="line">    }</span><br><span class="line">    fmt.Printf(<span class="string">"msg is :%s\n"</span>, s)</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="/2021/06/26/beego-pai-xing-bang-gai-zao/1.png" alt="description"></p>
+<p>第二次提交评论成功后，能在接口显示videoId=1的数值+1</p>
+<p><img src="/2021/06/26/beego-pai-xing-bang-gai-zao/2.png" alt="description"></p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/06/26/si-xin-dui-lie/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/06/26/si-xin-dui-lie/" class="post-title-link" itemprop="url">死信队列</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-06-25 16:21:41" itemprop="dateCreated datePublished" datetime="2021-06-25T16:21:41Z">2021-06-25</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-06-27 01:59:40" itemprop="dateModified" datetime="2021-06-27T01:59:40Z">2021-06-27</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/mq/" itemprop="url" rel="index"><span itemprop="name">mq</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>使用场景</p>
+<ul>
+<li>发送消息后，规定十分钟后发给用户。</li>
+<li>规定发送消息每天固定时间发给用户。</li>
+<li>订单下完后没有支付，30分钟后取消订单。</li>
+<li>下单后定时收到系统的提示消息。</li>
+</ul>
+<p>在A队列上设置消息过期时间TTL，绑定消息死信后转发到B交换机。这里B交换机就被成为死信交换机，B交换机路由到B队列，B队列就被成为死信队列。再由B消费者消费掉<br>死信产生的条件不止是TTL过期，还有消息被拒绝和队列达到最大长度都会产生死信。</p>
+<p>死信产生的条件不止是TTL过期，还有消息被拒绝和队列达到最大长度都会产生死信。</p>
+<p>死信队列消费端实现</p>
+<p>services/mq/Mq.go</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 死信队列消费端</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">ConsumerDlx</span><span class="params">(exchangeA <span class="keyword">string</span>, queueAName <span class="keyword">string</span>, exchangeB <span class="keyword">string</span>, queueBName <span class="keyword">string</span>, ttl <span class="keyword">int</span>, callback Callback)</span></span> {</span><br><span class="line">    <span class="comment">// 建立连接</span></span><br><span class="line">    conn, err := Connect()</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">        fmt.Println(err)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">defer</span> conn.Close()</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建一个Channel</span></span><br><span class="line">    channel, err := conn.Channel()</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">        fmt.Println(err)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">defer</span> channel.Close()</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建A交换机</span></span><br><span class="line">    err = channel.ExchangeDeclare(</span><br><span class="line">        exchangeA, <span class="comment">// name</span></span><br><span class="line">        <span class="string">"fanout"</span>,  <span class="comment">// type</span></span><br><span class="line">        <span class="literal">true</span>,      <span class="comment">// durable</span></span><br><span class="line">        <span class="literal">false</span>,     <span class="comment">// auto-deleted</span></span><br><span class="line">        <span class="literal">false</span>,     <span class="comment">// internal</span></span><br><span class="line">        <span class="literal">false</span>,     <span class="comment">// no-wait</span></span><br><span class="line">        <span class="literal">nil</span>,       <span class="comment">// arguments</span></span><br><span class="line">    )</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">        fmt.Println(err)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建一个queue A队列，指定消息过期时间，并且绑定过期以后发送到那个交换机</span></span><br><span class="line">    queueA, err := channel.QueueDeclare(</span><br><span class="line">        queueAName, <span class="comment">// name</span></span><br><span class="line">        <span class="literal">true</span>,       <span class="comment">// durable</span></span><br><span class="line">        <span class="literal">false</span>,      <span class="comment">// delete when usused</span></span><br><span class="line">        <span class="literal">false</span>,      <span class="comment">// exclusive</span></span><br><span class="line">        <span class="literal">false</span>,      <span class="comment">// no-wait</span></span><br><span class="line">        amqp.Table{ <span class="comment">// 实战消息过期时间</span></span><br><span class="line">            <span class="comment">// 当消息过期时把消息发送到 exchangeB</span></span><br><span class="line">            <span class="string">"x-dead-letter-exchange"</span>: exchangeB,</span><br><span class="line">            <span class="string">"x-message-ttl"</span>:          ttl,</span><br><span class="line">            <span class="comment">//"x-dead-letter-queue" : queueBName, // 绑定队列</span></span><br><span class="line">            <span class="comment">//"x-dead-letter-routing-key" :  // 绑定路由关键字</span></span><br><span class="line">        },</span><br><span class="line">    )</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">        fmt.Println(err)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="comment">// A交换机和A队列绑定</span></span><br><span class="line">    err = channel.QueueBind(</span><br><span class="line">        queueA.Name, <span class="comment">// queue name</span></span><br><span class="line">        <span class="string">""</span>,          <span class="comment">// routing key</span></span><br><span class="line">        exchangeA,   <span class="comment">// exchange</span></span><br><span class="line">        <span class="literal">false</span>,</span><br><span class="line">        <span class="literal">nil</span>,</span><br><span class="line">    )</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">        fmt.Println(err)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    }</span><br><span class="line">    <span class="comment">// 创建B交换机</span></span><br><span class="line">    err = channel.ExchangeDeclare(</span><br><span class="line">        exchangeB, <span class="comment">// name</span></span><br><span class="line">        <span class="string">"fanout"</span>,  <span class="comment">// type</span></span><br><span class="line">        <span class="literal">true</span>,      <span class="comment">// durable</span></span><br><span class="line">        <span class="literal">false</span>,     <span class="comment">// auto-deleted</span></span><br><span class="line">        <span class="literal">false</span>,     <span class="comment">// internal</span></span><br><span class="line">        <span class="literal">false</span>,     <span class="comment">// no-wait</span></span><br><span class="line">        <span class="literal">nil</span>,       <span class="comment">// arguments</span></span><br><span class="line">    )</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">        fmt.Println(err)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="comment">//创建一个queue B队列</span></span><br><span class="line">    queueB, err := channel.QueueDeclare(</span><br><span class="line">        queueBName, <span class="comment">// name</span></span><br><span class="line">        <span class="literal">true</span>,       <span class="comment">// durable</span></span><br><span class="line">        <span class="literal">false</span>,      <span class="comment">// delete when usused</span></span><br><span class="line">        <span class="literal">false</span>,      <span class="comment">// exclusive</span></span><br><span class="line">        <span class="literal">false</span>,      <span class="comment">// no-wait</span></span><br><span class="line">        <span class="literal">nil</span>,        <span class="comment">// arguments</span></span><br><span class="line">    )</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">        fmt.Println(err)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="comment">// B交换机和B队列绑定</span></span><br><span class="line">    err = channel.QueueBind(</span><br><span class="line">        queueB.Name, <span class="comment">// queue name</span></span><br><span class="line">        <span class="string">""</span>,          <span class="comment">// routing key</span></span><br><span class="line">        exchangeB,   <span class="comment">// exchange</span></span><br><span class="line">        <span class="literal">false</span>,</span><br><span class="line">        <span class="literal">nil</span>,</span><br><span class="line">    )</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">        fmt.Println(err)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 接收消息</span></span><br><span class="line">    msgs, err := channel.Consume(queueB.Name, <span class="string">""</span>, <span class="literal">false</span>, <span class="literal">false</span>, <span class="literal">false</span>, <span class="literal">false</span>, <span class="literal">nil</span>)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">        fmt.Println(err)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    forever := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">bool</span>)</span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> {</span><br><span class="line">        <span class="keyword">for</span> d := <span class="keyword">range</span> msgs {</span><br><span class="line">            s := BytesToString(&amp;(d.Body))</span><br><span class="line">            callback(*s)</span><br><span class="line">            d.Ack(<span class="literal">false</span>)</span><br><span class="line">        }</span><br><span class="line">    }()</span><br><span class="line"></span><br><span class="line">    fmt.Printf(<span class="string">" [*] Waiting for messages. To exit press CTRL+C\n"</span>)</span><br><span class="line">    &lt;-forever</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 死信队列生产端实现</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">PublishDlx</span><span class="params">(exchangeA <span class="keyword">string</span>, body <span class="keyword">string</span>)</span> <span class="title">error</span></span> {</span><br><span class="line">    <span class="comment">// 建立连接</span></span><br><span class="line">    conn, err := Connect()</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">        <span class="keyword">return</span> err</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">defer</span> conn.Close()</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建一个Channel</span></span><br><span class="line">    channel, err := conn.Channel()</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">        <span class="keyword">return</span> err</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">defer</span> channel.Close()</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 消息发送到A交换机</span></span><br><span class="line">    err = channel.Publish(exchangeA, <span class="string">""</span>, <span class="literal">false</span>, <span class="literal">false</span>, amqp.Publishing{</span><br><span class="line">        DeliveryMode: amqp.Persistent,</span><br><span class="line">        ContentType:  <span class="string">"text/plain"</span>,</span><br><span class="line">        Body:         []<span class="keyword">byte</span>(body),</span><br><span class="line">    })</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> err</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+
+<p>服务器端发送<br>controllers/mqDemo.go</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 死信队列push</span></span><br><span class="line"><span class="comment">// @router /mq/dlx/push [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *MqDemoController)</span> <span class="title">GetDlx</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> {</span><br><span class="line">        count := <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> {</span><br><span class="line">            mq.PublishDlx(<span class="string">"fyouku.dlx.a"</span>, <span class="string">"dlx"</span>+strconv.Itoa(count))</span><br><span class="line">            count++</span><br><span class="line">            time.Sleep(<span class="number">1</span> * time.Second)</span><br><span class="line">        }</span><br><span class="line">    }()</span><br><span class="line">    this.Ctx.WriteString(<span class="string">"dlx"</span>)</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="comment">// @router /mq/dlx/two/push [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *MqDemoController)</span> <span class="title">GetTwoDlx</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> {</span><br><span class="line">        count := <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> {</span><br><span class="line">            mq.PublishEx(<span class="string">"fyouku.dlx.b"</span>, <span class="string">"fanout"</span>, <span class="string">""</span>, <span class="string">"dlxtwo"</span>+strconv.Itoa(count))</span><br><span class="line">            count++</span><br><span class="line">            time.Sleep(<span class="number">1</span> * time.Second)</span><br><span class="line">        }</span><br><span class="line">    }()</span><br><span class="line">    this.Ctx.WriteString(<span class="string">"dlxTwo"</span>)</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
     <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/06/25/go-ge-shi-hua-de-shu-ru-he-shu-chu/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -200,7 +425,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-08-02 10:07:53" itemprop="dateModified" datetime="2021-08-02T10:07:53Z">2021-08-02</time>
+        <time title="修改时间：2021-09-16 13:54:57" itemprop="dateModified" datetime="2021-09-16T13:54:57Z">2021-09-16</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -222,8 +447,7 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fmt.Println(<span class="string">"###########"</span>) <span class="comment">// ###########</span></span><br></pre></td></tr></tbody></table></figure>
-
+          <p><code>fmt.Printxxx("")</code> 输出到控制台<br><code>fmt.Sprintxx("")</code> 返回 string<br><code>fmt.Errorxxxx("")</code> 返回error</p>
 <figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Println formats using the default formats for its operands and writes to standard output.</span></span><br><span class="line"><span class="comment">// Spaces are always added between operands and a newline is appended.</span></span><br><span class="line"><span class="comment">// It returns the number of bytes written and any write error encountered.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Println</span><span class="params">(a ...<span class="keyword">interface</span>{})</span> <span class="params">(n <span class="keyword">int</span>, err error)</span></span> {</span><br><span class="line">    <span class="keyword">return</span> Fprintln(os.Stdout, a...)</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
 
 <h3 id="Go-字符串格式化符号"><a href="#Go-字符串格式化符号" class="headerlink" title="Go 字符串格式化符号"></a>Go 字符串格式化符号</h3><p><code>fmt.Sprintf(格式化样式, 参数列表…)</code></p>
@@ -1340,230 +1564,6 @@
 <figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 频道页-根据频道类型获取推荐视频</span></span><br><span class="line"><span class="comment">// @router /channel/recommend/type [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *VideoController)</span> <span class="title">GetChannelRecomendTypeList</span><span class="params">()</span></span> {</span><br><span class="line">    channelId, _ := this.GetInt(<span class="string">"channelId"</span>)</span><br><span class="line">    typeId, _ := this.GetInt(<span class="string">"typeId"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> channelId == <span class="number">0</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4001</span>, <span class="string">"必须指定频道"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">if</span> typeId == <span class="number">0</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4002</span>, <span class="string">"必须指定频道类型"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    num, videos, err := models.GetChannelRecommendTypeList(channelId, typeId)</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnSuccess(<span class="number">0</span>, <span class="string">"success"</span>, videos, num)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4004</span>, <span class="string">"没有相关内容"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
 
 <p><img src="/2021/06/18/beego-you-ku-shou-ye/7.png" alt="description"></p>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/06/18/beego-wo-de-shi-pin-guan-li-gong-neng/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/06/18/beego-wo-de-shi-pin-guan-li-gong-neng/" class="post-title-link" itemprop="url">beego我的视频管理功能</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-06-17 16:21:41" itemprop="dateCreated datePublished" datetime="2021-06-17T16:21:41Z">2021-06-17</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-06-20 01:30:37" itemprop="dateModified" datetime="2021-06-20T01:30:37Z">2021-06-20</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/beego/" itemprop="url" rel="index"><span itemprop="name">beego</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p><code>models\video.go</code></p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 根据用户ID获取用户相关数据</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">GetUserVideo</span><span class="params">(uid <span class="keyword">int</span>)</span> <span class="params">(<span class="keyword">int64</span>, []VideoData, error)</span></span> {</span><br><span class="line">    o := orm.NewOrm()</span><br><span class="line">    <span class="keyword">var</span> videos []VideoData</span><br><span class="line">    num, err := o.Raw(<span class="string">"SELECT id,title,sub_title,img,img1,add_time,episodes_count, is_end FROM video WHERE user_id=? ORDER BY add_time DESC"</span>, uid).QueryRows(&amp;videos)</span><br><span class="line">    <span class="keyword">return</span> num, videos, err</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>controllers\video.go</code></p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//我的视频管理</span></span><br><span class="line"><span class="comment">// @router /user/video [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *VideoController)</span> <span class="title">UserVideo</span><span class="params">()</span></span> {</span><br><span class="line">    uid, _ := this.GetInt(<span class="string">"uid"</span>)</span><br><span class="line">    <span class="keyword">if</span> uid == <span class="number">0</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4001</span>, <span class="string">"必须指定用户"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    num, videos, err := models.GetUserVideo(uid)</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnSuccess(<span class="number">0</span>, <span class="string">"success"</span>, videos, num)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4004</span>, <span class="string">"没有相关内容"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p><img src="/2021/06/18/beego-wo-de-shi-pin-guan-li-gong-neng/1.png" alt="description"></p>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/06/18/beego-pi-liang-fa-song-xiao-xi-jie-kou/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/06/18/beego-pi-liang-fa-song-xiao-xi-jie-kou/" class="post-title-link" itemprop="url">批量发送消息接口</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-06-17 16:21:41" itemprop="dateCreated datePublished" datetime="2021-06-17T16:21:41Z">2021-06-17</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-06-26 01:44:09" itemprop="dateModified" datetime="2021-06-26T01:44:09Z">2021-06-26</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/beego/" itemprop="url" rel="index"><span itemprop="name">beego</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>批量发送消息接口</p>
-<p>接口地址：<code>/send/message</code></p>
-<ul>
-<li><p>接收参数为：<br>uids（用户ID，多个用,链接，1,2,3,4,5）<br>content（消息内容）</p>
-</li>
-<li><p>返回信息：<br>ret返回码 0=正确</p>
-</li>
-<li><p>业务逻辑：</p>
-<ul>
-<li>第一步，保存消息到message表</li>
-<li>第二步，通过英文逗号分隔uids</li>
-<li>第三步，遍历uids，保存每个uid和消息关系到message_user表</li>
-</ul>
-</li>
-</ul>
-<p><img src="/2021/06/18/beego-pi-liang-fa-song-xiao-xi-jie-kou/1.png" alt="description"></p>
-<p><code>models/message.go</code></p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> models</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"time"</span></span><br><span class="line">    <span class="comment">//"fyoukuApi/services/mq"</span></span><br><span class="line"></span><br><span class="line">    <span class="string">"github.com/beego/beego/v2/client/orm"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Message <span class="keyword">struct</span> {</span><br><span class="line">    Id      <span class="keyword">int</span></span><br><span class="line">    Content <span class="keyword">string</span></span><br><span class="line">    AddTime <span class="keyword">int64</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> MessageUser <span class="keyword">struct</span> {</span><br><span class="line">    Id        <span class="keyword">int</span></span><br><span class="line">    MessageId <span class="keyword">int64</span></span><br><span class="line">    AddTime   <span class="keyword">int64</span></span><br><span class="line">    Status    <span class="keyword">int</span></span><br><span class="line">    UserId    <span class="keyword">int</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">init</span><span class="params">()</span></span> {</span><br><span class="line">    orm.RegisterModel(<span class="built_in">new</span>(Message), <span class="built_in">new</span>(MessageUser))</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="comment">// 保存通知消息</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">SendMessageDo</span><span class="params">(content <span class="keyword">string</span>)</span> <span class="params">(<span class="keyword">int64</span>, error)</span></span> {</span><br><span class="line">    o := orm.NewOrm()</span><br><span class="line">    <span class="keyword">var</span> message Message</span><br><span class="line">    message.Content = content</span><br><span class="line">    message.AddTime = time.Now().Unix()</span><br><span class="line">    messageId, err := o.Insert(&amp;message)</span><br><span class="line">    <span class="keyword">return</span> messageId, err</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="comment">// 保存消息接收人</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">SendMessageUser</span><span class="params">(userId <span class="keyword">int</span>, messageId <span class="keyword">int64</span>)</span> <span class="title">error</span></span> {</span><br><span class="line">    o := orm.NewOrm()</span><br><span class="line">    <span class="keyword">var</span> messageUser MessageUser</span><br><span class="line">    messageUser.UserId = userId</span><br><span class="line">    messageUser.MessageId = messageId</span><br><span class="line">    messageUser.Status = <span class="number">1</span></span><br><span class="line">    messageUser.AddTime = time.Now().Unix()</span><br><span class="line">    _, err := o.Insert(&amp;messageUser)</span><br><span class="line">    <span class="keyword">return</span> err</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>controllers/user.go</code></p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 批量发送通知消息</span></span><br><span class="line"><span class="comment">// @router /send/message [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *UserController)</span> <span class="title">SendMessageDo</span><span class="params">()</span></span> {</span><br><span class="line">    uids := this.GetString(<span class="string">"uids"</span>)</span><br><span class="line">    content := this.GetString(<span class="string">"content"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> uids == <span class="string">""</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4001</span>, <span class="string">"请填写接收人~"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">if</span> content == <span class="string">""</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4002</span>, <span class="string">"请填写发送内容"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    messageId, err := models.SendMessageDo(content)</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        uidConfig := strings.Split(uids, <span class="string">","</span>)</span><br><span class="line">        <span class="keyword">for</span> _, v := <span class="keyword">range</span> uidConfig {</span><br><span class="line">            userId, _ := strconv.Atoi(v)</span><br><span class="line">            models.SendMessageUser(userId, messageId)</span><br><span class="line">            <span class="comment">// models.SendMessageUserMq(userId, messageId)</span></span><br><span class="line">        }</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnSuccess(<span class="number">0</span>, <span class="string">"发送成功~"</span>, <span class="string">""</span>, <span class="number">1</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">5000</span>, <span class="string">"发送失败，请联系客服~"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p><img src="/2021/06/18/beego-pi-liang-fa-song-xiao-xi-jie-kou/2.png" alt="description"></p>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
