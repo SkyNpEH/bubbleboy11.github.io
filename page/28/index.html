@@ -119,7 +119,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">354</span>
+          <span class="site-state-item-count">357</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -160,6 +160,358 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/lu-you-wang-yong-hu-deng-lu-jie-kou-lian-diao/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/lu-you-wang-yong-hu-deng-lu-jie-kou-lian-diao/" class="post-title-link" itemprop="url">用户登录接口联调</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-05-22 03:32:41" itemprop="dateModified" datetime="2021-05-22T03:32:41Z">2021-05-22</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%97%85%E6%B8%B8%E7%BD%91%E9%A1%B9%E7%9B%AE/" itemprop="url" rel="index"><span itemprop="name">旅游网项目</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h3 id="用户登录接口联调"><a href="#用户登录接口联调" class="headerlink" title="用户登录接口联调"></a>用户登录接口联调</h3><h4 id="实现步骤"><a href="#实现步骤" class="headerlink" title="实现步骤"></a>实现步骤</h4><ul>
+<li>第一步，在登录组件调用登录接口</li>
+<li>第二步，设置用户信息到 Vuex</li>
+<li>第三步，在个人中心显示用户信息，昵称和头像</li>
+<li>第四步，刷新个人中心，清空vuex里面的数据，重新调用个人信息接口设置到vuex</li>
+</ul>
+<p><code>src\utils\apis.js</code></p>
+<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 存放项目中所有的接口地址，当是```/api```开头，nginx把它转发给wsgi对应的内容进行处理，就会处理django的内容</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">const</span> apiHost = <span class="string">'http://localhost:8080/api'</span> <span class="comment">// 本地调试的localhost</span></span><br><span class="line"><span class="comment">// const apiHost = '/api' // linux服务器上用</span></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 用户账户相关的接口</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">const</span> AccountsApis = {</span><br><span class="line">  <span class="comment">// 用户登录</span></span><br><span class="line">  loginUrl: apiHost + <span class="string">'/accounts/user/api/login/'</span>,</span><br><span class="line">  <span class="comment">// 用户退出登录</span></span><br><span class="line">  logoutUrl: apiHost + <span class="string">'/accounts/user/api/logout/'</span>,</span><br><span class="line">  <span class="comment">// 用户信息</span></span><br><span class="line">  userInfoUrl: apiHost + <span class="string">'/accounts/user/api/info/'</span>,</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>src\utils\ajax.js</code></p>
+<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> qs <span class="keyword">from</span> <span class="string">'qs'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> ajax = axios.create({</span><br><span class="line">  <span class="comment">/***</span></span><br><span class="line"><span class="comment">   * 对请求的参数进行格式化处理</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  transformRequest: <span class="function"><span class="keyword">function</span> (<span class="params">data, headers</span>) </span>{</span><br><span class="line">    <span class="keyword">return</span> qs.stringify(data)</span><br><span class="line">  },</span><br><span class="line">  <span class="comment">// 默认携带上次的cookie</span></span><br><span class="line">  withCredentials: <span class="literal">true</span></span><br><span class="line">})</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>src\store\mutation-types.js</code></p>
+<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 修改用户信息</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> UPDATE_USER_INFO = <span class="string">'updateUserInfo'</span></span><br><span class="line"><span class="comment">// 删除用户信息</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> DELETE_USER_INFO = <span class="string">'deleteUserInfo'</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>src\store\index.js</code></p>
+<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> Vue <span class="keyword">from</span> <span class="string">'vue'</span></span><br><span class="line"><span class="keyword">import</span> Vuex <span class="keyword">from</span> <span class="string">'vuex'</span></span><br><span class="line"><span class="keyword">import</span> * <span class="keyword">as</span> types <span class="keyword">from</span> <span class="string">'./mutation-types'</span></span><br><span class="line"></span><br><span class="line">Vue.use(Vuex)</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="keyword">new</span> Vuex.Store({</span><br><span class="line">  state: {</span><br><span class="line">    user: {</span><br><span class="line">    },</span><br><span class="line">    profile: {</span><br><span class="line">    }</span><br><span class="line">  },</span><br><span class="line">  mutations: {</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 设置用户信息</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    [types.UPDATE_USER_INFO] (state, { user, profile }) {</span><br><span class="line">      state.user = {</span><br><span class="line">        ...state.user,</span><br><span class="line">        ...user</span><br><span class="line">      }</span><br><span class="line">      state.profile = {</span><br><span class="line">        ...state.profile,</span><br><span class="line">        ...profile</span><br><span class="line">      }</span><br><span class="line">    },</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 删除用户信息</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    [types.DELETE_USER_INFO] (state) {</span><br><span class="line">      state.user = {}</span><br><span class="line">      state.profile = {}</span><br><span class="line">    }</span><br><span class="line">  },</span><br><span class="line">  actions: {</span><br><span class="line">  },</span><br><span class="line">  modules: {</span><br><span class="line">  }</span><br><span class="line">})</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>src\views\accounts\Login.vue</code></p>
+<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">&lt;script&gt;</span><br><span class="line">import { AccountsApis } from '@/utils/apis'</span><br><span class="line">import { ajax } from '@/utils/ajax'</span><br><span class="line">export default {</span><br><span class="line">  methods: {</span><br><span class="line">    onSubmit () {</span><br><span class="line">      // 提交表单</span><br><span class="line">      // 1. 调用接口</span><br><span class="line">      ajax.post(AccountsApis.loginUrl, {</span><br><span class="line">        username: this.username,</span><br><span class="line">        password: this.password</span><br><span class="line">      }).then(({ data }) =&gt; {</span><br><span class="line">        // 2. 拿到用户信息，存储到vuex</span><br><span class="line">        this.$store.commit(types.UPDATE_USER_INFO, data)</span><br><span class="line">        this.$toast('登录成功')</span><br><span class="line">        this.$router.replace({name: 'Mine'})</span><br><span class="line">      }).catch(({ response: { data } }) =&gt; {</span><br><span class="line">        // 3. 如果出现了异常，需要给用户提示异常信息</span><br><span class="line">        console.log(data)</span><br><span class="line">        this.$toast(`${data.error_code},${data.error_msg}`)</span><br><span class="line">      })</span><br><span class="line">    }</span><br><span class="line">  }</span><br><span class="line">}</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>src\views\Mine.vue</code></p>
+<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;!-- 个人中心 --&gt;</span><br><span class="line">      &lt;div&gt;</span><br><span class="line">        &lt;p&gt;欢迎您，{{ user.nickname }}&lt;/p&gt;</span><br><span class="line">        &lt;a class="btn-link" href="#" @click="logout"&gt;退出登录&lt;/a&gt;</span><br><span class="line">      &lt;/div&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import { mapState } from 'vuex'</span><br><span class="line">import { AccountsApis } from '@/utils/apis'</span><br><span class="line">import * as types from '@/store/mutation-types'</span><br><span class="line">import { ajax } from '@/utils/ajax'</span><br><span class="line">import TripFooter from '@/components/common/Footer'</span><br><span class="line"></span><br><span class="line">export default {</span><br><span class="line">  components: {</span><br><span class="line">    TripFooter</span><br><span class="line">  },</span><br><span class="line">  methods: {</span><br><span class="line">    /**</span><br><span class="line">     * 查询用户信息</span><br><span class="line">     */</span><br><span class="line">    getUserInfo () {</span><br><span class="line">      ajax.get(AccountsApis.userInfoUrl).then(({ data }) =&gt; {</span><br><span class="line">        console.log('Mine-getUserInfo', data)</span><br><span class="line">        this.$store.commit(types.UPDATE_USER_INFO, data)</span><br><span class="line">      })</span><br><span class="line">    },</span><br><span class="line">    /**</span><br><span class="line">     * 退出登录</span><br><span class="line">     */</span><br><span class="line">    logout () {</span><br><span class="line">      // 1. 调用接口，退出登录</span><br><span class="line">      ajax.get(AccountsApis.logoutUrl).then(() =&gt; {</span><br><span class="line">        // 2. 提示用户</span><br><span class="line">        this.$notify({</span><br><span class="line">          message: '欢迎下次再来',</span><br><span class="line">          type: 'success'</span><br><span class="line">        })</span><br><span class="line">        // 3. 删除用户登录的信息</span><br><span class="line">        this.$store.commit(types.DELETE_USER_INFO))</span><br><span class="line">        // 4. 跳转到首页去</span><br><span class="line">        this.$router.push({name: 'Home'})</span><br><span class="line">      })</span><br><span class="line">    }</span><br><span class="line">  },</span><br><span class="line">  computed: mapState(['user']),</span><br><span class="line">  mounted () {</span><br><span class="line">    this.getUserInfo()</span><br><span class="line">  }</span><br><span class="line">}</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></tbody></table></figure>
+
+
+
+
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/lu-you-wang-ding-dan-mo-kuai-orm-mo-xing-she-ji/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/lu-you-wang-ding-dan-mo-kuai-orm-mo-xing-she-ji/" class="post-title-link" itemprop="url">旅游网订单模块ORM模型设计</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-05-13 08:00:04" itemprop="dateModified" datetime="2021-05-13T08:00:04Z">2021-05-13</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%97%85%E6%B8%B8%E7%BD%91%E9%A1%B9%E7%9B%AE/" itemprop="url" rel="index"><span itemprop="name">旅游网项目</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="订单模块ORM模型设计"><a href="#订单模块ORM模型设计" class="headerlink" title="订单模块ORM模型设计"></a>订单模块ORM模型设计</h1><figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python manage.py startapp</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>trip\settings.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">INSTALLED_APPS = [</span><br><span class="line">    <span class="comment"># 订单模块</span></span><br><span class="line">    <span class="string">'order.apps.OrderConfig'</span></span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
+
+
+<p><code>order\models.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.contrib.contenttypes.fields <span class="keyword">import</span> GenericForeignKey</span><br><span class="line"><span class="keyword">from</span> django.contrib.contenttypes.models <span class="keyword">import</span> ContentType</span><br><span class="line"><span class="keyword">from</span> django.db <span class="keyword">import</span> models</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> accounts.models <span class="keyword">import</span> User</span><br><span class="line"><span class="keyword">from</span> order.choices <span class="keyword">import</span> OrderStatus, OrderTypes</span><br><span class="line"><span class="keyword">from</span> utils.models <span class="keyword">import</span> CommonModel</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Order</span>(<span class="params">CommonModel</span>):</span></span><br><span class="line">    <span class="string">""" 订单 """</span></span><br><span class="line">    sn = models.CharField(<span class="string">'订单编号'</span>, max_length=<span class="number">32</span>)</span><br><span class="line">    user = models.ForeignKey(User, related_name=<span class="string">'orders'</span>, on_delete=models.PROTECT)</span><br><span class="line">    buy_count = models.IntegerField(<span class="string">'购买数量'</span>, default=<span class="number">1</span>)</span><br><span class="line">    buy_amount = models.FloatField(<span class="string">'总价'</span>)</span><br><span class="line"></span><br><span class="line">    to_user = models.CharField(<span class="string">'收货人'</span>, max_length=<span class="number">32</span>)</span><br><span class="line">    to_area = models.CharField(<span class="string">'省市区'</span>, max_length=<span class="number">32</span>, default=<span class="string">''</span>)</span><br><span class="line">    to_address = models.CharField(<span class="string">'详细地址'</span>, max_length=<span class="number">256</span>, default=<span class="string">''</span>)</span><br><span class="line">    to_phone = models.CharField(<span class="string">'手机号码'</span>, max_length=<span class="number">32</span>)</span><br><span class="line"></span><br><span class="line">    remark = models.CharField(<span class="string">'备注'</span>, max_length=<span class="number">255</span>, null=<span class="literal">True</span>, blank=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 快递信息</span></span><br><span class="line">    express_type = models.CharField(<span class="string">'快递'</span>, max_length=<span class="number">32</span>, null=<span class="literal">True</span>, blank=<span class="literal">True</span>)</span><br><span class="line">    express_no = models.CharField(<span class="string">'单号'</span>, max_length=<span class="number">32</span>, null=<span class="literal">True</span>, blank=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    status = models.SmallIntegerField(<span class="string">'订单状态'</span>,</span><br><span class="line">                                      choices=OrderStatus.choices,</span><br><span class="line">                                      default=OrderStatus.SUBMIT)</span><br><span class="line">    types = models.SmallIntegerField(<span class="string">'订单类型'</span>,</span><br><span class="line">                                     choices=OrderTypes.choices,</span><br><span class="line">                                     default=OrderTypes.SIGHT_TICKET)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        db_table = <span class="string">'order'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">OrderItem</span>(<span class="params">CommonModel</span>):</span></span><br><span class="line">    <span class="string">""" 订单明细 """</span></span><br><span class="line">    user = models.ForeignKey(User, related_name=<span class="string">'order_items'</span>,</span><br><span class="line">                             on_delete=models.CASCADE)</span><br><span class="line">    order = models.ForeignKey(Order, verbose_name=<span class="string">'订单'</span>,</span><br><span class="line">                              related_name=<span class="string">'order_items'</span>,</span><br><span class="line">                              null=<span class="literal">True</span>,</span><br><span class="line">                              on_delete=models.CASCADE)</span><br><span class="line">    <span class="comment"># 商品快照</span></span><br><span class="line">    flash_name = models.CharField(<span class="string">'商品名称'</span>, max_length=<span class="number">128</span>)</span><br><span class="line">    flash_img = models.ImageField(<span class="string">'商品的主图'</span>)</span><br><span class="line">    flash_price = models.FloatField(<span class="string">'兑换价格'</span>)</span><br><span class="line">    flash_origin_price = models.FloatField(<span class="string">'原价'</span>)</span><br><span class="line">    flash_discount = models.FloatField(<span class="string">'折扣'</span>)</span><br><span class="line"></span><br><span class="line">    count = models.PositiveIntegerField(<span class="string">'购买数量'</span>)</span><br><span class="line">    amount = models.FloatField(<span class="string">'总额'</span>)</span><br><span class="line"></span><br><span class="line">    status = models.SmallIntegerField(<span class="string">'状态'</span>,</span><br><span class="line">                                      choices=OrderStatus.choices,</span><br><span class="line">                                      default=OrderStatus.SUBMIT)</span><br><span class="line">    remark = models.CharField(<span class="string">'备注'</span>, max_length=<span class="number">255</span>, null=<span class="literal">True</span>, blank=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 复合关联</span></span><br><span class="line">    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)</span><br><span class="line">    object_id = models.PositiveIntegerField()</span><br><span class="line">    content_object = GenericForeignKey(<span class="string">'content_type'</span>, <span class="string">'object_id'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        db_table = <span class="string">'order_item'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Payment</span>(<span class="params">CommonModel</span>):</span></span><br><span class="line">    <span class="string">""" 支付凭证 """</span></span><br><span class="line"></span><br><span class="line">    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name=<span class="string">'payments'</span>)</span><br><span class="line">    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name=<span class="string">'payments'</span>)</span><br><span class="line">    amount = models.FloatField(<span class="string">'金额'</span>, help_text=<span class="string">'支付实际的金额'</span>)</span><br><span class="line">    sn = models.CharField(<span class="string">'流水号'</span>, max_length=<span class="number">32</span>)</span><br><span class="line">    third_sn = models.CharField(<span class="string">'第三方订单号'</span>, max_length=<span class="number">128</span>, null=<span class="literal">True</span>, blank=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    status = models.SmallIntegerField(<span class="string">'支付状态'</span>, default=<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">    meta = models.CharField(<span class="string">'其他数据'</span>, max_length=<span class="number">128</span>, null=<span class="literal">True</span>, blank=<span class="literal">True</span>)</span><br><span class="line">    remark = models.CharField(<span class="string">'备注信息'</span>, max_length=<span class="number">128</span>, null=<span class="literal">True</span>, blank=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        db_table = <span class="string">'order_payment'</span></span><br></pre></td></tr></tbody></table></figure>
+
+
+<p><code>order\choices.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.db <span class="keyword">import</span> models</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">OrderStatus</span>(<span class="params">models.IntegerChoices</span>):</span></span><br><span class="line">    <span class="string">""" 订单状态 """</span></span><br><span class="line">    SUBMIT = <span class="number">11</span>, <span class="string">'待支付'</span></span><br><span class="line">    PAID = <span class="number">12</span>, <span class="string">'已支付'</span></span><br><span class="line">    CANCELED = <span class="number">13</span>, <span class="string">'已取消'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">OrderTypes</span>(<span class="params">models.IntegerChoices</span>):</span></span><br><span class="line">    <span class="string">""" 订单类型 """</span></span><br><span class="line">    SIGHT_TICKET = <span class="number">10</span>, <span class="string">'门票'</span></span><br><span class="line">    HOTEL = <span class="number">11</span>, <span class="string">'酒店'</span></span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python manage.py check</span><br><span class="line">python manage.py makemigrations</span><br><span class="line">python manage.py migrate</span><br></pre></td></tr></tbody></table></figure>
+
+
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/lu-you-wang-ding-dan-xiang-qing-jie-kou-kai-fa/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/lu-you-wang-ding-dan-xiang-qing-jie-kou-kai-fa/" class="post-title-link" itemprop="url">旅游网订单详情接口开发</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-06-05 15:58:04" itemprop="dateModified" datetime="2021-06-05T15:58:04Z">2021-06-05</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%97%85%E6%B8%B8%E7%BD%91%E9%A1%B9%E7%9B%AE/" itemprop="url" rel="index"><span itemprop="name">旅游网项目</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="订单详情接口开发"><a href="#订单详情接口开发" class="headerlink" title="订单详情接口开发"></a>订单详情接口开发</h1><p>开发步骤</p>
+<ul>
+<li>第一步，设计接口返回内容及字段</li>
+</ul>
+<p><code>order\serializers.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> utils.serializers <span class="keyword">import</span> BaseSerializer</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">OrderItemSerializer</span>(<span class="params">BaseSerializer</span>):</span></span><br><span class="line">    <span class="string">""" 订单明细 """</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">to_dict</span>(<span class="params">self</span>):</span></span><br><span class="line">        obj = self.obj</span><br><span class="line">        <span class="keyword">return</span> {</span><br><span class="line">            <span class="string">'pk'</span>: obj.pk,</span><br><span class="line">            <span class="string">'flash_name'</span>: obj.flash_name,</span><br><span class="line">            <span class="string">'flash_img'</span>: obj.flash_img.url,</span><br><span class="line">            <span class="string">'flash_price'</span>: obj.flash_price,</span><br><span class="line">            <span class="string">'flash_origin_price'</span>: obj.flash_origin_price,</span><br><span class="line">            <span class="string">'flash_discount'</span>: obj.flash_discount,</span><br><span class="line">            <span class="string">'count'</span>: obj.count,</span><br><span class="line">            <span class="string">'amount'</span>: obj.amount,</span><br><span class="line">            <span class="string">'remark'</span>: obj.remark,</span><br><span class="line">            <span class="string">'object_id'</span>: obj.object_id,</span><br><span class="line">            <span class="string">'app_label'</span>: obj.content_type.app_label,</span><br><span class="line">            <span class="string">'model'</span>: obj.content_type.model,</span><br><span class="line">        }</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">OrderDetailSerializer</span>(<span class="params">BaseSerializer</span>):</span></span><br><span class="line">    <span class="string">""" 订单详细信息 """</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">to_dict</span>(<span class="params">self</span>):</span></span><br><span class="line">        obj = self.obj</span><br><span class="line">        items = []</span><br><span class="line">        <span class="keyword">for</span> item <span class="keyword">in</span> obj.order_items.all():</span><br><span class="line">            items.append(OrderItemSerializer(item).to_dict())</span><br><span class="line">        <span class="keyword">return</span> {</span><br><span class="line">            <span class="string">'sn'</span>: obj.sn,</span><br><span class="line">            <span class="string">'buy_amount'</span>: obj.buy_amount,</span><br><span class="line">            <span class="string">'buy_count'</span>: obj.buy_count,</span><br><span class="line">            <span class="string">'types'</span>: obj.types,</span><br><span class="line">            <span class="string">'status'</span>: obj.status,</span><br><span class="line">            <span class="string">'created_at'</span>: obj.created_at,</span><br><span class="line">            <span class="string">'remark'</span>: obj.remark,</span><br><span class="line">            <span class="string">'to_user'</span>: obj.to_user,</span><br><span class="line">            <span class="string">'to_area'</span>: obj.to_area,</span><br><span class="line">            <span class="string">'to_address'</span>: obj.to_address,</span><br><span class="line">            <span class="string">'to_phone'</span>: obj.to_phone,</span><br><span class="line">            <span class="string">'express_type'</span>: obj.express_type,</span><br><span class="line">            <span class="string">'express_no'</span>: obj.express_no,</span><br><span class="line">            <span class="string">'items'</span>: items</span><br><span class="line">        }</span><br></pre></td></tr></tbody></table></figure>
+
+<ul>
+<li>第二步，编写接口代码<br><code>order\urls.py</code></li>
+</ul>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.urls <span class="keyword">import</span> path</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> order <span class="keyword">import</span> views</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    <span class="comment"># 3.2 订单详情(支付、取消订单、删除订单)</span></span><br><span class="line">    path(<span class="string">'order/detail/&lt;int:sn&gt;/'</span>, views.OrderDetail.as_view(), name=<span class="string">"order_detail"</span>),</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>order\views.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.views.generic.detail <span class="keyword">import</span> BaseDetailView</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> order.models <span class="keyword">import</span> Order</span><br><span class="line"></span><br><span class="line"><span class="meta">@method_decorator(login_required, name='dispatch')</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">OrderDetail</span>(<span class="params">BaseDetailView</span>):</span></span><br><span class="line">    slug_field = <span class="string">'sn'</span></span><br><span class="line">    slug_url_kwarg = <span class="string">'sn'</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_queryset</span>(<span class="params">self</span>):</span></span><br><span class="line">        user = self.request.user</span><br><span class="line">        <span class="keyword">return</span> Order.objects.filter(user=user, is_valid=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span>(<span class="params">self, request, *args, **kwargs</span>):</span></span><br><span class="line">        <span class="string">""" GET: 订单详情 """</span></span><br><span class="line">        order_obj = self.get_object()</span><br><span class="line">        data = serializers.OrderDetailSerializer(order_obj).to_dict()</span><br><span class="line">        <span class="keyword">return</span> http.JsonResponse(data)</span><br></pre></td></tr></tbody></table></figure>
+
+<ul>
+<li>第三步，模拟HTTP请求，测试验证接口</li>
+</ul>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -658,7 +1010,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-05-10 01:19:16" itemprop="dateModified" datetime="2021-05-10T01:19:16Z">2021-05-10</time>
+        <time title="修改时间：2021-09-25 12:22:27" itemprop="dateModified" datetime="2021-09-25T12:22:27Z">2021-09-25</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -686,25 +1038,29 @@
 <p>复杂度用来衡量一个算法的质量，一般两个指标执行时间和执行所需内存.<br>撇开输入规模的影响，用相对执行时间=执行时间/输入规模来表示时间，为了表示更简便，</p>
 <p>算法的执行次数 用 输入大小n 的函数 表示，即 T(n) 。<br>算法的时间复杂度，用来度量算法的运行时间，记作: T(n) = O(f(n))。<br>它表示随着 输入大小n 的增大，算法执行需要的时间的增长速度可以用 f(n) 来描述。</p>
 <p>时间复杂度是 估算算法在计算的过程中所需要的计算工作量和运行时间 的最大量级<br>既然是为了估算，那就不需要准确，不是代码执行的实际时间<br>所以我们用同一个量级的典型函数来表示就行了。<br>并不需要纠结谁大一点，谁小一点的问题。</p>
-<p>空间复杂度:指算法在计算过程中所需要的内存空间</p>
+<hr>
 <p>常见的时间复杂度:<br>随着问题的规模n，不断的增大，时间复杂度就不断的增大，意味着算法的执行效率越低</p>
 <p>O(1)常数阶，代表的并不是输入规模和执行时间的比率是1，而是假定输入规模为n，然后算法执行时间是多少，符号代数吧，n代表输入规模，是最低的时空复杂度了，也就是耗时/耗空间与输入数据大小无关，无论输入数据增大多少倍，耗时/耗空间都不变。 哈希算法就是典型的O(1)时间复杂度，无论数据规模多大，都可以在一次计算后找到目标（不考虑冲突的话）</p>
 <p>O(n)线性阶，输入规模为N，执行时间 &lt; cn，c 为任意常数。<br>空间复杂度也类似，这个题就是那个字符集的大小(字符集中不同字符的个数）可能比字符串的长度更大，所以是O(n+字符集的大小），就代表数据量增大几倍，耗时也增大几倍。比如常见的遍历算法。</p>
 <p>时间复杂度O(n^2)平方阶，就代表数据量增大n倍时，耗时增大n的平方倍，这是比线性更高的时间复杂度。比如冒泡排序，就是典型的O(n^2)的算法，对n个数排序，需要扫描n×n次。</p>
 <p>O(log2n)对数阶，当数据增大n倍时，耗时增大logn倍（这里的log是以2为底的，比如，当数据增大256倍时，耗时只增大8倍，是比线性还要低的时间复杂度）。二分查找就是O(logn)的算法，每找一次排除一半的可能，256个数据中查找只要找8次就可以找到目标。</p>
 <p>O(nlog2n)线性对数，就是n乘以logn，当数据增大256倍时，耗时增大256*8=2048倍。这个复杂度高于线性低于平方。归并排序就是O(nlogn)的时间复杂度。</p>
-<p>时间复杂度的几条基本计算规则<br>1.基本操作，即只有常数项，认为其时间复杂度为O(1) 当 T(n) = c，c 为一个常数的时候，<br>2.顺序结构，时间复杂度按加法进行计算<br>3.循环结构，时间复杂度按乘法进行计算<br>4.分支结构，时间复杂度取最大值<br>5.判断一个算法的效率时，往往只需要关注操作数量的最高次项，忽略与最高阶系数。其它次要项和常数项可以忽略<br>在没有特殊说明时，我们所分析的算法的时间复杂度都是指最坏时间复杂度</p>
+<p>时间复杂度的几条基本计算规则<br>1.基本操作，即只有常数项，认为其时间复杂度为O(1)， 当 T(n) = c，c 为一个常数的时候，<br>计算机执行程序是通过二进制指令来执行的，二进制数据最基本的操作有——与（&amp;）、或（|）、非（）、异或（），基本四则运算（+、-、*、/），逻辑运算（&gt;、&lt;、=）是转换成有限次二进制指令来执行，次数不跟参与计算的数据大小有关，</p>
+<p>2.顺序结构，时间复杂度按加法进行计算<br>3.循环结构，时间复杂度按乘法进行计算<br>4.分支结构，时间复杂度取最大值<br>5.判断一个算法的效率时，往往只需要关注操作数量的最高次项，忽略与最高阶系数。其它次要项和常数项可以忽略<br>在没有特殊说明时，我们所分析的算法的时间复杂度都是指最坏时间复杂度</p>
 <p>此时算法的时间复杂度就是 O(f(n))<br>从内向外分析，从最深层开始分析。如果遇到函数调用，要深入函数进行分析。</p>
 <p>只要算法中不存在循环语句、递归语句，即使有成千上万行的代码，其时间复杂度也是Ο(1)。</p>
 <p>1.对于一个循环，假设循环体的时间复杂度为 O(n)，循环次数为 m，<br>则这个循环的时间复杂度为 O(n×m)。</p>
 <figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">aFunc</span><span class="params">(<span class="keyword">int</span> n)</span> </span>{</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) {         <span class="comment">// 循环次数为 n</span></span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"Hello, World!\n"</span>);      <span class="comment">// 循环体时间复杂度为 O(1)</span></span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
 <p>此时时间复杂度为 O(n × 1)，即 O(n)。</p>
 <p>2.对于多个循环，假设循环体的时间复杂度为 O(n)，<br>各个循环的循环次数分别是a, b, c…，<br>则这个循环的时间复杂度为 O(n×a×b×c…)。</p>
-<figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">aFunc</span><span class="params">(<span class="keyword">int</span> n)</span> </span>{</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) {         <span class="comment">// 循环次数为 n</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; n; j++) {       <span class="comment">// 循环次数为 n</span></span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">"Hello, World!\n"</span>);      <span class="comment">// 循环体时间复杂度为 O(1)</span></span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-<p>k层关于n的循环 n^k<br>此时时间复杂度为 O(n × n × 1)，即 O(n^2)。n × (1 + n)=n^2+2~n^2</p>
+<figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">aFunc</span><span class="params">(<span class="keyword">int</span> n)</span> </span>{</span><br><span class="line">    <span class="keyword">int</span> sum = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) {         <span class="comment">// 循环次数为 n</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; n; j++) {       <span class="comment">// 循环次数为 n</span></span><br><span class="line">            sum++;     <span class="comment">// 循环体时间复杂度为 O(1)</span></span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>k层关于n的循环 n^k<br>这段代码中，int sum = 0 执行了一次，int i = 0 执行了一次，i &lt; n 执行了n次，i++ 执行了 n 次，int j = 0 执行了n次，j &lt; n、j++和sum++ 分别执行了n^2次，我们假设赋值、比较、++，都是一个 cpu 指令（事实上不是，可以拆分成更细的操作），那么这段代码执行的指令数量是3<em>n^2+3</em>n+2</p>
+<p>时间复杂度关注的是影响速度的因素。上述式子，当 N 增大，N^2 比 N 大得多，在 N^2 面前，N 的影响几乎可以忽略，因此我们忽略掉 N 的部分，将上述代码的时间复杂度简写为 o(N^2)。</p>
 <figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> a <span class="keyword">in</span> range(<span class="number">0</span>, <span class="number">1001</span>):</span><br><span class="line">    <span class="keyword">for</span> b <span class="keyword">in</span> range(<span class="number">0</span>, <span class="number">1001</span>):</span><br><span class="line">        <span class="keyword">for</span> c <span class="keyword">in</span> range(<span class="number">0</span>, <span class="number">1001</span>):</span><br><span class="line">            <span class="keyword">if</span> a**<span class="number">2</span> + b**<span class="number">2</span> == c**<span class="number">2</span> <span class="keyword">and</span> a+b+c == <span class="number">1000</span>:</span><br><span class="line">                print(<span class="string">"a, b, c: %d, %d, %d"</span> % (a, b, c))</span><br></pre></td></tr></tbody></table></figure>
 <p>时间复杂度： O(n<em>n</em>n) = O(n^3)</p>
 <figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> a <span class="keyword">in</span> range(<span class="number">0</span>, <span class="number">1001</span>):</span><br><span class="line">    <span class="keyword">for</span> b <span class="keyword">in</span> range(<span class="number">0</span>, <span class="number">1001</span>-a):</span><br><span class="line">        c = <span class="number">1000</span> - a - b</span><br><span class="line">        <span class="keyword">if</span> a**<span class="number">2</span> + b**<span class="number">2</span> == c**<span class="number">2</span>:</span><br><span class="line">            print(<span class="string">"a, b, c: %d, %d, %d"</span> % (a, b, c))</span><br></pre></td></tr></tbody></table></figure>
+
 <p>T(n) = O(n<em>n</em>(1+1)) = O(n*n) = O(n2)</p>
 <p>3.对于顺序执行的语句或者算法，总的时间复杂度等于其中最大的时间复杂度。</p>
 <figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">aFunc</span><span class="params">(<span class="keyword">int</span> n)</span> </span>{</span><br><span class="line">    <span class="comment">// 第一部分时间复杂度为 O(n^2)</span></span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) {         <span class="comment">// 循环次数为 n</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; n; j++) {         <span class="comment">// 循环次数为 n</span></span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">"Hello, World!\n"</span>);      <span class="comment">// 循环体时间复杂度为 O(1)</span></span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">    <span class="comment">// 第二部分时间复杂度为 O(n)</span></span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; n; j++) {         <span class="comment">// 循环次数为 n</span></span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"Hello, World!\n"</span>);      <span class="comment">// 循环体时间复杂度为 O(1)</span></span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
@@ -722,7 +1078,20 @@
 <figure class="highlight angelscript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">long aFunc(<span class="built_in">int</span> n) {</span><br><span class="line"><span class="comment">// 第一条路径时间复杂度为 O(n^2)</span></span><br><span class="line">    <span class="keyword">if</span> (n &lt;= <span class="number">1</span>) {</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        <span class="keyword">return</span> aFunc(n - <span class="number">1</span>) + aFunc(n - <span class="number">2</span>);</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
 <p>显然运行次数，T(0) = T(1) = 1，<br>同时 T(n) = T(n - 1) + T(n - 2) + 1，<br>这里的 1 是其中的加法算一次执行。</p>
 <p>第二条路径时间复杂度为 O(n^2)<br>显然 T(n) = T(n - 1) + T(n - 2) 是一个斐波那契数列，<br>通过归纳证明法可以证明，<br>当 n &gt;= 1 时 T(n) &lt; (5/3)^n，<br>同时当 n &gt; 4 时 T(n) &gt;= (3/2)^n。<br>所以该方法的时间复杂度可以表示为 O((5/3)^n)，简化后为 O(2^n)。<br>可见这个方法所需的运行时间是以指数的速度增长</p>
-<p>空间复杂度:用来评估算法内存占用大小的式子<br>空间复杂度的表示方式与时间复杂度完全一样<br>算法使用了几个变量:O(1)<br>算法使用了长度为n的一维列表:O(n)<br>算法使用了m行n列的二维列表:O(mn)<br>“空间换时间”，时间越快越好</p>
+<hr>
+<p>空间复杂度：指算法在计算过程中所需要的内存空间大小的式子<br>内存中基本单位是字节，1个字节为8位，总共可以表示2^8=256个值。</p>
+<p>我们在设定变量时，一旦变量赋值成功，该变量就在内存中有一片指向的地址，这片地址是操作系统分配的。该变量定义的时候需声明需要多少空间，操作系统会给分配多少空间。一旦分配，这个变量在内存中就固定下来了。</p>
+<p>我们在代码中需要声明每个变量的类型，比如int，为4个字节的整型；double，为8个字节的浮点型；char，为一个字节的字符等等。python由于可以不用声明类型，我们很少关注每个变量所占用的内存空间。python底层仍然是存在基本类型，只是封装了一层动态识别。</p>
+<p>空间复杂度的表示方式与时间复杂度完全一样<br>算法使用了几个变量:O(1)<br>算法使用了长度为n的一维列表、一个n个元素的数组:O(n)<br>算法使用了m行n列的二维列表:O(mn)<br>一个n*n的二维数组，是o(n^2)的空间复杂度。<br>这里的o(n)表示，存在一个跟n无关的常数k，使得申请的内存空间为 kn。</p>
+<figure class="highlight c++"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> a[N];   <span class="comment">// 空间复杂度o(N)，申请的内存空间为4N个字节</span></span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">a = [<span class="number">0</span>] * N;</span><br></pre></td></tr></tbody></table></figure>
+
+<p>空间复杂度o(N)，但申请的内存空间不止4N个字节，python为数组封装了一层，里面还会记录一些常用的元数据以便快速查询，比如size</p>
+<hr>
+<p>比如响应速度快的，通常用空间换时间的原则；<br>内存放不下，就适当放宽时间复杂度来换内存的优化。<br>设计代码就是对时间、空间、开发成本各种要素的平衡，尽可能取到最优化的策略。</p>
+<p>1秒钟能执行千万级别的运算，千万级别是什么概念呢？</p>
+<p>n取值在百万-千万左右，o(n)的算法能在1秒钟内实现<br>n取值在十万左右，o(nlogn)的算法能在1秒钟内实现<br>n取值在一千左右，o(n^2)的算法能在1秒钟内实现<br>……<br>上面我们看了一个简单小案例的时间复杂度分析，和各种时间复杂度下1 秒钟能够完成多大量级的运算。</p>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -932,420 +1301,6 @@
 
 <p>对字符串排序，要求把开头为’x’的排到前面，然后再以字典序排。</p>
 <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> functools <span class="keyword">import</span> cmp_to_key</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cmp</span>(<span class="params">s1, s2</span>):</span></span><br><span class="line">    <span class="keyword">if</span> s1[<span class="number">0</span>] == <span class="string">'x'</span> <span class="keyword">and</span> s2[<span class="number">0</span>] != <span class="string">'x'</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span></span><br><span class="line">    <span class="keyword">if</span> s2[<span class="number">0</span>] == <span class="string">'x'</span> <span class="keyword">and</span> s1[<span class="number">0</span>] != <span class="string">'x'</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span></span><br><span class="line">    <span class="keyword">if</span> s1 &gt; s2:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span></span><br><span class="line">    <span class="keyword">if</span> s1 &lt; s2:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">front_x</span>(<span class="params">words</span>):</span></span><br><span class="line">    t = sorted(words, key=cmp_to_key(cmp), reverse=<span class="number">1</span>)</span><br><span class="line">    <span class="keyword">return</span> t</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">print(front_x([<span class="string">'mix'</span>, <span class="string">'xyz'</span>, <span class="string">'apple'</span>, <span class="string">'xanadu'</span>, <span class="string">'aardvark'</span>]))</span><br><span class="line"><span class="comment"># 输出:['xanadu', 'xyz', 'aardvark', 'apple', 'mix']</span></span><br></pre></td></tr></tbody></table></figure><script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/ce-shi-gong-ju/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/ce-shi-gong-ju/" class="post-title-link" itemprop="url">测试工具</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-06-21 07:58:43" itemprop="dateModified" datetime="2021-06-21T07:58:43Z">2021-06-21</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%B5%8B%E8%AF%95/" itemprop="url" rel="index"><span itemprop="name">测试</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>接口测试三剑客</p>
-<p> VScode 插件</p>
-<ul>
-<li>UML工具：PlantUML(快速画出时序图等UML图)</li>
-<li>Http Client(调试):Rest Client (可以快速构造请求,来调试，比postman相比json数据可以注释的)</li>
-</ul>
-<p>Pycharm-<br>Tools-HTTP Client 是 IDEA 朋友charm 默认安装，并且启用的插件，</p>
-<p>通过菜单右键File—New—HTTP Request直接创建 HTTP request 文件</p>
-<p>使用一个.http后缀（或.rest后缀）的文本文件，<br>将可执行的Rest 接口和参数，统一管理起来， 组成一个Rest 接口可执行文件</p>
-<p>Http Client 组件的牛逼之处，就是这个 ：Rest 接口可执行文件</p>
-<p>可以作为项目文件和我的项目放一起，不会显得凌乱，<br>通过 Git 提交到仓库，方便多人协作。大家共享文件，共同维护接口请求数据，自然就不会出现调试别人接口还要导入他人数据的情况啦，方便 测试用例、测试参数、测试数据的 共享</p>
-<p>默认会创建一个名为 rest-api.http 的文件，该文件被存储在 用户目录的 Scratches 文件夹下。</p>
-<p>接下来就可以改rest-api.http 的文件中执行 Rest 接口， 效果如下：</p>
-<p>可以通过配置来帮我们快速切换对应的环境（变量），只要写一次的请求体，就可以用作于多个环境。</p>
-<p>example - ruquests with authorization</p>
-<p>更好用的是，我们可以定义变量（不同的环境使用不同的变量），<br>我们可以定义<code>http-client.env.json</code> 样式，里边写一些通用变量相关的值。<br>只要在请求脚本目录下就可以读到，遵循约定大于配置的原则，<br>然后我们在<code>.http</code>文件下就可以引用：<br>regular 对应的文件http-client.env.json<br>private 对应的文件http-client.private.env.json</p>
-<p><code>http-client.env.json</code></p>
-<figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">{</span><br><span class="line">  <span class="attr">"dev"</span>: {</span><br><span class="line">    <span class="attr">"baseUrl"</span>: <span class="string">"http://gateway.xxx.cn/"</span>,</span><br><span class="line">    <span class="attr">"username"</span>: <span class="string">""</span>,</span><br><span class="line">    <span class="attr">"password"</span>: <span class="string">""</span></span><br><span class="line">  },</span><br><span class="line">  <span class="attr">"pre"</span>: {</span><br><span class="line">    <span class="attr">"baseUrl"</span>: <span class="string">"http://localhsot:8888/"</span>,</span><br><span class="line">    <span class="attr">"username"</span>: <span class="string">""</span>,</span><br><span class="line">    <span class="attr">"password"</span>: <span class="string">""</span></span><br><span class="line">  }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p>在<code>.http</code>文件中使用就可以引用到我们公用的环境变量了：</p>
-<figure class="highlight http"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">GET {{baseUrl}}/api/item?id=99</span><br><span class="line"><span class="attribute">Accept</span>: application/json</span><br></pre></td></tr></tbody></table></figure>
-
-<p>代替接口测试工具postman,</p>
-<p>Convert request to the new format</p>
-<p>抓包工具fiddler,Python开发测试工具。</p>
-<p>Chrome/Firefox 开发者工具: 浏览器内置，方便易用</p>
-<ul>
-<li>Elements: HTML元素面板，用于定位查看元素源代码</li>
-<li>Console: js控制台面板，js命令行，查看前端日志</li>
-<li>Sources: 资源面板，用于断点调试js</li>
-<li>Network: 请求信息面板，查看请求及响应信息</li>
-</ul>
-<h2 id="fiddler"><a href="#fiddler" class="headerlink" title="fiddler"></a>fiddler</h2><p>http协议调试代理工具，它能够记录并检查所有你的电脑和互联网之间http通讯，设置断点，查看所有的“进出”fiddler的数据。<br>可以手机抓包，模拟弱网，拦截请求，定制响应<br>fiddler的工作原理：在电脑端设置一个代理，电脑发起的所有http请求都会经过这个代理，fiddler代理把收到的请求后再将这个请求发给服务器，服务器收fiddler的请求处理后在返回给fiddler，fiddler收到服务端返回的数据同样再返回给我们的电脑</p>
-<p>打开后，系统代理变成默认端口8888，<br>选择Connections，fiddler监听的端口默认是8888，如果该端口与你其他应用的端口冲突，你也可以自定义1024~65536范围内的任意端口，然后勾选作为系统代理。</p>
-<p>逍遥模拟器wifi端口改成8888<br>Tools-Opotions-Https </p>
-<ol>
-<li>勾选 Decrypt Https traffic-ignore server certificate error </li>
-</ol>
-<p>浏览器代理设置<br>2. actions - export Root certificate to Desktop，浏览器证书-受信任的根证书颁发机构 导入</p>
-<p>fiddler的运用：</p>
-<ul>
-<li>查看接口请求方式</li>
-<li>抓到查看请求数据、响应数据，查看Raw格式/表单格式/Json/XML格式</li>
-<li>拦截和修改请求</li>
-<li>抓取Postman/接口脚本发送的请求，方便调试</li>
-<li>过滤器</li>
-</ul>
-<p>请求方式<br>测试请求方式为post，提交数据添加header,cookie，body;<br>请求方式为get：接口地址？多个请求数据用&amp;连接 前为key，后面数参数数据，添加也是在header里面添加键、值，</p>
-<ul>
-<li>接口返回状态</li>
-<li>设置代理（用于移动端抓包）</li>
-<li>header和cookie</li>
-<li>设置断点</li>
-<li>添加筛选</li>
-</ul>
-<p>rules- automatic breakpoint -before request上不了网络 disable正常上网</p>
-<p>快捷键<br>删除全部请求：<code>Ctrl+X</code><br>保留选中请求，删除其他：<code>Shift+Del</code></p>
-<h2 id="Postman"><a href="#Postman" class="headerlink" title="Postman"></a>Postman</h2><p>自动反复测试一个需要携带header的post请求，并且对针对线上、测试环境同一个数据进行测试。<br>并对实际结果做比较，以作为测试结果<br>关键字：自动 反复 线上  线下</p>
-<p>Postman是一种网页调试与发送网页http请求的chrome插件。我们可以用来很方便的模拟get或者post或者其他方式的请求来调试接口</p>
-<p>使用Postman如果通过自己拼接url，自己造数据，是非常麻烦的。因此选择Postman+Postman interceptor，使用Postman interceptor可以拦截到网页请求，同时传到postman的history列表中，然后我们只需要在postman中修改一下url就可以直接send了。</p>
-<p>主要功能包括</p>
-<ul>
-<li><p>模拟各种 HTTP requests</p>
-</li>
-<li><p>Collection 功能（测试集合）栏保存有常用的接口，可以按接口类型或者业务类型放在不同的文件夹下。<br>把接口放到collections里同一个文件夹下可以进行接口的批量执行，需要把所有要测试的接口放在一个文件夹下，点击右边的三角形，然后点击run，进行运行<br>iteration：迭代次数</p>
-</li>
-<li><p>Params url带上参数</p>
-</li>
-<li><p>Authentication 认证 </p>
-<ul>
-<li>Basic Auth 用户名密码认证</li>
-<li>API Key: Token认证</li>
-<li>OAuth 2.0: </li>
-</ul>
-</li>
-<li><p>需要header或者cookie时候，则要填写header才可以成功请求，cookie的值也是填写到header中，添加cookie和header之后添加入参到Body中<br>添加key value</p>
-</li>
-<li><p>body里有内容，get会把数据都放到url中，body不可以点击。可以加表单，可以上传txt和file。<br>在后端解析的代码解析的request.data通常放在 raw JSON 里面，<br>更新post,body里面修改发送</p>
-</li>
-</ul>
-<ul>
-<li><p>人性化的 Response 整理</p>
-</li>
-<li><p>内置测试脚本语言，点击右边的code，可以选择自己熟悉的代码，选择之后，根据选择生成接口测试的代码。 生成对应语言的http请求的代码。</p>
-</li>
-<li><p>设定变量与环境 enviroment：右上角的设置按钮，选择manage environment，输入环境名称和url<br>如设置线上和测试环境的地址名称，这样可以自由地切换不同的测试环境来执行接口测试。</p>
-</li>
-<li><p>通过tests栏设置相关内容可以判断测试结果是pass还是fail。<br>在返回数据查uid，如果查到了就说明接口是成功的<br><code>tests["Body matches string"]=responseBody.has（"uid"）;</code></p>
-</li>
-</ul>
-<p>平台设计理念</p>
-<ul>
-<li>前后台分离，前台完成关键字设计，后台进行Web自动化执行</li>
-<li>基于数据库管理关键字内容</li>
-<li>在线UI操作，在线创建测试用例，在线自定义测试计划</li>
-<li>可以查看历史运行记录和测试报告</li>
-</ul>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/liu-lan-qi-zhong-duan-cha-kan-yuan-su-biao-qian/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/liu-lan-qi-zhong-duan-cha-kan-yuan-su-biao-qian/" class="post-title-link" itemprop="url">浏览器终端查看元素标签</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-05-07 08:55:56" itemprop="dateModified" datetime="2021-05-07T08:55:56Z">2021-05-07</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>打开console<br>document.getElementById(tid);<br>document.getElementByClassName(“from-group”); 判断页面有多少个元素</p>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/liu-lan-qi-fang-wen-url/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/liu-lan-qi-fang-wen-url/" class="post-title-link" itemprop="url">浏览器访问url</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-07-20 11:51:31" itemprop="dateModified" datetime="2021-07-20T11:51:31Z">2021-07-20</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">计算机网络</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>电脑是如何访问百度的？<br>浏览器输入一个网址url并发送请求到服务器，再到服务器返回浏览器发生了哪些事情？</p>
-<p>可以从以下角度回答问题<br>中间涉及到了哪些过程<br>每个过程包含哪些网络协议<br>每个协议都干了什么？</p>
-<p>知道什么说什么，不要把自己带坑里，熟悉到哪一层协议就说到哪一层）</p>
-<p>&nbsp; DNS查询—》TCP握手—》HTTP请求—》反向代理Nginx—》uwsgi / gunicom—》web app 响应—》TCP握手。<br>浏览器本身是一个客户端，当你输入URL的时候，首先浏览器会去请求DNS服务器，一开始并不会做DNS查询，而是先去看有没有DNS缓存，如果不在DNS缓存里面并且hosts文件里面也没有的时候，<br>它就会向本地DNS服务器发起一个DNS查询，如果本地DNS没有查到的时候(DNS 查询是一个递归查询)它就会向上层继续查询，一直向域名服务器和根服务器继续进行递归查询。<br>一直到查询完之后返回给我们相应的域名对应的IP地址，<br>比如：输入<a href="http://www.aliyun.com阿里云就会返回对应的IP地址：106.11.62.15。">www.aliyun.com阿里云就会返回对应的IP地址：106.11.62.15。</a><br>&nbsp; &nbsp; &nbsp; &nbsp;DNS查询完之后就获取到IP地址，当拿到IP地址之后浏览器就可以调用Socket函数来去发起TCP请求，通过三次握手与并等待服务器的确认。<br>在服务器响应请求后，建立TCP连接。<br>&nbsp; &nbsp; &nbsp; &nbsp;建立起连接之后，发起应用层协议HTTP请求，发起的HTTP请求并不是一开始打到web框架，而是打到Nginx反向代理，很多访问量比较高的网站都会使用nginx来作为反向代理和负载均衡，通过nginx转发到多台服务器上。<br>&nbsp; &nbsp; &nbsp; &nbsp;Nginx反向代理之后就到 WSGI服务器这一层，uwsgi / gunicom作用就是主要兼容web应用(flask/django/tornado)。通过uwsgi 再把请求转发到web应用层(web app响应)也就是web框架层。在web应用层一般就是做一些数据库的增删改查或者发一条消息等，最后把请求response，通过TCP发送给用户。<br>&nbsp; &nbsp; &nbsp; 如果没有其它数据传输的时候，就会执行TCP的四次挥手。</p>
-<p>然后，浏览器向服务器发送HTTP请求，服务器接收到请求包之后才开始处理请求包，服务器调用自身服务，返回HTTP Response（响应）包；包含HTML代码<br>然后浏览器客户端收到来自服务器的响应获取到了HTML，并进行HTML内资源请求，比如里面的CSS,JS，图片等资源。<br>最后浏览器将渲染渲染这个Response包里的主体（body），呈现给用户。等收到全部的内容随后断开与该服务器之间的TCP连接。</p>
-<p>一、精简回答<br>1.DNS：domain name server，域名解析 用于将域名转化成ip地址的服务器。<br>在Internet上域名与IP地址之间是一一对应的，域名虽然便于人们记忆，但机器之间只能互相认识IP地址，<br>就像是查号台、地址簿，会告诉互联网该如何去解读IP地址，<br>它们之间的转换工作称为域名解析，域名解析需要由专门的域名解析服务器来完成，DNS就是进行域名解析的服务器 。</p>
-<p>譬如将38.160.150.31转换成人能读懂的网址，比如bbc.co.uk，并指出哪条途径可以到达存有这个IP地址的服务器。</p>
-<p>域名：<a target="_blank" rel="noopener" href="http://www.baidu.com/">www.baidu.com</a><br>DNS服务端：119.29.29.29<br>通过DNS服务器解析119.29.29.29，解析<a target="_blank" rel="noopener" href="http://www.baidu.com/">http://www.baidu.com</a><br>2.访问百度的IP<br>百度IP地址：14.215.177.38<br>通过浏览器方位14.215.177.38:443端口</p>
-<p>二、详细回答</p>
-<ol>
-<li>如何到达DNS地址：119.29.29.29</li>
-<li>未知的IP地址我们会发送给网关：192.168.30.254</li>
-<li>如何发送给网关，需要知道网关的MAC地址；</li>
-<li>已知网关的IP地址，如何知道网关的MAC地址。</li>
-<li>ARP解析，IP地址→MAC地址192.168.30.254 00-23-05-43-3f-42</li>
-<li>ARP解析过程<br>1）发送ARP广播包，同一个广播域内的所有设备都会接收到。<br>2）需要解析的IP地址的MAC设备会进行回应。IP→MAC<br>3）电脑段接收到ARP信息保存到arp表</li>
-<li>之后要发送给网关都是通过arp表中的192.168.30.254 00-23-05-43-3f-42</li>
-<li>电脑发送DNS解析请求目的为119.29.29.29地址给网关，网关进行三层路由查询，转发给出口，出口源地址NAT转发给运营商……</li>
-<li>DNS服务器响应的DNS解析请求，返回给百度的IP为14.215.177.38</li>
-<li>浏览器访问14.215.177.38:443（百度）到这个IP的请求；</li>
-<li>14.215.177.38:443（百度）发送页面信息给电脑。</li>
-</ol>
-<p>内网公网地址切换，分布式服务器，网关处理</p>
-<p>再浏览器打开网址或者CMD ping</p>
-<h3 id="Web服务器的工作原理可以简单地归纳为"><a href="#Web服务器的工作原理可以简单地归纳为" class="headerlink" title="Web服务器的工作原理可以简单地归纳为"></a>Web服务器的工作原理可以简单地归纳为</h3><p>客户端通过TCP/IP协议建立到服务器的TCP连接<br>客户端向服务器发送HTTP协议请求包，请求服务器里的资源文档<br>服务器向客户端发送HTTP协议应答包，如果请求的资源包含有动态语言的内容，那么服务器会调用动态语言的解释引擎负责处理“动态内容”，并将处理得到的数据返回给客户端<br>客户机与服务器断开。由客户端解释HTML文档，在客户端屏幕上渲染图形结果</p>
-<script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }

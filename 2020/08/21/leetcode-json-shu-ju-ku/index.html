@@ -20,15 +20,15 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"bubbleboy11.github.io","root":"/","images":"/images","scheme":"Muse","version":"8.6.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
-<meta name="description" content="将leetcode案例的json格式数据转成数据库插入语句，并插入到数据库。 json用例数据： 12345678910111213141516171819202122232425262728{    &quot;headers&quot;: {        &quot;student&quot;: [            &quot;name&quot;,            &quot;continent&quot;        ]    },    &quot;rows&quot;">
+<meta name="description" content="online judge 的组成一般分为两个部分：  web服务：用来展示题目，接收用户提交的代码，并把结果展示给用户； 判题系统：将用户提交记录进入队列，依次在沙箱中判题，并把结果保存在数据库。  online judge 是如何判题的？要知道题目的种类是很多的，而且类似 LeetCode 的刷题网站有很多。对于各种类型的题目，他们的 online judge也都各有差别，我在这里大致的将题目分">
 <meta property="og:type" content="article">
 <meta property="og:title" content="leetcode json 数据库">
 <meta property="og:url" content="https://bubbleboy11.github.io/2020/08/21/leetcode-json-shu-ju-ku/index.html">
 <meta property="og:site_name" content="外心人D的博客">
-<meta property="og:description" content="将leetcode案例的json格式数据转成数据库插入语句，并插入到数据库。 json用例数据： 12345678910111213141516171819202122232425262728{    &quot;headers&quot;: {        &quot;student&quot;: [            &quot;name&quot;,            &quot;continent&quot;        ]    },    &quot;rows&quot;">
+<meta property="og:description" content="online judge 的组成一般分为两个部分：  web服务：用来展示题目，接收用户提交的代码，并把结果展示给用户； 判题系统：将用户提交记录进入队列，依次在沙箱中判题，并把结果保存在数据库。  online judge 是如何判题的？要知道题目的种类是很多的，而且类似 LeetCode 的刷题网站有很多。对于各种类型的题目，他们的 online judge也都各有差别，我在这里大致的将题目分">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-08-20T16:21:41.000Z">
-<meta property="article:modified_time" content="2021-04-02T12:24:45.946Z">
+<meta property="article:modified_time" content="2021-09-25T07:59:25.411Z">
 <meta property="article:author" content="外心人D">
 <meta property="article:tag" content="Leetcode">
 <meta name="twitter:card" content="summary">
@@ -122,7 +122,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">354</span>
+          <span class="site-state-item-count">357</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -204,7 +204,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-04-02 12:24:45" itemprop="dateModified" datetime="2021-04-02T12:24:45Z">2021-04-02</time>
+        <time title="修改时间：2021-09-25 07:59:25" itemprop="dateModified" datetime="2021-09-25T07:59:25Z">2021-09-25</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -226,7 +226,28 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <p>将leetcode案例的json格式数据转成数据库插入语句，并插入到数据库。</p>
+        <p>online judge 的组成<br>一般分为两个部分：</p>
+<ul>
+<li>web服务：用来展示题目，接收用户提交的代码，并把结果展示给用户；</li>
+<li>判题系统：将用户提交记录进入队列，依次在沙箱中判题，并把结果保存在数据库。</li>
+</ul>
+<p>online judge 是如何判题的？<br>要知道题目的种类是很多的，而且类似 LeetCode 的刷题网站有很多。对于各种类型的题目，他们的 online judge也都各有差别，我在这里大致的将题目分为三种：</p>
+<ul>
+<li>用户提交的程序必须包含输入输出部分，输出唯一；</li>
+<li>包含输入输出部分，但输出不唯一；</li>
+<li>给定一个函数定义，在函数中实现逻辑。</li>
+</ul>
+<p>下面我们来看下各种刷题网站的 online judge 是怎么评判对错的：</p>
+<p><strong>牛客网</strong>：用户提交的程序必须包含输入输出部分，输出唯一。<br>牛客网的 online judge 会预先把测试数据准备好，分为输入文件和正确答案的输出文件。当我们提交代码后，online judge 会自动将我们的代码保存成文件然后进行编译。如果在编译的过程中遇到错误，那么会直接出现compile error。<br>在编译完成之后判题系统执行我们的代码，并且读取输入文件，将我们的输出定向到输出文件，同时设置超时时<br>间。</p>
+<p>将 code.py 文件的输出定向到 ouput 文件中<br>简单的linux例子：</p>
+<figure class="highlight sh"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat input | python code.py &gt; output</span><br></pre></td></tr></tbody></table></figure>
+
+<p>如果代码执行时间超出指定时间，会返回 time limit exceed(时限超出)。代码执行完成之后，判题系统将得到的输出<br>文件与正确答案进行比对，如果输出文件与正确答案相同则返回 accepted 。如果输出文件与正确答案比对有差别<br>则返回 wrong answer(错误的答案) 或者output limie exceed（输出太多信息）。</p>
+<p><strong>codeforce</strong>：包含输入输出部分，但输出不唯一。<br>这类题目很有趣，举个例子：</p>
+<p>给定一个正整数N，输出所有符合a+b=N（a和b都是正整数）的ab对</p>
+<p>这类题目没有固定的答案，100个人可能有100种答案。这类题目与输出唯一题目不同的是：这种题目在判题的时候<br>不是对比输出文件和正确答案。网站会预先准备一套判题代码，判题代码会读取输出文件和正确答案，然后通过特<br>有的逻辑判断答案的对错。</p>
+<p><strong>LeetCode</strong>：给定一个函数定义，在函数中实现逻辑。<br>对于这种类型的题目 LeetCode 会针对每一道题目写一个测试代码。你输入什么，测试代码对比输出什么。如果答<br>案不唯一还会根据题目信息写一个校验代码。<br>判题系统会将我们实现的函数代码进行编译，然后与测试代码放在一起。测试代码调用我们编写的函数进行测试，<br>并且设置超出时间。当我们编写的代码输出结果后，由校验代码判断是否通过。</p>
+<p>将leetcode案例的json格式数据转成数据库插入语句，并插入到数据库。</p>
 <p>json用例数据：</p>
 <figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">{</span><br><span class="line">    <span class="attr">"headers"</span>: {</span><br><span class="line">        <span class="attr">"student"</span>: [</span><br><span class="line">            <span class="string">"name"</span>,</span><br><span class="line">            <span class="string">"continent"</span></span><br><span class="line">        ]</span><br><span class="line">    },</span><br><span class="line">    <span class="attr">"rows"</span>: {</span><br><span class="line">        <span class="attr">"student"</span>: [</span><br><span class="line">            [</span><br><span class="line">                <span class="string">"Jane"</span>,</span><br><span class="line">                <span class="string">"America"</span></span><br><span class="line">            ],</span><br><span class="line">            [</span><br><span class="line">                <span class="string">"Pascal"</span>,</span><br><span class="line">                <span class="string">"Europe"</span></span><br><span class="line">            ],</span><br><span class="line">            [</span><br><span class="line">                <span class="string">"Xi"</span>,</span><br><span class="line">                <span class="string">"Asia"</span></span><br><span class="line">            ],</span><br><span class="line">            [</span><br><span class="line">                <span class="string">"Jack"</span>,</span><br><span class="line">                <span class="string">"America"</span></span><br><span class="line">            ]</span><br><span class="line">        ]</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
 

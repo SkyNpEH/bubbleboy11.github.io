@@ -119,7 +119,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">354</span>
+          <span class="site-state-item-count">357</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -160,6 +160,440 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/06/18/beego-shang-chuan-shi-pin/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/06/18/beego-shang-chuan-shi-pin/" class="post-title-link" itemprop="url">beego上传视频到本地</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-06-17 16:21:41" itemprop="dateCreated datePublished" datetime="2021-06-17T16:21:41Z">2021-06-17</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-07-22 10:55:50" itemprop="dateModified" datetime="2021-07-22T10:55:50Z">2021-07-22</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/beego/" itemprop="url" rel="index"><span itemprop="name">beego</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>非api项目实现</p>
+<p><code>utils.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 视频文件名生成函数</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">GetVideoName</span><span class="params">(uid <span class="keyword">string</span>)</span> <span class="title">string</span></span> {</span><br><span class="line">    <span class="comment">// 用户ID+精确到毫秒的时间戳</span></span><br><span class="line">    h := md5.New()</span><br><span class="line">    h.Write([]<span class="keyword">byte</span>(uid + strconv.FormatInt(time.Now().UnixNano(), <span class="number">10</span>)))</span><br><span class="line">    <span class="keyword">return</span> hex.EncodeToString(h.Sum(<span class="literal">nil</span>))</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>controllers\user.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 上传视频文件</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *UserController)</span> <span class="title">UploadVideo</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="keyword">var</span> (</span><br><span class="line">        err   error</span><br><span class="line">        title <span class="keyword">string</span></span><br><span class="line">    )</span><br><span class="line">    r := *this.Ctx.Request</span><br><span class="line">    <span class="comment">// 获取表单提交的数据</span></span><br><span class="line">    uid := r.FormValue(<span class="string">"uid"</span>)</span><br><span class="line">    <span class="comment">// 获取文件流</span></span><br><span class="line">    file, header, _ := r.FormFile(<span class="string">"file"</span>)</span><br><span class="line">    <span class="comment">// 转换文件流为二进制</span></span><br><span class="line">    b, _ := ioutil.ReadAll(file)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 生成文件名</span></span><br><span class="line">    filename := strings.Split(header.Filename, <span class="string">"."</span>)</span><br><span class="line">    filename[<span class="number">0</span>] = utils.GetVideoName(uid)</span><br><span class="line">    <span class="comment">// 文件保存的位置</span></span><br><span class="line">    <span class="keyword">var</span> fileDir = <span class="string">"/Users/zhja/goRoot/src/fyouku/static/video/"</span> + filename[<span class="number">0</span>] + <span class="string">"."</span> + filename[<span class="number">1</span>]</span><br><span class="line">    <span class="comment">// 播放地址</span></span><br><span class="line">    <span class="keyword">var</span> playUrl = <span class="string">"/static/video/"</span> + filename[<span class="number">0</span>] + <span class="string">"."</span> + filename[<span class="number">1</span>]</span><br><span class="line">    err = ioutil.WriteFile(fileDir, b, <span class="number">0777</span>)</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        title = utils.ReturnSuccess(<span class="number">0</span>, playUrl, <span class="literal">nil</span>, <span class="number">1</span>)</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        title = utils.ReturnError(<span class="number">5000</span>, <span class="string">"上传失败，请联系客服"</span>)</span><br><span class="line">    }</span><br><span class="line">    this.Ctx.WriteString(title)</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>上传完成以后，调用接口保存视频的地址和信息，http访问视频来播报<br>api实现</p>
+<p><code>models\video.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">SaveVideo</span><span class="params">(title <span class="keyword">string</span>, subTitle <span class="keyword">string</span>, channelId <span class="keyword">int</span>, regionId <span class="keyword">int</span>, typeId <span class="keyword">int</span>, playUrl <span class="keyword">string</span>, user_id <span class="keyword">int</span>, aliyunVideoId <span class="keyword">string</span>)</span> <span class="title">error</span></span> {</span><br><span class="line">    o := orm.NewOrm()</span><br><span class="line">    <span class="keyword">var</span> video Video</span><br><span class="line">    time := time.Now().Unix()</span><br><span class="line">    video.Title = title</span><br><span class="line">    video.SubTitle = subTitle</span><br><span class="line">    video.AddTime = time</span><br><span class="line">    video.Img = <span class="string">""</span></span><br><span class="line">    video.Img1 = <span class="string">""</span></span><br><span class="line">    video.EpisodesCount = <span class="number">1</span></span><br><span class="line">    video.IsEnd = <span class="number">1</span></span><br><span class="line">    video.ChannelId = channelId</span><br><span class="line">    video.Status = <span class="number">1</span></span><br><span class="line">    video.RegionId = regionId</span><br><span class="line">    video.TypeId = typeId</span><br><span class="line">    video.EpisodesUpdateTime = time</span><br><span class="line">    video.Comment = <span class="number">0</span></span><br><span class="line">    video.UserId = user_id</span><br><span class="line">    videoId, err := o.Insert(&amp;video)</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        <span class="keyword">if</span> aliyunVideoId != <span class="string">""</span> {</span><br><span class="line">            playUrl = <span class="string">""</span></span><br><span class="line">        }</span><br><span class="line">        _, err = o.Raw(<span class="string">"INSERT INTO video_episodes (title,add_time,num,video_id,play_url,status,comment,aliyun_video_id) VALUES (?,?,?,?,?,?,?,?)"</span>, subTitle, time, <span class="number">1</span>, videoId, playUrl, <span class="number">1</span>, <span class="number">0</span>, aliyunVideoId).Exec()</span><br><span class="line">        <span class="comment">//fmt.Println(err)</span></span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> err</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>controllers\video.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 保存用户上传视频信息</span></span><br><span class="line"><span class="comment">// @router /video/save [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *VideoController)</span> <span class="title">VideoSave</span><span class="params">()</span></span> {</span><br><span class="line">    playUrl := this.GetString(<span class="string">"playUrl"</span>)</span><br><span class="line">    title := this.GetString(<span class="string">"title"</span>)</span><br><span class="line">    subTitle := this.GetString(<span class="string">"subTitle"</span>)</span><br><span class="line">    channelId, _ := this.GetInt(<span class="string">"channelId"</span>)</span><br><span class="line">    typeId, _ := this.GetInt(<span class="string">"typeId"</span>)</span><br><span class="line">    regionId, _ := this.GetInt(<span class="string">"regionId"</span>)</span><br><span class="line">    uid, _ := this.GetInt(<span class="string">"uid"</span>)</span><br><span class="line">    aliyunVideoId := this.GetString(<span class="string">"aliyunVideoId"</span>)</span><br><span class="line">    <span class="keyword">if</span> uid == <span class="number">0</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4001</span>, <span class="string">"请先登录"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">if</span> playUrl == <span class="string">""</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4002</span>, <span class="string">"视频地址不能为空"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    err := models.SaveVideo(title, subTitle, channelId, regionId, typeId, playUrl, uid, aliyunVideoId)</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnSuccess(<span class="number">0</span>, <span class="string">"success"</span>, <span class="literal">nil</span>, <span class="number">1</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">5000</span>, err)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>云上传</p>
+<p>后台开通点播服务</p>
+<p><a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/57056.html?spm=a2c4g.11174283.6.646.9fb0149bsvFs2f">https://help.aliyun.com/document_detail/57056.html?spm=a2c4g.11174283.6.646.9fb0149bsvFs2f</a></p>
+<p>开通RAM账号,配置点播权限<br>获得 userid, accessKeyld, accessKey Secret 复制到代码</p>
+<p> ◆实现客户端上传功能阿里云而不是本地，不经过自己服务器中转节省时间和流量<br> ◆创建和获取上传凭证以及播放凭证</p>
+<p>回调接口<br>增加保存阿里云视频id，因为播放的时候要指定videoid保存到数据库</p>
+<p>上传到本地的视频，用视频地址播放<br>上传到阿里云点播的视频，用videoid点播播放<br><a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/87263.html?spm=a2c4g.11186623.6.1121.51dd43defU9ABo">https://help.aliyun.com/document_detail/87263.html?spm=a2c4g.11186623.6.1121.51dd43defU9ABo</a></p>
+<p><code>models\video.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">SaveAliyunVideo</span><span class="params">(videoId <span class="keyword">string</span>, log <span class="keyword">string</span>)</span> <span class="title">error</span></span> {</span><br><span class="line">    o := orm.NewOrm()</span><br><span class="line">    _, err := o.Raw(<span class="string">"INSERT INTO aliyun_video (video_id, log, add_time) VALUES (?,?,?)"</span>, videoId, log, time.Now().Unix()).Exec()</span><br><span class="line">    fmt.Println(err)</span><br><span class="line">    <span class="keyword">return</span> err</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>controllers\aliyun.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> controllers</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"demo/models"</span></span><br><span class="line">    <span class="string">"encoding/json"</span></span><br><span class="line">    <span class="string">"fmt"</span></span><br><span class="line"></span><br><span class="line">    <span class="string">"github.com/aliyun/alibaba-cloud-sdk-go/sdk"</span></span><br><span class="line">    <span class="string">"github.com/aliyun/alibaba-cloud-sdk-go/sdk/auth/credentials"</span></span><br><span class="line">    <span class="string">"github.com/aliyun/alibaba-cloud-sdk-go/services/vod"</span></span><br><span class="line"></span><br><span class="line">    beego <span class="string">"github.com/beego/beego/v2/server/web"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> AliyunController <span class="keyword">struct</span> {</span><br><span class="line">    beego.Controller</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> (</span><br><span class="line">    accessKeyId     = <span class="string">"阿里云复制"</span></span><br><span class="line">    accessKeySecret = <span class="string">"阿里云复制"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> JSONS <span class="keyword">struct</span> {</span><br><span class="line">    RequestId     <span class="keyword">string</span></span><br><span class="line">    UploadAddress <span class="keyword">string</span></span><br><span class="line">    UploadAuth    <span class="keyword">string</span></span><br><span class="line">    VideoId       <span class="keyword">string</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *AliyunController)</span> <span class="title">InitVodClient</span><span class="params">(accessKeyId <span class="keyword">string</span>, accessKeySecret <span class="keyword">string</span>)</span> <span class="params">(client *vod.Client, err error)</span></span> {</span><br><span class="line">    <span class="comment">// 点播服务接入区域</span></span><br><span class="line">    regionId := <span class="string">"cn-shanghai"</span></span><br><span class="line">    <span class="comment">// 创建授权对象</span></span><br><span class="line">    credential := &amp;credentials.AccessKeyCredential{</span><br><span class="line">        accessKeyId,</span><br><span class="line">        accessKeySecret,</span><br><span class="line">    }</span><br><span class="line">    <span class="comment">// 自定义config</span></span><br><span class="line">    config := sdk.NewConfig()</span><br><span class="line">    config.AutoRetry = <span class="literal">true</span>     <span class="comment">// 失败是否自动重试</span></span><br><span class="line">    config.MaxRetryTime = <span class="number">3</span>     <span class="comment">// 最大重试次数</span></span><br><span class="line">    config.Timeout = <span class="number">3000000000</span> <span class="comment">// 连接超时，单位：纳秒；默认为3秒</span></span><br><span class="line">    <span class="comment">// 创建vodClient实例</span></span><br><span class="line">    <span class="keyword">return</span> vod.NewClientWithOptions(regionId, config, credential)</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *AliyunController)</span> <span class="title">MyCreateUploadVideo</span><span class="params">(client *vod.Client, title <span class="keyword">string</span>, desc <span class="keyword">string</span>, fileName <span class="keyword">string</span>, coverUrl <span class="keyword">string</span>, tags <span class="keyword">string</span>)</span> <span class="params">(response *vod.CreateUploadVideoResponse, err error)</span></span> {</span><br><span class="line">    request := vod.CreateCreateUploadVideoRequest()</span><br><span class="line">    request.Title = title</span><br><span class="line">    request.Description = desc</span><br><span class="line">    request.FileName = fileName</span><br><span class="line">    <span class="comment">//request.CateId = "-1"</span></span><br><span class="line">    request.CoverURL = coverUrl</span><br><span class="line">    request.Tags = tags</span><br><span class="line">    request.AcceptFormat = <span class="string">"JSON"</span></span><br><span class="line">    <span class="keyword">return</span> client.CreateUploadVideo(request)</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="comment">// @router /aliyun/create/upload/video [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *AliyunController)</span> <span class="title">CreateUploadVideo</span><span class="params">()</span></span> {</span><br><span class="line">    title := this.GetString(<span class="string">"title"</span>)</span><br><span class="line">    desc := this.GetString(<span class="string">"desc"</span>)</span><br><span class="line">    fileName := this.GetString(<span class="string">"fileName"</span>)</span><br><span class="line">    coverUrl := this.GetString(<span class="string">"coverUrl"</span>)</span><br><span class="line">    tags := this.GetString(<span class="string">"tags"</span>)</span><br><span class="line">    client, err := this.InitVodClient(accessKeyId, accessKeySecret)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">        <span class="built_in">panic</span>(err)</span><br><span class="line">    }</span><br><span class="line">    response, err := this.MyCreateUploadVideo(client, title, desc, fileName, coverUrl, tags)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">        <span class="built_in">panic</span>(err)</span><br><span class="line">    }</span><br><span class="line">    fmt.Println(response.GetHttpContentString())</span><br><span class="line">    <span class="comment">//fmt.Printf("VideoId: %s\n UploadAddress: %s\n UploadAuth: %s",</span></span><br><span class="line">    <span class="comment">//    response.VideoId, response.UploadAddress, response.UploadAuth)</span></span><br><span class="line">    data := &amp;JSONS{</span><br><span class="line">        response.RequestId,</span><br><span class="line">        response.UploadAddress,</span><br><span class="line">        response.UploadAuth,</span><br><span class="line">        response.VideoId,</span><br><span class="line">    }</span><br><span class="line">    this.Data[<span class="string">"json"</span>] = data</span><br><span class="line">    this.ServeJSON()</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *AliyunController)</span> <span class="title">MyRefreshUploadVideo</span><span class="params">(client *vod.Client, videoId <span class="keyword">string</span>)</span> <span class="params">(response *vod.RefreshUploadVideoResponse, err error)</span></span> {</span><br><span class="line">    request := vod.CreateRefreshUploadVideoRequest()</span><br><span class="line">    request.VideoId = videoId</span><br><span class="line">    request.AcceptFormat = <span class="string">"JSON"</span></span><br><span class="line">    <span class="keyword">return</span> client.RefreshUploadVideo(request)</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="comment">// @router /aliyun/refresh/upload/video [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *AliyunController)</span> <span class="title">RefreshUploadVideo</span><span class="params">()</span></span> {</span><br><span class="line">    videoId := this.GetString(<span class="string">"videoId"</span>)</span><br><span class="line"></span><br><span class="line">    client, err := this.InitVodClient(accessKeyId, accessKeySecret)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">        <span class="built_in">panic</span>(err)</span><br><span class="line">    }</span><br><span class="line">    response, err := this.MyRefreshUploadVideo(client, videoId)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">        <span class="built_in">panic</span>(err)</span><br><span class="line">    }</span><br><span class="line">    fmt.Println(response.GetHttpContentString())</span><br><span class="line">    <span class="comment">//fmt.Printf("UploadAddress: %s\n UploadAuth: %s", response.UploadAddress, response.UploadAuth)</span></span><br><span class="line">    data := &amp;JSONS{</span><br><span class="line">        response.RequestId,</span><br><span class="line">        response.UploadAddress,</span><br><span class="line">        response.UploadAuth,</span><br><span class="line">        response.VideoId,</span><br><span class="line">    }</span><br><span class="line">    this.Data[<span class="string">"json"</span>] = data</span><br><span class="line">    this.ServeJSON()</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *AliyunController)</span> <span class="title">MyGetPlayAuth</span><span class="params">(client *vod.Client, videoId <span class="keyword">string</span>)</span> <span class="params">(response *vod.GetVideoPlayAuthResponse, err error)</span></span> {</span><br><span class="line">    request := vod.CreateGetVideoPlayAuthRequest()</span><br><span class="line">    request.VideoId = videoId</span><br><span class="line">    request.AcceptFormat = <span class="string">"JSON"</span></span><br><span class="line">    <span class="keyword">return</span> client.GetVideoPlayAuth(request)</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> PlayJSONS <span class="keyword">struct</span> {</span><br><span class="line">    PlayAuth <span class="keyword">string</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="comment">// @router /aliyun/video/play/auth [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *AliyunController)</span> <span class="title">GetPlayAuth</span><span class="params">()</span></span> {</span><br><span class="line">    videoId := this.GetString(<span class="string">"videoId"</span>)</span><br><span class="line">    client, err := this.InitVodClient(accessKeyId, accessKeySecret)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">        <span class="built_in">panic</span>(err)</span><br><span class="line">    }</span><br><span class="line">    response, err := this.MyGetPlayAuth(client, videoId)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">        <span class="built_in">panic</span>(err)</span><br><span class="line">    }</span><br><span class="line">    fmt.Println(response.GetHttpContentString())</span><br><span class="line">    <span class="comment">//fmt.Printf("%s: %s\n", response.VideoMeta, response.PlayAuth)</span></span><br><span class="line">    data := &amp;PlayJSONS{</span><br><span class="line">        response.PlayAuth,</span><br><span class="line">    }</span><br><span class="line">    this.Data[<span class="string">"json"</span>] = data</span><br><span class="line">    this.ServeJSON()</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> CallbackData <span class="keyword">struct</span> {</span><br><span class="line">    EventTime   <span class="keyword">string</span></span><br><span class="line">    EventType   <span class="keyword">string</span></span><br><span class="line">    VideoId     <span class="keyword">string</span></span><br><span class="line">    Status      <span class="keyword">string</span></span><br><span class="line">    Exteng      <span class="keyword">string</span></span><br><span class="line">    StreamInfos []CallbackStreamInfosData</span><br><span class="line">}</span><br><span class="line"><span class="keyword">type</span> CallbackStreamInfosData <span class="keyword">struct</span> {</span><br><span class="line">    Status     <span class="keyword">string</span></span><br><span class="line">    Bitrate    <span class="keyword">int</span></span><br><span class="line">    Definition <span class="keyword">string</span></span><br><span class="line">    Duration   <span class="keyword">int</span></span><br><span class="line">    Encrypt    <span class="keyword">bool</span></span><br><span class="line">    FileUrl    <span class="keyword">string</span></span><br><span class="line">    Format     <span class="keyword">string</span></span><br><span class="line">    Fps        <span class="keyword">int</span></span><br><span class="line">    Height     <span class="keyword">int</span></span><br><span class="line">    Size       <span class="keyword">int</span></span><br><span class="line">    Width      <span class="keyword">int</span></span><br><span class="line">    JobId      <span class="keyword">string</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="comment">// 回调函数</span></span><br><span class="line"><span class="comment">// @router /aliyun/video/callback [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *AliyunController)</span> <span class="title">VideoCallback</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="keyword">var</span> ob CallbackData</span><br><span class="line">    r := this.Ctx.Input.RequestBody</span><br><span class="line">    json.Unmarshal(r, &amp;ob)</span><br><span class="line"></span><br><span class="line">    models.SaveAliyunVideo(ob.VideoId, <span class="keyword">string</span>(r))</span><br><span class="line">    this.Ctx.WriteString(<span class="string">"success"</span>)</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/06/18/beego-fang-you-ku/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/06/18/beego-fang-you-ku/" class="post-title-link" itemprop="url">beego仿优酷</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-06-17 16:21:41" itemprop="dateCreated datePublished" datetime="2021-06-17T16:21:41Z">2021-06-17</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-06-19 13:40:04" itemprop="dateModified" datetime="2021-06-19T13:40:04Z">2021-06-19</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/beego/" itemprop="url" rel="index"><span itemprop="name">beego</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h3 id="优酷网功能"><a href="#优酷网功能" class="headerlink" title="优酷网功能"></a>优酷网功能</h3><p>用户相关的功能，有用户注册、用户登录，这个是最先要实现的功能，因为很多功能比如发送弹幕、发布评论都是建立在用户登录的基础上的。另外用户相关的还有 我发布的视频、我的消息功能、系统批量发送消息功能。</p>
+<p>动漫频道页，包含顶部推广广告、日漫推荐、国漫推荐、少女推荐、动漫排行。</p>
+<p>视频列表页，包含两部分，第一部分视频属性信息的获取，第二部分视频列表的获取以及下拉翻页获取视频列表</p>
+<p>排行榜，各个榜单的排行，动漫排行和少女类型排行。</p>
+<p>视频播放页，视频网站最核心的功能，视频播放功能咱们使用阿里云点播播放器SDK；剧集列表获取；视频网站比较流行的弹幕功能，讲解弹幕实现的原理、前后端弹幕功能的实现、发送弹幕、弹幕列表功能；相关推荐功能，这里获取的逻辑和频道页获取的逻辑相同；评论功能，也是视频网站的核心功能，有发布评论功能和评论列表功能。</p>
+<p>上传视频功能， 分为两个模式来讲，本节先按照第一种模式，上传视频文件到本地服务器的模式来完成功能。（同学可以跟着老师开发） 另外一种模式，整合阿里云上传视频SDK，使用阿里云服务。上传完视频使用阿里云视频ID来播放，另外需要视频转码，所有要提供回调函数保存阿里云回调的信息。（因为这部分需要两个条件，第一先要有线上服务器，可以让阿里云访问到。第二需要开通阿里云的点播服务，满足这两部分的可以跟着我实现功能。不满足的也可以把这部分作为参考，增加面试和工作中经验，毕竟企业大都是按照这种模式实现的）<br>这些不是优酷网所有的功能，但是已经涵盖了核心</p>
+<p><img src="/2021/06/18/beego-fang-you-ku/1.png" alt="description"></p>
+<p><code>controllers/common.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Operations about Users</span></span><br><span class="line"><span class="keyword">type</span> CommonController <span class="keyword">struct</span> {</span><br><span class="line">    beego.Controller</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="comment">// 返回信息：json格式，其中 code（状态码，0=正确），items（返回信息），count（条数）</span></span><br><span class="line"><span class="keyword">type</span> JsonStruct <span class="keyword">struct</span> {</span><br><span class="line">    Code  <span class="keyword">int</span>         <span class="string">`json:"code"`</span></span><br><span class="line">    Msg   <span class="keyword">interface</span>{} <span class="string">`json:"msg"`</span></span><br><span class="line">    Items <span class="keyword">interface</span>{} <span class="string">`json:"items"`</span></span><br><span class="line">    Count <span class="keyword">int64</span>       <span class="string">`json:"count"`</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="comment">// 单独封装的返回正确状态的函数，统一调用</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">ReturnSuccess</span><span class="params">(code <span class="keyword">int</span>, msg <span class="keyword">interface</span>{}, items <span class="keyword">interface</span>{}, count <span class="keyword">int64</span>)</span> <span class="params">(json *JsonStruct)</span></span> {</span><br><span class="line">    json = &amp;JsonStruct{Code: code, Msg: msg, Items: items, Count: count}</span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">ReturnError</span><span class="params">(code <span class="keyword">int</span>, msg <span class="keyword">interface</span>{})</span> <span class="params">(json *JsonStruct)</span></span> {</span><br><span class="line">    json = &amp;JsonStruct{Code: code, Msg: msg}</span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//格式化时间</span></span><br><span class="line"><span class="comment">//func DateFormat(times int64) string {</span></span><br><span class="line"><span class="comment">//    video_time := time.Unix(times, 0)</span></span><br><span class="line"><span class="comment">//    return video_time.Format("2006-01-02")</span></span><br><span class="line"><span class="comment">//}</span></span><br></pre></td></tr></tbody></table></figure>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/06/18/beego-you-ku-shou-ye/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/06/18/beego-you-ku-shou-ye/" class="post-title-link" itemprop="url">beego优酷首页</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-06-17 16:21:41" itemprop="dateCreated datePublished" datetime="2021-06-17T16:21:41Z">2021-06-17</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-06-19 11:57:14" itemprop="dateModified" datetime="2021-06-19T11:57:14Z">2021-06-19</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/beego/" itemprop="url" rel="index"><span itemprop="name">beego</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><code>router.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">init</span><span class="params">()</span></span> {</span><br><span class="line">    web.Include(&amp;controllers.VideoController{})</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="顶部广告功能"><a href="#顶部广告功能" class="headerlink" title="顶部广告功能"></a>顶部广告功能</h3><p>接口地址：<code>/channel/advert</code></p>
+<ul>
+<li><p>接收参数为：channelId（频道ID，1=动漫）</p>
+</li>
+<li><p>返回信息：</p>
+<ul>
+<li>id = 广告ID</li>
+<li>title = 标题</li>
+<li>sub_title = 副标题</li>
+<li>img = 图片地址</li>
+<li>add_time = 添加时间</li>
+<li>url = 链接地址</li>
+</ul>
+</li>
+<li><p>业务逻辑：获取advert表中channelId=接收参数和status=1的数据</p>
+</li>
+</ul>
+<p><code>models/advert.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> models</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"github.com/beego/beego/v2/client/orm"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Advert <span class="keyword">struct</span> {</span><br><span class="line">    Id       <span class="keyword">int</span></span><br><span class="line">    Title    <span class="keyword">string</span></span><br><span class="line">    SubTitle <span class="keyword">string</span></span><br><span class="line">    AddTime  <span class="keyword">int64</span></span><br><span class="line">    Img      <span class="keyword">string</span></span><br><span class="line">    Url      <span class="keyword">string</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">init</span><span class="params">()</span></span> {</span><br><span class="line">    orm.RegisterModel(<span class="built_in">new</span>(Advert))</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">GetChannelAdvert</span><span class="params">(channelId <span class="keyword">int</span>)</span> <span class="params">(<span class="keyword">int64</span>, []Advert, error)</span></span> {</span><br><span class="line">    o := orm.NewOrm()</span><br><span class="line">    <span class="keyword">var</span> adverts []Advert</span><br><span class="line">    num, err := o.Raw(<span class="string">"SELECT id, title, sub_title,img,add_time,url FROM advert WHERE status=1 AND channel_id=? ORDER BY sort DESC LIMIT 1"</span>, channelId).QueryRows(&amp;adverts)</span><br><span class="line">    <span class="keyword">return</span> num, adverts, err</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>controllers\video.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 频道页 - 获取顶部广告</span></span><br><span class="line"><span class="comment">// @router /channel/advert [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *VideoController)</span> <span class="title">ChannelAdvert</span><span class="params">()</span></span> {</span><br><span class="line">    channelId, _ := this.GetInt(<span class="string">"channelId"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> channelId == <span class="number">0</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4001</span>, <span class="string">"必须指定频道"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    num, videos, err := models.GetChannelAdvert(channelId)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnSuccess(<span class="number">0</span>, <span class="string">"success"</span>, videos, num)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4004</span>, <span class="string">"请求数据失败，请稍后重试~"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="/2021/06/18/beego-you-ku-shou-ye/1.png" alt="description"></p>
+<h3 id="正在热播功能"><a href="#正在热播功能" class="headerlink" title="正在热播功能"></a>正在热播功能</h3><p>接口地址：<code>/channel/hot</code></p>
+<ul>
+<li><p>接收参数为：channelId（频道ID，1=动漫）</p>
+</li>
+<li><p>返回信息：</p>
+<ul>
+<li>id = 视频ID</li>
+<li>title = 标题</li>
+<li>sub_title = 副标题</li>
+<li>img = 竖版图片地址</li>
+<li>img1 = 横版图片地址</li>
+<li>add_time = 添加时间</li>
+<li>episodes_count = 剧集集数</li>
+<li>is_end = 是否完结</li>
+</ul>
+</li>
+<li><p>业务逻辑：获取video表中channelId=接收参数、status=1、is_hot=1条件的数据，按照剧集更新时间倒序，获取9条。</p>
+</li>
+</ul>
+<p><code>models\video.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> VideoData <span class="keyword">struct</span> {</span><br><span class="line">    Id            <span class="keyword">int</span></span><br><span class="line">    Title         <span class="keyword">string</span></span><br><span class="line">    SubTitle      <span class="keyword">string</span></span><br><span class="line">    AddTime       <span class="keyword">int64</span></span><br><span class="line">    Img           <span class="keyword">string</span></span><br><span class="line">    Img1          <span class="keyword">string</span></span><br><span class="line">    EpisodesCount <span class="keyword">int</span></span><br><span class="line">    IsEnd         <span class="keyword">int</span></span><br><span class="line">    Comment       <span class="keyword">int</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="comment">// 根据频道ID获取正在热播视频</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">GetChannelHotList</span><span class="params">(channelId <span class="keyword">int</span>)</span> <span class="params">(<span class="keyword">int64</span>, []VideoData, error)</span></span> {</span><br><span class="line">    o := orm.NewOrm()</span><br><span class="line">    <span class="keyword">var</span> videos []VideoData</span><br><span class="line">    num, err := o.Raw(<span class="string">"SELECT id,title,sub_title,add_time, img,img1,episodes_count,is_end FROM video WHERE status=1 AND is_hot=1 AND channel_id=? ORDER BY episodes_update_time DESC LIMIT 9"</span>, channelId).QueryRows(&amp;videos)</span><br><span class="line">    <span class="keyword">return</span> num, videos, err</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>controllers\video.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 频道页-获取正在热播</span></span><br><span class="line"><span class="comment">// @router /channel/hot [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *VideoController)</span> <span class="title">ChannelHotList</span><span class="params">()</span></span> {</span><br><span class="line">    channelId, _ := this.GetInt(<span class="string">"channelId"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> channelId == <span class="number">0</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4001</span>, <span class="string">"必须指定频道"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    num, videos, err := models.GetChannelHotList(channelId)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnSuccess(<span class="number">0</span>, <span class="string">"success"</span>, videos, num)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4004</span>, <span class="string">"没有相关内容"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="/2021/06/18/beego-you-ku-shou-ye/2.png" alt="description"><br><img src="/2021/06/18/beego-you-ku-shou-ye/3.png" alt="description"><br><img src="/2021/06/18/beego-you-ku-shou-ye/4.png" alt="description"></p>
+<h3 id="日漫国漫推荐功能"><a href="#日漫国漫推荐功能" class="headerlink" title="日漫国漫推荐功能"></a>日漫国漫推荐功能</h3><p>接口地址：<code>/channel/recommend/region</code></p>
+<ul>
+<li><p>接收参数为：<br>channelId（频道ID，1=动漫）<br>regionId（地区ID，1=日漫，2=国漫）</p>
+</li>
+<li><p>返回信息：</p>
+<ul>
+<li>id = 视频ID</li>
+<li>title = 标题</li>
+<li>sub_title = 副标题</li>
+<li>img = 竖版图片地址</li>
+<li>img1 = 横版图片地址</li>
+<li>add_time = 添加时间</li>
+<li>episodes_count = 剧集集数</li>
+<li>is_end = 是否完结</li>
+</ul>
+</li>
+<li><p>业务逻辑：获取video表中channelId=接收参数、status=1、is_recommend=1、region_id=接受的参数条件的数据，按照剧集更新时间倒序，获取9条。</p>
+</li>
+</ul>
+<p><code>models\video.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> VideoData <span class="keyword">struct</span> {</span><br><span class="line">    Id            <span class="keyword">int</span></span><br><span class="line">    Title         <span class="keyword">string</span></span><br><span class="line">    SubTitle      <span class="keyword">string</span></span><br><span class="line">    AddTime       <span class="keyword">int64</span></span><br><span class="line">    Img           <span class="keyword">string</span></span><br><span class="line">    Img1          <span class="keyword">string</span></span><br><span class="line">    EpisodesCount <span class="keyword">int</span></span><br><span class="line">    IsEnd         <span class="keyword">int</span></span><br><span class="line">    Comment       <span class="keyword">int</span></span><br><span class="line">}</span><br><span class="line"><span class="comment">// 频道页-根据频道地区获取推荐的视频</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">GetChannelRecommendRegionList</span><span class="params">(channelId <span class="keyword">int</span>, regionId <span class="keyword">int</span>)</span> <span class="params">(<span class="keyword">int64</span>, []VideoData, error)</span></span> {</span><br><span class="line">    o := orm.NewOrm()</span><br><span class="line">    <span class="keyword">var</span> videos []VideoData</span><br><span class="line">    num, err := o.Raw(<span class="string">"SELECT id,title,sub_title,add_time,img,img1,episodes_count,is_end FROM video WHERE status=1 AND is_recommend=1 AND region_id=? AND channel_id=? ORDER BY episodes_update_time DESC LIMIT 9"</span>, regionId, channelId).QueryRows(&amp;videos)</span><br><span class="line">    <span class="keyword">return</span> num, videos, err</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>controllers\video.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 根据频道下地区ID获取推荐视频</span></span><br><span class="line"><span class="comment">// @router /channel/recommend/region [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *VideoController)</span> <span class="title">ChannelRecommendRegionList</span><span class="params">()</span></span> {</span><br><span class="line">    channelId, _ := this.GetInt(<span class="string">"channelId"</span>)</span><br><span class="line">    regionId, _ := this.GetInt(<span class="string">"regionId"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> channelId == <span class="number">0</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4001</span>, <span class="string">"必须指定频道"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">if</span> regionId == <span class="number">0</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4002</span>, <span class="string">"必须指定频道地区"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    num, videos, err := models.GetChannelRecommendRegionList(channelId, regionId)</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnSuccess(<span class="number">0</span>, <span class="string">"success"</span>, videos, num)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4004</span>, <span class="string">"没有相关内容"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="/2021/06/18/beego-you-ku-shou-ye/5.png" alt="description"><br><img src="/2021/06/18/beego-you-ku-shou-ye/6.png" alt="description"></p>
+<h3 id="少女推荐功能"><a href="#少女推荐功能" class="headerlink" title="少女推荐功能"></a>少女推荐功能</h3><p>接口地址：<code>/channel/recommend/type</code></p>
+<ul>
+<li>接收参数为：<ul>
+<li>channelId（频道ID，1=动漫）</li>
+<li>typeId（分类ID，1=少女）</li>
+</ul>
+</li>
+<li>返回信息：<ul>
+<li>id = 视频ID</li>
+<li>title = 标题</li>
+<li>sub_title = 副标题</li>
+<li>img = 竖版图片地址</li>
+<li>img1 = 横版图片地址</li>
+<li>add_time = 添加时间</li>
+<li>episodes_count = 剧集集数</li>
+<li>is_end = 是否完结</li>
+</ul>
+</li>
+<li>业务逻辑：获取video表中channelId=接收参数、status=1、is_recommend=1、type_id=接受的参数条件的数据，按照剧集更新时间倒序，获取9条。</li>
+</ul>
+<p><code>models\video.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> VideoData <span class="keyword">struct</span> {</span><br><span class="line">    Id            <span class="keyword">int</span></span><br><span class="line">    Title         <span class="keyword">string</span></span><br><span class="line">    SubTitle      <span class="keyword">string</span></span><br><span class="line">    AddTime       <span class="keyword">int64</span></span><br><span class="line">    Img           <span class="keyword">string</span></span><br><span class="line">    Img1          <span class="keyword">string</span></span><br><span class="line">    EpisodesCount <span class="keyword">int</span></span><br><span class="line">    IsEnd         <span class="keyword">int</span></span><br><span class="line">    Comment       <span class="keyword">int</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="comment">// 根据频道下类型ID获取推荐视频</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">GetChannelRecommendTypeList</span><span class="params">(channelId <span class="keyword">int</span>, typeId <span class="keyword">int</span>)</span> <span class="params">(<span class="keyword">int64</span>, []VideoData, error)</span></span> {</span><br><span class="line">    o := orm.NewOrm()</span><br><span class="line">    <span class="keyword">var</span> videos []VideoData</span><br><span class="line">    num, err := o.Raw(<span class="string">"SELECT id,title,sub_title,add_time,img,img1,episodes_count,is_end FROM video WHERE status=1 AND is_recommend=1 AND type_id=? AND channel_id=? ORDER BY episodes_update_time DESC LIMIT 9"</span>, typeId, channelId).QueryRows(&amp;videos)</span><br><span class="line">    <span class="keyword">return</span> num, videos, err</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>controllers\video.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 频道页-根据频道类型获取推荐视频</span></span><br><span class="line"><span class="comment">// @router /channel/recommend/type [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *VideoController)</span> <span class="title">GetChannelRecomendTypeList</span><span class="params">()</span></span> {</span><br><span class="line">    channelId, _ := this.GetInt(<span class="string">"channelId"</span>)</span><br><span class="line">    typeId, _ := this.GetInt(<span class="string">"typeId"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> channelId == <span class="number">0</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4001</span>, <span class="string">"必须指定频道"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">if</span> typeId == <span class="number">0</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4002</span>, <span class="string">"必须指定频道类型"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    num, videos, err := models.GetChannelRecommendTypeList(channelId, typeId)</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnSuccess(<span class="number">0</span>, <span class="string">"success"</span>, videos, num)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4004</span>, <span class="string">"没有相关内容"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="/2021/06/18/beego-you-ku-shou-ye/7.png" alt="description"></p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -424,7 +858,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-06-26 03:29:27" itemprop="dateModified" datetime="2021-06-26T03:29:27Z">2021-06-26</time>
+        <time title="修改时间：2021-09-25 07:06:40" itemprop="dateModified" datetime="2021-09-25T07:06:40Z">2021-09-25</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -458,8 +892,9 @@
 <p><code>controllers/user.go</code></p>
 <figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 批量发送通知消息</span></span><br><span class="line"><span class="comment">// @router /send/message [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *UserController)</span> <span class="title">SendMessageDo</span><span class="params">()</span></span> {</span><br><span class="line">    uids := this.GetString(<span class="string">"uids"</span>)</span><br><span class="line">    content := this.GetString(<span class="string">"content"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> uids == <span class="string">""</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4001</span>, <span class="string">"请填写接收人~"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">if</span> content == <span class="string">""</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4002</span>, <span class="string">"请填写发送内容"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    messageId, err := models.SendMessageDo(content)</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        uidConfig := strings.Split(uids, <span class="string">","</span>)</span><br><span class="line">        <span class="keyword">for</span> _, v := <span class="keyword">range</span> uidConfig {</span><br><span class="line">            userId, _ := strconv.Atoi(v)</span><br><span class="line">            <span class="comment">// models.SendMessageUser(userId, messageId)</span></span><br><span class="line">            <span class="comment">//不再直接操作数据库，把消息发送到队列，异步消费这些消息</span></span><br><span class="line">            models.SendMessageUserMq(userId, messageId)</span><br><span class="line">        }</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnSuccess(<span class="number">0</span>, <span class="string">"发送成功~"</span>, <span class="string">""</span>, <span class="number">1</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">5000</span>, <span class="string">"发送失败，请联系客服~"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
 
-
 <p><img src="/2021/06/18/beego-pi-liang-fa-song-xiao-xi-gai-zao/1.png" alt="description"><br><img src="/2021/06/18/beego-pi-liang-fa-song-xiao-xi-gai-zao/2.png" alt="description"></p>
+<p>grotine后面的执行不会受到前面的任务阻塞</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> SendData <span class="keyword">struct</span> {</span><br><span class="line">    UserId    <span class="keyword">int</span></span><br><span class="line">    MessageId <span class="keyword">int64</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="comment">//批量发送通知消息</span></span><br><span class="line"><span class="comment">//@router /send/message [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *UserController)</span> <span class="title">SendMessageDo</span><span class="params">()</span></span> {</span><br><span class="line">    uids := this.GetString(<span class="string">"uids"</span>)</span><br><span class="line">    content := this.GetString(<span class="string">"content"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> uids == <span class="string">""</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4001</span>, <span class="string">"请填写接收人~"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">if</span> content == <span class="string">""</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4002</span>, <span class="string">"请填写发送内容"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    messageId, err := models.SendMessageDo(content)</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        uidConfig := strings.Split(uids, <span class="string">","</span>)</span><br><span class="line">        count := <span class="built_in">len</span>(uidConfig)</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 获取 data channel</span></span><br><span class="line">        sendChan := <span class="built_in">make</span>(<span class="keyword">chan</span> SendData, count)</span><br><span class="line">        closeChan := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">bool</span>, count)</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 把获取到的data 放到channel中</span></span><br><span class="line">       <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> {</span><br><span class="line">            <span class="keyword">var</span> data SendData</span><br><span class="line">            <span class="keyword">for</span> _, v := <span class="keyword">range</span> uidConfig {</span><br><span class="line">                userId, _ := strconv.Atoi(v)</span><br><span class="line">                data.UserId = userId</span><br><span class="line">                data.MessageId = messageId</span><br><span class="line">                sendChan &lt;- data</span><br><span class="line">            }</span><br><span class="line">            <span class="built_in">close</span>(sendChan)</span><br><span class="line">        }()</span><br><span class="line"></span><br><span class="line">        <span class="comment">//处理sendChannel中的信息</span></span><br><span class="line">        <span class="keyword">for</span> i := <span class="number">0</span>; i &lt; <span class="number">5</span>; i++ {</span><br><span class="line">            <span class="keyword">go</span> sendMessageFunc(sendChan, closeChan)</span><br><span class="line">        }</span><br><span class="line"></span><br><span class="line">        <span class="comment">//判断是否执行完成，信息聚合</span></span><br><span class="line">        <span class="keyword">for</span> i := <span class="number">0</span>; i &lt; <span class="number">5</span>; i++ {</span><br><span class="line">            &lt;-closeChan</span><br><span class="line">        }</span><br><span class="line">        <span class="built_in">close</span>(closeChan)</span><br><span class="line"></span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnSuccess(<span class="number">0</span>, <span class="string">"发送成功~"</span>, <span class="string">""</span>, <span class="number">1</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">5000</span>, <span class="string">"发送失败，请联系客服~"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">sendMessageFunc</span><span class="params">(sendChan <span class="keyword">chan</span> SendData, closeChan <span class="keyword">chan</span> <span class="keyword">bool</span>)</span></span> {</span><br><span class="line">    <span class="keyword">for</span> t := <span class="keyword">range</span> sendChan {</span><br><span class="line">        fmt.Println(t)</span><br><span class="line">        models.SendMessageUserMq(t.UserId, t.MessageId)</span><br><span class="line">    }</span><br><span class="line">    closeChan &lt;- <span class="literal">true</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -1018,356 +1453,6 @@
 
 <p><code>controllers\video.go</code></p>
 <figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 获取视频剧集列表</span></span><br><span class="line"><span class="comment">// @router /video/episodes/list [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *VideoController)</span> <span class="title">VideoEpisodesList</span><span class="params">()</span></span> {</span><br><span class="line">    videoId, _ := this.GetInt(<span class="string">"videoId"</span>)</span><br><span class="line">    <span class="keyword">if</span> videoId == <span class="number">0</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4001</span>, <span class="string">"必须指定视频ID"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    <span class="comment">// num, episodes, err := models.GetVideoEpisodesList(videoId)</span></span><br><span class="line">    num, episodes, err := models.RedisGetVideoEpisodesList(videoId)</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnSuccess(<span class="number">0</span>, <span class="string">"success"</span>, episodes, num)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4004</span>, <span class="string">"请求数据失败，请稍后重试~"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/06/18/beego-ping-lun/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/06/18/beego-ping-lun/" class="post-title-link" itemprop="url">beego评论</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-06-17 16:21:41" itemprop="dateCreated datePublished" datetime="2021-06-17T16:21:41Z">2021-06-17</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-06-21 16:01:15" itemprop="dateModified" datetime="2021-06-21T16:01:15Z">2021-06-21</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/beego/" itemprop="url" rel="index"><span itemprop="name">beego</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p><code>models/comment.go</code></p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> models</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"time"</span></span><br><span class="line"></span><br><span class="line">    <span class="string">"github.com/beego/beego/v2/client/orm"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Comment <span class="keyword">struct</span> {</span><br><span class="line">    Id          <span class="keyword">int</span></span><br><span class="line">    Content     <span class="keyword">string</span></span><br><span class="line">    AddTime     <span class="keyword">int64</span></span><br><span class="line">    UserId      <span class="keyword">int</span></span><br><span class="line">    Stamp       <span class="keyword">int</span></span><br><span class="line">    Status      <span class="keyword">int</span></span><br><span class="line">    PraiseCount <span class="keyword">int</span></span><br><span class="line">    EpisodesId  <span class="keyword">int</span></span><br><span class="line">    VideoId     <span class="keyword">int</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">init</span><span class="params">()</span></span> {</span><br><span class="line">    orm.RegisterModel(<span class="built_in">new</span>(Comment))</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>controllers\comment.go</code></p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> controllers</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"demo/models"</span></span><br><span class="line"></span><br><span class="line">    beego <span class="string">"github.com/beego/beego/v2/server/web"</span></span><br><span class="line">    <span class="comment">//"reflect"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> CommentController <span class="keyword">struct</span> {</span><br><span class="line">    beego.Controller</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> CommentInfo <span class="keyword">struct</span> { <span class="comment">// 前端要求的返回值和数据库中的字段值不一样，为了不改变返回数据信息，要规范json</span></span><br><span class="line">    Id           <span class="keyword">int</span>             <span class="string">`json:"id"`</span></span><br><span class="line">    Content      <span class="keyword">string</span>          <span class="string">`json:"content"`</span></span><br><span class="line">    AddTime      <span class="keyword">int64</span>           <span class="string">`json:"addTime"`</span></span><br><span class="line">    AddTimeTitle <span class="keyword">string</span>          <span class="string">`json:"addTimeTitle"`</span></span><br><span class="line">    UserId       <span class="keyword">int</span>             <span class="string">`json:"userId"`</span></span><br><span class="line">    Stamp        <span class="keyword">int</span>             <span class="string">`json:"stamp"`</span></span><br><span class="line">    PraiseCount  <span class="keyword">int</span>             <span class="string">`json:"praiseCount"`</span></span><br><span class="line">    UserInfo     models.UserInfo <span class="string">`json:"userinfo"`</span></span><br><span class="line">    EpisodesId   <span class="keyword">int</span>             <span class="string">`json:"episodesId"`</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>routers\default.go</code></p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">init</span><span class="params">()</span></span> {</span><br><span class="line">    web.Include(&amp;controllers.CommentController{})</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<h3 id="发表评论功能"><a href="#发表评论功能" class="headerlink" title="发表评论功能"></a>发表评论功能</h3><p>接口地址：<code>/comment/save</code></p>
-<ul>
-<li><p>接收参数为：<br>videoId（视频ID）<br>episodesId（剧集ID）<br>uid（用户ID）<br>content（评论内容）</p>
-</li>
-<li><p>返回信息：<br>ret返回码 0=正确</p>
-</li>
-<li><p>业务逻辑：先保存评论信息到comment表，再更新对应剧集的评论数和对应视频的评论数。<br>详细逻辑见下图</p>
-</li>
-</ul>
-<p>注意：保存完评论信息以后，更新对应剧集的评论数和对应视频的评论数。这里可以进行优化改造。小伙伴可以思考一下，先做一个铺垫，后面章节会对应讲解。</p>
-<p><img src="/2021/06/18/beego-ping-lun/1.png" alt="description"></p>
-<p><code>models/comment.go</code></p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">SaveComment</span><span class="params">(content <span class="keyword">string</span>, uid <span class="keyword">int</span>, episodesId <span class="keyword">int</span>, videoId <span class="keyword">int</span>)</span> <span class="title">error</span></span> {</span><br><span class="line">    o := orm.NewOrm()</span><br><span class="line">    <span class="keyword">var</span> comment Comment</span><br><span class="line">    comment.Content = content</span><br><span class="line">    comment.UserId = uid</span><br><span class="line">    comment.EpisodesId = episodesId</span><br><span class="line">    comment.VideoId = videoId</span><br><span class="line">    comment.Stamp = <span class="number">0</span></span><br><span class="line">    comment.Status = <span class="number">1</span></span><br><span class="line">    comment.AddTime = time.Now().Unix()</span><br><span class="line">    _, err := o.Insert(&amp;comment)</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        <span class="comment">// 修改视频的总评论数</span></span><br><span class="line">        o.Raw(<span class="string">"UPDATE video SET comment=comment+1 WHERE id=?"</span>, videoId).Exec()</span><br><span class="line">        <span class="comment">// 修改视频剧集的评论数</span></span><br><span class="line">        o.Raw(<span class="string">"UPDATE video_episodes SET comment=comment+1 WHERE id=?"</span>, episodesId).Exec()</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 更新redis排行榜 - 通过MQ来实现</span></span><br><span class="line">        <span class="comment">// 创建一个简单模式的MQ</span></span><br><span class="line">        <span class="comment">// 把要传递的数据转换为json字符串</span></span><br><span class="line">        <span class="comment">//    videoObj := map[string]int{</span></span><br><span class="line">        <span class="comment">//        "VideoId": videoId,</span></span><br><span class="line">        <span class="comment">//    }</span></span><br><span class="line">        <span class="comment">//    videoJson, _ := json.Marshal(videoObj)</span></span><br><span class="line">        <span class="comment">//    mq.Publish("", "fyouku_top", string(videoJson))</span></span><br><span class="line">        <span class="comment">//</span></span><br><span class="line">        <span class="comment">//    // 延迟增加评论数</span></span><br><span class="line">        <span class="comment">//    videoCountObj := map[string]int{</span></span><br><span class="line">        <span class="comment">//        "VideoId":    videoId,</span></span><br><span class="line">        <span class="comment">//        "EpisodesId": episodesId,</span></span><br><span class="line">        <span class="comment">//    }</span></span><br><span class="line">        <span class="comment">//    videoCountJson, _ := json.Marshal(videoCountObj)</span></span><br><span class="line">        <span class="comment">//    mq.PublishDlx("fyouku.comment.count", string(videoCountJson))</span></span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> err</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>controllers\comment.go</code></p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 保存评论</span></span><br><span class="line"><span class="comment">// @router /comment/save [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *CommentController)</span> <span class="title">Save</span><span class="params">()</span></span> {</span><br><span class="line">    content := this.GetString(<span class="string">"content"</span>)</span><br><span class="line">    uid, _ := this.GetInt(<span class="string">"uid"</span>)</span><br><span class="line">    episodesId, _ := this.GetInt(<span class="string">"episodesId"</span>)</span><br><span class="line">    videoId, _ := this.GetInt(<span class="string">"videoId"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> content == <span class="string">""</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4001</span>, <span class="string">"内容不能为空"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">if</span> uid == <span class="number">0</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4002</span>, <span class="string">"请先登录"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">if</span> episodesId == <span class="number">0</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4003</span>, <span class="string">"必须指定评论剧集ID"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">if</span> videoId == <span class="number">0</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4005</span>, <span class="string">"必须指定视频ID"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    err := models.SaveComment(content, uid, episodesId, videoId)</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnSuccess(<span class="number">0</span>, <span class="string">"succes"</span>, <span class="string">""</span>, <span class="number">1</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">5000</span>, err)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p><img src="/2021/06/18/beego-ping-lun/2.png" alt="description"></p>
-<h3 id="获取评论列表"><a href="#获取评论列表" class="headerlink" title="获取评论列表"></a>获取评论列表</h3><p>接口地址：<br>/comment/list</p>
-<ul>
-<li><p>接收参数为：<br>episodesId（剧集ID）<br>offset（起始位置）<br>limit（条数）</p>
-</li>
-<li><p>返回信息：<br>id = 评论ID<br>content = 评论内容<br>add_time = 评论时间<br>add_time_title = 转换时间格式<br>user_id = 用户ID<br>stamp = 盖章信息，热门等<br>praise_count = 点赞数<br>episodes_id = 剧集ID<br>user_info = 用户相关信息<br>user_info.id = 用户ID<br>user_info.name = 用户名<br>user_info.avatar = 头像<br>user_info.add_time = 注册时间</p>
-</li>
-<li><p>业务逻辑：获取comment表中episodes_id=接收参数和status=1的数据，按照评论时间倒序。遍历获取到的数据通过user_id获取用户信息（昵称，头像）。</p>
-</li>
-</ul>
-<p>注意：遍历获取到的数据通过user_id获取用户信息，这里也可以进行优化改造，小伙伴可以思考一下，先做铺垫，后面章节对应讲解。</p>
-<p><code>models/comment.go</code></p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">GetCommentList</span><span class="params">(episodesId <span class="keyword">int</span>, offset <span class="keyword">int</span>, limit <span class="keyword">int</span>)</span> <span class="params">(<span class="keyword">int64</span>, []Comment, error)</span></span> {</span><br><span class="line">    o := orm.NewOrm()</span><br><span class="line">    <span class="keyword">var</span> comments []Comment</span><br><span class="line">    num, _ := o.Raw(<span class="string">"SELECT id FROM comment WHERE status=1 AND episodes_id=?"</span>, episodesId).QueryRows(&amp;comments)</span><br><span class="line">    _, err := o.Raw(<span class="string">"SELECT id,content,add_time,user_id,stamp,praise_count,episodes_id FROM comment WHERE status=1 AND episodes_id=? ORDER BY add_time DESC LIMIT ?,?"</span>, episodesId, offset, limit).QueryRows(&amp;comments)</span><br><span class="line">    <span class="keyword">return</span> num, comments, err</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>controllers\comment.go</code></p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 获取评论列表</span></span><br><span class="line"><span class="comment">// @router /comment/list [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *CommentController)</span> <span class="title">List</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="comment">//获取剧集数</span></span><br><span class="line">    episodesId, _ := this.GetInt(<span class="string">"episodesId"</span>)</span><br><span class="line">    <span class="comment">//获取页码信息</span></span><br><span class="line">    limit, _ := this.GetInt(<span class="string">"limit"</span>)</span><br><span class="line">    offset, _ := this.GetInt(<span class="string">"offset"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> episodesId == <span class="number">0</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4001</span>, <span class="string">"必须指定视频剧集"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">if</span> limit == <span class="number">0</span> {</span><br><span class="line">        limit = <span class="number">12</span></span><br><span class="line">    }</span><br><span class="line">    num, comments, err := models.GetCommentList(episodesId, offset, limit)</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        <span class="keyword">var</span> data []CommentInfo</span><br><span class="line">        <span class="keyword">var</span> commentInfo CommentInfo</span><br><span class="line">        <span class="keyword">for</span> _, v := <span class="keyword">range</span> comments {</span><br><span class="line">            commentInfo.Id = v.Id</span><br><span class="line">            commentInfo.Content = v.Content</span><br><span class="line">            commentInfo.AddTime = v.AddTime</span><br><span class="line">            commentInfo.AddTimeTitle = DateFormat(v.AddTime)</span><br><span class="line">            commentInfo.UserId = v.UserId</span><br><span class="line">            commentInfo.Stamp = v.Stamp</span><br><span class="line">            commentInfo.PraiseCount = v.PraiseCount</span><br><span class="line">            commentInfo.EpisodesId = v.EpisodesId</span><br><span class="line">            <span class="comment">// 获取用户信息</span></span><br><span class="line">            commentInfo.UserInfo, _ = models.GetUserInfo(v.UserId)</span><br><span class="line">            data = <span class="built_in">append</span>(data, commentInfo)</span><br><span class="line">        }</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnSuccess(<span class="number">0</span>, <span class="string">"success"</span>, data, num)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4004</span>, <span class="string">"没有相关内容"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p><img src="/2021/06/18/beego-ping-lun/3.png" alt="description"></p>
-<h3 id="获取评论列表增加缓存"><a href="#获取评论列表增加缓存" class="headerlink" title="获取评论列表增加缓存"></a>获取评论列表增加缓存</h3><p><code>models/comment.go</code></p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 增加redis缓存 - 根据用户ID获取用户信息</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">RedisGetUserInfo</span><span class="params">(uid <span class="keyword">int</span>)</span> <span class="params">(UserInfo, error)</span></span> {</span><br><span class="line">    <span class="keyword">var</span> user UserInfo</span><br><span class="line">    conn := redisClient.PoolConnect()</span><br><span class="line">    <span class="keyword">defer</span> conn.Close()</span><br><span class="line"></span><br><span class="line">    redisKey := <span class="string">"user:id:"</span> + strconv.Itoa(uid)</span><br><span class="line">    <span class="comment">// 判断redis是否存在</span></span><br><span class="line">    exists, err := redis.Bool(conn.Do(<span class="string">"exists"</span>, redisKey))</span><br><span class="line">    <span class="keyword">if</span> exists {</span><br><span class="line">        res, _ := redis.Values(conn.Do(<span class="string">"hgetall"</span>, redisKey))</span><br><span class="line">        err = redis.ScanStruct(res, &amp;user)</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        o := orm.NewOrm()</span><br><span class="line">        err := o.Raw(<span class="string">"SELECT id,name,add_time,avatar FROM user WHERE id=? LIMIT 1"</span>, uid).QueryRow(&amp;user)</span><br><span class="line">        <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">            <span class="comment">// 保存redis</span></span><br><span class="line">            _, err = conn.Do(<span class="string">"hmset"</span>, redis.Args{redisKey}.AddFlat(user)...)</span><br><span class="line">            <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">                conn.Do(<span class="string">"expire"</span>, redisKey, <span class="number">60</span>*<span class="number">60</span>*<span class="number">24</span>*<span class="number">30</span>)</span><br><span class="line">            }</span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> user, err</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>controllers\comment.go</code></p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 获取评论列表</span></span><br><span class="line"><span class="comment">// @router /comment/list [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *CommentController)</span> <span class="title">List</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="comment">//获取剧集数</span></span><br><span class="line">    episodesId, _ := this.GetInt(<span class="string">"episodesId"</span>)</span><br><span class="line">    <span class="comment">//获取页码信息</span></span><br><span class="line">    limit, _ := this.GetInt(<span class="string">"limit"</span>)</span><br><span class="line">    offset, _ := this.GetInt(<span class="string">"offset"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> episodesId == <span class="number">0</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4001</span>, <span class="string">"必须指定视频剧集"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">if</span> limit == <span class="number">0</span> {</span><br><span class="line">        limit = <span class="number">12</span></span><br><span class="line">    }</span><br><span class="line">    num, comments, err := models.GetCommentList(episodesId, offset, limit)</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        <span class="keyword">var</span> data []CommentInfo</span><br><span class="line">        <span class="keyword">var</span> commentInfo CommentInfo</span><br><span class="line">        <span class="keyword">for</span> _, v := <span class="keyword">range</span> comments {</span><br><span class="line">            commentInfo.Id = v.Id</span><br><span class="line">            commentInfo.Content = v.Content</span><br><span class="line">            commentInfo.AddTime = v.AddTime</span><br><span class="line">            commentInfo.AddTimeTitle = DateFormat(v.AddTime)</span><br><span class="line">            commentInfo.UserId = v.UserId</span><br><span class="line">            commentInfo.Stamp = v.Stamp</span><br><span class="line">            commentInfo.PraiseCount = v.PraiseCount</span><br><span class="line">            commentInfo.EpisodesId = v.EpisodesId</span><br><span class="line">            <span class="comment">// 获取用户信息</span></span><br><span class="line">            <span class="comment">//commentInfo.UserInfo, _ = models.GetUserInfo(v.UserId)</span></span><br><span class="line">            commentInfo.UserInfo, _ = models.RedisGetUserInfo(v.UserId)</span><br><span class="line">            data = <span class="built_in">append</span>(data, commentInfo)</span><br><span class="line">        }</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnSuccess(<span class="number">0</span>, <span class="string">"success"</span>, data, num)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4004</span>, <span class="string">"没有相关内容"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/06/18/beego-a-li-yun-dian-bo/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/06/18/beego-a-li-yun-dian-bo/" class="post-title-link" itemprop="url">beego阿里云点播</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-06-17 16:21:41" itemprop="dateCreated datePublished" datetime="2021-06-17T16:21:41Z">2021-06-17</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-06-21 01:40:14" itemprop="dateModified" datetime="2021-06-21T01:40:14Z">2021-06-21</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/beego/" itemprop="url" rel="index"><span itemprop="name">beego</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p><a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/125570.html?spm=a2c4g.11186623.6.1170.959424c5snCdUB">https://help.aliyun.com/document_detail/125570.html?spm=a2c4g.11186623.6.1170.959424c5snCdUB</a></p>
-<h3 id="Web播放器SDK使用"><a href="#Web播放器SDK使用" class="headerlink" title="Web播放器SDK使用"></a>Web播放器SDK使用</h3><p>官方文档中提供了用户测试用例，按照用例中的代码整合到项目中就可以了。播放器支持4种播放模式，本课程只讲解前两种方式，视频地址直接播放和阿里云点播模式播放（只需要阿里云的videoId）</p>
-<figure class="highlight html"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">"viewport"</span>   <span class="attr">content</span>=<span class="string">"width=device-width, height=device-height, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"</span>/&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">title</span>&gt;</span>用户测试用例<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">     <span class="comment">&lt;!--引入阿里云的css和js--&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">"stylesheet"</span> <span class="attr">href</span>=<span class="string">"https://g.alicdn.com/de/prismplayer/2.8.2/skins/default/aliplayer-min.css"</span> /&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">script</span> <span class="attr">charset</span>=<span class="string">"utf-8"</span> <span class="attr">type</span>=<span class="string">"text/javascript"</span> <span class="attr">src</span>=<span class="string">"https://g.alicdn.com/de/prismplayer/2.8.2/aliplayer-min.js"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!--定义div，用来展示播放器，指定ID--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span>  <span class="attr">class</span>=<span class="string">"prism-player"</span> <span class="attr">id</span>=<span class="string">"J_prismPlayer"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript">            <span class="comment">//创建对象指定上面设置的ID，</span></span></span><br><span class="line"><span class="javascript">            <span class="keyword">var</span> player = <span class="keyword">new</span> Aliplayer({</span></span><br><span class="line"><span class="javascript">            id: <span class="string">'J_prismPlayer'</span>,</span></span><br><span class="line"><span class="javascript">            width: <span class="string">'100%'</span>,</span></span><br><span class="line"><span class="javascript">            autoplay: <span class="literal">true</span>,</span></span><br><span class="line"><span class="javascript">            <span class="comment">//支持播放地址播放,此播放优先级最高</span></span></span><br><span class="line"><span class="javascript">            source : <span class="string">'播放url'</span>,</span></span><br><span class="line"><span class="javascript">            <span class="comment">//播放方式二：点播用户推荐</span></span></span><br><span class="line"><span class="javascript">            vid : <span class="string">'1e067a2831b641db90d570b6480fbc40'</span>,</span></span><br><span class="line"><span class="javascript">            playauth : <span class="string">'ddd'</span>,</span></span><br><span class="line"><span class="javascript">            cover: <span class="string">'http://liveroom-img.oss-cn-qingdao.aliyuncs.com/logo.png'</span>,</span></span><br><span class="line"><span class="javascript">            encryptType:<span class="number">1</span>, <span class="comment">//当播放私有加密流时需要设置。</span></span></span><br><span class="line"><span class="javascript">            <span class="comment">//播放方式三：仅MPS用户使用</span></span></span><br><span class="line"><span class="javascript">            vid : <span class="string">'1e067a2831b641db90d570b6480fbc40'</span>,</span></span><br><span class="line"><span class="javascript">            accId: <span class="string">'dd'</span>,</span></span><br><span class="line"><span class="javascript">            accSecret: <span class="string">'dd'</span>,</span></span><br><span class="line"><span class="javascript">            stsToken: <span class="string">'dd'</span>,</span></span><br><span class="line"><span class="javascript">            domainRegion: <span class="string">'dd'</span>,</span></span><br><span class="line"><span class="javascript">            authInfo: <span class="string">'dd'</span>,</span></span><br><span class="line"><span class="javascript">            <span class="comment">//播放方式四：使用STS方式播放</span></span></span><br><span class="line"><span class="javascript">            vid : <span class="string">'1e067a2831b641db90d570b6480fbc40'</span>,</span></span><br><span class="line"><span class="javascript">            accessKeyId: <span class="string">'dd'</span>,</span></span><br><span class="line"><span class="javascript">            securityToken: <span class="string">'dd'</span>,</span></span><br><span class="line"><span class="javascript">            accessKeySecret: <span class="string">'dd'</span>,</span></span><br><span class="line"><span class="javascript">             region:<span class="string">'cn-shanghai'</span>,<span class="comment">//eu-central-1,ap-southeast-1</span></span></span><br><span class="line"><span class="javascript">            },<span class="function"><span class="keyword">function</span>(<span class="params">player</span>)</span>{</span></span><br><span class="line"><span class="javascript">                <span class="built_in">console</span>.log(<span class="string">'播放器创建好了。'</span>)</span></span><br><span class="line">           });</span><br><span class="line">        <span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p><img src="/2021/06/18/beego-a-li-yun-dian-bo/1.png" alt="description"><br><img src="/2021/06/18/beego-a-li-yun-dian-bo/2.png" alt="description"><br><img src="/2021/06/18/beego-a-li-yun-dian-bo/3.png" alt="description"><br><img src="/2021/06/18/beego-a-li-yun-dian-bo/4.png" alt="description"><br><img src="/2021/06/18/beego-a-li-yun-dian-bo/5.png" alt="description"><br><img src="/2021/06/18/beego-a-li-yun-dian-bo/6.png" alt="description"><br><img src="/2021/06/18/beego-a-li-yun-dian-bo/7.png" alt="description"><br><img src="/2021/06/18/beego-a-li-yun-dian-bo/8.png" alt="description"><br><img src="/2021/06/18/beego-a-li-yun-dian-bo/9.png" alt="description"></p>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/06/18/beego-xiang-mu-xian-shang-bu-shu/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/06/18/beego-xiang-mu-xian-shang-bu-shu/" class="post-title-link" itemprop="url">beego项目线上部署</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-06-17 16:21:41" itemprop="dateCreated datePublished" datetime="2021-06-17T16:21:41Z">2021-06-17</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-06-21 02:44:14" itemprop="dateModified" datetime="2021-06-21T02:44:14Z">2021-06-21</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/beego/" itemprop="url" rel="index"><span itemprop="name">beego</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>修改运行环境参数</p>
-<p>bee pack<br>pack 目录用来发布应用的时候打包，会把项目打包成 zip 包，<br>这样我们部署的时候直接把打包之后的项目上传，解压就可以部署了：</p>
-<p>自带http服务，不需要nginx和appche</p>
-<p>◆线上环境检查,上传文件部署</p>
-<p>配置访问域名，测试功能</p>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {

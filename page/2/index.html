@@ -119,7 +119,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">354</span>
+          <span class="site-state-item-count">357</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -160,6 +160,610 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/08/18/go-ce-shi/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/08/18/go-ce-shi/" class="post-title-link" itemprop="url">go测试</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-08-17 16:21:41" itemprop="dateCreated datePublished" datetime="2021-08-17T16:21:41Z">2021-08-17</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-09-20 11:58:01" itemprop="dateModified" datetime="2021-09-20T11:58:01Z">2021-09-20</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/go/" itemprop="url" rel="index"><span itemprop="name">go</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>少DEBUG，多Testing</p>
+<h2 id="传统测试"><a href="#传统测试" class="headerlink" title="传统测试"></a>传统测试</h2><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span> <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testAdd</span><span class="params">()</span> </span>{</span><br><span class="line">    asserEquals(<span class="number">3</span>, add(<span class="number">1</span>, <span class="number">2</span>));</span><br><span class="line">    asserEquals(<span class="number">2</span>, add(<span class="number">0</span>, <span class="number">2</span>));</span><br><span class="line">    asserEquals(<span class="number">0</span>, add(<span class="number">0</span>, <span class="number">0</span>));</span><br><span class="line">    asserEquals(<span class="number">0</span>, add(-<span class="number">1</span>, <span class="number">1</span>));</span><br><span class="line">    asserEquals(Integer.MIN_VALUE, add(<span class="number">1</span>, Integer.MAX_VALUE));</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<ul>
+<li>测试数据和测试逻辑混在一起</li>
+<li>出错信息不明确</li>
+<li>一旦一个数据出错测试全部结束</li>
+</ul>
+<h2 id="单元测试"><a href="#单元测试" class="headerlink" title="单元测试"></a>单元测试</h2><ol>
+<li>正常执行</li>
+<li>异常例子</li>
+<li>正常与异常的边界例子</li>
+<li>追求分支覆盖</li>
+<li>追求代码覆盖</li>
+</ol>
+<h2 id="表格驱动测试"><a href="#表格驱动测试" class="headerlink" title="表格驱动测试"></a>表格驱动测试</h2><ul>
+<li>分离的测试数据和测试逻辑</li>
+<li>明确的出错信息</li>
+<li>可以部分失败</li>
+<li>go语言的语法使得我们更容易实践表格驱动测试</li>
+</ul>
+<p>文件名必须命名为：xxx_test.go<br>如果要测试add函数，那么文件名就叫做add_test.go<br>测试方法 <code>TestXXXX(t *testing.T)</code><br>如果要测试add函数，那么方法就叫做 <code>TestAdd(t *testing.T)</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">"testing"</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestTriangle</span><span class="params">(t *testing.T)</span></span> {</span><br><span class="line">    tests := []<span class="keyword">struct</span>{ a, b, c <span class="keyword">int</span> }{</span><br><span class="line">        {<span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>},</span><br><span class="line">        {<span class="number">5</span>, <span class="number">12</span>, <span class="number">13</span>},</span><br><span class="line">        {<span class="number">8</span>, <span class="number">15</span>, <span class="number">17</span>},</span><br><span class="line">        {<span class="number">12</span>, <span class="number">35</span>, <span class="number">37</span>},</span><br><span class="line">        {<span class="number">30000</span>, <span class="number">40000</span>, <span class="number">50000</span>},</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> _, tt := <span class="keyword">range</span> tests {</span><br><span class="line">        <span class="keyword">if</span> actual := calcTriangle(tt.a, tt.b); actual != tt.c {</span><br><span class="line">            t.Errorf(<span class="string">"calcTriangle(%d, %d); "</span>+<span class="string">"got %d; expected %d"</span>,</span><br><span class="line">                tt.a, tt.b, actual, tt.c)</span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line"><span class="comment">// goland</span></span><br><span class="line">=== RUN   TestTriangle</span><br><span class="line">--- PASS: TestTriangle (<span class="number">0.00</span>s)</span><br><span class="line">PASS</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 命令行 --- go test</span></span><br><span class="line">Running tool: C:\Program Files\Go\bin\<span class="keyword">go</span>.exe test -timeout <span class="number">30</span>s -run ^TestTriangle$ imooc.com/ccmouse/learngo/lang/basic/basic -v -count=<span class="number">1</span></span><br><span class="line"></span><br><span class="line">=== RUN   TestTriangle</span><br><span class="line">--- PASS: TestTriangle (<span class="number">0.00</span>s)</span><br><span class="line">PASS</span><br><span class="line">ok      imooc.com/ccmouse/learngo/lang/basic/basic    <span class="number">0.031</span>s</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">"testing"</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">add</span><span class="params">(a, b <span class="keyword">int</span>)</span> <span class="title">int</span></span> {</span><br><span class="line">    <span class="keyword">return</span> a + b</span><br><span class="line">}</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestAdd</span><span class="params">(t *testing.T)</span></span> {</span><br><span class="line"></span><br><span class="line">    tests := []<span class="keyword">struct</span>{ a, b, c <span class="keyword">int</span> }{</span><br><span class="line">        {<span class="number">3</span>, <span class="number">4</span>, <span class="number">7</span>},</span><br><span class="line">        {<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>},</span><br><span class="line">        {<span class="number">4</span>, <span class="number">5</span>, <span class="number">1</span>}, <span class="comment">//模拟出错</span></span><br><span class="line">        {<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>}, <span class="comment">// 模拟出错</span></span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> _, tt := <span class="keyword">range</span> tests {</span><br><span class="line">        <span class="keyword">if</span> actual := add(tt.a, tt.b); actual != tt.c {</span><br><span class="line">            t.Errorf(<span class="string">"%d + %d got %d ;expected %d "</span>, tt.a, tt.b, tt.c, actual)</span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line">---</span><br><span class="line"><span class="comment">// 命令行 在当前目录下使用`go test`命令</span></span><br><span class="line">=== RUN   TestAdd</span><br><span class="line">    TestAdd: add_test.<span class="keyword">go</span>:<span class="number">19</span>: <span class="number">4</span> + <span class="number">5</span> got <span class="number">1</span> ;expected <span class="number">9</span></span><br><span class="line">    TestAdd: add_test.<span class="keyword">go</span>:<span class="number">19</span>: <span class="number">1</span> + <span class="number">1</span> got <span class="number">1</span> ;expected <span class="number">2</span></span><br><span class="line">--- FAIL: TestAdd (<span class="number">0.00</span>s)</span><br><span class="line">FAIL</span><br></pre></td></tr></tbody></table></figure>
+
+<p>用命令行测试<br>在当前目录下使用<code>go test</code>命令</p>
+<figure class="highlight shell"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span><span class="bash"> go tool cover</span></span><br><span class="line">Usage of 'go tool cover':</span><br><span class="line">Given a coverage profile produced by 'go test':</span><br><span class="line">        go test -coverprofile=c.out 生成文件</span><br><span class="line"></span><br><span class="line">Open a web browser displaying annotated source code:</span><br><span class="line">        go tool cover -html=c.out  页面观看覆盖率</span><br><span class="line"></span><br><span class="line">Write out an HTML file instead of launching a web browser:</span><br><span class="line">        go tool cover -html=c.out -o coverage.html</span><br><span class="line"></span><br><span class="line">Display coverage percentages to stdout for each function:</span><br><span class="line">        go tool cover -func=c.out</span><br><span class="line"></span><br><span class="line">Finally, to generate modified source code with coverage annotations</span><br><span class="line">(what go test -cover does):</span><br><span class="line">        go tool cover -mode=set -var=CoverageVariableName program.go</span><br><span class="line"></span><br><span class="line">Flags:</span><br><span class="line">  -V    print version and exit</span><br><span class="line">  -func string</span><br><span class="line">        output coverage profile information for each function</span><br><span class="line">  -html string</span><br><span class="line">        generate HTML representation of coverage profile</span><br><span class="line">  -mode string</span><br><span class="line">        coverage mode: set, count, atomic</span><br><span class="line">  -o string</span><br><span class="line">        file for output; default: stdout</span><br><span class="line">  -var string</span><br><span class="line">        name of coverage variable to generate (default "GoCover")</span><br><span class="line"></span><br><span class="line">  Only one of -html, -func, or -mode may be set.</span><br></pre></td></tr></tbody></table></figure>
+
+<p>goland <code>Run '' with Coverage</code> 检测代码覆盖率</p>
+<p><code>go tool cover -html=c.out</code><br>注意： test文件要和逻辑代码在同一个包中 不然显示不出来</p>
+<p><code>go test -bench . -cpuprofile=cpu.out</code> 生成二进制文件<br>用pprof查看这个二进制文件 <code>go tool pprof cpu.out</code>：<br>进入<code>pprof</code>交互式命令行环境<br>进入<code>pprof</code>环境之后，使用<code>web</code>命令生成图</p>
+<figure class="highlight mel"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">#  Failed to execute <span class="keyword">dot</span>. Is Graphviz installed? Error: <span class="keyword">exec</span>: <span class="string">"dot"</span>: executable <span class="keyword">file</span> not found <span class="keyword">in</span> $PATH</span><br></pre></td></tr></tbody></table></figure>
+
+<p>要先安装graphviz工具</p>
+<figure class="highlight mipsasm"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">brew </span><span class="keyword">install </span>graphviz</span><br></pre></td></tr></tbody></table></figure>
+
+<p>这张图会告诉你时间消耗在哪个地方，箭头越粗，方框越大越耗时<br>然后通过看这张图，看哪里可以优化，优化完再次运行，然后不断优化到满意为止</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/08/17/go-fan-xing/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/08/17/go-fan-xing/" class="post-title-link" itemprop="url">go泛型</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-08-16 16:21:41" itemprop="dateCreated datePublished" datetime="2021-08-16T16:21:41Z">2021-08-16</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-09-22 01:10:27" itemprop="dateModified" datetime="2021-09-22T01:10:27Z">2021-09-22</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/go/" itemprop="url" rel="index"><span itemprop="name">go</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>泛型有什么作用？<br>在使用Go没有泛型之前我们怎么实现针对多类型的逻辑实现的呢？有很多方法，比如说使用interface{}作为变量类型参数，在内部通过类型判断进入对应的处理逻辑；将类型转化为特定表现的鸭子类型，通过接口定义的方法实现逻辑整合；还有人专门编写了Go的函数代码生成工具，通过批量生成不同类型的相同实现函数代替手工实现等等。这些方法多多少少存在一些问题：使用了interface{}作为参数意味着放弃了编译时检查，作为强类型语言的一个优势就被抹掉了。同样，无论使用代码生成还是手工书写，一旦出现问题，意味着这些方法都需要重复生成或者进行批量修改，工作量反而变得更多了。</p>
+<p>在Go中引入泛型会给程序开发带来很多好处：通过泛型，可以针对多种类型编写一次代码，大大节省了编码时间。你可以充分应用编译器的编译检查，保证程序变量类型的可靠性。借助泛型，你可以减少代码的重复度，也不会出现一处出现问题需要修改多处地方的尴尬问题。这也让很多测试工作变得更简单，借助类型安全，你甚至可以少考虑很多的边缘情况。</p>
+<p>泛型方法：</p>
+<ol>
+<li>形式在方法名后面加类型参数，FuncName[T constraint]</li>
+<li>类型参数可以有多个</li>
+<li>constraint 是类型约束，必须是接口。可以是普通接口，也可以是如 Numeric 这种复合接口</li>
+</ol>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/08/07/leetocode/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/08/07/leetocode/" class="post-title-link" itemprop="url">leetcode</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-08-06 16:21:41" itemprop="dateCreated datePublished" datetime="2021-08-06T16:21:41Z">2021-08-06</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-09-30 04:19:51" itemprop="dateModified" datetime="2021-09-30T04:19:51Z">2021-09-30</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <ol start="3">
+<li>无重复字符的最长子串<br>给定一个字符串 s ，请你找出其中不含有重复字符的 最长子串 的长度。</li>
+</ol>
+<p>示例 1:</p>
+<figure class="highlight makefile"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">输入: s = "abcabcbb"</span></span><br><span class="line"><span class="section">输出: 3</span></span><br><span class="line"><span class="section">解释: 因为无重复字符的最长子串是 "abc"，所以其长度为 3。</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>示例 2:</p>
+<figure class="highlight makefile"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">输入: s = "bbbbb"</span></span><br><span class="line"><span class="section">输出: 1</span></span><br><span class="line"><span class="section">解释: 因为无重复字符的最长子串是 "b"，所以其长度为 1。</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>示例 3:</p>
+<figure class="highlight makefile"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">输入: s = "pwwkew"</span></span><br><span class="line"><span class="section">输出: 3</span></span><br><span class="line"><span class="section">解释: 因为无重复字符的最长子串是 "wke"，所以其长度为 3。</span></span><br><span class="line">     请注意，你的答案必须是 子串 的长度，<span class="string">"pwke"</span> 是一个子序列，不是子串。</span><br></pre></td></tr></tbody></table></figure>
+
+<p>示例 4:</p>
+<figure class="highlight makefile"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">输入: s = ""</span></span><br><span class="line"><span class="section">输出: 0</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>提示：</p>
+<p>0 &lt;= s.length &lt;= 5 * 10^4<br>s 由英文字母、数字、符号和空格组成</p>
+<p>法一 滑动窗口<br>思路和算法</p>
+<p>我们先用一个例子考虑如何在较优的时间复杂度内通过本题。</p>
+<p>找出<strong>从每一个字符开始的，不包含重复字符的最长子串</strong>，那么其中最长的那个字符串即为答案。</p>
+<p>以示例一中的字符串 abcabcbb 为例，<br>先从第一个字符开始，只有一个字符肯定不会重复吧。“a”满足条件，更新最大长度为1；然后走到第二个字符，“ab”也满足，更新最大长度为2。<br>走到第三个字符，“abc” 也满足，更新最大长度为 3。<br>走到第四个字符，我们发现 “a” 已经出现过了，于是我们就必须要删除之前的一些字符来继续满足无重复字符的条件，但是我们不知道前面已经出现过一次的 “a” 的 index 在哪里呀，所以我们只能一个一个找了，从当前子串的“abca”的第一个字符开始找，删除第一个字符 “a”，发现这时候只剩下一个 “a”了，我们又满足条件了，更新最大长度为3，以此类推：</p>
+<figure class="highlight livecodeserver"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">start</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line">  |</span><br><span class="line">  |</span><br><span class="line">  v</span><br><span class="line"></span><br><span class="line">  <span class="keyword">a</span>  b  c  <span class="keyword">a</span>  b  c  b  b</span><br></pre></td></tr></tbody></table></figure>
+
+<p>end 指针不停往前走，只要当前子串 s[start:end+1] 不满足无重复字符条件的时候，我们就让 start 指针往前走直到满足条件为止，每次满足条件我们都要更新一下最大长度，即 res。<br>这就是滑动窗口的思想，也称为sliding window，</p>
+<p>对于示例一中的字符串，我们列举出这些结果，其中括号中表示选中的字符以及最长的字符串：</p>
+<p>以 (a)bcabcbb 开始的最长字符串为 (abc)abcbb；<br>以 a(b)cabcbb 开始的最长字符串为 a(bca)bcbb；<br>以 ab(c)abcbb 开始的最长字符串为 ab(cab)cbb；<br>以 abc(a)bcbb 开始的最长字符串为 abc(abc)bb；<br>以 abca(b)cbb 开始的最长字符串为 abca(bc)bb；<br>以 abcab(c)bb 开始的最长字符串为 abcab(cb)b；<br>以 abcabc(b)b 开始的最长字符串为 abcabc(b)b；<br>以 abcabcb(b) 开始的最长字符串为 abcabcb(b)。</p>
+<p>发现了什么？如果我们依次递增地枚举子串的起始位置，那么子串的结束位置也是递增的！<br>这里的原因在于，假设我们选择字符串中的第 k 个字符作为起始位置，并且得到了不包含重复字符的最长子串的结束位置为 r_k。那么当我们选择第 k+1 个字符作为起始位置时，首先从 k+1 到 r_k 的字符显然是不重复的，并且由于少了原本的第 k 个字符，我们可以尝试继续增大 r_k，直到右侧出现了重复字符为止。</p>
+<p>这样一来，我们就可以使用「滑动窗口」来解决这个问题了：</p>
+<ul>
+<li><p>我们使用两个指针表示字符串中的某个子串（或窗口）的左右边界，其中左指针代表着上文中「枚举子串的起始位置」，而右指针即为上文中的 r_k；</p>
+</li>
+<li><p>在每一步的操作中，我们会将左指针向右移动一格，表示 <strong>我们开始枚举下一个字符作为起始位置</strong>，然后我们可以不断地向右移动右指针，但需要保证这两个指针对应的子串中没有重复的字符。在移动结束后，这个子串就对应着 <strong>以左指针开始的，不包含重复字符的最长子串</strong>。我们记录下这个子串的长度；</p>
+</li>
+<li><p>在枚举结束后，我们找到的最长的子串的长度即为答案。</p>
+</li>
+</ul>
+<p>判断重复字符<br>在上面的流程中，我们还需要使用一种数据结构来判断 是否有重复的字符，<br>但是我们不知道前面已经出现过一次的“a”的index在哪里呀，所以我们只能一个一个找了。<br>我们可以对这里做一个优化，就不需要一个个去找了。只需要用一个常用的数据结构为哈希集合、字典<br>（即 C++ 中的 std::unordered_set，Java 中的 HashSet，Python 中的 set, JavaScript 中的 Set, golang 中的 map[byte]int{}）。<br>对当前子串中的每一个字符，将其在input中的来源index记录下来即可。</p>
+<p>我们先从第一个字符开始，只要碰到已经出现过的字符，我们就必须从之前出现该字符的index开始重新往后看。</p>
+<p>例如‘xyzxlkjh’，当看到第二个‘x’时，我们就应该从第一个x后面的y开始重新往后看了。</p>
+<p>我们将每一个已经阅读过的字符作为key，而它的值就是它在原字符串中的index。<br>如果我们现在的字符不在字典里面，我们就把它加进字典中去。<br>因此，只要end指针指向的这个字符c，在该字典中的值大于等于了当前子串首字符的index时，就说明c在当前子串中已经出现过了，<br>我们就将当前子串的首字符的index加1，即从后一位又重新开始读，此时当前子串已经满足条件了，然后我们更新res。</p>
+<p>在左指针向右移动的时候，我们从哈希集合中移除一个字符，在右指针向右移动的时候，我们往哈希集合中添加一个字符。</p>
+<p>时间复杂度：O(N)，其中 N 是字符串的长度。左指针和右指针分别会遍历整个字符串一次。</p>
+<p>空间复杂度：O(|\Sigma|)O(∣Σ∣)，其中 \SigmaΣ 表示字符集（即字符串中可以出现的字符），|\Sigma|∣Σ∣ 表示字符集的大小。在本题中没有明确说明字符集，因此可以默认为所有 ASCII 码在 [0, 128)[0,128) 内的字符，即 |\Sigma| = 128∣Σ∣=128。我们需要用到哈希集合来存储出现过的字符，而字符最多有 |\Sigma|∣Σ∣ 个，因此空间复杂度为 O(|\Sigma|)O(∣Σ∣)。</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">lengthOfLongestSubstring</span>(<span class="params">self, s: str</span>) -&gt; int:</span></span><br><span class="line">        <span class="comment"># 哈希集合，记录每个字符是否出现过</span></span><br><span class="line">        occ = set()</span><br><span class="line">        n = len(s)</span><br><span class="line">        <span class="comment"># 右指针，初始值为 -1，相当于我们在字符串的左边界的左侧，还没有开始移动</span></span><br><span class="line">        rk, ans = <span class="number">-1</span>, <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(n):</span><br><span class="line">            <span class="keyword">if</span> i != <span class="number">0</span>:</span><br><span class="line">                <span class="comment"># 左指针向右移动一格，移除一个字符</span></span><br><span class="line">                occ.remove(s[i - <span class="number">1</span>])</span><br><span class="line">            <span class="keyword">while</span> rk + <span class="number">1</span> &lt; n <span class="keyword">and</span> s[rk + <span class="number">1</span>] <span class="keyword">not</span> <span class="keyword">in</span> occ:</span><br><span class="line">                <span class="comment"># 不断地移动右指针</span></span><br><span class="line">                occ.add(s[rk + <span class="number">1</span>])</span><br><span class="line">                rk += <span class="number">1</span></span><br><span class="line">            <span class="comment"># 第 i 到 rk 个字符是一个极长的无重复字符子串</span></span><br><span class="line">            ans = max(ans, rk - i + <span class="number">1</span>)</span><br><span class="line">        <span class="keyword">return</span> ans</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">lengthOfLongestSubstring</span><span class="params">(s <span class="keyword">string</span>)</span> <span class="title">int</span></span> {</span><br><span class="line">    <span class="comment">// 哈希集合，记录每个字符是否出现过</span></span><br><span class="line">    m := <span class="keyword">map</span>[<span class="keyword">byte</span>]<span class="keyword">int</span>{} <span class="comment">// map[uint8]int</span></span><br><span class="line">    n := <span class="built_in">len</span>(s)</span><br><span class="line">    <span class="comment">// 右指针，初始值为 -1，相当于我们在字符串的左边界的左侧，还没有开始移动</span></span><br><span class="line">    rk, ans := <span class="number">-1</span>, <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> i := <span class="number">0</span>; i &lt; n; i++ {</span><br><span class="line">        <span class="keyword">if</span> i != <span class="number">0</span> {</span><br><span class="line">            <span class="comment">// 左指针向右移动一格，移除一个字符</span></span><br><span class="line">            <span class="built_in">delete</span>(m, s[i<span class="number">-1</span>])</span><br><span class="line">        }</span><br><span class="line">        <span class="keyword">for</span> rk+<span class="number">1</span> &lt; n &amp;&amp; m[s[rk+<span class="number">1</span>]] == <span class="number">0</span> {</span><br><span class="line">            <span class="comment">// 不断地移动右指针</span></span><br><span class="line">            m[s[rk+<span class="number">1</span>]]++</span><br><span class="line">            rk++</span><br><span class="line">        }</span><br><span class="line">        <span class="comment">// 第 i 到 rk 个字符是一个极长的无重复字符子串</span></span><br><span class="line">        <span class="comment">// rk-i+1 是当前字串从第 i 到 rk 个字符的长度</span></span><br><span class="line">        ans = max(ans, rk-i+<span class="number">1</span>)</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> ans</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">max</span><span class="params">(x, y <span class="keyword">int</span>)</span> <span class="title">int</span></span> { <span class="comment">// go没有内置的max函数，但是有输入输出float的 math.Max</span></span><br><span class="line">    <span class="keyword">if</span> x &lt; y {</span><br><span class="line">        <span class="keyword">return</span> y</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> x</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>s = “abcabcbb”<br>len(s) = 8<br>rk, ans := -1, 0</p>
+<p>i = 0<br>    rk + 1 = 0 &lt; 8 &amp;&amp; m[s[rk+1]] = m[abcabcbb[0]] = m[“a”] == 0<br>    m[s[rk+1]] = m[s[rk+1]] + 1 = 1<br>    m[“a”] = m[“a”] + 1 = 1<br>    rk = rk + 1 = 0</p>
+<pre><code>rk + 1 = 1 &lt; 8 &amp;&amp; m[s[rk+1]] = m[abcabcbb[1]] = m["b"] == 0
+m["b"] = m["b"] + 1 = 1
+rk = rk + 1 = 1
+
+rk + 1 = 2 &lt; 8 &amp;&amp; m[s[rk+1]] = m[abcabcbb[2]] = m["c"] == 0
+m["c"] = m["c"] + 1 = 1
+rk = rk + 1 = 2
+
+rk + 1 = 3 &lt; 8 &amp;&amp; m[s[rk+1]] = m[abcabcbb[3]] = m["a"] = 1 != 0
+
+ans = max(ans, rk-i+1) = max(0, 2-0+1) = 3
+</code></pre>
+<p>i = 1 != 0<br>    delete(m, s[i-1]) = delete(map[a:1 b:1 c:1], s[0]) = delete(map[a:1 b:1 c:1], “a”)<br>    m = map[b:1 c:1]</p>
+<pre><code>rk + 1 = 3 &lt; 8 &amp;&amp; m[s[rk+1]] = m[abcabcbb[3]] = m["a"] == 0
+m[s[rk+1]] = m[s[rk+1]] + 1 = 1
+m["a"] = m["a"] + 1 = 1
+rk = rk + 1 = 3
+
+rk + 1 = 4 &lt; 8 &amp;&amp; m[s[rk+1]] = m[abcabcbb[4]] = m["b"] == 1 != 0
+
+ans = max(ans, rk-i+1) = max(3, 3-1+1) = 3
+</code></pre>
+<p>i = 2 != 0<br>    delete(m, s[i-1]) = delete(map[a:1 b:1 c:1], s[1]) = delete(map[a:1 b:1 c:1], “b”)<br>    m = map[a:1 c:1]</p>
+<pre><code>rk + 1 = 4 &lt; 8 &amp;&amp; m[s[rk+1]] = m[abcabcbb[4]] = m["b"] == 0
+m[s[rk+1]] = m[s[rk+1]] + 1 = 1
+m["b"] = m["b"] + 1 = 1
+rk = rk + 1 = 4
+
+rk + 1 = 5 &lt; 8 &amp;&amp; m[s[rk+1]] = m[abcabcbb[5]] = m["c"] == 1 != 0
+
+ans = max(ans, rk-i+1) = max(3, 4-2+1) = 3
+</code></pre>
+<p>i = 3 != 0<br>    delete(m, s[i-1]) = delete(map[a:1 b:1 c:1], s[2]) = delete(map[a:1 b:1 c:1], “c”)<br>    m = map[a:1 b:1]</p>
+<pre><code>rk + 1 = 5 &lt; 8 &amp;&amp; m[s[rk+1]] = m[abcabcbb[5]] = m["c"] == 0
+m[s[rk+1]] = m[s[rk+1]] + 1 = 1
+m["c"] = m["c"] + 1 = 1
+rk = rk + 1 = 5
+
+rk + 1 = 6 &lt; 8 &amp;&amp; m[s[rk+1]] = m[abcabcbb[6]] = m["b"] == 1 != 0
+ans = max(ans, rk-i+1) = max(3, 5-3+1) = 3
+</code></pre>
+<p>i = 4 != 0<br>    delete(m, s[i-1]) = delete(map[a:1 b:1 c:1], s[3]) = delete(map[a:1 b:1 c:1], “a”)<br>    m = map[b:1 c:1]</p>
+<pre><code>rk + 1 = 6 &lt; 8 &amp;&amp; m[s[rk+1]] = m[abcabcbb[6]] = m["b"] == 1 != 0
+ans = max(ans, rk-i+1) = max(3, 5-4+1) = 3
+</code></pre>
+<p>i = 5 != 0<br>    delete(m, s[i-1]) = delete(map[b:1 c:1], s[4]) = delete(map[b:1 c:1], “b”)<br>    m = map[c:1]</p>
+<pre><code>rk + 1 = 6 &lt; 8 &amp;&amp; m[s[rk+1]] = m[abcabcbb[6]] = m["b"] == 0
+m[s[rk+1]] = m[s[rk+1]] + 1 = 1
+m["b"] = m["b"] + 1 = 1
+rk = rk + 1 = 6
+
+rk + 1 = 7 &lt; 8 &amp;&amp; m[s[rk+1]] = m[abcabcbb[7]] = m["b"] == 1 != 0
+ans = max(ans, rk-i+1) = max(3, 6-5+1) = 3
+</code></pre>
+<p>i = 6 != 0<br>    delete(m, s[i-1]) = delete(map[a:1 b:1 c:1], s[5]) = delete(map[a:1 b:1 c:1], “c”)<br>    m = map[b:1]</p>
+<pre><code>rk + 1 = 7 &lt; 8 &amp;&amp; m[s[rk+1]] = m[abcabcbb[7]] = m["b"] == 1 != 0
+ans = max(ans, rk-i+1) = max(3, 6-6+1) = 3
+</code></pre>
+<p>i = 7 != 0<br>    delete(m, s[i-1]) = delete(map[b:1], s[6]) = delete(map[b:1], “b”)<br>    m = map[]</p>
+<pre><code>rk + 1 = 7 &lt; 8 &amp;&amp; m[s[rk+1]] = m[abcabcbb[7]] = m["b"] == 0
+m[s[rk+1]] = m[s[rk+1]] + 1 = 1
+m["b"] = m["b"] + 1 = 1
+rk = rk + 1 = 7
+
+rk + 1 = 8
+ans = max(ans, rk-i+1) = max(3, 7-7+1) = 3
+</code></pre>
+<p>return ans = 3</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Max returns the larger of x or y.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// Special cases are:</span></span><br><span class="line"><span class="comment">//    Max(x, +Inf) = Max(+Inf, x) = +Inf</span></span><br><span class="line"><span class="comment">//    Max(x, NaN) = Max(NaN, x) = NaN</span></span><br><span class="line"><span class="comment">//    Max(+0, ±0) = Max(±0, +0) = +0</span></span><br><span class="line"><span class="comment">//    Max(-0, -0) = -0</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Max</span><span class="params">(x, y <span class="keyword">float64</span>)</span> <span class="title">float64</span></span> {</span><br><span class="line">    <span class="keyword">if</span> haveArchMax {</span><br><span class="line">        <span class="keyword">return</span> archMax(x, y)</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> max(x, y)</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">lengthOfLongestSubstring</span><span class="params">(s <span class="keyword">string</span>)</span> <span class="title">int</span></span> {</span><br><span class="line">    <span class="keyword">if</span> s == <span class="string">""</span> {</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    start, end := <span class="number">0</span>, <span class="number">0</span></span><br><span class="line">    res, lookup := <span class="number">0</span>, <span class="keyword">map</span>[<span class="keyword">byte</span>]<span class="keyword">bool</span>{}</span><br><span class="line">    <span class="keyword">for</span> start &lt; <span class="built_in">len</span>(s) &amp;&amp; end &lt; <span class="built_in">len</span>(s) {</span><br><span class="line">        _, ok := lookup[s[end]]</span><br><span class="line">        <span class="keyword">if</span> !ok { <span class="comment">// 最新碰到的字符在当前子串中没有出现过</span></span><br><span class="line">            lookup[s[end]] = <span class="literal">true</span> <span class="comment">// 记录下当前子串新增的一个字符</span></span><br><span class="line">            res = <span class="keyword">int</span>(math.Max(<span class="keyword">float64</span>(res), <span class="keyword">float64</span>(end-start+<span class="number">1</span>))) <span class="comment">// 因为当前子串满足条件，更新最大长度</span></span><br><span class="line">            end += <span class="number">1</span> <span class="comment">// end 指针向前走一步</span></span><br><span class="line">        } <span class="keyword">else</span> { <span class="comment">// 最新碰到的字符在当前子串中已经出现过了</span></span><br><span class="line">            <span class="built_in">delete</span>(lookup, s[start]) <span class="comment">// 从当前子串中删除之前出现过的字符</span></span><br><span class="line">            start += <span class="number">1</span> <span class="comment">// start 指针向前走一步，直到没有重复为止</span></span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> res</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>法二</p>
+<p>程序变量解释<br>start 是当前无重复字符的子串首字符的 index；<br>maps 放置每一个字符的 index，如果 maps.get(s[i], -1) 大于等于 start 的话，就说明字符重复了，此时就要重置 res 和 start 的值了。</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">lengthOfLongestSubstring</span><span class="params">(s <span class="keyword">string</span>)</span> <span class="title">int</span></span> {</span><br><span class="line">    res, start := <span class="number">0</span>, <span class="number">0</span> <span class="comment">// start 指针指向的是当前子串首字符在 input 中对应的index</span></span><br><span class="line">    lookup := <span class="keyword">map</span>[<span class="keyword">byte</span>]<span class="keyword">int</span>{}</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> i, _ := <span class="keyword">range</span> s {</span><br><span class="line">        idx, ok := lookup[s[i]]</span><br><span class="line">        <span class="keyword">if</span> !ok {</span><br><span class="line">            start = <span class="keyword">int</span>(math.Max(<span class="keyword">float64</span>(start), <span class="keyword">float64</span>(<span class="number">-1</span>+<span class="number">1</span>))) <span class="comment">// 找到当前子串新的起点</span></span><br><span class="line">        } <span class="keyword">else</span> {</span><br><span class="line">            start = <span class="keyword">int</span>(math.Max(<span class="keyword">float64</span>(start), <span class="keyword">float64</span>(idx+<span class="number">1</span>))) <span class="comment">// 找到当前子串新的起点</span></span><br><span class="line">        }</span><br><span class="line">        <span class="comment">// 第 start 到 i 个字符是一个极长的无重复字符子串</span></span><br><span class="line">        <span class="comment">// i-start+1 是当前字串从第 i 到 rk 个字符的长度</span></span><br><span class="line">        res = <span class="keyword">int</span>(math.Max(<span class="keyword">float64</span>(res), <span class="keyword">float64</span>(i-start+<span class="number">1</span>))) <span class="comment">// 当前子串满足条件了，更新结果</span></span><br><span class="line">        lookup[s[i]] = i                                      <span class="comment">// 将当前字符与其在 input 中的 index 记录下来</span></span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> res</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>s = “abcabcbb”<br>len(s) = 8<br>start, res := 0, 0</p>
+<p>i = 0<br>    lookup[s[i]] = lookup[“abcabcbb”[0]] = lookup[“a”]<br>    idx = 0, ok = false<br>    start = int(math.Max(float64(start), float64(-1+1)))<br>    start = int(math.Max(float64(0), float64(-1+1))) = 0<br>    res = int(math.Max(float64(res), float64(i-start+1)))<br>    res = int(math.Max(float64(0), float64(0-0+1))) = 1<br>    lookup[s[i]] = lookup[“a”] = i = 0</p>
+<p>i = 1<br>    lookup[s[i]] = lookup[“abcabcbb”[2]] = lookup[“c”]<br>    idx = 0, ok = false<br>    start = int(math.Max(float64(start), float64(-1+1)))<br>    start = int(math.Max(float64(0), float64(-1+1))) = 0<br>    res = int(math.Max(float64(res), float64(i-start+1)))<br>    res = int(math.Max(float64(1), float64(1-0+1))) = 2<br>    lookup[s[i]] = lookup[“b”] = i = 1</p>
+<p>i = 2<br>    lookup[s[i]] = lookup[“abcabcbb”[1]] = lookup[“b”]<br>    idx = 0, ok = false<br>    start = int(math.Max(float64(start), float64(-1+1)))<br>    start = int(math.Max(float64(0), float64(-1+1))) = 0<br>    res = int(math.Max(float64(res), float64(i-start+1)))<br>    res = int(math.Max(float64(2), float64(2-0+1))) = 3<br>    lookup[s[i]] = lookup[“c”] = i = 2</p>
+<p>i = 3<br>    lookup[s[i]] = lookup[“abcabcbb”[3]] = lookup[“a”]<br>    idx = 0, ok = true<br>    start = int(math.Max(float64(start), float64(idx+1)))<br>    start = int(math.Max(float64(0), float64(0+1))) = 1<br>    res = int(math.Max(float64(res), float64(i-start+1)))<br>    res = int(math.Max(float64(3), float64(3-1+1))) = 3<br>    lookup[s[i]] = lookup[“a”] = i = 3</p>
+<p>i = 4<br>    lookup[s[i]] = lookup[“abcabcbb”[4]] = lookup[“b”]<br>    idx = 1, ok = true<br>    start = int(math.Max(float64(start), float64(idx+1)))<br>    start = int(math.Max(float64(1), float64(1+1))) = 2<br>    res = int(math.Max(float64(res), float64(i-start+1)))<br>    res = int(math.Max(float64(3), float64(4-2+1))) = 3<br>    lookup[s[i]] = lookup[“b”] = i = 4</p>
+<p>i = 5<br>    lookup[s[i]] = lookup[“abcabcbb”[5]] = lookup[“c”]<br>    idx = 2, ok = true<br>    start = int(math.Max(float64(start), float64(idx+1)))<br>    start = int(math.Max(float64(1), float64(2+1))) = 3<br>    res = int(math.Max(float64(res), float64(i-start+1)))<br>    res = int(math.Max(float64(3), float64(5-3+1))) = 3<br>    lookup[s[i]] = lookup[“c”] = i = 5</p>
+<p>i = 6<br>    lookup[s[i]] = lookup[“abcabcbb”[6]] = lookup[“b”]<br>    idx = 4, ok = true<br>    start = int(math.Max(float64(start), float64(idx+1)))<br>    start = int(math.Max(float64(1), float64(4+1))) = 5<br>    res = int(math.Max(float64(res), float64(i-start+1)))<br>    res = int(math.Max(float64(3), float64(6-5+1))) = 3<br>    lookup[s[i]] = lookup[“b”] = i = 6</p>
+<p>i = 7<br>    lookup[s[i]] = lookup[“abcabcbb”[7]] = lookup[“b”]<br>    idx = 6, ok = true<br>    start = int(math.Max(float64(start), float64(idx+1)))<br>    start = int(math.Max(float64(1), float64(6+1))) = 7<br>    res = int(math.Max(float64(res), float64(i-start+1)))<br>    res = int(math.Max(float64(3), float64(7-7+1))) = 3<br>    lookup[s[i]] = lookup[“b”] = i = 7</p>
+<p>return ans = 3</p>
+<p>法三<br>对于一个字母 x</p>
+<p>start 当前找到的最长不含有重复字符的子串的开始</p>
+<ul>
+<li>lastOccurred[x]不存在，或者&lt;start → 无需操作</li>
+<li>lastOccurred[x] &gt;= start → 更新 start = lastOccurred[x+1]</li>
+<li>更新 lastOccurred[x]，更新 maxLength</li>
+</ul>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">lengthOfLongestSubstring</span><span class="params">(s <span class="keyword">string</span>)</span> <span class="title">int</span></span> {</span><br><span class="line">    <span class="comment">// 哈希集合，记录每个字符是否出现过</span></span><br><span class="line">    <span class="comment">// lastOccurred := make(map[byte]int)</span></span><br><span class="line">    lastOccurred := <span class="built_in">make</span>(<span class="keyword">map</span>[<span class="keyword">rune</span>]<span class="keyword">int</span>)</span><br><span class="line">    start := <span class="number">0</span></span><br><span class="line">    maxLength := <span class="number">0</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// for i, ch := range []byte(s) { // 不支持中文</span></span><br><span class="line">    <span class="comment">// for i, ch := range s { // 支持中文，一个中文字符算3个长度</span></span><br><span class="line">    <span class="keyword">for</span> i, ch := <span class="keyword">range</span> []<span class="keyword">rune</span>(s) { <span class="comment">// 支持中文，一个中文字符算1个长度</span></span><br><span class="line">        <span class="keyword">if</span> lastI, ok := lastOccurred[ch]; ok &amp;&amp; lastI &gt;= start {</span><br><span class="line">            start = lastI + <span class="number">1</span></span><br><span class="line">        }</span><br><span class="line">        <span class="keyword">if</span> i-start+<span class="number">1</span> &gt; maxLength {</span><br><span class="line">            maxLength = i - start + <span class="number">1</span></span><br><span class="line">        }</span><br><span class="line">        lastOccurred[ch] = i <span class="comment">// key唯一，如果有重复key会覆盖value</span></span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> maxLength</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    fmt.Println(</span><br><span class="line">        lengthOfLongestSubstring(<span class="string">"abcabcbb"</span>)) <span class="comment">// 3</span></span><br><span class="line">    fmt.Println(</span><br><span class="line">        lengthOfLongestSubstring(<span class="string">"bbbbb"</span>)) <span class="comment">// 1</span></span><br><span class="line">    fmt.Println(</span><br><span class="line">        lengthOfLongestSubstring(<span class="string">"pwwkew"</span>)) <span class="comment">// 3</span></span><br><span class="line">    fmt.Println(</span><br><span class="line">        lengthOfLongestSubstring(<span class="string">""</span>)) <span class="comment">// 0</span></span><br><span class="line">    fmt.Println(</span><br><span class="line">        lengthOfLongestSubstring(<span class="string">"b"</span>)) <span class="comment">// 1</span></span><br><span class="line">    fmt.Println(</span><br><span class="line">        lengthOfLongestSubstring(<span class="string">"abcdef"</span>)) <span class="comment">// 6</span></span><br><span class="line">    fmt.Println(</span><br><span class="line">        lengthOfLongestSubstring(<span class="string">"这里是慕课网"</span>)) <span class="comment">// 6</span></span><br><span class="line">    fmt.Println(</span><br><span class="line">        lengthOfLongestSubstring(<span class="string">"一二三二一"</span>)) <span class="comment">// 3</span></span><br><span class="line">    fmt.Println(</span><br><span class="line">        lengthOfLongestSubstring(</span><br><span class="line">            <span class="string">"黑化肥挥发发灰会花飞灰化肥挥发发黑会飞花"</span>)) <span class="comment">// 8</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestSubstr</span><span class="params">(t *testing.T)</span></span> {</span><br><span class="line">    tests := []<span class="keyword">struct</span> {</span><br><span class="line">        s   <span class="keyword">string</span></span><br><span class="line">        ans <span class="keyword">int</span></span><br><span class="line">    }{</span><br><span class="line">        <span class="comment">// Normal cases</span></span><br><span class="line">        {<span class="string">"abcabcbb"</span>, <span class="number">3</span>},</span><br><span class="line">        {<span class="string">"pwwkew"</span>, <span class="number">3</span>},</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Edge cases</span></span><br><span class="line">        {<span class="string">""</span>, <span class="number">0</span>},</span><br><span class="line">        {<span class="string">"b"</span>, <span class="number">1</span>},</span><br><span class="line">        {<span class="string">"bbbbbbbbb"</span>, <span class="number">1</span>},</span><br><span class="line">        {<span class="string">"abcabcabcd"</span>, <span class="number">4</span>},</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Chinese support</span></span><br><span class="line">        {<span class="string">"这里是慕课网"</span>, <span class="number">6</span>},</span><br><span class="line">        {<span class="string">"一二三二一"</span>, <span class="number">3</span>},</span><br><span class="line">        {<span class="string">"黑化肥挥发发灰会花飞灰化肥挥发发黑会飞花"</span>, <span class="number">8</span>},</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> _, tt := <span class="keyword">range</span> tests {</span><br><span class="line">        actual := lengthOfLongestSubstring(tt.s)</span><br><span class="line">        <span class="keyword">if</span> actual != tt.ans {</span><br><span class="line">            t.Errorf(<span class="string">"got %d for input %s; "</span>+<span class="string">"expected %d"</span>,</span><br><span class="line">                actual, tt.s, tt.ans)</span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line">--- ide ---</span><br><span class="line">=== RUN   TestSubstr</span><br><span class="line">--- PASS: TestSubstr (<span class="number">0.00</span>s)</span><br><span class="line">PASS</span><br><span class="line"></span><br><span class="line">--- 命令行 ---</span><br><span class="line">=== RUN   TestSubstr</span><br><span class="line">--- PASS: TestSubstr (<span class="number">0.00</span>s)</span><br><span class="line">PASS</span><br><span class="line">coverage: <span class="number">52.6</span>% of statements in ../../../../learngo/...</span><br><span class="line">ok      imooc.com/ccmouse/learngo/lang/container/nonrepeatingsubstr    <span class="number">0.042</span>s</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// BenchmarkXxx testing.B</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">BenchmarkSubstr</span><span class="params">(b *testing.B)</span></span> {</span><br><span class="line">    s := <span class="string">"黑化肥挥发发灰会花飞灰化肥挥发发黑会飞花"</span> <span class="comment">// 一般性能测试选择最复杂的那个用例</span></span><br><span class="line"></span><br><span class="line">    ans := <span class="number">8</span></span><br><span class="line">    <span class="comment">// 如果在这里做测试用的数据的生成，不想把这个时间加进去，可以在生成数据之后reset一下时间</span></span><br><span class="line">    b.ResetTimer()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> i := <span class="number">0</span>; i &lt; b.N; i++ {</span><br><span class="line">    <span class="comment">// 性能测试一般循环多次，具体不用我们定，用b.N系统自动帮我们确定多少次</span></span><br><span class="line">        actual := lengthOfLongestSubstring(s)</span><br><span class="line">        <span class="keyword">if</span> actual != ans {</span><br><span class="line">            b.Errorf(<span class="string">"got %d for input %s; "</span>+<span class="string">"expected %d"</span>,</span><br><span class="line">                actual, s, ans)</span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line">---</span><br><span class="line">BenchmarkSubstr</span><br><span class="line"># <span class="number">100000000</span>次    每次操作  <span class="number">0.512</span> ns</span><br><span class="line">BenchmarkSubstr<span class="number">-8</span>            <span class="number">100000000</span>次      <span class="number">0.512</span> ns/op</span><br><span class="line">PASS</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// BenchmarkXxx testing.B</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">BenchmarkSubstr</span><span class="params">(b *testing.B)</span></span> {</span><br><span class="line">    s := <span class="string">"黑化肥挥发发灰会花飞灰化肥挥发发黑会飞花"</span> <span class="comment">// 一般性能测试选择最复杂的那个用例</span></span><br><span class="line">    <span class="keyword">for</span> i := <span class="number">0</span>; i &lt; <span class="number">13</span>; i++ {</span><br><span class="line">        s = s + s</span><br><span class="line">    }</span><br><span class="line">    b.Logf(<span class="string">"len(s) = %d"</span>, <span class="built_in">len</span>(s))</span><br><span class="line">    ans := <span class="number">8</span></span><br><span class="line">    <span class="comment">// 如果在这里做测试用的数据的生成，不想把这个时间加进去，可以在生成数据之后reset一下时间</span></span><br><span class="line">    b.ResetTimer()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> i := <span class="number">0</span>; i &lt; b.N; i++ {</span><br><span class="line">    <span class="comment">// 性能测试一般循环多次，具体不用我们定，用b.N系统自动帮我们确定多少次</span></span><br><span class="line">        actual := lengthOfLongestSubstring(s)</span><br><span class="line">        <span class="keyword">if</span> actual != ans {</span><br><span class="line">            b.Errorf(<span class="string">"got %d for input %s; "</span>+<span class="string">"expected %d"</span>,</span><br><span class="line">                actual, s, ans)</span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line">---</span><br><span class="line">BenchmarkSubstr</span><br><span class="line">nonrepeating_test.<span class="keyword">go</span>:<span class="number">40</span>: <span class="built_in">len</span>(s) = <span class="number">491520</span></span><br><span class="line">nonrepeating_test.<span class="keyword">go</span>:<span class="number">40</span>: <span class="built_in">len</span>(s) = <span class="number">491520</span></span><br><span class="line">BenchmarkSubstr<span class="number">-8</span>            <span class="number">100</span>      <span class="number">17965116</span> ns/op</span><br><span class="line">PASS</span><br></pre></td></tr></tbody></table></figure>
+
+
+<figure class="highlight shell"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">PS C:\Users\rose\go\src\learngo\lang\container\nonrepeatingsubstr&gt; go test -bench .</span><br><span class="line">goos: windows</span><br><span class="line">goarch: amd64</span><br><span class="line">pkg: imooc.com/ccmouse/learngo/lang/container/nonrepeatingsubstr</span><br><span class="line">cpu: Intel(R) Core(TM) i5-8250U CPU @ 1.60GHz</span><br><span class="line">BenchmarkSubstr-8            200           5943632 ns/op</span><br><span class="line">--- BENCH: BenchmarkSubstr-8</span><br><span class="line">    nonrepeating_test.go:40: len(s) = 491520</span><br><span class="line">    nonrepeating_test.go:40: len(s) = 491520</span><br><span class="line">    nonrepeating_test.go:40: len(s) = 491520</span><br><span class="line">PASS</span><br><span class="line">ok      imooc.com/ccmouse/learngo/lang/container/nonrepeatingsubstr     1.837s</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight shell"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">PS C:\Users\rose\go\src\learngo\lang\container\nonrepeatingsubstr&gt; go test -bench . -cpuprofile cpu.out</span><br><span class="line">goos: windows</span><br><span class="line">goarch: amd64</span><br><span class="line">pkg: imooc.com/ccmouse/learngo/lang/container/nonrepeatingsubstr</span><br><span class="line">cpu: Intel(R) Core(TM) i5-8250U CPU @ 1.60GHz</span><br><span class="line">BenchmarkSubstr-8            171           7770656 ns/op</span><br><span class="line">--- BENCH: BenchmarkSubstr-8</span><br><span class="line">    nonrepeating_test.go:40: len(s) = 491520</span><br><span class="line">    nonrepeating_test.go:40: len(s) = 491520</span><br><span class="line">    nonrepeating_test.go:40: len(s) = 491520</span><br><span class="line">PASS</span><br><span class="line">ok      imooc.com/ccmouse/learngo/lang/container/nonrepeatingsubstr     2.277s</span><br></pre></td></tr></tbody></table></figure>
+
+<p>我们可以设立两层循环，外层循环对字符串进行整体遍历—代表子串的起始点i，内层循环从当前起始点开始往后遍历，并且将每一个当前遇到的字符存入哈希集合当中，根据哈希表的特点我们可以很快地找出哈希表中是否存在某个字符，当不存在的时候内存循环结束，同时在内层循环中我们还是需要维护一个右边界的指针r，每循环一次内层循环就加一，当内层循环结束时，就代表从外层循环选择的左边界i到内层循环维护的右边界指针r这个区间的字符串为当前起始点的无重复字符的最长子串，这时与最大值max进行比较赋值，当整个循环完成，这个max就是最大的长度。</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">lengthOfLongestSubstring</span><span class="params">(s <span class="keyword">string</span>)</span> <span class="title">int</span></span> {</span><br><span class="line">    <span class="comment">//存储当前最长不重复子串，用来查询下个字符是否存在</span></span><br><span class="line">    maps := <span class="keyword">map</span>[<span class="keyword">byte</span>]<span class="keyword">int</span>{}</span><br><span class="line">    <span class="comment">//r是子串的右置针，这里还没有还是移动所以初始化为-1</span></span><br><span class="line">    <span class="comment">//max记录最大的子串的长度</span></span><br><span class="line">    r, max := <span class="number">-1</span>, <span class="number">0</span></span><br><span class="line">    <span class="comment">//从头开始遍历字符串</span></span><br><span class="line">    <span class="keyword">for</span> i := <span class="number">0</span>; i &lt; <span class="built_in">len</span>(s); i++ {</span><br><span class="line">        <span class="comment">//当每一次外层循环结束就代表i++也就是待遍历子串的左边界加一，所以这个时候我们需要讲maps中</span></span><br><span class="line">        <span class="comment">//的最左字符删除</span></span><br><span class="line">        <span class="keyword">if</span> i &gt; <span class="number">0</span> {</span><br><span class="line">            <span class="built_in">delete</span>(maps, s[i<span class="number">-1</span>])</span><br><span class="line">        }</span><br><span class="line">        <span class="keyword">for</span> r &lt; <span class="built_in">len</span>(s)<span class="number">-1</span> &amp;&amp; maps[s[r+<span class="number">1</span>]] == <span class="number">0</span> {</span><br><span class="line">            maps[s[r+<span class="number">1</span>]] = <span class="number">1</span></span><br><span class="line">            r++</span><br><span class="line">        }</span><br><span class="line">        <span class="keyword">if</span> max &lt; r-i+<span class="number">1</span> {</span><br><span class="line">            max = r - i + <span class="number">1</span></span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> max</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+
+<hr>
+<h3 id="整数反转"><a href="#整数反转" class="headerlink" title="整数反转"></a>整数反转</h3><p>给你一个 32 位的有符号整数 x ，返回将 x 中的数字部分反转后的结果。</p>
+<p>如果反转后整数超过 32 位的有符号整数的范围 [−2^31,  2^31 − 1] = [-2147483648~2147483647]，就返回 0。</p>
+<p>假设环境不允许存储 64 位整数（有符号或无符号）。</p>
+<p>示例 1：</p>
+<figure class="highlight angelscript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：x = <span class="number">123</span></span><br><span class="line">输出：<span class="number">321</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>示例 2：</p>
+<figure class="highlight angelscript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：x = <span class="number">-123</span></span><br><span class="line">输出：<span class="number">-321</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>示例 3：</p>
+<figure class="highlight angelscript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：x = <span class="number">120</span></span><br><span class="line">输出：<span class="number">21</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>示例 4：</p>
+<figure class="highlight angelscript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：x = <span class="number">0</span></span><br><span class="line">输出：<span class="number">0</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>将一个有符号整数进行反转，也就是说 64 这个数字再反转后会变为 46 ，个位数反转到十位数，十位数反转到个位数。如果给出的整数是负数的话，整数的符号不能变。在这道题中我们要注意以下几点：</p>
+<ul>
+<li>整数会有负数的情况；</li>
+<li>最后一位是 0 的情况下要舍弃，例如 120 反转后为 21 。</li>
+</ul>
+<p>解题方案<br>思路1：时间复杂度: O(lgx) 空间复杂度: O(1)<br>翻转数字问题需要注意的就是溢出问题，为什么会存在溢出问题呢？</p>
+<p>int型的数值范围是 -2147483648～2147483647 (-2^31 ~ 2^31 - 1)，<br>那么如果我们要翻转 1000000009 这个在数值范围内的数，得到 9000000001，<br>但翻转后的数就超过了范围，这个情况就是溢出，这个时候程序返回 0 即可。</p>
+<p>如果输入的是负数，就递归调用原函数，参数变成 -x 即可，代码大致执行流程如下：</p>
+<ul>
+<li>首先判断 x 是否为负数，如果是负数先取绝对值然后递归取反，最后再将结果转换为负数即可；</li>
+<li>res 为最后结果，最开始等于 0 。x % 10(例如：123 % 10 = 3) 取出最后一位数。每次得到最后一位数字，并将其作为结果中的当前最高位；</li>
+<li>判断结果 res 是否溢出，如果溢出则返回 0 </li>
+</ul>
+<p>时刻注意特殊情况——为负数怎么办；为0怎么办；为空怎么办。<br>合理运用写完的函数，机智一点，不要碰到负数又去实现一个负数的版本，直接递归调用原函数就可以了</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">reverse</span>(<span class="params">self, x: int</span>) -&gt; int:</span></span><br><span class="line">        <span class="keyword">if</span> x &lt; <span class="number">0</span>: <span class="comment"># 判断是否为负数</span></span><br><span class="line">            <span class="keyword">return</span> -self.reverse(-x) <span class="comment"># 如果是负数则取绝对值调用自身，最后将结果转为负数</span></span><br><span class="line">        res = <span class="number">0</span></span><br><span class="line">        <span class="keyword">while</span> x: <span class="comment"># 每次得到最后一位数字，并将其作为结果中的当前最高位</span></span><br><span class="line">            res = res * <span class="number">10</span> + x % <span class="number">10</span></span><br><span class="line">            x //= <span class="number">10</span></span><br><span class="line">        <span class="keyword">return</span> res <span class="keyword">if</span> res &lt;= <span class="number">0x7fffffff</span> <span class="keyword">else</span> <span class="number">0</span> <span class="comment"># 如果溢出就返回0</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>x = 123</p>
+<p>res = 0 + 3 = 3<br>x = 123 // 10 = 12</p>
+<p>res = 3 * 10 + 12 % 10 = 32<br>x = 12 // 10 = 1</p>
+<p>res = 32 * 10 + 1 % 10 = 321<br>x = 1 // 10 = 0</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">reverse</span><span class="params">(x <span class="keyword">int</span>)</span> <span class="title">int</span></span> {</span><br><span class="line">    <span class="keyword">if</span> x &lt; <span class="number">0</span> { <span class="comment">// 如果是负数就取反递归再取反</span></span><br><span class="line">        <span class="keyword">return</span> -reverse(-x)</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    res := <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> x != <span class="number">0</span> { <span class="comment">// 每次得到最后一位数字，并将其作为结果中的当前最高位</span></span><br><span class="line">        res = res * <span class="number">10</span> + x % <span class="number">10</span></span><br><span class="line">        x /= <span class="number">10</span></span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">if</span> res &lt;= <span class="number">0x7fffffff</span> { <span class="comment">// 如果溢出就返回0</span></span><br><span class="line">        <span class="keyword">return</span> res</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<hr>
+<h3 id="整数转罗马数字"><a href="#整数转罗马数字" class="headerlink" title="整数转罗马数字"></a>整数转罗马数字</h3><p>罗马数字包含以下七种字符： I， V， X， L，C，D 和 M。</p>
+<figure class="highlight angelscript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">字符          数值</span><br><span class="line">I             <span class="number">1</span></span><br><span class="line">V             <span class="number">5</span></span><br><span class="line">X             <span class="number">10</span></span><br><span class="line">L             <span class="number">50</span></span><br><span class="line">C             <span class="number">100</span></span><br><span class="line">D             <span class="number">500</span></span><br><span class="line">M             <span class="number">1000</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>例如， 罗马数字 2 写做 II ，即为两个并列的 1。12 写做 XII ，即为 X + II 。 27 写做  XXVII, 即为 XX + V + II 。</p>
+<p>通常情况下，罗马数字中小的数字在大的数字的右边。但也存在特例，例如 4 不写做 IIII，而是 IV。数字 1 在数字 5 的左边，所表示的数等于大数 5 减小数 1 得到的数值 4 。同样地，数字 9 表示为 IX。这个特殊的规则只适用于以下六种情况：</p>
+<ul>
+<li>I 可以放在 V (5) 和 X (10) 的左边，来表示 4 和 9。</li>
+<li>X 可以放在 L (50) 和 C (100) 的左边，来表示 40 和 90。</li>
+<li>C 可以放在 D (500) 和 M (1000) 的左边，来表示 400 和 900。</li>
+</ul>
+<p>给你一个整数，将其转为罗马数字。</p>
+<p>示例 1:</p>
+<figure class="highlight dart"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入: <span class="built_in">num</span> = <span class="number">3</span></span><br><span class="line">输出: <span class="string">"III"</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>示例 2:</p>
+<figure class="highlight dart"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入: <span class="built_in">num</span> = <span class="number">4</span></span><br><span class="line">输出: <span class="string">"IV"</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>示例 3:</p>
+<figure class="highlight dart"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入: <span class="built_in">num</span> = <span class="number">9</span></span><br><span class="line">输出: <span class="string">"IX"</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>示例 4:</p>
+<figure class="highlight nix"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入: <span class="attr">num</span> = <span class="number">58</span></span><br><span class="line">输出: <span class="string">"LVIII"</span></span><br><span class="line">解释: <span class="attr">L</span> = <span class="number">50</span>, <span class="attr">V</span> = <span class="number">5</span>, <span class="attr">III</span> = <span class="number">3</span>.</span><br></pre></td></tr></tbody></table></figure>
+
+<p>示例 5:</p>
+<figure class="highlight nix"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入: <span class="attr">num</span> = <span class="number">1994</span></span><br><span class="line">输出: <span class="string">"MCMXCIV"</span></span><br><span class="line">解释: <span class="attr">M</span> = <span class="number">1000</span>, <span class="attr">CM</span> = <span class="number">900</span>, <span class="attr">XC</span> = <span class="number">90</span>, <span class="attr">IV</span> = <span class="number">4</span>.</span><br></pre></td></tr></tbody></table></figure>
+
+<p>详细的罗马数字计数规则如下：</p>
+<ul>
+<li>相同的数字连写，所表示的数等于这些数字相加得到的数，例如：III = 3；</li>
+<li>小的数字在大的数字右边，所表示的数等于这些数字相加得到的数，例如：VIII = 8；</li>
+<li>小的数字，限于（I、X 和 C）在大的数字左边，所表示的数等于大数减去小数所得的数，例如：IV = 4，这条规则好目前与本题无关；</li>
+<li>正常使用时，连续的数字重复不得超过三次；</li>
+<li>在一个数的上面画横线，表示这个数扩大 1000 倍（本题只考虑 3999 以内的数，所以用不到这条规则）；</li>
+<li>从前向后遍历罗马数字，如果某个数比前一个数小，则加上该数；反之，减去前一个数的两倍然后加上该数。</li>
+</ul>
+<p>我们可以将所有罗马数字的不同符号及对应整数放在字典中。但由于题目限制，正常使用时连续的数字重复不能超过三次，所以对于 400、40、4 或者是 900、90、9 这种情况我们直接单独列出来。</p>
+<p>注：之所以将 900、90、9 这三种情况列出是因为罗马数字中并没有单独表示 400 的字符存在，而且不允许DCD这样的情况出现。</p>
+<p>将罗马数字和对应整数以及各种特殊情况整合到字典中后，首先将字典按照对应罗马数字的对应整数值进行排序并遍历，每一项中的键 symbol 对应罗马数字符号 ，值 val 对应整数。</p>
+<p>如果 num 大于 val 则进入 while 循环，并将当前的罗马数字字符 symbol 拼接到最后结果 roman 中，然后 num - val ，每执行一次 while 循环重新判断 num &gt;= val。如果不满足则跳出 while 循环，执行下一次 for 循环。</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">intToRoman</span>(<span class="params">self, num: int</span>) -&gt; str:</span></span><br><span class="line">        lookup = {</span><br><span class="line">            <span class="string">'M'</span>: <span class="number">1000</span>,</span><br><span class="line">            <span class="string">'CM'</span>: <span class="number">900</span>,</span><br><span class="line">            <span class="string">'D'</span>: <span class="number">500</span>,</span><br><span class="line">            <span class="string">'CD'</span>: <span class="number">400</span>,</span><br><span class="line">            <span class="string">'C'</span>: <span class="number">100</span>,</span><br><span class="line">            <span class="string">'XC'</span>: <span class="number">90</span>,</span><br><span class="line">            <span class="string">'L'</span>: <span class="number">50</span>,</span><br><span class="line">            <span class="string">'XL'</span>: <span class="number">40</span>,</span><br><span class="line">            <span class="string">'X'</span>: <span class="number">10</span>,</span><br><span class="line">            <span class="string">'IX'</span>: <span class="number">9</span>,</span><br><span class="line">            <span class="string">'V'</span>: <span class="number">5</span>,</span><br><span class="line">            <span class="string">'IV'</span>: <span class="number">4</span>,</span><br><span class="line">            <span class="string">'I'</span>: <span class="number">1</span></span><br><span class="line">        }</span><br><span class="line">        roman = <span class="string">''</span></span><br><span class="line">        <span class="comment"># 因为dict本身是无序的，这里做了一个排序的操作，否则可能会出现IIII这种状况。</span></span><br><span class="line">        <span class="keyword">for</span> symbol, val <span class="keyword">in</span> sorted(lookup.items(), key=<span class="keyword">lambda</span> t: t[<span class="number">1</span>])[::<span class="number">-1</span>]:</span><br><span class="line">            <span class="keyword">while</span> num &gt;= val:</span><br><span class="line">                roman += symbol</span><br><span class="line">                num -= val</span><br><span class="line">        <span class="keyword">return</span> roman</span><br></pre></td></tr></tbody></table></figure>
+
+<p>以整数 3568 为例，3568 的对应罗马数字为：MMMDLXVIII</p>
+<p>第一次 for 循环 ————&gt; symbol = ‘M’ val = 1000 , num &gt;= val成立，进入 while 循环：<br>    第一次 while 循环：<br>        将 ‘M’ 拼接到 roman 中， num 减去当前 val ，此时 roman 为 ‘M’,num 为 2568<br>    第二次 while 循环：<br>        将 ‘M’ 拼接到 roman 中，num 减去当前 val ，此时 roman 为 ‘MM’,num 为 1568<br>    第三次 while 循环：<br>        将 ‘M’ 拼接到 roman 中，num 减去当前 val ，此时 roman 为 ‘MMM’,num 为 568                     num &gt;= val 不成立，退出 while 循环。<br>第二次 for 循环 ————&gt; symbol = ‘CM’ val = 900 , num &gt;= val不成立，不能进入 while 循环：<br>第三次 for 循环 ————&gt; symbol = ‘D’ val = 500 , num &gt;= val成立，进入 while 循环：<br>    第一次 while 循环：<br>        将 ‘D’ 拼接到 roman 中， num 减去当前 val ，此时 roman 为 ‘MMMD’,num 为 68<br>        num &gt;= val 不成立，退出 while 循环。<br>第四次 for 循环 ————&gt; symbol = ‘CD’ val = 400 , num &gt;= val不成立，不能进入 while 循环：<br>…………<br>第七次 for 循环 ————&gt; symbol = ‘L’ val = 50 , num &gt;= val成立，进入 while 循环：<br>    第一次 while 循环：<br>        将 ‘L’ 拼接到 roman 中， num 减去当前 val ，此时 roman 为 ‘MMMDL’,num 为 18<br>        num &gt;= val 不成立，退出 while 循环。<br>…………依次执行后得出结果为 MMMDLXVIII 。</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">intToRoman</span><span class="params">(num <span class="keyword">int</span>)</span> <span class="title">string</span></span> {</span><br><span class="line">    <span class="comment">// 初始化了一个一一对应的map，方便后面取出符号。</span></span><br><span class="line">    lookupSymbol := []<span class="keyword">string</span>{<span class="string">"M"</span>, <span class="string">"CM"</span>, <span class="string">"D"</span>, <span class="string">"CD"</span>, <span class="string">"C"</span>, <span class="string">"XC"</span>, <span class="string">"L"</span>, <span class="string">"XL"</span>, <span class="string">"X"</span>, <span class="string">"IX"</span>, <span class="string">"V"</span>, <span class="string">"IV"</span>, <span class="string">"I"</span>}</span><br><span class="line">    lookupNum := []<span class="keyword">int</span>{<span class="number">1000</span>, <span class="number">900</span>, <span class="number">500</span>, <span class="number">400</span>, <span class="number">100</span>, <span class="number">90</span>, <span class="number">50</span>, <span class="number">40</span>, <span class="number">10</span>, <span class="number">9</span>, <span class="number">5</span>, <span class="number">4</span>, <span class="number">1</span>}</span><br><span class="line">    roman := <span class="string">""</span></span><br><span class="line">    <span class="keyword">for</span> i, symbol := <span class="keyword">range</span> lookupSymbol {</span><br><span class="line">        val := lookupNum[i]</span><br><span class="line">        <span class="keyword">for</span> num &gt;= val {</span><br><span class="line">            roman += symbol</span><br><span class="line">            num -= val</span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> roman</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<hr>
+<h3 id="罗马数字转整数"><a href="#罗马数字转整数" class="headerlink" title="罗马数字转整数"></a>罗马数字转整数</h3><p>罗马数字包含以下七种字符: I， V， X， L，C，D 和 M。</p>
+<figure class="highlight angelscript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">字符          数值</span><br><span class="line">I             <span class="number">1</span></span><br><span class="line">V             <span class="number">5</span></span><br><span class="line">X             <span class="number">10</span></span><br><span class="line">L             <span class="number">50</span></span><br><span class="line">C             <span class="number">100</span></span><br><span class="line">D             <span class="number">500</span></span><br><span class="line">M             <span class="number">1000</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>例如， 罗马数字 2 写做 II ，即为两个并列的 1。12 写做 XII ，即为 X + II 。 27 写做  XXVII, 即为 XX + V + II 。</p>
+<p>通常情况下，罗马数字中小的数字在大的数字的右边。但也存在特例，例如 4 不写做 IIII，而是 IV。数字 1 在数字 5 的左边，所表示的数等于大数 5 减小数 1 得到的数值 4 。同样地，数字 9 表示为 IX。这个特殊的规则只适用于以下六种情况：</p>
+<p>I 可以放在 V (5) 和 X (10) 的左边，来表示 4 和 9。<br>X 可以放在 L (50) 和 C (100) 的左边，来表示 40 和 90。<br>C 可以放在 D (500) 和 M (1000) 的左边，来表示 400 和 900。<br>给定一个罗马数字，将其转换成整数。输入确保在 1 到 3999 的范围内。</p>
+<p>示例 1:</p>
+<figure class="highlight makefile"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">输入: "III"</span></span><br><span class="line"><span class="section">输出: 3</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>示例 2:</p>
+<figure class="highlight makefile"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">输入: "IV"</span></span><br><span class="line"><span class="section">输出: 4</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>示例 3:</p>
+<figure class="highlight makefile"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">输入: "IX"</span></span><br><span class="line"><span class="section">输出: 9</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>示例 4:</p>
+<figure class="highlight angelscript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入: <span class="string">"LVIII"</span></span><br><span class="line">输出: <span class="number">58</span></span><br><span class="line">解释: L = <span class="number">50</span>, V= <span class="number">5</span>, III = <span class="number">3.</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>示例 5:</p>
+<figure class="highlight angelscript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入: <span class="string">"MCMXCIV"</span></span><br><span class="line">输出: <span class="number">1994</span></span><br><span class="line">解释: M = <span class="number">1000</span>, CM = <span class="number">900</span>, XC = <span class="number">90</span>, IV = <span class="number">4.</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>提示：</p>
+<p>1 &lt;= s.length &lt;= 15<br>s 仅含字符 (‘I’, ‘V’, ‘X’, ‘L’, ‘C’, ‘D’, ‘M’)<br>题目数据保证 s 是一个有效的罗马数字，且表示整数在范围 [1, 3999] 内<br>题目所给测试用例皆符合罗马数字书写规则，不会出现跨位等情况。<br>IL 和 IM 这样的例子并不符合题目要求，49 应该写作 XLIX，999 应该写作 CMXCIX 。<br>关于罗马数字的详尽书写规则，可以参考 罗马数字 - Mathematics 。<br>通过次数467,201提交次数739,123</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">```</span><br><span class="line"></span><br><span class="line">```go</span><br></pre></td></tr></tbody></table></figure><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -459,7 +1063,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-09-17 07:54:56" itemprop="dateModified" datetime="2021-09-17T07:54:56Z">2021-09-17</time>
+        <time title="修改时间：2021-09-23 14:52:10" itemprop="dateModified" datetime="2021-09-23T14:52:10Z">2021-09-23</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -767,7 +1371,9 @@
 <p><img src="./go%E7%9A%84http/24.png" alt="description"></p>
 <figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    http.HandleFunc(<span class="string">"/"</span>, home)</span><br><span class="line">    http.HandleFunc(<span class="string">"/body/once"</span>, readBodyOnce)</span><br><span class="line">    http.HandleFunc(<span class="string">"/body/multi"</span>, getBodyIsNil)</span><br><span class="line">    http.HandleFunc(<span class="string">"/url/query"</span>, queryParams)</span><br><span class="line">    http.HandleFunc(<span class="string">"/header"</span>, header)</span><br><span class="line">    http.HandleFunc(<span class="string">"/wholeUrl"</span>, wholeUrl)</span><br><span class="line">    http.HandleFunc(<span class="string">"/form"</span>, form)</span><br><span class="line">    <span class="keyword">if</span> err := http.ListenAndServe(<span class="string">":8080"</span>, <span class="literal">nil</span>); err != <span class="literal">nil</span> {</span><br><span class="line">        <span class="built_in">panic</span>(err)</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
 
-<script>
+
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    serve := http.FileServer(http.Dir(<span class="string">"."</span>))</span><br><span class="line">    <span class="comment">//http.Handle("/", serve)</span></span><br><span class="line">    http.ListenAndServe(<span class="string">":8080"</span>, serve)</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure><script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
@@ -842,7 +1448,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-09-20 12:04:46" itemprop="dateModified" datetime="2021-09-20T12:04:46Z">2021-09-20</time>
+        <time title="修改时间：2021-09-22 00:52:05" itemprop="dateModified" datetime="2021-09-22T00:52:05Z">2021-09-22</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -932,13 +1538,22 @@
 <p>因为需要封装的原因，所以一个结构体中的方法必须在一个包内定义。也就是说，如果结构体定义在了包A中，那么它对应的方法也必须都定义在包A中，不可以在别的包中定义，这样就破坏了封装的概念。但是可以是不同的文件，即可以在同一个包中的不同源文件中定义结构体的方法。</p>
 <h3 id="匿名引用格式"><a href="#匿名引用格式" class="headerlink" title="匿名引用格式"></a>匿名引用格式</h3><p>在执行 main 包的 mian 函数之前， Go 引导程序会先对整个程序的包进行初始化。</p>
 <p>Go语言包的初始化有如下特点：<br>包初始化程序从 main 函数引用的包开始，逐级查找包的引用，直到找到没有引用其他包的包，最终生成一个包引用的有向无环图。<br>Go 编译器会将有向无环图转换为一棵树，然后从树的叶子节点开始逐层向上对包进行初始化。</p>
+<p>init 方法</p>
+<ul>
+<li>无参数</li>
+<li>无返回值</li>
+<li>包被引入的时候执行，只执行一次！</li>
+<li>执行顺序不定（目前是按照所在文件名排序）</li>
+<li>一个包，一个文件内都可以有多个 init 函数，包加载时会执行全部的 init 函数，但并不能保证执行顺序，所以不建议在一个包中放入多个 init 函数，将需要初始化的逻辑放到一个 init 函数里面。</li>
+</ul>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></tbody></table></figure>
+
 <p>-当前包引入其他包，优先调用其他包的全局变量，init()函数（如果其他包也调用 了init()函数，则继续向上调用），再调用本包的init()函数</p>
 <p>单个包的初始化过程执行顺序:初始化常量–》全局变量-》init()-&gt;main()</p>
-<p>导包<code>_</code>的作用是:当导入一个包的时候，该包的init和其他函数都会被导入，go语言编译器会自动调用，init函数自动执行，不需要显示调用<br>在定义的时候不能有任何的参数与返回值<br>匿名引用导入包使用也不会报错<br>引用某个包时，如果只是希望执行包初始化的init函数，而不使用包内部的数据时，可以使用匿名引用格，也会和其他包一样编译到可执行文件中</p>
+<p>导包<code>_</code>的作用是:当导入一个包的时候，该包的init和其他函数都会被导入，go语言编译器会自动调用，init函数自动执行，不需要显示调用</p>
+<p>匿名引用导入包使用也不会报错<br>引用某个包时，如果只是希望执行包初始化的init函数，而不使用包内部的数据时，可以使用匿名引用格，也会和其他包一样编译到可执行文件中</p>
 <ul>
 <li><p>一般用于初始化工具，比如连接数据库</p>
-</li>
-<li><p>一个包可以有多个 init 函数，包加载时会执行全部的 init 函数，但并不能保证执行顺序，所以不建议在一个包中放入多个 init 函数，将需要初始化的逻辑放到一个 init 函数里面。</p>
 </li>
 <li><p>包不能出现环形引用的情况，比如包 a 引用了包 b，包 b 引用了包 c，如果包 c 又引用了包 a，则编译不能通过。</p>
 </li>
@@ -1276,360 +1891,6 @@
 <p>“正统”函数编程<br>不可变性：不能有状态，只有常量和函数<br>函数只能有一个参数<br>修改为正统函数式编程</p>
 <figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> iAdder <span class="function"><span class="keyword">func</span><span class="params">(<span class="keyword">int</span>)</span> <span class="params">(<span class="keyword">int</span>, iAdder)</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">adder2</span><span class="params">(base <span class="keyword">int</span>)</span> <span class="title">iAdder</span></span> {</span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">func</span><span class="params">(v <span class="keyword">int</span>)</span> <span class="params">(<span class="keyword">int</span>, iAdder)</span></span> {</span><br><span class="line">        <span class="keyword">return</span> base + v, adder2(base + v)</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line">    b := adder2(<span class="number">0</span>)</span><br><span class="line">    <span class="keyword">for</span> i := <span class="number">0</span>; i &lt; <span class="number">10</span>; i++ {</span><br><span class="line">        <span class="keyword">var</span> s <span class="keyword">int</span></span><br><span class="line">        s, b = b(i)</span><br><span class="line">        fmt.Printf(<span class="string">"0 + 1 + ... + %d = %d\n"</span>, i, s)</span><br><span class="line">    }</span><br><span class="line">---</span><br><span class="line"><span class="number">0</span> + <span class="number">1</span> + ... + <span class="number">0</span> = <span class="number">0</span></span><br><span class="line"><span class="number">0</span> + <span class="number">1</span> + ... + <span class="number">1</span> = <span class="number">1</span></span><br><span class="line"><span class="number">0</span> + <span class="number">1</span> + ... + <span class="number">2</span> = <span class="number">3</span></span><br><span class="line"><span class="number">0</span> + <span class="number">1</span> + ... + <span class="number">3</span> = <span class="number">6</span></span><br><span class="line"><span class="number">0</span> + <span class="number">1</span> + ... + <span class="number">4</span> = <span class="number">10</span></span><br><span class="line"><span class="number">0</span> + <span class="number">1</span> + ... + <span class="number">5</span> = <span class="number">15</span></span><br><span class="line"><span class="number">0</span> + <span class="number">1</span> + ... + <span class="number">6</span> = <span class="number">21</span></span><br><span class="line"><span class="number">0</span> + <span class="number">1</span> + ... + <span class="number">7</span> = <span class="number">28</span></span><br><span class="line"><span class="number">0</span> + <span class="number">1</span> + ... + <span class="number">8</span> = <span class="number">36</span></span><br><span class="line"><span class="number">0</span> + <span class="number">1</span> + ... + <span class="number">9</span> = <span class="number">45</span></span><br></pre></td></tr></tbody></table></figure>
 <script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/07/16/go-de-aop/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/07/16/go-de-aop/" class="post-title-link" itemprop="url">go的aop</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-07-15 16:21:41" itemprop="dateCreated datePublished" datetime="2021-07-15T16:21:41Z">2021-07-15</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-09-20 03:04:18" itemprop="dateModified" datetime="2021-09-20T03:04:18Z">2021-09-20</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/go/" itemprop="url" rel="index"><span itemprop="name">go</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>AOP：用闭包来实现责任链<br>• 为 server 支持一些 AOP逻辑<br>• AOP：横向关注点，一般用于解决 Log, tracing，metric，熔断，限流等<br>• filter：我们希望请求在真正被处理之前能够经过一大堆的 filter</p>
-<p>责任链是很常见的用于解决 AOP 的一种方式。<br>2. 类似的也叫做 middleware, interceptor… 本质是一样的<br>3. Go 函数是一等公民，所以可以考虑用闭包来实现责任链<br>4. filter 很常见，比如说鉴权，日志，tracing，以及跨域等都可以用 filter 来实现</p>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/07/15/go-zuo-yong-yu/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/07/15/go-zuo-yong-yu/" class="post-title-link" itemprop="url">go作用域</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-07-14 16:21:41" itemprop="dateCreated datePublished" datetime="2021-07-14T16:21:41Z">2021-07-14</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-07-15 10:22:23" itemprop="dateModified" datetime="2021-07-15T10:22:23Z">2021-07-15</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/go/" itemprop="url" rel="index"><span itemprop="name">go</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>任何一种编程中，作用域是程序中定义的变量所存在的区域，超过该区域变量就不能被访问。</p>
-<p>变量的作用域由变量的定义位置决定，在不同位置定义的变量，它的作用域是不一样的。<br>作用域（Scope）为已声明标识符所表示的常量、类型、变量、函数或包在源代码中的作用范围。权限的概念，可见性就是变量可以在哪个范围以内使用。有些变量可以在所有代码文件中使用，有些变量只能在当前的文件中使用，有些变量只能在函数内部使用，有些变量只能在 for 循环内部使用。</p>
-<p>Go 语言中变量可以在三个地方声明：</p>
-<h3 id="局部变量-（Local-Variable）"><a href="#局部变量-（Local-Variable）" class="headerlink" title="局部变量 （Local Variable）"></a>局部变量 （Local Variable）</h3><p>函数体内定义的变量，作用域只在函数体内有效，在函数外部是不可知的。<br>函数的参数和返回值变量也是局部变量。<br>局部变量不是一直存在的，它只在定义它的函数被调用后存在，函数调用结束后这个局部变量定义的内存空间就会被释放。销毁。</p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 声明局部变量 */</span></span><br><span class="line"><span class="keyword">var</span> a, b, c <span class="keyword">int</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 初始化参数 */</span></span><br><span class="line">a = <span class="number">10</span></span><br><span class="line">b = <span class="number">20</span></span><br><span class="line">c = a + b</span><br><span class="line"></span><br><span class="line">fmt.Printf(<span class="string">"结果： a = %d, b = %d and c = %d\n"</span>, a, b, c)</span><br><span class="line"><span class="comment">// 结果： a = 10, b = 20 and c = 30</span></span><br></pre></td></tr></tbody></table></figure>
-
-<h3 id="全局变量"><a href="#全局变量" class="headerlink" title="全局变量"></a>全局变量</h3><p>在函数体外定义声明的变量，全局变量只需要在一个源文件中定义声明后，就可以在整个程序所有源文件中使用，<br>可以在整个包甚至外部包（被导出后）不包含这个全局变量的源文件需要使用“import”关键字引入全局变量所在的源文件之后才能使用这个全局变量。<br>在整个程序生命周期内都是有效的，在任意的函数内部能访问全局变量。</p>
-<p>全局变量声明必须以 var 关键字开头，如果想要在外部包中使用全局变量的首字母必须大写。</p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 声明全局变量 */</span></span><br><span class="line"><span class="keyword">var</span> g <span class="keyword">int</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">   <span class="comment">/* 声明局部变量 */</span></span><br><span class="line">    <span class="keyword">var</span> a, b <span class="keyword">int</span></span><br><span class="line">    <span class="comment">/* 初始化参数 */</span></span><br><span class="line">    a = <span class="number">10</span></span><br><span class="line">    b = <span class="number">20</span></span><br><span class="line">    g = a + b</span><br><span class="line">    fmt.Printf(<span class="string">"结果： a = %d, b = %d and g = %d\n"</span>, a, b, g)</span><br><span class="line">    <span class="comment">// 结果： a = 10, b = 20 and g = 30</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p>Go 语言程序中全局变量与局部变量名称可以相同，但是函数内的局部变量会被优先考虑</p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 声明全局变量 */</span></span><br><span class="line"><span class="keyword">var</span> g <span class="keyword">int</span> = <span class="number">20</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="comment">/* 声明局部变量 */</span></span><br><span class="line">    <span class="keyword">var</span> g <span class="keyword">int</span> = <span class="number">30</span></span><br><span class="line">    fmt.Printf(<span class="string">"结果： g = %d\n"</span>, g) <span class="comment">// 结果： g = 30</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<h3 id="形式参数"><a href="#形式参数" class="headerlink" title="形式参数"></a>形式参数</h3><p>在定义函数时函数名后面括号中的变量<br>会作为函数体内的局部变量。<br>默认情况下，Go 语言使用的是值传递，即在调用过程中不会影响到实际参数。<br>如果与全局变量同名它们会优先使用。</p>
-<p>形式参数只在函数调用时才会生效，函数调用结束后就会被销毁，在函数未被调用时，函数的形参并不占用实际的存储单元，也没有实际值。</p>
-<h4 id="函数值传递"><a href="#函数值传递" class="headerlink" title="函数值传递"></a>函数值传递</h4><p>指在调用函数时将实际参数复制一份传递到函数中，这样在函数中如果对参数进行修改，将不会影响到实际参数。</p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 声明全局变量 */</span></span><br><span class="line"><span class="keyword">var</span> a <span class="keyword">int</span> = <span class="number">20</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="comment">/* main 函数中声明局部变量 */</span></span><br><span class="line">    <span class="keyword">var</span> a <span class="keyword">int</span> = <span class="number">10</span></span><br><span class="line">    <span class="keyword">var</span> b <span class="keyword">int</span> = <span class="number">20</span></span><br><span class="line">    <span class="keyword">var</span> c <span class="keyword">int</span> = <span class="number">0</span></span><br><span class="line"></span><br><span class="line">    fmt.Printf(<span class="string">"main()函数中 a = %d\n"</span>, a)</span><br><span class="line">    <span class="comment">// main()函数中 a = 10</span></span><br><span class="line">    c = sum(a, b)</span><br><span class="line">    <span class="comment">// sum() 函数中 a = 10</span></span><br><span class="line">    <span class="comment">// sum() 函数中 b = 20</span></span><br><span class="line">    fmt.Printf(<span class="string">"main()函数中 c = %d\n"</span>, c)</span><br><span class="line">    <span class="comment">// main()函数中 c = 30</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 函数定义-两数相加 */</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">sum</span><span class="params">(a, b <span class="keyword">int</span>)</span> <span class="title">int</span></span> {</span><br><span class="line">    fmt.Printf(<span class="string">"sum() 函数中 a = %d\n"</span>, a)</span><br><span class="line">    fmt.Printf(<span class="string">"sum() 函数中 b = %d\n"</span>, b)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> a + b</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">testScope</span><span class="params">(args <span class="keyword">int</span>)</span></span> {</span><br><span class="line">    args = <span class="number">100</span></span><br><span class="line">    fmt.Println(args)</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> args <span class="keyword">int</span></span><br><span class="line">    testScope(args) <span class="comment">// 100</span></span><br><span class="line">    fmt.Println(args) <span class="comment">// 0</span></span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">add</span><span class="params">(params ...<span class="keyword">int</span>)</span> <span class="params">(sum <span class="keyword">int</span>)</span></span> {</span><br><span class="line">    <span class="keyword">for</span> _, v := <span class="keyword">range</span> params {</span><br><span class="line">        sum += v</span><br><span class="line">    }</span><br><span class="line">    params[<span class="number">0</span>] = <span class="number">9</span> <span class="comment">// 值传递不影响</span></span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line">}</span><br><span class="line">    fmt.Println(add(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>)) <span class="comment">// 15</span></span><br></pre></td></tr></tbody></table></figure>
-
-<h4 id="函数引用传递"><a href="#函数引用传递" class="headerlink" title="函数引用传递"></a>函数引用传递</h4><p>在调用函数时将实际参数的地址传递到函数中，那么在函数中对参数所进行的修改，将影响到实际参数。</p>
-<p>引用传递指针参数传递到函数内，</p>
-<h2 id="变量的生命周期"><a href="#变量的生命周期" class="headerlink" title="变量的生命周期"></a>变量的生命周期</h2><p>在程序运行期间变量有效存在的时间间隔。</p>
-<p>变量的生命周期与变量的作用域有着不可分割的联系：</p>
-<ul>
-<li>全局变量：它的生命周期和整个程序的运行周期是一致的；</li>
-<li>局部变量：它的生命周期则是动态的，从创建这个变量的声明语句开始，到这个变量不再被引用为止；</li>
-<li>形式参数和函数返回值：它们都属于局部变量，在函数被调用的时候创建，函数调用结束后被销毁。</li>
-</ul>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> t := <span class="number">0.0</span>; t &lt; cycles*<span class="number">2</span>*math.Pi; t += res {</span><br><span class="line">    x := math.Sin(t)</span><br><span class="line">    y := math.Sin(t*freq + phase)</span><br><span class="line">    img.SetColorIndex(</span><br><span class="line">        size+<span class="keyword">int</span>(x*size+<span class="number">0.5</span>), size+<span class="keyword">int</span>(y*size+<span class="number">0.5</span>),</span><br><span class="line">        blackIndex, <span class="comment">// 最后插入的逗号不会导致编译错误，这是Go编译器的一个特性</span></span><br><span class="line">    )               <span class="comment">// 小括号另起一行缩进，和大括号的风格保存一致</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p>上面代码中，在每次循环的开始会创建临时变量 t，然后在每次循环迭代中创建临时变量 x 和 y。临时变量 x、y 存放在栈中，随着函数执行结束（执行遇到最后一个}），释放其内存。</p>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/07/14/go-di-gui-han-shu/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/07/14/go-di-gui-han-shu/" class="post-title-link" itemprop="url">go递归函数</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-07-13 16:21:41" itemprop="dateCreated datePublished" datetime="2021-07-13T16:21:41Z">2021-07-13</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-08-14 01:11:12" itemprop="dateModified" datetime="2021-08-14T01:11:12Z">2021-08-14</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/go/" itemprop="url" rel="index"><span itemprop="name">go</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>递归函数指的是在运行的过程中函数内部调用函数自身的函数，<br>从数学解题思路来说，递归就是把一个大问题拆分成多个小问题，再各个击破，在实际开发过程中，递归函数可以解决许多数学问题，</p>
-<p>递归函数 在一个循环体当中执行，必须有一个条件可以在满足某个条件时终止当前的循环，否则为死循环</p>
-<p>构成递归需要具备以下条件：</p>
-<ul>
-<li>一个问题可以被拆分成多个子问题；</li>
-<li>拆分前的原问题与拆分后的子问题除了数据规模不同，但处理问题的思路是一样的；</li>
-<li>不能无限制的调用本身，子问题需要有退出递归状态的条件。<br>注意：编写递归函数时，一定要有终止条件，否则就会无限调用下去，直到内存溢出。</li>
-</ul>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">recursion</span><span class="params">()</span></span> {</span><br><span class="line">   recursion() <span class="comment">/* 函数调用自身 */</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">   recursion()</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<h3 id="斐波那契数列"><a href="#斐波那契数列" class="headerlink" title="斐波那契数列"></a>斐波那契数列</h3><p>位置     值<br>1        1<br>2        1<br>3        2<br>4        3<br>..    ..<br>n    func(n-1) + func(n-2)</p>
-<p>传递一个位置，返回当前位置的值</p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    result := <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> i := <span class="number">1</span>; i &lt;= <span class="number">5</span>; i++ {</span><br><span class="line">        result = fibonacci(i)</span><br><span class="line">        fmt.Printf(<span class="string">"fibonacci(%d) is: %d\n"</span>, i, result)</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">fibonacci</span><span class="params">(n <span class="keyword">int</span>)</span> <span class="params">(res <span class="keyword">int</span>)</span></span> {</span><br><span class="line">    <span class="keyword">if</span> n &lt;= <span class="number">2</span> {</span><br><span class="line">        res = <span class="number">1</span> <span class="comment">// res = n</span></span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        res = fibonacci(n<span class="number">-1</span>) + fibonacci(n<span class="number">-2</span>)</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">fibonacci</span><span class="params">(n <span class="keyword">int</span>)</span> <span class="title">int</span></span> {</span><br><span class="line">    <span class="keyword">if</span> n &lt; <span class="number">2</span> {</span><br><span class="line">        <span class="keyword">return</span> n</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> fibonacci(n<span class="number">-2</span>) + fibonacci(n<span class="number">-1</span>)</span><br><span class="line">}</span><br><span class="line">---</span><br><span class="line">fibonacci(<span class="number">1</span>) is: <span class="number">1</span></span><br><span class="line">fibonacci(<span class="number">2</span>) is: <span class="number">1</span></span><br><span class="line">fibonacci(<span class="number">3</span>) is: <span class="number">2</span></span><br><span class="line">fibonacci(<span class="number">4</span>) is: <span class="number">3</span></span><br><span class="line">fibonacci(<span class="number">5</span>) is: <span class="number">5</span></span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Fibonacci</span><span class="params">()</span> <span class="title">func</span><span class="params">()</span> <span class="title">int</span></span> {</span><br><span class="line">    a, b := <span class="number">0</span>, <span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">func</span><span class="params">()</span> <span class="title">int</span></span> { <span class="comment">// 闭包</span></span><br><span class="line">        a, b = b, a+b</span><br><span class="line">        <span class="keyword">return</span> a</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    f := fibonacci()</span><br><span class="line">    <span class="built_in">println</span>(f()) <span class="comment">// 1</span></span><br><span class="line">    <span class="built_in">println</span>(f()) <span class="comment">// 1</span></span><br><span class="line">    <span class="built_in">println</span>(f()) <span class="comment">// 2</span></span><br><span class="line">    <span class="built_in">println</span>(f()) <span class="comment">// 3</span></span><br><span class="line">    <span class="built_in">println</span>(f()) <span class="comment">// 5</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"fmt"</span></span><br><span class="line">    <span class="string">"io"</span></span><br><span class="line">    <span class="string">"bufio"</span></span><br><span class="line">    <span class="string">"strings"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Fibonacci</span><span class="params">()</span> <span class="title">intGen</span></span> {</span><br><span class="line">    a, b := <span class="number">0</span>, <span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">func</span><span class="params">()</span> <span class="title">int</span></span> {</span><br><span class="line">        a, b = b, a+b</span><br><span class="line">        <span class="keyword">return</span> a</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> intGen <span class="function"><span class="keyword">func</span><span class="params">()</span> <span class="title">int</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 函数作为接收者类型也就是作为参数实现Read接口</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(g intGen)</span> <span class="title">Read</span><span class="params">(p []<span class="keyword">byte</span>)</span> <span class="params">(n <span class="keyword">int</span>, err error)</span></span> {</span><br><span class="line">    next := g()</span><br><span class="line">    <span class="keyword">if</span> next &gt; <span class="number">200</span> {</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>, io.EOF</span><br><span class="line">    }</span><br><span class="line">    s := fmt.Sprintf(<span class="string">"%d\n"</span>, next)</span><br><span class="line">    <span class="keyword">return</span> strings.NewReader(s).Read(p) <span class="comment">// 找个代理帮助我们读取</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">printFileContents</span><span class="params">(reader io.Reader)</span></span> {</span><br><span class="line">    scanner := bufio.NewScanner(reader)</span><br><span class="line">    <span class="keyword">for</span> scanner.Scan() {</span><br><span class="line">        fmt.Println(scanner.Text())</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="keyword">var</span> f intGen = Fibonacci()</span><br><span class="line">    printFileContents(f)</span><br><span class="line">}</span><br><span class="line">---</span><br><span class="line"><span class="number">1</span></span><br><span class="line"><span class="number">1</span></span><br><span class="line"><span class="number">2</span></span><br><span class="line"><span class="number">3</span></span><br><span class="line"><span class="number">5</span></span><br><span class="line"><span class="number">8</span></span><br><span class="line"><span class="number">13</span></span><br><span class="line"><span class="number">21</span></span><br><span class="line"><span class="number">34</span></span><br><span class="line"><span class="number">55</span></span><br><span class="line"><span class="number">89</span></span><br><span class="line"><span class="number">144</span></span><br></pre></td></tr></tbody></table></figure>
-
-<h3 id="数字阶乘"><a href="#数字阶乘" class="headerlink" title="数字阶乘"></a>数字阶乘</h3><p>一个正整数的阶乘（factorial）是所有小于及等于该数的正整数的积，并且 0 的阶乘为 1，自然数 n 的阶乘写作n!</p>
-<p>例如，n!=1×2×3×…×n，阶乘亦可以递归方式定义：0!=1，n!=(n-1)!×n。</p>
-<p>使用递归函数计算给定数的阶乘，示例代码如下所示：</p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Factorial</span><span class="params">(n <span class="keyword">uint64</span>)</span> <span class="params">(result <span class="keyword">uint64</span>)</span></span> {</span><br><span class="line">    <span class="keyword">if</span> n &gt; <span class="number">0</span> {</span><br><span class="line">        result = n * Factorial(n<span class="number">-1</span>)</span><br><span class="line">        <span class="keyword">return</span> result</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span></span><br><span class="line">}</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="keyword">var</span> i <span class="keyword">int</span> = <span class="number">10</span></span><br><span class="line">    fmt.Printf(<span class="string">"%d 的阶乘是 %d\n"</span>, i, Factorial(<span class="keyword">uint64</span>(i)))</span><br><span class="line">}</span><br><span class="line">---</span><br><span class="line"><span class="number">10</span> 的阶乘是 <span class="number">3628800</span></span><br></pre></td></tr></tbody></table></figure>
-
-<h3 id="多个函数组成递归"><a href="#多个函数组成递归" class="headerlink" title="多个函数组成递归"></a>多个函数组成递归</h3><p>Go语言中也可以使用相互调用的递归函数，多个函数之间相互调用形成闭环，因为Go语言编译器的特殊性，这些函数的声明顺序可以是任意的，下面这个简单的例子展示了函数 odd 和 even 之间的相互调用：</p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"fmt"</span></span><br><span class="line">)</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    fmt.Printf(<span class="string">"%d is even: is %t\n"</span>, <span class="number">16</span>, even(<span class="number">16</span>)) <span class="comment">// 16 is even: is true</span></span><br><span class="line">    fmt.Printf(<span class="string">"%d is odd: is %t\n"</span>, <span class="number">17</span>, odd(<span class="number">17</span>))</span><br><span class="line">    <span class="comment">// 17 is odd: is true</span></span><br><span class="line">    fmt.Printf(<span class="string">"%d is odd: is %t\n"</span>, <span class="number">18</span>, odd(<span class="number">18</span>))</span><br><span class="line">    <span class="comment">// 18 is odd: is false</span></span><br><span class="line">}</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">even</span><span class="params">(nr <span class="keyword">int</span>)</span> <span class="title">bool</span></span> {</span><br><span class="line">    <span class="keyword">if</span> nr == <span class="number">0</span> {</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> odd(RevSign(nr) - <span class="number">1</span>)</span><br><span class="line">}</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">odd</span><span class="params">(nr <span class="keyword">int</span>)</span> <span class="title">bool</span></span> {</span><br><span class="line">    <span class="keyword">if</span> nr == <span class="number">0</span> {</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> even(RevSign(nr) - <span class="number">1</span>)</span><br><span class="line">}</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">RevSign</span><span class="params">(nr <span class="keyword">int</span>)</span> <span class="title">int</span></span> {</span><br><span class="line">    <span class="keyword">if</span> nr &lt; <span class="number">0</span> {</span><br><span class="line">        <span class="keyword">return</span> -nr</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> nr</span><br><span class="line">}</span><br><span class="line">---</span><br><span class="line"><span class="number">16</span> is even: is <span class="literal">true</span></span><br><span class="line"><span class="number">17</span> is odd: is <span class="literal">true</span></span><br><span class="line"><span class="number">18</span> is odd: is <span class="literal">false</span></span><br></pre></td></tr></tbody></table></figure>
-
-
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></tbody></table></figure><script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }

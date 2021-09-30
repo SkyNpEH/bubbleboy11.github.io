@@ -28,7 +28,7 @@
 <meta property="og:description" content="包管理 1.12之前 go的没有包管理 python java maven go modules 包package：工程项目当中根据不同工作模块建立的不同的文件夹 Go 语言的源码复用建立在包（package）基础之上。Go语言是使用包来组织源代码的，包（package）是多个 Go 源码的集合，是一种高级的代码复用方案。Go语言中为我们提供了很多内置包，如 fmt、os、io 等。 所有与包相关">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-07-19T16:21:41.000Z">
-<meta property="article:modified_time" content="2021-09-20T12:04:46.170Z">
+<meta property="article:modified_time" content="2021-09-22T00:52:05.598Z">
 <meta property="article:author" content="外心人D">
 <meta name="twitter:card" content="summary">
 
@@ -122,7 +122,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">354</span>
+          <span class="site-state-item-count">357</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -204,7 +204,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-09-20 12:04:46" itemprop="dateModified" datetime="2021-09-20T12:04:46Z">2021-09-20</time>
+        <time title="修改时间：2021-09-22 00:52:05" itemprop="dateModified" datetime="2021-09-22T00:52:05Z">2021-09-22</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -294,13 +294,22 @@
 <p>因为需要封装的原因，所以一个结构体中的方法必须在一个包内定义。也就是说，如果结构体定义在了包A中，那么它对应的方法也必须都定义在包A中，不可以在别的包中定义，这样就破坏了封装的概念。但是可以是不同的文件，即可以在同一个包中的不同源文件中定义结构体的方法。</p>
 <h3 id="匿名引用格式"><a href="#匿名引用格式" class="headerlink" title="匿名引用格式"></a>匿名引用格式</h3><p>在执行 main 包的 mian 函数之前， Go 引导程序会先对整个程序的包进行初始化。</p>
 <p>Go语言包的初始化有如下特点：<br>包初始化程序从 main 函数引用的包开始，逐级查找包的引用，直到找到没有引用其他包的包，最终生成一个包引用的有向无环图。<br>Go 编译器会将有向无环图转换为一棵树，然后从树的叶子节点开始逐层向上对包进行初始化。</p>
+<p>init 方法</p>
+<ul>
+<li>无参数</li>
+<li>无返回值</li>
+<li>包被引入的时候执行，只执行一次！</li>
+<li>执行顺序不定（目前是按照所在文件名排序）</li>
+<li>一个包，一个文件内都可以有多个 init 函数，包加载时会执行全部的 init 函数，但并不能保证执行顺序，所以不建议在一个包中放入多个 init 函数，将需要初始化的逻辑放到一个 init 函数里面。</li>
+</ul>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></tbody></table></figure>
+
 <p>-当前包引入其他包，优先调用其他包的全局变量，init()函数（如果其他包也调用 了init()函数，则继续向上调用），再调用本包的init()函数</p>
 <p>单个包的初始化过程执行顺序:初始化常量–》全局变量-》init()-&gt;main()</p>
-<p>导包<code>_</code>的作用是:当导入一个包的时候，该包的init和其他函数都会被导入，go语言编译器会自动调用，init函数自动执行，不需要显示调用<br>在定义的时候不能有任何的参数与返回值<br>匿名引用导入包使用也不会报错<br>引用某个包时，如果只是希望执行包初始化的init函数，而不使用包内部的数据时，可以使用匿名引用格，也会和其他包一样编译到可执行文件中</p>
+<p>导包<code>_</code>的作用是:当导入一个包的时候，该包的init和其他函数都会被导入，go语言编译器会自动调用，init函数自动执行，不需要显示调用</p>
+<p>匿名引用导入包使用也不会报错<br>引用某个包时，如果只是希望执行包初始化的init函数，而不使用包内部的数据时，可以使用匿名引用格，也会和其他包一样编译到可执行文件中</p>
 <ul>
 <li><p>一般用于初始化工具，比如连接数据库</p>
-</li>
-<li><p>一个包可以有多个 init 函数，包加载时会执行全部的 init 函数，但并不能保证执行顺序，所以不建议在一个包中放入多个 init 函数，将需要初始化的逻辑放到一个 init 函数里面。</p>
 </li>
 <li><p>包不能出现环形引用的情况，比如包 a 引用了包 b，包 b 引用了包 c，如果包 c 又引用了包 a，则编译不能通过。</p>
 </li>
