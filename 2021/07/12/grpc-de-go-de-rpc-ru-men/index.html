@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css" integrity="sha256-2H3fkXt6FEmrReK448mDVGKb3WW2ZZw35gI7vqHOE4Y=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"bubbleboy11.github.io","root":"/","images":"/images","scheme":"Muse","version":"8.6.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="https:&#x2F;&#x2F;chai2010.cn&#x2F;advanced-go-programming-book&#x2F;ch4-rpc&#x2F;ch4-01-rpc-intro.html RPC版”Hello, World”Go语言的RPC包的路径为net&#x2F;rpc，也就是放在了net包目录下面。因此我们可以猜测该RPC包是建立在net包基础之上的。在第一章“Hello, World”革命一节最后，我们基于http实现了一个打印">
+<meta property="og:type" content="article">
+<meta property="og:title" content="grpc的go的rpc入门">
+<meta property="og:url" content="https://bubbleboy11.github.io/2021/07/12/grpc-de-go-de-rpc-ru-men/index.html">
+<meta property="og:site_name" content="外心人D的博客">
+<meta property="og:description" content="https:&#x2F;&#x2F;chai2010.cn&#x2F;advanced-go-programming-book&#x2F;ch4-rpc&#x2F;ch4-01-rpc-intro.html RPC版”Hello, World”Go语言的RPC包的路径为net&#x2F;rpc，也就是放在了net包目录下面。因此我们可以猜测该RPC包是建立在net包基础之上的。在第一章“Hello, World”革命一节最后，我们基于http实现了一个打印">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-07-11T16:21:41.000Z">
+<meta property="article:modified_time" content="2021-10-05T03:26:03.662Z">
+<meta property="article:author" content="外心人D">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://bubbleboy11.github.io/2021/07/12/grpc-de-go-de-rpc-ru-men/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://bubbleboy11.github.io/2021/07/12/grpc-de-go-de-rpc-ru-men/","path":"2021/07/12/grpc-de-go-de-rpc-ru-men/","title":"grpc的go的rpc入门"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>grpc的go的rpc入门 | 外心人D的博客</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="外心人D的博客" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">外心人D的博客</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#RPC%E7%89%88%E2%80%9DHello-World%E2%80%9D"><span class="nav-text">RPC版”Hello, World”</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9B%B4%E5%AE%89%E5%85%A8%E7%9A%84RPC%E6%8E%A5%E5%8F%A3"><span class="nav-text">更安全的RPC接口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B7%A8%E8%AF%AD%E8%A8%80%E7%9A%84RPC"><span class="nav-text">跨语言的RPC</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Http%E4%B8%8A%E7%9A%84RPC"><span class="nav-text">Http上的RPC</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-overview">
+            <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">外心人D</p>
+  <div class="site-description" itemprop="description">本博客大多内容为慕课和网上博客，并非原创</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">359</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+          </div>
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/07/12/grpc-de-go-de-rpc-ru-men/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          grpc的go的rpc入门
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-07-11 16:21:41" itemprop="dateCreated datePublished" datetime="2021-07-11T16:21:41Z">2021-07-11</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-10-05 03:26:03" itemprop="dateModified" datetime="2021-10-05T03:26:03Z">2021-10-05</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/go/" itemprop="url" rel="index"><span itemprop="name">go</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p><a target="_blank" rel="noopener" href="https://chai2010.cn/advanced-go-programming-book/ch4-rpc/ch4-01-rpc-intro.html">https://chai2010.cn/advanced-go-programming-book/ch4-rpc/ch4-01-rpc-intro.html</a></p>
+<h3 id="RPC版”Hello-World”"><a href="#RPC版”Hello-World”" class="headerlink" title="RPC版”Hello, World”"></a>RPC版”Hello, World”</h3><p>Go语言的RPC包的路径为net/rpc，也就是放在了net包目录下面。因此我们可以猜测该RPC包是建立在net包基础之上的。在第一章“Hello, World”革命一节最后，我们基于http实现了一个打印例子。下面我们尝试基于rpc实现一个类似的例子。</p>
+<p>我们先构造一个HelloService类型，其中的Hello方法用于实现打印功能</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> HelloService <span class="keyword">struct</span> {}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *HelloService)</span> <span class="title">Hello</span><span class="params">(request <span class="keyword">string</span>, reply *<span class="keyword">string</span>)</span> <span class="title">error</span></span> {</span><br><span class="line">    *reply = <span class="string">"hello "</span>+ request</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>其中Hello方法必须满足<strong>Go语言的RPC规则：方法只能有两个可序列化的参数，其中第二个参数是指针类型，并且返回一个error类型，同时必须是公开的方法</strong>。</p>
+<p>然后就可以将HelloService类型的对象注册为一个RPC服务：</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="comment">//2. 注册处理逻辑 handler</span></span><br><span class="line">    rpc.RegisterName(<span class="string">"HelloService"</span>, <span class="built_in">new</span>(HelloService))</span><br><span class="line">    <span class="comment">// rpc.RegisterName("HelloService", &amp;HelloService{})</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//1. 实例化一个server</span></span><br><span class="line">    listener, err := net.Listen(<span class="string">"tcp"</span>, <span class="string">":1234"</span>) <span class="comment">// 省略127.0.0.1</span></span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">        log.Fatal(<span class="string">"ListenTCP error:"</span>, err)</span><br><span class="line">        <span class="comment">// panic("监听端口失败")</span></span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="comment">//3. 启动服务</span></span><br><span class="line">    conn, err := listener.Accept()</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">        log.Fatal(<span class="string">"Accept error:"</span>, err) <span class="comment">// 当一个新的连接进来的时候</span></span><br><span class="line">        <span class="comment">// panic("建立链接失败")</span></span><br><span class="line">    }</span><br><span class="line">    rpc.ServeConn(conn)</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>其中<code>rpc.Register</code>函数调用会将对象类型中所有满足RPC规则的对象方法注册为RPC函数，所有注册的方法会放在“HelloService”服务空间之下。然后我们建立一个唯一的TCP链接，并且通过<code>rpc.ServeConn</code>函数在该TCP链接上为对方提供RPC服务。</p>
+<p>下面是客户端请求HelloService服务的代码：</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"fmt"</span></span><br><span class="line">    <span class="string">"net/rpc"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="comment">//1. 建立连接</span></span><br><span class="line">    client, err := rpc.Dial(<span class="string">"tcp"</span>, <span class="string">"localhost:1234"</span>)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">        log.Fatal(<span class="string">"dialing:"</span>, err)</span><br><span class="line">        <span class="comment">// panic("连接失败")</span></span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">var</span> reply <span class="keyword">string</span> <span class="comment">//string有默认值</span></span><br><span class="line">    err = client.Call(<span class="string">"HelloService.Hello"</span>, <span class="string">"hello"</span>, &amp;reply)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">        log.Fatal(err)</span><br><span class="line">        <span class="comment">// panic("调用失败")</span></span><br><span class="line">    }</span><br><span class="line">    fmt.Println(reply)</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>首先是通过<code>rpc.Dial</code>拨号RPC服务，然后通过<code>client.Call</code>调用具体的RPC方法。在调用<code>client.Call</code>时，第一个参数是用点号链接的RPC服务名字和方法名字，第二和第三个参数分别我们定义RPC方法的两个参数。</p>
+<p>先运行服务端，再运行客户端，执行结果</p>
+<figure class="highlight avrasm"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">hello:</span>hello</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="更安全的RPC接口"><a href="#更安全的RPC接口" class="headerlink" title="更安全的RPC接口"></a>更安全的RPC接口</h3><p>在涉及RPC的应用中，作为开发人员一般至少有三种角色：首先是服务端实现RPC方法的开发人员，其次是客户端调用RPC方法的人员，最后也是最重要的是制定服务端和客户端RPC接口规范的设计人员。在前面的例子中我们为了简化将以上几种角色的工作全部放到了一起，虽然看似实现简单，但是不利于后期的维护和工作的切割。</p>
+<p>如果要重构HelloService服务，第一步需要明确服务的名字和接口：</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> hanlder</span><br><span class="line"></span><br><span class="line"><span class="comment">// 名称前缀解决冲突的问题</span></span><br><span class="line"><span class="keyword">const</span> HelloServiceName = <span class="string">"handler/HelloService"</span></span><br><span class="line"><span class="comment">// const HelloServiceName = "path/to/pkg.HelloService"</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 业务逻辑</span></span><br><span class="line"><span class="comment">// 关心的是NewHelloService 这个结构体中的方法而不是名字</span></span><br><span class="line"><span class="keyword">type</span> NewHelloService <span class="keyword">struct</span>{}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *NewHelloService)</span> <span class="title">Hello</span><span class="params">(request <span class="keyword">string</span>, reply *<span class="keyword">string</span>)</span> <span class="title">error</span></span> {</span><br><span class="line">    <span class="comment">//返回值是通过修改reply的值</span></span><br><span class="line">    *reply = <span class="string">"hello, "</span> + request</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> server_proxy</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"OldPackageTest/new_helloworld/hanlder"</span></span><br><span class="line">    <span class="string">"net/rpc"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> HelloServicer <span class="keyword">interface</span> {</span><br><span class="line">    Hello(request <span class="keyword">string</span>, reply *<span class="keyword">string</span>) error</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="comment">//如果做到解耦 - 我们关系的是函数 鸭子类型</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">RegisterHelloService</span><span class="params">(srv HelloServicer)</span> <span class="title">error</span></span> { <span class="comment">// 用接口不用导入结构体，增强解耦</span></span><br><span class="line">    <span class="keyword">return</span> rpc.RegisterName(hanlder.HelloServiceName, srv)</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>我们将RPC服务的接口规范分为三个部分：首先是服务的名字，然后是服务要实现的详细方法列表，最后是注册该类型服务的函数。为了避免名字冲突，我们在RPC服务的名字中增加了包路径前缀（这个是RPC服务抽象的包路径，并非完全等价Go语言的包路径）。RegisterHelloService注册服务时，编译器会要求传入的对象满足HelloServiceInterface接口。</p>
+<p>在定义了RPC服务接口规范之后，客户端就可以根据规范编写RPC调用的代码了：</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="comment">// 1. 建立连接</span></span><br><span class="line">    client, err := rpc.Dial(<span class="string">"tcp"</span>, <span class="string">"localhost:1234"</span>)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">        log.Fatal(<span class="string">"dialing:"</span>, err)</span><br><span class="line">        <span class="comment">// panic("连接失败")</span></span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">var</span> reply <span class="keyword">string</span> <span class="comment">//string有默认值</span></span><br><span class="line">    err = client.Call(hanlder.HelloServiceName+<span class="string">".Hello"</span>, <span class="string">"hello"</span>, &amp;reply)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">        log.Fatal(err)</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>其中唯一的变化是client.Call的第一个参数用<code>HelloServiceName+".Hello"</code>代替了<code>"HelloService.Hello"</code>。然而通过client.Call函数调用RPC方法依然比较繁琐，同时参数的类型依然无法得到编译器提供的安全保障。</p>
+<p>为了简化客户端用户调用RPC函数，我们在可以在接口规范部分增加对客户端的简单包装：</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> client_proxy</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"OldPackageTest/new_helloworld/hanlder"</span></span><br><span class="line">    <span class="string">"net/rpc"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> HelloServiceStub <span class="keyword">struct</span> {</span><br><span class="line">    *rpc.Client</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="comment">//在go语言中没有类、对象 就意味着没有初始化方法</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">NewHelloServiceClient</span><span class="params">(protcol, address <span class="keyword">string</span>)</span> <span class="title">HelloServiceStub</span></span> {</span><br><span class="line">    conn, err := rpc.Dial(protcol, address)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">        <span class="comment">// panic("connect error!")</span></span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> HelloServiceStub{Client: conn}</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *HelloServiceStub)</span> <span class="title">Hello</span><span class="params">(request <span class="keyword">string</span>, reply *<span class="keyword">string</span>)</span> <span class="title">error</span></span> {</span><br><span class="line">    err := c.Call(hanlder.HelloServiceName+<span class="string">".Hello"</span>, request, reply)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">        <span class="keyword">return</span> err</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>我们在接口规范中针对客户端新增加了HelloServiceClient类型，该类型也必须满足HelloServiceInterface接口，这样客户端用户就可以直接通过接口对应的方法调用RPC函数。同时提供了一个DialHelloService方法，直接拨号HelloService服务。</p>
+<p>基于新的客户端接口，我们可以简化客户端用户的代码：</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"OldPackageTest/new_helloworld/client_proxy"</span></span><br><span class="line">    <span class="string">"fmt"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="comment">//封装后，像本地调用函数一样</span></span><br><span class="line">    <span class="comment">//1. 建立连接</span></span><br><span class="line">    client, err := client_proxy.NewHelloServiceClient(<span class="string">"tcp"</span>, <span class="string">"localhost:1234"</span>)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">        log.Fatal(<span class="string">"dialing:"</span>, err)</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line"><span class="comment">//1. 只想写业务逻辑 不想关注每个函数的名称</span></span><br><span class="line">    <span class="comment">// 客户端部分</span></span><br><span class="line">    <span class="keyword">var</span> reply <span class="keyword">string</span> <span class="comment">//string有默认值</span></span><br><span class="line">    err := client.Hello(<span class="string">"hello"</span>, &amp;reply)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">        log.Fatal(err)</span><br><span class="line">        <span class="comment">// panic("调用失败")</span></span><br><span class="line">    }</span><br><span class="line">    fmt.Println(reply)</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>现在客户端用户不用再担心RPC方法名字或参数类型不匹配等低级错误的发生。</p>
+<p>最后是基于RPC接口规范编写真实的服务端代码：</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"OldPackageTest/new_helloworld/hanlder"</span></span><br><span class="line">    <span class="string">"OldPackageTest/new_helloworld/server_proxy"</span></span><br><span class="line">    <span class="string">"net"</span></span><br><span class="line">    <span class="string">"net/rpc"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 业务逻辑</span></span><br><span class="line"><span class="keyword">type</span> HelloService <span class="keyword">struct</span>{}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *HelloService)</span> <span class="title">Hello</span><span class="params">(request <span class="keyword">string</span>, reply *<span class="keyword">string</span>)</span> <span class="title">error</span></span> {</span><br><span class="line">    <span class="comment">//返回值是通过修改reply的值</span></span><br><span class="line">    *reply = <span class="string">"hello, "</span> + request</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="comment">//1. 实例化一个server</span></span><br><span class="line">    listener, err := net.Listen(<span class="string">"tcp"</span>, <span class="string">":1234"</span>)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">        log.Fatal(<span class="string">"ListenTCP error:"</span>, err)</span><br><span class="line">    }</span><br><span class="line">    <span class="comment">//2. 注册处理逻辑 handler</span></span><br><span class="line">    server_proxy.RegisterHelloService(&amp;hanlder.NewHelloService{})</span><br><span class="line">    <span class="comment">// server_proxy.RegisterHelloService(new(hanlder.NewHelloService))</span></span><br><span class="line">    <span class="comment">//3. 启动服务</span></span><br><span class="line">    <span class="keyword">for</span> {</span><br><span class="line">        conn, err := listener.Accept() <span class="comment">//当一个新的连接进来的时候</span></span><br><span class="line">        <span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">            log.Fatal(<span class="string">"Accept error:"</span>, err)</span><br><span class="line">        }</span><br><span class="line">        <span class="keyword">go</span> rpc.ServeConn(conn)</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>在新的RPC服务端实现中，我们用RegisterHelloService函数来注册函数，这样不仅可以避免命名服务名称的工作，同时也保证了传入的服务对象满足了RPC接口的定义。最后我们新的服务改为支持多个TCP链接，然后为每个TCP链接提供RPC服务。</p>
+<h3 id="跨语言的RPC"><a href="#跨语言的RPC" class="headerlink" title="跨语言的RPC"></a>跨语言的RPC</h3><p>标准库的RPC默认采用Go语言特有的gob编码，因此从其它语言调用Go语言实现的RPC服务将比较困难。在互联网的微服务时代，每个RPC以及服务的使用者都可能采用不同的编程语言，因此跨语言是互联网时代RPC的一个首要条件。得益于RPC的框架设计，Go语言的RPC其实也是很容易实现跨语言支持的。</p>
+<p>Go语言的RPC框架有两个比较有特色的设计：一个是RPC数据打包时可以通过插件实现自定义的编码和解码；另一个是RPC建立在抽象的<code>io.ReadWriteCloser</code>接口之上的，我们可以将RPC架设在不同的通讯协议之上。这里我们将尝试通过官方自带的<code>net/rpc/jsonrpc</code>扩展实现一个跨语言的RPC。</p>
+<p>首先是基于json编码重新实现RPC服务：</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"net"</span></span><br><span class="line">    <span class="string">"net/rpc"</span></span><br><span class="line">    <span class="string">"net/rpc/jsonrpc"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> HelloService <span class="keyword">struct</span>{}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *HelloService)</span> <span class="title">Hello</span><span class="params">(request <span class="keyword">string</span>, reply *<span class="keyword">string</span>)</span> <span class="title">error</span></span> {</span><br><span class="line">    <span class="comment">//返回值是通过修改reply的值</span></span><br><span class="line">    *reply = <span class="string">"hello, "</span> + request</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="comment">//1. 实例化一个server</span></span><br><span class="line">    listener, err := net.Listen(<span class="string">"tcp"</span>, <span class="string">":1234"</span>)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">        log.Fatal(<span class="string">"ListenTCP error:"</span>, err)</span><br><span class="line">    }</span><br><span class="line">    <span class="comment">//2. 注册处理逻辑 handler</span></span><br><span class="line">    rpc.RegisterName(<span class="string">"HelloService"</span>, &amp;HelloService{})</span><br><span class="line">    <span class="comment">// rpc.RegisterName("HelloService", new(HelloService))</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//3. 启动服务</span></span><br><span class="line">    <span class="keyword">for</span> { <span class="comment">// 死循环，运行完不退出</span></span><br><span class="line">        conn, err := listener.Accept() <span class="comment">//当一个新的连接进来的时候，</span></span><br><span class="line">        <span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">            log.Fatal(<span class="string">"Accept error:"</span>, err)</span><br><span class="line">        }</span><br><span class="line">        <span class="keyword">go</span> rpc.ServeCodec(jsonrpc.NewServerCodec(conn)) <span class="comment">// 并发</span></span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>代码中最大的变化是用<code>rpc.ServeCodec</code>函数替代了<code>rpc.ServeConn</code>函数，传入的参数是针对服务端的json编解码器。</p>
+<p>然后是实现json版本的客户端：</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"fmt"</span></span><br><span class="line">    <span class="string">"net"</span></span><br><span class="line">    <span class="string">"net/rpc/jsonrpc"</span></span><br><span class="line"></span><br><span class="line">    <span class="string">"net/rpc"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="comment">//1. 建立连接</span></span><br><span class="line">    conn, err := net.Dial(<span class="string">"tcp"</span>, <span class="string">"localhost:1234"</span>)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">        log.Fatal(<span class="string">"ListenTCP error:"</span>, err)</span><br><span class="line">        <span class="comment">// panic("连接失败")</span></span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    client := rpc.NewClientWithCodec(jsonrpc.NewClientCodec(conn))</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> reply <span class="keyword">string</span> <span class="comment">//string有默认值</span></span><br><span class="line">    err = client.Call(<span class="string">"HelloService.Hello"</span>, <span class="string">"hello"</span>, &amp;reply)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">        log.Fatal(err)</span><br><span class="line">        <span class="comment">// panic("调用失败")</span></span><br><span class="line">    }</span><br><span class="line">    fmt.Println(reply)</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>先手工调用net.Dial函数建立TCP链接，然后基于该链接建立针对客户端的json编解码器。</p>
+<p>在确保客户端可以正常调用RPC服务的方法之后，我们用一个普通的TCP服务代替Go语言版本的RPC服务，这样可以查看客户端调用时发送的数据格式。比如通过nc命令<code>nc -l 1234</code>在同样的端口启动一个TCP服务。然后再次执行一次RPC调用将会发现nc输出了以下的信息：</p>
+<figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">{<span class="attr">"method"</span>:<span class="string">"HelloService.Hello"</span>,<span class="attr">"params"</span>:[<span class="string">"hello"</span>],<span class="attr">"id"</span>:<span class="number">0</span>}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>这是一个json编码的数据，其中method部分对应要调用的rpc服务和方法组合成的名字，params部分的第一个元素为参数，id是由调用端维护的一个唯一的调用编号。</p>
+<p>请求的json数据对象在内部对应两个结构体：客户端是clientRequest，服务端是serverRequest。<br>clientRequest和serverRequest结构体的内容基本是一致的：</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> clientRequest <span class="keyword">struct</span> {</span><br><span class="line">    Method <span class="keyword">string</span>         <span class="string">`json:"method"`</span></span><br><span class="line">    Params [<span class="number">1</span>]<span class="keyword">interface</span>{} <span class="string">`json:"params"`</span></span><br><span class="line">    Id     <span class="keyword">uint64</span>         <span class="string">`json:"id"`</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> serverRequest <span class="keyword">struct</span> {</span><br><span class="line">    Method <span class="keyword">string</span>           <span class="string">`json:"method"`</span></span><br><span class="line">    Params *json.RawMessage <span class="string">`json:"params"`</span></span><br><span class="line">    Id     *json.RawMessage <span class="string">`json:"id"`</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>在获取到RPC调用对应的json数据后，我们可以通过直接向架设了RPC服务的TCP服务器发送json数据模拟RPC方法调用：</p>
+<figure class="highlight shell"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">echo</span> -e <span class="string">'{"method":"HelloService.Hello","params":["hello"],"id":1}'</span> | nc localhost 1234</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>返回的结果也是一个json格式的数据：</p>
+<figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">{<span class="attr">"id"</span>:<span class="number">1</span>,<span class="attr">"result"</span>:<span class="string">"hello:hello"</span>,<span class="attr">"error"</span>:<span class="literal">null</span>}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>其中id对应输入的id参数，result为返回的结果，error部分在出问题时表示错误信息。对于顺序调用来说，id不是必须的。但是Go语言的RPC框架支持异步调用，当返回结果的顺序和调用的顺序不一致时，可以通过id来识别对应的调用。</p>
+<p>返回的json数据也是对应内部的两个结构体：客户端是clientResponse，服务端是serverResponse。两个结构体的内容同样也是类似的：</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> clientResponse <span class="keyword">struct</span> {</span><br><span class="line">    Id     <span class="keyword">uint64</span>           <span class="string">`json:"id"`</span></span><br><span class="line">    Result *json.RawMessage <span class="string">`json:"result"`</span></span><br><span class="line">    Error  <span class="keyword">interface</span>{}      <span class="string">`json:"error"`</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> serverResponse <span class="keyword">struct</span> {</span><br><span class="line">    Id     *json.RawMessage <span class="string">`json:"id"`</span></span><br><span class="line">    Result <span class="keyword">interface</span>{}      <span class="string">`json:"result"`</span></span><br><span class="line">    Error  <span class="keyword">interface</span>{}      <span class="string">`json:"error"`</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>因此无论采用何种语言，只要遵循同样的json结构，以同样的流程就可以和Go语言编写的RPC服务进行通信。这样我们就实现了跨语言的RPC。</p>
+<p>python客户端</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> json</span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> itertools</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">JSONClient</span>(<span class="params">object</span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, addr</span>):</span></span><br><span class="line">        self.socket = socket.create_connection(addr)</span><br><span class="line">        self.id_counter = itertools.count()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__del__</span>(<span class="params">self</span>):</span></span><br><span class="line">        self.socket.close()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">call</span>(<span class="params">self, name, *params</span>):</span></span><br><span class="line">        request = dict(id=next(self.id_counter),</span><br><span class="line">                    params=list(params),</span><br><span class="line">                    method=name)</span><br><span class="line">        self.socket.sendall(json.dumps(request).encode())</span><br><span class="line"></span><br><span class="line">        <span class="comment"># This must loop if resp is bigger than 4K</span></span><br><span class="line">        response = self.socket.recv(<span class="number">4096</span>)</span><br><span class="line">        response = json.loads(response.decode())</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> response.get(<span class="string">'id'</span>) != request.get(<span class="string">'id'</span>):</span><br><span class="line">            <span class="keyword">raise</span> Exception(<span class="string">"expected id=%s, received id=%s: %s"</span></span><br><span class="line">                            %(request.get(<span class="string">'id'</span>), response.get(<span class="string">'id'</span>),</span><br><span class="line">                              response.get(<span class="string">'error'</span>)))</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> response.get(<span class="string">'error'</span>) <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">            <span class="keyword">raise</span> Exception(response.get(<span class="string">'error'</span>))</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> response.get(<span class="string">'result'</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">close</span>(<span class="params">self</span>):</span></span><br><span class="line">    self._socket.close()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    rpc = JSONClient((<span class="string">"localhost"</span>, <span class="number">1234</span>))</span><br><span class="line">    args = <span class="string">"hello"</span></span><br><span class="line">    print(rpc.call(<span class="string">"HelloService.Hello"</span>, args))</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># go_json_rpc_client</span></span><br><span class="line"><span class="keyword">import</span> json</span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"></span><br><span class="line">request = {</span><br><span class="line">    <span class="string">"id"</span>:<span class="number">0</span>,</span><br><span class="line">    <span class="string">"params"</span>:[<span class="string">"bobby"</span>],</span><br><span class="line">    <span class="string">"method"</span>: <span class="string">"HelloService.Hello"</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">client = socket.create_connection((<span class="string">"localhost"</span>, <span class="number">1234</span>))</span><br><span class="line">client.sendall(json.dumps(request).encode())</span><br><span class="line"></span><br><span class="line"><span class="comment">#获取服务器返回的数据</span></span><br><span class="line">This must loop <span class="keyword">if</span> resp <span class="keyword">is</span> bigger than <span class="number">4</span>K</span><br><span class="line">rsp = client.recv(<span class="number">1024</span>)</span><br><span class="line">rsp = client.recv(<span class="number">4096</span>)</span><br><span class="line">rsp = json.loads(rsp.decode())</span><br><span class="line"></span><br><span class="line">print(rsp)  <span class="comment"># {'id': 0, 'result': 'hello, bobby', 'error': None}</span></span><br><span class="line">print(rsp[<span class="string">"result"</span>])  <span class="comment"># hello, bobby</span></span><br><span class="line">client.close() <span class="comment">#关闭这个链接</span></span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">request = {</span><br><span class="line">    <span class="string">"id"</span>:<span class="number">0</span>,</span><br><span class="line">    <span class="string">"params"</span>:[<span class="string">"bobby"</span>],</span><br><span class="line">    <span class="string">"method"</span>: <span class="string">"HelloService.Hello"</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line">rsp = requests.post(<span class="string">"http://localhost:1234/jsonrpc"</span>, json=request)</span><br><span class="line">print(rsp.text)  <span class="comment"># {"id":0,"result":"hello, bobby","error":null}</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="Http上的RPC"><a href="#Http上的RPC" class="headerlink" title="Http上的RPC"></a>Http上的RPC</h3><p>替换rpc的传输协议为http</p>
+<p>Go语言内在的RPC框架已经支持在Http协议上提供RPC服务。但是框架的http服务同样采用了内置的gob协议，并且没有提供采用其它协议的接口，因此从其它语言依然无法访问的。在前面的例子中，我们已经实现了在TCP协议之上运行jsonrpc服务，并且通过nc命令行工具成功实现了RPC方法调用。现在我们尝试在http协议上提供jsonrpc服务。</p>
+<p>新的RPC服务其实是一个类似REST规范的接口，接收请求并采用相应处理流程：</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"io"</span></span><br><span class="line">    <span class="string">"net/http"</span></span><br><span class="line">    <span class="string">"net/rpc"</span></span><br><span class="line">    <span class="string">"net/rpc/jsonrpc"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> HelloService <span class="keyword">struct</span>{}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *HelloService)</span> <span class="title">Hello</span><span class="params">(request <span class="keyword">string</span>, reply *<span class="keyword">string</span>)</span> <span class="title">error</span></span> {</span><br><span class="line">    <span class="comment">//返回值是通过修改reply的值</span></span><br><span class="line">    *reply = <span class="string">"hello, "</span> + request</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="comment">//1. 实例化一个server</span></span><br><span class="line">    rpc.RegisterName(<span class="string">"HelloService"</span>, &amp;HelloService{})</span><br><span class="line">    http.HandleFunc(<span class="string">"/jsonrpc"</span>, <span class="function"><span class="keyword">func</span><span class="params">(w http.ResponseWriter, r *http.Request)</span></span> {</span><br><span class="line">        <span class="keyword">var</span> conn io.ReadWriteCloser = <span class="keyword">struct</span> {</span><br><span class="line">            io.Writer</span><br><span class="line">            io.ReadCloser</span><br><span class="line">        }{</span><br><span class="line">            ReadCloser: r.Body,</span><br><span class="line">            Writer:     w,</span><br><span class="line">        }</span><br><span class="line">        rpc.ServeRequest(jsonrpc.NewServerCodec(conn))</span><br><span class="line">    })</span><br><span class="line">    http.ListenAndServe(<span class="string">":1234"</span>, <span class="literal">nil</span>)</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>RPC的服务架设在“/jsonrpc”路径，在处理函数中基于http.ResponseWriter和http.Request类型的参数构造一个io.ReadWriteCloser类型的conn通道。然后基于conn构建针对服务端的json编码解码器。最后通过rpc.ServeRequest函数为每次请求处理一次RPC方法调用。</p>
+<p>模拟一次RPC调用的过程就是向该链接发送一个json字符串：</p>
+<figure class="highlight shell"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> curl localhost:1234/jsonrpc -X POST \</span></span><br><span class="line">    --data '{"method":"HelloService.Hello","params":["hello"],"id":0}'</span><br></pre></td></tr></tbody></table></figure>
+
+<p>返回的结果依然是json字符串：</p>
+<figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">{<span class="attr">"id"</span>:<span class="number">0</span>,<span class="attr">"result"</span>:<span class="string">"hello:hello"</span>,<span class="attr">"error"</span>:<span class="literal">null</span>}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>这样就可以很方便地从不同语言中访问RPC服务了。</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/07/08/go-jie-kou/" rel="prev" title="go接口">
+                  <i class="fa fa-chevron-left"></i> go接口
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/07/12/grpc/" rel="next" title="grpc">
+                  grpc <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">外心人D</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

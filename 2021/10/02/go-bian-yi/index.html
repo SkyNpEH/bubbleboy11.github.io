@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css" integrity="sha256-2H3fkXt6FEmrReK448mDVGKb3WW2ZZw35gI7vqHOE4Y=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"bubbleboy11.github.io","root":"/","images":"/images","scheme":"Muse","version":"8.6.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="寻找 make 的实现https:&#x2F;&#x2F;golang.org&#x2F;ref&#x2F;spec Making slices, maps and channels ¶The built-in function make takes a type T, which must be a slice, map or channel type, optionally followed by a type-specific l">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go 进程的启动过程、调度循环和GPM">
+<meta property="og:url" content="https://bubbleboy11.github.io/2021/10/02/go-bian-yi/index.html">
+<meta property="og:site_name" content="外心人D的博客">
+<meta property="og:description" content="寻找 make 的实现https:&#x2F;&#x2F;golang.org&#x2F;ref&#x2F;spec Making slices, maps and channels ¶The built-in function make takes a type T, which must be a slice, map or channel type, optionally followed by a type-specific l">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-10-01T16:21:41.000Z">
+<meta property="article:modified_time" content="2021-10-04T13:16:45.615Z">
+<meta property="article:author" content="外心人D">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://bubbleboy11.github.io/2021/10/02/go-bian-yi/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://bubbleboy11.github.io/2021/10/02/go-bian-yi/","path":"2021/10/02/go-bian-yi/","title":"Go 进程的启动过程、调度循环和GPM"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Go 进程的启动过程、调度循环和GPM | 外心人D的博客</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="外心人D的博客" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">外心人D的博客</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%BB%E6%89%BE-make-%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="nav-text">寻找 make 的实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%82%E5%AF%9F-make"><span class="nav-text">观察 make</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%BB%E6%89%BE-new-%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="nav-text">寻找 new 的实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%82%E5%AF%9F-new-%E8%BE%93%E5%87%BA%E5%86%85%E5%AE%B9%E9%9A%BE%E4%BB%A5%E8%AF%BB%E6%87%82%EF%BC%8C%E4%B8%8D%E6%8E%A8%E8%8D%90"><span class="nav-text">观察 new(输出内容难以读懂，不推荐)</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-overview">
+            <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">外心人D</p>
+  <div class="site-description" itemprop="description">本博客大多内容为慕课和网上博客，并非原创</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">359</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+          </div>
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/10/02/go-bian-yi/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Go 进程的启动过程、调度循环和GPM
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-10-01 16:21:41" itemprop="dateCreated datePublished" datetime="2021-10-01T16:21:41Z">2021-10-01</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-10-04 13:16:45" itemprop="dateModified" datetime="2021-10-04T13:16:45Z">2021-10-04</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/go/" itemprop="url" rel="index"><span itemprop="name">go</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h3 id="寻找-make-的实现"><a href="#寻找-make-的实现" class="headerlink" title="寻找 make 的实现"></a>寻找 make 的实现</h3><p><a target="_blank" rel="noopener" href="https://golang.org/ref/spec">https://golang.org/ref/spec</a></p>
+<p>Making slices, maps and channels ¶<br>The built-in function make takes a type T, which must be a slice, map or channel type, optionally followed by a type-specific list of expressions. It returns a value of type T (not *T). The memory is initialized as described in the section on initial values.</p>
+<figure class="highlight routeros"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Call            <span class="built_in"> Type </span>T     Result</span><br><span class="line"></span><br><span class="line">make(T, n)       slice      slice of<span class="built_in"> type </span>T with length n <span class="keyword">and</span> capacity n</span><br><span class="line">make(T, n, m)    slice      slice of<span class="built_in"> type </span>T with length n <span class="keyword">and</span> capacity m</span><br><span class="line"></span><br><span class="line">make(T)          map        map of<span class="built_in"> type </span>T</span><br><span class="line">make(T, n)       map        map of<span class="built_in"> type </span>T with initial space <span class="keyword">for</span> approximately n elements</span><br><span class="line"></span><br><span class="line">make(T)          channel    unbuffered channel of<span class="built_in"> type </span>T</span><br><span class="line">make(T, n)       channel    buffered channel of<span class="built_in"> type </span>T, buffer size n</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="观察-make"><a href="#观察-make" class="headerlink" title="观察 make"></a>观察 make</h3><figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="comment">// make slice</span></span><br><span class="line">    <span class="comment">// 空间开的比较大，是为了让这个 slice 分配在堆上，栈上的 slice 结果不太一样</span></span><br><span class="line">    <span class="keyword">var</span> sl = <span class="built_in">make</span>([]<span class="keyword">int</span>, <span class="number">100000</span>)</span><br><span class="line">    <span class="built_in">println</span>(sl)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// make channel</span></span><br><span class="line">    <span class="keyword">var</span> ch = <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>, <span class="number">5</span>)</span><br><span class="line">    <span class="built_in">println</span>(ch)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// make map</span></span><br><span class="line">    <span class="keyword">var</span> m = <span class="built_in">make</span>(<span class="keyword">map</span>[<span class="keyword">int</span>]<span class="keyword">int</span>, <span class="number">22</span>)</span><br><span class="line">    <span class="built_in">println</span>(m)</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">❯❯❯ cat -n <span class="built_in">make</span>.<span class="keyword">go</span>  # 一次性显示文件内容和行号</span><br><span class="line">     <span class="number">1</span>    <span class="keyword">package</span> main</span><br><span class="line">     <span class="number">2</span></span><br><span class="line">     <span class="number">3</span>    <span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">     <span class="number">4</span>        <span class="comment">// make slice</span></span><br><span class="line">     <span class="number">5</span>        <span class="comment">// 空间开的比较大，是为了让这个 slice 分配在堆上，栈上的 slice 结果不太一样</span></span><br><span class="line">     <span class="number">6</span>        <span class="keyword">var</span> sl = <span class="built_in">make</span>([]<span class="keyword">int</span>, <span class="number">100000</span>)</span><br><span class="line">     <span class="number">7</span>        <span class="built_in">println</span>(sl)</span><br><span class="line">     <span class="number">8</span></span><br><span class="line">     <span class="number">9</span>        <span class="comment">// make channel</span></span><br><span class="line">    <span class="number">10</span>        <span class="keyword">var</span> ch = <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>, <span class="number">5</span>)</span><br><span class="line">    <span class="number">11</span>        <span class="built_in">println</span>(ch)</span><br><span class="line">    <span class="number">12</span></span><br><span class="line">    <span class="number">13</span>        <span class="comment">// make map</span></span><br><span class="line">    <span class="number">14</span>        <span class="keyword">var</span> m = <span class="built_in">make</span>(<span class="keyword">map</span>[<span class="keyword">int</span>]<span class="keyword">int</span>, <span class="number">22</span>)</span><br><span class="line">    <span class="number">15</span>        <span class="built_in">println</span>(m)</span><br><span class="line">    <span class="number">16</span>    }</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight shell"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">go build make.go &amp;&amp; go tool objdump ./make | grep -E "make.go:6|make.go:10|make.go:14"</span><br></pre></td></tr></tbody></table></figure>
+
+<p>这里使用 go tool compile -S 也是可以的。</p>
+<h3 id="寻找-new-的实现"><a href="#寻找-new-的实现" class="headerlink" title="寻找 new 的实现"></a>寻找 new 的实现</h3><p>The built-in function new takes a type T, allocates storage for a variable of that type at run time, and returns a value of type *T pointing to it. The variable is initialized as described in the section on initial values.</p>
+<figure class="highlight stylus"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">new</span><span class="params">(T)</span></span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>For instance</p>
+<figure class="highlight gauss"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">type</span> S <span class="keyword">struct</span> { a int; b float64 }</span><br><span class="line"><span class="keyword">new</span>(S)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>allocates storage for a variable of type S, initializes it (a=0, b=0.0), and returns a value of type *S containing the address of the location.</p>
+<p>不太好找，需要去看编译器的内部代码，建议放弃</p>
+<h3 id="观察-new-输出内容难以读懂，不推荐"><a href="#观察-new-输出内容难以读懂，不推荐" class="headerlink" title="观察 new(输出内容难以读懂，不推荐)"></a>观察 new(<strong>输出内容难以读懂，不推荐</strong>)</h3><figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">❯❯❯ cat -n <span class="built_in">new</span>.<span class="keyword">go</span></span><br><span class="line">     <span class="number">1</span>    <span class="keyword">package</span> main</span><br><span class="line">     <span class="number">2</span></span><br><span class="line">     <span class="number">3</span>    <span class="keyword">type</span> person <span class="keyword">struct</span>{ age <span class="keyword">int</span> }</span><br><span class="line">     <span class="number">4</span></span><br><span class="line">     <span class="number">5</span>    <span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">     <span class="number">6</span>        <span class="keyword">var</span> a = <span class="built_in">new</span>(<span class="keyword">int</span>)</span><br><span class="line">     <span class="number">7</span>        <span class="keyword">var</span> b = <span class="built_in">new</span>(person)</span><br><span class="line">     <span class="number">8</span>        <span class="keyword">var</span> c = <span class="built_in">new</span>(<span class="keyword">chan</span> <span class="keyword">int</span>)</span><br><span class="line">     <span class="number">9</span>        <span class="keyword">var</span> d = <span class="built_in">new</span>(<span class="keyword">map</span>[<span class="keyword">int</span>]<span class="keyword">int</span>)</span><br><span class="line">    <span class="number">10</span></span><br><span class="line">    <span class="number">11</span>        <span class="built_in">println</span>(a, b, c, d)</span><br><span class="line">    <span class="number">12</span>    }</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight angelscript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">❯❯❯ go build -gcflags=<span class="string">"-N -l"</span> new.go &amp;&amp; go tool objdump new | grep -E <span class="string">"new.go:6|new.go:7|new.go:8|new.go:9"</span></span><br><span class="line">  new.go:<span class="number">6</span>        <span class="number">0x1051591</span>        <span class="number">48</span>c744241000000000    MOVQ $<span class="number">0x0</span>, <span class="number">0x10</span>(SP)</span><br><span class="line">  new.go:<span class="number">6</span>        <span class="number">0x105159a</span>        <span class="number">488</span>d442410        LEAQ <span class="number">0x10</span>(SP), AX</span><br><span class="line">  new.go:<span class="number">6</span>        <span class="number">0x105159f</span>        <span class="number">4889442430</span>        MOVQ AX, <span class="number">0x30</span>(SP)</span><br><span class="line">  new.go:<span class="number">7</span>        <span class="number">0x10515a4</span>        <span class="number">48</span>c744240800000000    MOVQ $<span class="number">0x0</span>, <span class="number">0x8</span>(SP)</span><br><span class="line">  new.go:<span class="number">7</span>        <span class="number">0x10515ad</span>        <span class="number">488</span>d442408        LEAQ <span class="number">0x8</span>(SP), AX</span><br><span class="line">  new.go:<span class="number">7</span>        <span class="number">0x10515b2</span>        <span class="number">4889442428</span>        MOVQ AX, <span class="number">0x28</span>(SP)</span><br><span class="line">  new.go:<span class="number">8</span>        <span class="number">0x10515b7</span>        <span class="number">48</span>c744244000000000    MOVQ $<span class="number">0x0</span>, <span class="number">0x40</span>(SP)</span><br><span class="line">  new.go:<span class="number">8</span>        <span class="number">0x10515c0</span>        <span class="number">488</span>d442440        LEAQ <span class="number">0x40</span>(SP), AX</span><br><span class="line">  new.go:<span class="number">8</span>        <span class="number">0x10515c5</span>        <span class="number">4889442420</span>        MOVQ AX, <span class="number">0x20</span>(SP)</span><br><span class="line">  new.go:<span class="number">9</span>        <span class="number">0x10515ca</span>        <span class="number">48</span>c744243800000000    MOVQ $<span class="number">0x0</span>, <span class="number">0x38</span>(SP)</span><br><span class="line">  new.go:<span class="number">9</span>        <span class="number">0x10515d3</span>        <span class="number">488</span>d442438        LEAQ <span class="number">0x38</span>(SP), AX</span><br><span class="line">  new.go:<span class="number">9</span>        <span class="number">0x10515d8</span>        <span class="number">4889442418</span>        MOVQ AX, <span class="number">0x18</span>(SP)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>被优化搞得面目全非了。</p>
+<figure class="highlight angelscript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">❯❯❯ go tool compile -N -S  new.go | grep -E <span class="string">"new.go:6|new.go:7|new.go:8|new.go:9"</span></span><br><span class="line">    <span class="number">0x0021</span> <span class="number">00033</span> (new.go:<span class="number">6</span>)    MOVQ    $<span class="number">0</span>, <span class="string">""</span>..<span class="built_in">auto</span>tmp_4+<span class="number">16</span>(SP)</span><br><span class="line">    <span class="number">0x002a</span> <span class="number">00042</span> (new.go:<span class="number">6</span>)    LEAQ    <span class="string">""</span>..<span class="built_in">auto</span>tmp_4+<span class="number">16</span>(SP), AX</span><br><span class="line">    <span class="number">0x002f</span> <span class="number">00047</span> (new.go:<span class="number">6</span>)    MOVQ    AX, <span class="string">""</span>.a+<span class="number">48</span>(SP)</span><br><span class="line">    <span class="number">0x0034</span> <span class="number">00052</span> (new.go:<span class="number">7</span>)    MOVQ    $<span class="number">0</span>, <span class="string">""</span>..<span class="built_in">auto</span>tmp_5+<span class="number">8</span>(SP)</span><br><span class="line">    <span class="number">0x003d</span> <span class="number">00061</span> (new.go:<span class="number">7</span>)    LEAQ    <span class="string">""</span>..<span class="built_in">auto</span>tmp_5+<span class="number">8</span>(SP), AX</span><br><span class="line">    <span class="number">0x0042</span> <span class="number">00066</span> (new.go:<span class="number">7</span>)    MOVQ    AX, <span class="string">""</span>.b+<span class="number">40</span>(SP)</span><br><span class="line">    <span class="number">0x0047</span> <span class="number">00071</span> (new.go:<span class="number">8</span>)    MOVQ    $<span class="number">0</span>, <span class="string">""</span>..<span class="built_in">auto</span>tmp_6+<span class="number">64</span>(SP)</span><br><span class="line">    <span class="number">0x0050</span> <span class="number">00080</span> (new.go:<span class="number">8</span>)    LEAQ    <span class="string">""</span>..<span class="built_in">auto</span>tmp_6+<span class="number">64</span>(SP), AX</span><br><span class="line">    <span class="number">0x0055</span> <span class="number">00085</span> (new.go:<span class="number">8</span>)    MOVQ    AX, <span class="string">""</span>.c+<span class="number">32</span>(SP)</span><br><span class="line">    <span class="number">0x005a</span> <span class="number">00090</span> (new.go:<span class="number">9</span>)    MOVQ    $<span class="number">0</span>, <span class="string">""</span>..<span class="built_in">auto</span>tmp_7+<span class="number">56</span>(SP)</span><br><span class="line">    <span class="number">0x0063</span> <span class="number">00099</span> (new.go:<span class="number">9</span>)    LEAQ    <span class="string">""</span>..<span class="built_in">auto</span>tmp_7+<span class="number">56</span>(SP), AX</span><br><span class="line">    <span class="number">0x0068</span> <span class="number">00104</span> (new.go:<span class="number">9</span>)    MOVQ    AX, <span class="string">""</span>.d+<span class="number">24</span>(SP)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>可见就是生成了一些临时变量。</p>
+<p>神奇的内置数据结构<br>教学目标：工作痛点：详细内容：学习 hashtable，timer 等复杂的数据结构实现；了解这些结构的进化历史和相关的优缺点；了解基本<br>的 CSP 编程理念。内置数据结构只会使用 api，碰到了相关的问题不知道该从何下手，对相关数据结构的设计缺乏宏观认<br>识。</p>
+<ol>
+<li><p>Go 语言的 hash 表实现：map 解析</p>
+</li>
+<li><p>Go 语言的 timer 实现演进</p>
+</li>
+<li><p>channel 的实现，CSP 理论基础</p>
+</li>
+</ol>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/10/02/go-jin-cheng-de-qi-dong-guo-cheng-diao-du-xun-huan-he-gpm/" rel="prev" title="Go 进程的启动过程、调度循环和GPM">
+                  <i class="fa fa-chevron-left"></i> Go 进程的启动过程、调度循环和GPM
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">外心人D</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

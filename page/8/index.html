@@ -119,7 +119,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">357</span>
+          <span class="site-state-item-count">359</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -160,6 +160,296 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/06/18/beego-shi-pin-lie-biao-ye/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/06/18/beego-shi-pin-lie-biao-ye/" class="post-title-link" itemprop="url">beego视频列表页</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-06-17 16:21:41" itemprop="dateCreated datePublished" datetime="2021-06-17T16:21:41Z">2021-06-17</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-06-20 10:11:53" itemprop="dateModified" datetime="2021-06-20T10:11:53Z">2021-06-20</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/beego/" itemprop="url" rel="index"><span itemprop="name">beego</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><code>controllers\base.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> controllers</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"demo/models"</span></span><br><span class="line"></span><br><span class="line">    beego <span class="string">"github.com/beego/beego/v2/server/web"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> BaseController <span class="keyword">struct</span> {</span><br><span class="line">    beego.Controller</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>routers\default.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">init</span><span class="params">()</span></span> {</span><br><span class="line">    web.Include(&amp;controllers.BaseController{})</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="获取频道下地区"><a href="#获取频道下地区" class="headerlink" title="获取频道下地区"></a>获取频道下地区</h3><p>接口地址：<code>/channel/region</code></p>
+<p>接受参数和返回信息</p>
+<p>接收参数为：channelId（频道ID，1=动漫）<br>返回信息：<br>id = ID<br>name = 名称</p>
+<p>业务逻辑：获取channel_region表中channelId=接收参数和status=1的数据<br><code>models\base.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Region <span class="keyword">struct</span> {</span><br><span class="line">    Id   <span class="keyword">int</span></span><br><span class="line">    Name <span class="keyword">string</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">GetChannelRegion</span><span class="params">(channelId <span class="keyword">int</span>)</span> <span class="params">(<span class="keyword">int64</span>, []Region, error)</span></span> {</span><br><span class="line">    <span class="comment">// 获取频道下地区</span></span><br><span class="line">    o := orm.NewOrm()</span><br><span class="line">    <span class="keyword">var</span> regions []Region</span><br><span class="line">    num, err := o.Raw(<span class="string">"SELECT id,name FROM channel_region WHERE status=1 AND channel_id=? ORDER BY sort DESC"</span>, channelId).QueryRows(&amp;regions)</span><br><span class="line">    <span class="keyword">return</span> num, regions, err</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>controllers\base.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 根据频道下地区ID获取频道地区推荐视频列表</span></span><br><span class="line"><span class="comment">// @router /channel/region [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *BaseController)</span> <span class="title">ChannelRegion</span><span class="params">()</span></span> {</span><br><span class="line">    channelId, _ := this.GetInt(<span class="string">"channelId"</span>)</span><br><span class="line">    <span class="keyword">if</span> channelId == <span class="number">0</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4001</span>, <span class="string">"必须指定频道"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    num, regions, err := models.GetChannelRegion(channelId)</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnSuccess(<span class="number">0</span>, <span class="string">"success"</span>, regions, num)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4004</span>, <span class="string">"没有相关内容"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="/2021/06/18/beego-shi-pin-lie-biao-ye/1.png" alt="description"></p>
+<h3 id="获取频道下类型"><a href="#获取频道下类型" class="headerlink" title="获取频道下类型"></a>获取频道下类型</h3><p>接口地址：</p>
+<p>/channel/type</p>
+<p>接受参数和返回信息</p>
+<p>接收参数为：channelId（频道ID，1=动漫）<br>返回信息：<br>id = ID<br>name = 名称</p>
+<p>业务逻辑：获取channel_type表中channelId=接收参数和status=1的数据</p>
+<p><code>models\base.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Type <span class="keyword">struct</span> {</span><br><span class="line">    Id   <span class="keyword">int</span></span><br><span class="line">    Name <span class="keyword">string</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">GetChannelType</span><span class="params">(channelId <span class="keyword">int</span>)</span> <span class="params">(<span class="keyword">int64</span>, []Type, error)</span></span> {</span><br><span class="line">    <span class="comment">// 获取频道下类型</span></span><br><span class="line">    o := orm.NewOrm()</span><br><span class="line">    <span class="keyword">var</span> types []Type</span><br><span class="line">    num, err := o.Raw(<span class="string">"SELECT id,name FROM channel_type WHERE status=1 AND channel_id=? ORDER BY sort DESC"</span>, channelId).QueryRows(&amp;types)</span><br><span class="line">    <span class="keyword">return</span> num, types, err</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 根据频道下类型ID获取频道类型推荐视频列表</span></span><br><span class="line"><span class="comment">// @router /channel/type [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *BaseController)</span> <span class="title">ChannelType</span><span class="params">()</span></span> {</span><br><span class="line">    channelId, _ := this.GetInt(<span class="string">"channelId"</span>)</span><br><span class="line">    <span class="keyword">if</span> channelId == <span class="number">0</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4001</span>, <span class="string">"必须指定频道"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    num, types, err := models.GetChannelType(channelId)</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnSuccess(<span class="number">0</span>, <span class="string">"success"</span>, types, num)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4004</span>, <span class="string">"没有相关内容"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="/2021/06/18/beego-shi-pin-lie-biao-ye/2.png" alt="description"></p>
+<h3 id="获取视频列表"><a href="#获取视频列表" class="headerlink" title="获取视频列表"></a>获取视频列表</h3><p>接口地址：</p>
+<p>/channel/video</p>
+<p>接受参数和返回信息</p>
+<p>接收参数为：<br>channelId（频道ID，1=动漫）<br>regionId（地区ID） typeId（分类ID） end（是否完结） sort（排序方式） offset（起始条数） limit（每页条数）<br>返回信息：<br>id = 视频ID<br>title = 标题<br>sub_title = 副标题<br>img = 竖版图片地址<br>img1 = 横版图片地址<br>add_time = 添加时间<br>episodes_count = 剧集集数<br>is_end = 是否完结<br>业务逻辑：<br>获取video表中数据<br>channelId=接收参数（必填项）<br>status=1<br>regionId、typeId（根据是否传值，增加筛选条件）<br>end（n=未完结，y=已完结）<br>sort（默认时间倒序，episodesUpdateTime=剧集更新时间倒序，comment=评论数倒序）</p>
+<p><code>models\base.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 频道下根据不同条件和排序方式获取视频信息</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">GetChannelVideoList</span><span class="params">(channelId <span class="keyword">int</span>, regionId <span class="keyword">int</span>, typeId <span class="keyword">int</span>, end <span class="keyword">string</span>, sort <span class="keyword">string</span>, offset <span class="keyword">int</span>, limit <span class="keyword">int</span>)</span> <span class="params">(<span class="keyword">int64</span>, []orm.Params, error)</span></span> {</span><br><span class="line">    o := orm.NewOrm()</span><br><span class="line">    <span class="keyword">var</span> videos []orm.Params</span><br><span class="line"></span><br><span class="line">    qs := o.QueryTable(<span class="string">"video"</span>)</span><br><span class="line">    qs = qs.Filter(<span class="string">"channel_id"</span>, channelId)</span><br><span class="line">    qs = qs.Filter(<span class="string">"status"</span>, <span class="number">1</span>)</span><br><span class="line">    <span class="keyword">if</span> regionId &gt; <span class="number">0</span> {</span><br><span class="line">        qs = qs.Filter(<span class="string">"region_id"</span>, regionId)</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">if</span> typeId &gt; <span class="number">0</span> {</span><br><span class="line">        qs = qs.Filter(<span class="string">"type_id"</span>, typeId)</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">if</span> end == <span class="string">"n"</span> {</span><br><span class="line">        qs = qs.Filter(<span class="string">"is_end"</span>, <span class="number">0</span>)</span><br><span class="line">    } <span class="keyword">else</span> <span class="keyword">if</span> end == <span class="string">"y"</span> {</span><br><span class="line">        qs = qs.Filter(<span class="string">"is_end"</span>, <span class="number">1</span>)</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">if</span> sort == <span class="string">"episodesUpdateTime"</span> {</span><br><span class="line">        qs = qs.OrderBy(<span class="string">"-episodes_update_time"</span>)</span><br><span class="line">    } <span class="keyword">else</span> <span class="keyword">if</span> sort == <span class="string">"comment"</span> {</span><br><span class="line">        qs = qs.OrderBy(<span class="string">"-comment"</span>)</span><br><span class="line">    } <span class="keyword">else</span> <span class="keyword">if</span> sort == <span class="string">"addTime"</span> {</span><br><span class="line">        qs = qs.OrderBy(<span class="string">"-add_time"</span>)</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        qs = qs.OrderBy(<span class="string">"-add_time"</span>)</span><br><span class="line">    }</span><br><span class="line">    nums, _ := qs.Values(&amp;videos, <span class="string">"id"</span>, <span class="string">"title"</span>, <span class="string">"sub_title"</span>, <span class="string">"add_time"</span>, <span class="string">"img"</span>, <span class="string">"img1"</span>, <span class="string">"episodes_count"</span>, <span class="string">"is_end"</span>)</span><br><span class="line">    qs = qs.Limit(limit, offset)</span><br><span class="line">    _, err := qs.Values(&amp;videos, <span class="string">"id"</span>, <span class="string">"title"</span>, <span class="string">"sub_title"</span>, <span class="string">"add_time"</span>, <span class="string">"img"</span>, <span class="string">"img1"</span>, <span class="string">"episodes_count"</span>, <span class="string">"is_end"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> nums, videos, err</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 频道页，根据接收到的参数获取视频列表</span></span><br><span class="line"><span class="comment">// @router /channel/video [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *VideoController)</span> <span class="title">ChannelVideo</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="comment">// 获取频道ID</span></span><br><span class="line">    channelId, _ := this.GetInt(<span class="string">"channelId"</span>)</span><br><span class="line">    <span class="comment">// 获取频道地区ID</span></span><br><span class="line">    regionId, _ := this.GetInt(<span class="string">"regionId"</span>)</span><br><span class="line">    <span class="comment">// 获取频道类型ID</span></span><br><span class="line">    typeId, _ := this.GetInt(<span class="string">"typeId"</span>)</span><br><span class="line">    <span class="comment">// 获取状态</span></span><br><span class="line">    end := this.GetString(<span class="string">"end"</span>)</span><br><span class="line">    <span class="comment">// 获取排序</span></span><br><span class="line">    sort := this.GetString(<span class="string">"sort"</span>)</span><br><span class="line">    <span class="comment">// 获取页码信息</span></span><br><span class="line">    limit, _ := this.GetInt(<span class="string">"limit"</span>)</span><br><span class="line">    <span class="comment">// 从多少页开始获取信息</span></span><br><span class="line">    offset, _ := this.GetInt(<span class="string">"offset"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> channelId == <span class="number">0</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4001</span>, <span class="string">"必须指定频道"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> limit == <span class="number">0</span> {</span><br><span class="line">        limit = <span class="number">12</span></span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    num, videos, err := models.GetChannelVideoList(channelId, regionId, typeId, end, sort, offset, limit)</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnSuccess(<span class="number">0</span>, <span class="string">"success"</span>, videos, num)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4004</span>, <span class="string">"没有相关内容"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="/2021/06/18/beego-shi-pin-lie-biao-ye/3.png" alt="description"></p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/06/18/beego-shi-pin-bo-fang-ye/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/06/18/beego-shi-pin-bo-fang-ye/" class="post-title-link" itemprop="url">beego视频播放页</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-06-17 16:21:41" itemprop="dateCreated datePublished" datetime="2021-06-17T16:21:41Z">2021-06-17</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-06-21 16:00:56" itemprop="dateModified" datetime="2021-06-21T16:00:56Z">2021-06-21</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/beego/" itemprop="url" rel="index"><span itemprop="name">beego</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>页面分为两种情况：</p>
+<ul>
+<li>未指定剧集数，默认打开第一集，播放第一集的视频</li>
+<li>指定剧集数，打开对应剧集信息</li>
+</ul>
+<p><code>controllers\video.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> controllers</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"demo/models"</span></span><br><span class="line"></span><br><span class="line">    beego <span class="string">"github.com/beego/beego/v2/server/web"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> VideoController <span class="keyword">struct</span> {</span><br><span class="line">    beego.Controller</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>routers\default.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">init</span><span class="params">()</span></span> {</span><br><span class="line">    web.InsertFilter(<span class="string">"/demo/*"</span>, web.BeforeRouter, FilterDemo)</span><br><span class="line">    web.Include(&amp;controllers.VideoController{})</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="视频详细信息接口"><a href="#视频详细信息接口" class="headerlink" title="视频详细信息接口"></a>视频详细信息接口</h3><p>接口地址：<code>/video/info</code></p>
+<ul>
+<li><p>接收参数为：videoId（视频ID）</p>
+</li>
+<li><p>返回信息：<br>id = ID<br>title = 标题<br>sub_title = 副标题<br>add_time = 添加时间<br>img = 竖版缩略图<br>img1 = 横版缩略图<br>episodes_count = 剧集数<br>… …和video表中的数字段是一一对应的</p>
+</li>
+<li><p>业务逻辑：获取video表中id=接收参数的数据。<br>注意：这里没有获取到视频播放地址或者阿里云视频ID</p>
+</li>
+</ul>
+<p><code>models\video.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Video <span class="keyword">struct</span> {</span><br><span class="line">    Id                 <span class="keyword">int</span></span><br><span class="line">    Title              <span class="keyword">string</span></span><br><span class="line">    SubTitle           <span class="keyword">string</span></span><br><span class="line">    AddTime            <span class="keyword">int64</span></span><br><span class="line">    Img                <span class="keyword">string</span></span><br><span class="line">    Img1               <span class="keyword">string</span></span><br><span class="line">    EpisodesCount      <span class="keyword">int</span></span><br><span class="line">    IsEnd              <span class="keyword">int</span></span><br><span class="line">    ChannelId          <span class="keyword">int</span></span><br><span class="line">    Status             <span class="keyword">int</span></span><br><span class="line">    RegionId           <span class="keyword">int</span></span><br><span class="line">    TypeId             <span class="keyword">int</span></span><br><span class="line">    EpisodesUpdateTime <span class="keyword">int64</span></span><br><span class="line">    Comment            <span class="keyword">int</span></span><br><span class="line">    UserId             <span class="keyword">int</span></span><br><span class="line">    IsRecommend        <span class="keyword">int</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="comment">// 根据视频ID获取视频详情</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">GetVideoInfo</span><span class="params">(videoId <span class="keyword">int</span>)</span> <span class="params">(Video, error)</span></span> {</span><br><span class="line">    o := orm.NewOrm()</span><br><span class="line">    <span class="keyword">var</span> video Video</span><br><span class="line">    err := o.Raw(<span class="string">"SELECT * FROM video WHERE id=? LIMIT 1"</span>, videoId).QueryRow(&amp;video)</span><br><span class="line">    <span class="keyword">return</span> video, err</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>controllers\video.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 根据视频id获取视频详情</span></span><br><span class="line"><span class="comment">// @router /video/info [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *VideoController)</span> <span class="title">VideoInfo</span><span class="params">()</span></span> {</span><br><span class="line">    videoId, _ := this.GetInt(<span class="string">"videoId"</span>)</span><br><span class="line">    <span class="keyword">if</span> videoId == <span class="number">0</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4001</span>, <span class="string">"必须指定视频ID"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    video, err := models.GetVideoInfo(videoId)</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnSuccess(<span class="number">0</span>, <span class="string">"success"</span>, video, <span class="number">1</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4004</span>, <span class="string">"请求数据失败，请稍后重试~"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="/2021/06/18/beego-shi-pin-bo-fang-ye/1.png" alt="description"></p>
+<h3 id="视频详情接口改造"><a href="#视频详情接口改造" class="headerlink" title="视频详情接口改造"></a>视频详情接口改造</h3><p><code>models\video.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 增加redis缓存 - 根据视频ID获取视频详情</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">RedisGetVideoInfo</span><span class="params">(videoId <span class="keyword">int</span>)</span> <span class="params">(Video, error)</span></span> {</span><br><span class="line">    <span class="keyword">var</span> video Video</span><br><span class="line">    conn := redisClient.PoolConnect()</span><br><span class="line">    <span class="keyword">defer</span> conn.Close()</span><br><span class="line">    <span class="comment">// 定义redis key</span></span><br><span class="line">    redisKey := <span class="string">"video:id:"</span> + strconv.Itoa(videoId)</span><br><span class="line">    <span class="comment">// 判断redis中是否存在</span></span><br><span class="line">    exists, err := redis.Bool(conn.Do(<span class="string">"exists"</span>, redisKey))</span><br><span class="line">    <span class="keyword">if</span> exists {</span><br><span class="line">        res, _ := redis.Values(conn.Do(<span class="string">"hgetall"</span>, redisKey))</span><br><span class="line">        err = redis.ScanStruct(res, &amp;video)</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        o := orm.NewOrm()</span><br><span class="line">        err := o.Raw(<span class="string">"SELECT * FROM video WHERE id=? LIMIT 1"</span>, videoId).QueryRow(&amp;video)</span><br><span class="line">        <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">            <span class="comment">// 从数据库取出的数据保存到redis</span></span><br><span class="line">            _, err := conn.Do(<span class="string">"hmset"</span>, redis.Args{redisKey}.AddFlat(video)...)</span><br><span class="line">            <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">                conn.Do(<span class="string">"expire"</span>, redisKey, <span class="number">60</span>*<span class="number">60</span>*<span class="number">24</span>*<span class="number">30</span>)</span><br><span class="line">            }</span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> video, err</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>controllers\video.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 根据视频id获取视频详情</span></span><br><span class="line"><span class="comment">// @router /video/info [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *VideoController)</span> <span class="title">VideoInfo</span><span class="params">()</span></span> {</span><br><span class="line">    videoId, _ := this.GetInt(<span class="string">"videoId"</span>)</span><br><span class="line">    <span class="keyword">if</span> videoId == <span class="number">0</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4001</span>, <span class="string">"必须指定视频ID"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    <span class="comment">//video, err := models.GetVideoInfo(videoId)</span></span><br><span class="line">    video, err := models.RedisGetVideoInfo(videoId)</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnSuccess(<span class="number">0</span>, <span class="string">"success"</span>, video, <span class="number">1</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4004</span>, <span class="string">"请求数据失败，请稍后重试~"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="视频剧集列表接口"><a href="#视频剧集列表接口" class="headerlink" title="视频剧集列表接口"></a>视频剧集列表接口</h3><p>接口地址：<code>/video/episodes/list</code></p>
+<ul>
+<li><p>接收参数为：videoId（视频ID）</p>
+</li>
+<li><p>返回信息：<br>id = ID<br>title = 剧集标题<br>add_time = 添加时间<br>num = 第几集<br>play_url = 播放地址<br>comment = 剧集评论数<br>aliyun_video_id = 阿里云点播视频ID</p>
+</li>
+<li><p>业务逻辑：获取video_episodes表中video_id=接收参数的数据，按照剧集数正序。</p>
+</li>
+</ul>
+<figure class="highlight sql"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">id</span>,title,add_time,<span class="keyword">num</span>,play_url,<span class="keyword">comment</span> <span class="keyword">FROM</span> video_episodes <span class="keyword">WHERE</span> video_id=? <span class="keyword">order</span> <span class="keyword">by</span> <span class="keyword">num</span> <span class="keyword">asc</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>前端通过episodesId和剧集列表中的id匹配，获取对应播放的play_url和aliyun_video_id</p>
+<p>图二中国漫、日漫、少女推荐功能</p>
+<p>这里和频道页中的规则是一样的，参考频道页的文档就可以了</p>
+<p><code>models\video.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Episodes <span class="keyword">struct</span> {</span><br><span class="line">    Id            <span class="keyword">int</span></span><br><span class="line">    Title         <span class="keyword">string</span></span><br><span class="line">    AddTime       <span class="keyword">int64</span></span><br><span class="line">    Num           <span class="keyword">int</span></span><br><span class="line">    PlayUrl       <span class="keyword">string</span></span><br><span class="line">    Comment       <span class="keyword">int</span></span><br><span class="line">    AliyunVideoId <span class="keyword">string</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="comment">// 根据视频Id获取视频剧集列表</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">GetVideoEpisodesList</span><span class="params">(videoId <span class="keyword">int</span>)</span> <span class="params">(<span class="keyword">int64</span>, []Episodes, error)</span></span> {</span><br><span class="line">    o := orm.NewOrm()</span><br><span class="line">    <span class="keyword">var</span> episodes []Episodes</span><br><span class="line">    num, err := o.Raw(<span class="string">"SELECT id,title,add_time,num,play_url,comment FROM video_episodes WHERE video_id=? order by num asc"</span>, videoId).QueryRows(&amp;episodes)</span><br><span class="line">    <span class="keyword">return</span> num, episodes, err</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>controllers\video.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 获取视频剧集列表</span></span><br><span class="line"><span class="comment">// @router /video/episodes/list [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *VideoController)</span> <span class="title">VideoEpisodesList</span><span class="params">()</span></span> {</span><br><span class="line">    videoId, _ := this.GetInt(<span class="string">"videoId"</span>)</span><br><span class="line">    <span class="keyword">if</span> videoId == <span class="number">0</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4001</span>, <span class="string">"必须指定视频ID"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    num, episodes, err := models.GetVideoEpisodesList(videoId)</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnSuccess(<span class="number">0</span>, <span class="string">"success"</span>, episodes, num)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4004</span>, <span class="string">"请求数据失败，请稍后重试~"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="/2021/06/18/beego-shi-pin-bo-fang-ye/2.png" alt="description"></p>
+<h3 id="视频剧集列表接口改造"><a href="#视频剧集列表接口改造" class="headerlink" title="视频剧集列表接口改造"></a>视频剧集列表接口改造</h3><p><code>models\video.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 增加redis缓存 - 获取视频剧集列表</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">RedisGetVideoEpisodesList</span><span class="params">(videoId <span class="keyword">int</span>)</span> <span class="params">(<span class="keyword">int64</span>, []Episodes, error)</span></span> {</span><br><span class="line">    <span class="keyword">var</span> (</span><br><span class="line">        episodes []Episodes</span><br><span class="line">        num      <span class="keyword">int64</span></span><br><span class="line">        err      error</span><br><span class="line">    )</span><br><span class="line">    conn := redisClient.PoolConnect()</span><br><span class="line">    <span class="keyword">defer</span> conn.Close()</span><br><span class="line"></span><br><span class="line">    redisKey := <span class="string">"video:episodes:videoId:"</span> + strconv.Itoa(videoId)</span><br><span class="line">    <span class="comment">// 判断rediskey是否已存在</span></span><br><span class="line">    exists, err := redis.Bool(conn.Do(<span class="string">"exists"</span>, redisKey))</span><br><span class="line">    <span class="keyword">if</span> exists {</span><br><span class="line">        num, err = redis.Int64(conn.Do(<span class="string">"llen"</span>, redisKey))</span><br><span class="line">        <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">            values, _ := redis.Values(conn.Do(<span class="string">"lrange"</span>, redisKey, <span class="string">"0"</span>, <span class="string">"-1"</span>))</span><br><span class="line">            <span class="keyword">var</span> episodesInfo Episodes</span><br><span class="line">            <span class="comment">// json转换为字符串？list?</span></span><br><span class="line">            <span class="keyword">for</span> _, v := <span class="keyword">range</span> values {</span><br><span class="line">                err = json.Unmarshal(v.([]<span class="keyword">byte</span>), &amp;episodesInfo)</span><br><span class="line">                <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">                    episodes = <span class="built_in">append</span>(episodes, episodesInfo)</span><br><span class="line">                }</span><br><span class="line">            }</span><br><span class="line">        }</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        o := orm.NewOrm()</span><br><span class="line">        num, err = o.Raw(<span class="string">"SELECT id,title,add_time,num,play_url,comment,aliyun_video_id FROM video_episodes WHERE video_id=? order by num asc"</span>, videoId).QueryRows(&amp;episodes)</span><br><span class="line">        <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">            <span class="comment">// 因为这里获取到的不是字符串，不能保存到redis list中，遍历获取到的信息，把信息json化保存</span></span><br><span class="line">            <span class="keyword">for</span> _, v := <span class="keyword">range</span> episodes {</span><br><span class="line">                jsonValue, err := json.Marshal(v)</span><br><span class="line">                <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">                    <span class="comment">// 保存redis</span></span><br><span class="line">                    conn.Do(<span class="string">"rpush"</span>, redisKey, jsonValue)</span><br><span class="line">                }</span><br><span class="line">            }</span><br><span class="line">            conn.Do(<span class="string">"expire"</span>, redisKey, <span class="number">60</span>*<span class="number">60</span>*<span class="number">24</span>*<span class="number">30</span>)</span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> num, episodes, err</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>controllers\video.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 获取视频剧集列表</span></span><br><span class="line"><span class="comment">// @router /video/episodes/list [*]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *VideoController)</span> <span class="title">VideoEpisodesList</span><span class="params">()</span></span> {</span><br><span class="line">    videoId, _ := this.GetInt(<span class="string">"videoId"</span>)</span><br><span class="line">    <span class="keyword">if</span> videoId == <span class="number">0</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4001</span>, <span class="string">"必须指定视频ID"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">    <span class="comment">// num, episodes, err := models.GetVideoEpisodesList(videoId)</span></span><br><span class="line">    num, episodes, err := models.RedisGetVideoEpisodesList(videoId)</span><br><span class="line">    <span class="keyword">if</span> err == <span class="literal">nil</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnSuccess(<span class="number">0</span>, <span class="string">"success"</span>, episodes, num)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">        this.Data[<span class="string">"json"</span>] = ReturnError(<span class="number">4004</span>, <span class="string">"请求数据失败，请稍后重试~"</span>)</span><br><span class="line">        this.ServeJSON()</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1129,351 +1419,6 @@
 <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BookInfoSerializer</span>(<span class="params">serializers.Serializer</span>):</span></span><br><span class="line">    <span class="string">"""图书数据序列化器"""</span></span><br><span class="line">    id = serializers.IntegerField(label=<span class="string">'ID'</span>, read_only=<span class="literal">True</span>)</span><br><span class="line">    btitle = serializers.CharField(label=<span class="string">'名称'</span>, max_length=<span class="number">20</span>)</span><br><span class="line">    bpub_date = serializers.DateField(label=<span class="string">'发布日期'</span>, required=<span class="literal">False</span>)</span><br><span class="line">    bread = serializers.IntegerField(label=<span class="string">'阅读量'</span>, required=<span class="literal">False</span>)</span><br><span class="line">    bcomment = serializers.IntegerField(label=<span class="string">'评论量'</span>, required=<span class="literal">False</span>)</span><br><span class="line">    image = serializers.ImageField(label=<span class="string">'图片'</span>, required=<span class="literal">False</span>)</span><br></pre></td></tr></tbody></table></figure>
 
 <figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> booktest.serializers <span class="keyword">import</span> BookInfoSerializer</span><br><span class="line">data = {<span class="string">'bpub_date'</span>: <span class="number">123</span>}</span><br><span class="line">serializer = BookInfoSerializer(data=data)</span><br><span class="line">serializer.is_valid()  <span class="comment"># 返回False</span></span><br><span class="line">serializer.errors</span><br><span class="line"><span class="comment"># {'btitle': [ErrorDetail(string='This field is required.', code='required')], 'bpub_date': [ErrorDetail(string='Date has wrong format. Use one of these formats instead: YYYY[-MM[-DD]].', code='invalid')]}</span></span><br><span class="line">serializer.validated_data  <span class="comment"># {}</span></span><br><span class="line"></span><br><span class="line">data = {<span class="string">'btitle'</span>: <span class="string">'python'</span>}</span><br><span class="line">serializer = BookInfoSerializer(data=data)</span><br><span class="line">serializer.is_valid()  <span class="comment"># True</span></span><br><span class="line">serializer.errors  <span class="comment"># {}</span></span><br><span class="line">serializer.validated_data  <span class="comment">#  OrderedDict([('btitle', 'python')])</span></span><br></pre></td></tr></tbody></table></figure><script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/05/31/beego/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/05/31/beego/" class="post-title-link" itemprop="url">beego</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-05-30 16:21:41" itemprop="dateCreated datePublished" datetime="2021-05-30T16:21:41Z">2021-05-30</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-07-08 05:53:15" itemprop="dateModified" datetime="2021-07-08T05:53:15Z">2021-07-08</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/beego/" itemprop="url" rel="index"><span itemprop="name">beego</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>不要用clash的terminal</p>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">go get -u github.com/beego/beego/v2</span><br><span class="line">go get -u github.com/beego/bee/v2</span><br><span class="line">bee version</span><br></pre></td></tr></tbody></table></figure>
-
-<p>Bee主要命令<br><code>bee new project_name</code>新建一个 Web 项目</p>
-<p>bee工具创建的项目结构<br>conf  : 保存了项目的一些配置信息<br>controllers : 保存MVC中的控制器<br>models : 保存MVC中的模型<br>views 保存MVC中的视图<br>routers : 保存了项目的路由<br>static : 保存了项目中的静态资源 images .css .js<br>tests : 保存测试用例<br>main.go : 项目的入口文件</p>
-<p><code>bee api apiproject</code>创建 API 应用的，和 Web 项目相比，少了 static 和 views 目录，多了一个 test 模块，用来做单元测试的</p>
-<p><code>bee run</code> 运行监控 beego 的项目</p>
-<p><code>bee pack</code> 发布应用的时候打包，会把项目打包成 zip 包，这样我们部署的时候直接把打包之后的项目上传，解压就可以部署</p>
-<p>注意：<code>bee pack -be GOOS=linux</code><br>MAC下打的包是不能再linux执行的，需要制定参数</p>
-<h3 id="Beego项目的执行流程"><a href="#Beego项目的执行流程" class="headerlink" title="Beego项目的执行流程"></a>Beego项目的执行流程</h3><p>5.1客户端发起请求<br><a target="_blank" rel="noopener" href="http://127.0.0.1:8080/">http://127.0.0.1:8080/</a><br>5.2执行项目的路由相关代码, 找到处理对应请求的控制器<br>beego.Router(“/“, &amp;controllers.MainController{})<br>5.3执行控制器对应的方法<br>默认会根据请求类型找到对应的请求方法Get/Post方法<br>5.4在对应的方法中处理业务逻辑, 返回对应的界面<br>c.TplName = “index.tpl” // 返回对应的界面<br>5.5客户端显示对应的界面</p>
-<p>先把入门看了<br><a target="_blank" rel="noopener" href="https://beego.me/quickstart">https://beego.me/quickstart</a></p>
-<p>命令行进行编译并执行</p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"github.com/beego/beego/v2/server/web"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> MainController <span class="keyword">struct</span> {</span><br><span class="line">    web.Controller</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *MainController)</span> <span class="title">Get</span><span class="params">()</span></span> {</span><br><span class="line">    this.Ctx.WriteString(<span class="string">"hello world"</span>)</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">    web.Router(<span class="string">"/"</span>, &amp;MainController{})</span><br><span class="line">    web.Run()</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ go build -o hello hello.go</span><br><span class="line">$ ./hello</span><br></pre></td></tr></tbody></table></figure>
-
-<ol>
-<li><p>首先我们导入了包 <code>github.com/beego/beego/v2/server/web</code>。我们知道 Go 语言里面被导入的包会按照<strong>深度优先</strong>的顺序去执行导入包的初始化（变量和 init 函数，更多详情），beego 包中会初始化一个 BeeAPP 的应用和一些参数。</p>
-</li>
-<li><p>定义 Controller，这里我们定义了一个 <code>struct</code> 为 M<code>ainController</code>，充分利用了 Go 语言的组合的概念，匿名包含了 <code>web.Controller</code>，这样我们的 <code>MainController</code> 就拥有了 <code>web.Controller</code> 的所有方法。</p>
-</li>
-<li><p>定义 RESTful 方法，通过匿名组合之后，其实目前的 <code>MainController</code> 已经拥有了 <code>Get</code>、<code>Post</code>、<code>Delete</code>、<code>Put</code> 等方法，这些方法是分别用来对应用户请求的 Method 函数，<br>如果用户发起的是 POST 请求，那么就执行 Post 函数。<br>所以这里我们定义了 <code>MainController</code> 的 <code>Get</code> 方法用来重写继承的 <code>Get</code> 函数，这样当用户发起 GET 请求的时候就会执行该函数。</p>
-</li>
-<li><p>定义 <code>main</code> 函数，所有的 Go 应用程序和 C 语言一样都是 main 函数作为入口，所以我们这里定义了我们应用的入口。</p>
-</li>
-<li><p>Router 注册路由，路由就是告诉 beego，当用户来请求的时候，该如何去调用相应的 Controller，这里我们注册了请求 <code>/</code> 的时候，请求到 <code>MainController</code>。这里我们需要知道，Router 函数的两个参数函数，第一个是路径，第二个是 Controller 的指针。</p>
-</li>
-<li><p>Run 应用，最后一步就是把在步骤 1 中初始化的 BeeApp 开启起来，其实就是内部监听了 8080 端口：Go 默认情况会监听你本机所有的 IP 上面的 8080 端口。</p>
-</li>
-</ol>
-<p><code>URLMapping</code> 新增加的函数，用户如果没有进行注册，那么就会通过反射来执行对应的函数，如果注册了就会通过 interface 来进行执行函数，性能上面会提升很多</p>
-<h3 id="路由设置"><a href="#路由设置" class="headerlink" title="路由设置"></a>路由设置</h3><p>v1是<code>beego.Router</code><br>v2是<code>web.Router</code></p>
-<p>有两种方式：</p>
-<h4 id="在router-go中配置"><a href="#在router-go中配置" class="headerlink" title="在router.go中配置"></a>在<code>router.go</code>中配置</h4><p><code>default.go</code></p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 浏览器输出Hello World</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *MainController)</span> <span class="title">GetHello</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="keyword">var</span> (</span><br><span class="line">        title <span class="keyword">string</span></span><br><span class="line">    )</span><br><span class="line">    title = <span class="string">"Hello world"</span></span><br><span class="line">    c.Ctx.WriteString(title)</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>router.go</code></p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">init</span><span class="params">()</span></span> {</span><br><span class="line">    web.Router(<span class="string">"/hello"</span>, &amp;controllers.MainController{}, <span class="string">"get:GetHello"</span>)</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p><img src="/2021/05/31/beego/1.png" alt="description"></p>
-<h4 id="在router-go中include引入，直接在函数上方配置规则"><a href="#在router-go中include引入，直接在函数上方配置规则" class="headerlink" title="在router.go中include引入，直接在函数上方配置规则"></a>在<code>router.go</code>中<code>include</code>引入，直接在函数上方配置规则</h4><p><code>demo.go</code></p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 输出Hello World!</span></span><br><span class="line"><span class="comment">// @router /demo/hello [get]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *DemoController)</span> <span class="title">GetHello</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="keyword">var</span> (</span><br><span class="line">        title <span class="keyword">string</span></span><br><span class="line">    )</span><br><span class="line">    title = <span class="string">"Hello World!"</span></span><br><span class="line">    this.Ctx.WriteString(title)</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>router.go</code>注册路由</p>
-<p>controller 的 method 方法上面须有 router 注释（// @router），</p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">init</span><span class="params">()</span></span> {</span><br><span class="line">    web.Include(&amp;controllers.DemoController{})</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p><img src="/2021/05/31/beego/2.png" alt="description"></p>
-<h3 id="MVC模式"><a href="#MVC模式" class="headerlink" title="MVC模式"></a>MVC模式</h3><p>在目录下有 controllers models views 文件夹分别存放controller文件，model文件和模板文件。<br>后面项目中用到的文件都会分别在这三个文件夹中</p>
-<p>过滤器，<br>进行安全验证，访问用户中心的时候，<br>进行是否登录的判断可以在过滤器中，<br>也可以实现屏蔽IP的功能，<br>屏蔽黑名单的功能等等，对项目有整体的规则时，<br>都可以在过滤器中实现，不用在每个函数中来实现了</p>
-<p>过滤器是通过<code>beego.insertfilter(pattern string, positon int, filter FilterFunc, skip ...bool)</code>函数来实现的</p>
-<p><code>router.go</code></p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">init</span><span class="params">()</span></span> {</span><br><span class="line">    <span class="comment">// 这里是屏蔽规则，包含demo/的url都走过滤规则屏蔽；</span></span><br><span class="line">    <span class="comment">// 第二个参数是BeforeRouter，在寻找加载路由之前</span></span><br><span class="line">    <span class="comment">// 第三个参数是要执行的函数名。</span></span><br><span class="line">    <span class="keyword">var</span> FilterDemo = <span class="function"><span class="keyword">func</span><span class="params">(ctx *context.Context)</span></span> {</span><br><span class="line">        <span class="keyword">var</span> (</span><br><span class="line">            title <span class="keyword">string</span></span><br><span class="line">        )</span><br><span class="line">        title = <span class="string">"禁止访问"</span></span><br><span class="line">        ctx.WriteString(title)</span><br><span class="line">    }</span><br><span class="line">    web.InsertFilter(<span class="string">"/demo/*"</span>, web.BeforeRouter, FilterDemo)</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p><img src="/2021/05/31/beego/3.png" alt="description"></p>
-<h3 id="配置信息"><a href="#配置信息" class="headerlink" title="配置信息"></a>配置信息</h3><p>beego提供了专门配置文件，配置信息定义在conf文件夹中的app.conf</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">appname = fyouku // 项目名称</span><br><span class="line">httpport = 8098  // 访问端口号</span><br><span class="line">runmode = dev    // 运行环境，下面会根据运行环境加载不同配置</span><br><span class="line"></span><br><span class="line">[dev]  // 开发环境</span><br><span class="line">apiurl = http://127.0.0.1:8099</span><br><span class="line">microApi = http://127.0.0.1:8085</span><br><span class="line">defaultdb = root:123456@(127.0.0.1:3306)/fyouku?charset=utf8</span><br><span class="line">redisdb = 127.0.0.1:6379</span><br><span class="line">rabbitmq = amqp://guest:guest@127.0.0.1:5672/</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[prod]  // 线上环境</span><br><span class="line">apiurl = http://127.0.0.1:8099</span><br><span class="line">microApi = http://127.0.0.1:8085</span><br><span class="line">defaultdb = root:123456@(127.0.0.1:3306)/fyouku?charset=utf8</span><br><span class="line">redisdb = 127.0.0.1:6379</span><br><span class="line">rabbitmq = amqp://guest:guest@127.0.0.1:5672/</span><br></pre></td></tr></tbody></table></figure>
-
-<p>静态文件</p>
-<p>项目中的css、js、img文件都是怎样访问的，bee new创建的项目中有static文件夹，这是beego默认注册的静态文件处理目录</p>
-<figure class="highlight actionscript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">├── <span class="keyword">static</span></span><br><span class="line">    │   ├── css</span><br><span class="line">    │   ├── img</span><br><span class="line">    │   └── js</span><br></pre></td></tr></tbody></table></figure>
-<p>访问地址为：<a target="_blank" rel="noopener" href="http://127.0.0.1:8080/static/js/fyouku.js">http://127.0.0.1:8080/static/js/fyouku.js</a></p>
-<p>也可以通过下面命令来自定义目录</p>
-<figure class="highlight less"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">beego</span><span class="selector-class">.SetStaticPath</span>(<span class="string">"/down1"</span>, <span class="string">"download1"</span>)</span><br></pre></td></tr></tbody></table></figure>
-
-<p>view语法</p>
-<ul>
-<li>统一使用 作为左右标签</li>
-<li><code>.</code> 访问当前位置的上下文</li>
-<li><code>$</code> 引用当前模板根级的上下文</li>
-<li><code>$var</code> 访问创建的变量</li>
-</ul>
-<p>判断语句 <code>if ... else ... end</code></p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">{{if eq .IsEmail 1}}</span><br><span class="line">    &lt;a class="email" href="mailto:{{.Email}}"&gt;{{.Email}}&lt;/a&gt;</span><br><span class="line">{{else}}</span><br><span class="line">    &lt;a class="email" href="#"&gt;不允许访问Email&lt;/a&gt;</span><br><span class="line">{{end}}</span><br></pre></td></tr></tbody></table></figure>
-
-<p>循环语句 range</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">{{range $index,$value := .Pages}}</span><br><span class="line">    {{$index}} - {{$value.Num}} of {{$.Website}}</span><br><span class="line">    &lt;br&gt;</span><br><span class="line">{{end}}</span><br></pre></td></tr></tbody></table></figure>
-
-<p>载入其它模板</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">{{template "head.html" .}}</span><br></pre></td></tr></tbody></table></figure>
-
-<p>指定首页的模板</p>
-<p><code>controllers/default.go</code></p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *MainController)</span> <span class="title">Get</span><span class="params">()</span></span> {</span><br><span class="line">    c.Data[<span class="string">"Website"</span>] = <span class="string">"beego.me"</span></span><br><span class="line">    c.Data[<span class="string">"Email"</span>] = <span class="string">"astaxie@gmail.com"</span></span><br><span class="line">    c.Data[<span class="string">"IsEmail"</span>] = <span class="number">1</span></span><br><span class="line">    c.TplName = <span class="string">"index.tpl"</span></span><br><span class="line">    pages := []<span class="keyword">struct</span> {</span><br><span class="line">        Num <span class="keyword">int</span></span><br><span class="line">    }{{<span class="number">10</span>}, {<span class="number">20</span>}, {<span class="number">30</span>}}</span><br><span class="line">    c.Data[<span class="string">"Pages"</span>] = pages</span><br><span class="line"></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>views/footer.tpl</code></p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;footer&gt;</span><br><span class="line">  &lt;div class="author"&gt;</span><br><span class="line">    demo Official website:</span><br><span class="line">    &lt;a href="http://{{.Website}}"&gt;{{.Website}}&lt;/a&gt; /</span><br><span class="line">    Contact me:</span><br><span class="line">    {{if eq .IsEmail 1}}</span><br><span class="line">      &lt;a class="email" href="mailto:{{.Email}}"&gt;{{.Email}}&lt;/a&gt;</span><br><span class="line">    {{else}}</span><br><span class="line">          &lt;a class="email" href="mailto:{{.Email}}"&gt;禁止显示&lt;/a&gt;</span><br><span class="line">    {{end}}</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/footer&gt;</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>views/index.tpl</code></p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">  &lt;header&gt;</span><br><span class="line">    &lt;h1 class="logo"&gt;Welcome to Beego&lt;/h1&gt;</span><br><span class="line">    &lt;div class="description"&gt;</span><br><span class="line">      Beego is a simple &amp; powerful Go web framework which is inspired by tornado and sinatra.</span><br><span class="line">      {{range $index, $value := .Pages}}</span><br><span class="line">      &lt;br&gt;</span><br><span class="line">      {{$index}} - {{$value.Num}} of {{$.Website}}</span><br><span class="line">      {{end}}</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  &lt;/header&gt;</span><br><span class="line">{{template "footer.tpl" .}}</span><br></pre></td></tr></tbody></table></figure>
-
-<p><img src="/2021/05/31/beego/4.png" alt="description"></p>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/05/31/drf-yong-hu-shou-cang-jie-kou-shi-xian/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/05/31/drf-yong-hu-shou-cang-jie-kou-shi-xian/" class="post-title-link" itemprop="url">drf用户收藏接口实现</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-05-30 16:21:41" itemprop="dateCreated datePublished" datetime="2021-05-30T16:21:41Z">2021-05-30</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-06-16 15:11:07" itemprop="dateModified" datetime="2021-06-16T15:11:07Z">2021-06-16</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>用户点击收藏会创建一条收藏数据，用户再次点击一次，应该删除该条数据<br>设置user与good唯一索引验证：</p>
-<p>法一<br>因为在<code>UserFavSerializer</code>中使用的是<code>ModelSerializer</code>，类似于Django的<code>ModelForm</code>，它需要满足model中配置的条件，model中配置了<code>unique_together = ['user', 'goods']</code>，当提交的数据不满足就会抛出异常。</p>
-<p><code>user_operation/models.py</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserFav</span>(<span class="params">models.Model</span>):</span></span><br><span class="line">    <span class="string">'''用户收藏'''</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        <span class="comment"># 联合唯一验证，当数据已存在时，数据库就会抛出异常</span></span><br><span class="line">        unique_together = (<span class="string">'user'</span>, <span class="string">'goods'</span>)</span><br></pre></td></tr></tbody></table></figure>
-
-<p>法二：<br>序列化验证器<code>UniqueTogetherValidator</code></p>
-<p>添加指定商品和当前用户到收藏，所以需要获取当前用户<br><code>Advanced field defaults</code>的<code>CurrentUserDefault</code></p>
-<p>A default class that can be used to represent the current user. In order to use this,<br>the ‘request’ must have been provided as part of the context dictionary when instantiating the serializer.<br>可用于表示当前用户的默认类。为了使用它，在实例化序列化器时，request必须作为上下文字典的一部分提供</p>
-<p><code>user_operation/serializers.py</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework <span class="keyword">import</span> serializers</span><br><span class="line"><span class="keyword">from</span> rest_framework.validators <span class="keyword">import</span> UniqueTogetherValidator</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> .models <span class="keyword">import</span> UserFav</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserFavSerializer</span>(<span class="params">serializers.ModelSerializer</span>):</span></span><br><span class="line">    <span class="string">"""序列化用户收藏数据"""</span></span><br><span class="line">    <span class="comment"># 获取当前登录用户，不可以选择其他用户</span></span><br><span class="line">    user = serializers.HiddenField(default=serializers.CurrentUserDefault())</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        model = UserFav</span><br><span class="line">        <span class="comment"># 收藏的时候需要返回商品的id，因为取消收藏的时候必须知道商品的id是多少</span></span><br><span class="line">        fields = [<span class="string">'id'</span>, <span class="string">'user'</span>, <span class="string">'goods'</span>]</span><br><span class="line">        <span class="comment"># UserFav items belong to a parent list, and have an ordering defined by the 'position' field.</span></span><br><span class="line">        <span class="comment"># No two items in a given list may share the same position.</span></span><br><span class="line">        <span class="comment"># UserFav项目属于父列表，并且有一个由“position”字段定义的顺序。给定列表中的任何两项不得共享同一位置。</span></span><br><span class="line">        validators = [  <span class="comment"># validate实现唯一联合，同一用户对同一商品只能收藏一次</span></span><br><span class="line">            UniqueTogetherValidator(</span><br><span class="line">                queryset=UserFav.objects.filter(is_delete=<span class="literal">False</span>),</span><br><span class="line">                fields=[<span class="string">'user'</span>, <span class="string">'goods'</span>],</span><br><span class="line">                message=<span class="string">'请勿重复收藏'</span>  <span class="comment"># message的信息可以自定义</span></span><br><span class="line">            )</span><br><span class="line">        ]</span><br></pre></td></tr></tbody></table></figure>
-
-<p>以上<code>validators</code>不是作用域某个字段之上了，需要写在<code>Meta</code>中，因为<code>UniqueTogetherValidator</code>是作用域两个或两个字段以上的，不是针对一个字段，所以需要写在这。</p>
-<p>按照商品的<code>id</code>显示收藏详情。可用性高，用户进入商品详情页，用户要去查询这个商品有没有被收藏，<br>在数据接口url中传入商品 goods_id去查询，<br>如果有记录，则页面就显示已收藏的信息，如果没被记录，表明商品没被收藏。<br>而不再是根据默认的UserFav收藏表的主键id进行查找，实现自己设置查询使用字段进行查询queryset对象</p>
-<p><code>lookup_field</code>字段是在<code>get_queryset(self)</code>筛选过滤之后的结果进行查找，也就是过滤当前登录用户，保证了唯一性，所以不会出错。对于同一个商品，可能会被很多人收藏，但并不会造成查询出错，因为模型定义了商品和用户构成了联合唯一，过滤当前登录用户则对应的收藏商品唯一</p>
-<p><code>user_operation/views.py</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework <span class="keyword">import</span> viewsets, mixins</span><br><span class="line"><span class="keyword">from</span> rest_framework.authentication <span class="keyword">import</span> SessionAuthentication</span><br><span class="line"><span class="keyword">from</span> rest_framework.permissions <span class="keyword">import</span> IsAuthenticated</span><br><span class="line"><span class="keyword">from</span> rest_framework_simplejwt.authentication <span class="keyword">import</span> JWTAuthentication</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> utils.permissions <span class="keyword">import</span> IsOwnerOrReadOnly</span><br><span class="line"><span class="keyword">from</span> .models <span class="keyword">import</span> UserFav</span><br><span class="line"><span class="keyword">from</span> .serializers <span class="keyword">import</span> UserFavSerializer</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserFavViewSet</span>(<span class="params">mixins.CreateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin,</span></span></span><br><span class="line"><span class="class"><span class="params">                     mixins.DestroyModelMixin, viewsets.GenericViewSet</span>):</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    list:</span></span><br><span class="line"><span class="string">        用户收藏列表</span></span><br><span class="line"><span class="string">    create:</span></span><br><span class="line"><span class="string">        创建添加一条收藏记录</span></span><br><span class="line"><span class="string">    retrieve:</span></span><br><span class="line"><span class="string">        根据ID查询到用户收藏详情</span></span><br><span class="line"><span class="string">    destroy:</span></span><br><span class="line"><span class="string">        删除用户收藏</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    queryset = UserFav.objects.filter(is_delete=<span class="literal">False</span>)</span><br><span class="line">    <span class="comment"># IsAuthenticated：必须登录用户；IsOwnerOrReadOnly：必须是当前登录的用户</span></span><br><span class="line">    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]</span><br><span class="line">    serializer_class = UserFavSerializer</span><br><span class="line">    authentication_classes = [JWTAuthentication, SessionAuthentication]</span><br><span class="line">    lookup_field = <span class="string">'goods_id'</span>  <span class="comment"># 传入商品 goods_id去查询，而不再是根据默认的UserFav收藏表的主键id进行查找</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_queryset</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="string">"""只能查看当前登录用户的收藏，不会获取所有用户的收藏"""</span></span><br><span class="line">        <span class="keyword">return</span> UserFav.objects.filter(user=self.request.user, is_delete=<span class="literal">False</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_serializer_class</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="string">'''动态设置序列化'''</span></span><br><span class="line">        <span class="keyword">if</span> self.action == <span class="string">'list'</span>:</span><br><span class="line">            <span class="keyword">return</span> UserFavDetailSerializer</span><br><span class="line">        <span class="keyword">elif</span> self.action == <span class="string">'create'</span>:</span><br><span class="line">            <span class="keyword">return</span> UserFavSerializer</span><br><span class="line">        <span class="keyword">return</span> UserFavSerializer</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>url.py</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> user_operation.views <span class="keyword">import</span> UserFavViewSet</span><br><span class="line"></span><br><span class="line">router.register(<span class="string">'userfavs'</span>, UserFavViewSet)</span><br></pre></td></tr></tbody></table></figure>
-
-<p>查看已收藏列表<br><img src="/2021/05/31/drf-yong-hu-shou-cang-jie-kou-shi-xian/1.png" alt="description"></p>
-<p>选中一个商品，点击POST，这时候会向后台提交一个数据<br><img src="/2021/05/31/drf-yong-hu-shou-cang-jie-kou-shi-xian/2.png" alt="description"><br><img src="/2021/05/31/drf-yong-hu-shou-cang-jie-kou-shi-xian/3.png" alt="description"></p>
-<p>查看一个已收藏详情<br><img src="/2021/05/31/drf-yong-hu-shou-cang-jie-kou-shi-xian/4.png" alt="description"></p>
-<p>当某个商品已经存在收藏时再重复添加收藏，在两个及以上字段联合验证失败时返回错误信息的关键字段，前端在接收后可以进行相应处理<code>non_field_errors</code>，会提示自定义提示“请勿重复收藏”<br><img src="/2021/05/31/drf-yong-hu-shou-cang-jie-kou-shi-xian/5.png" alt="description"></p>
-<p><code>non_field_errors</code>表示不能指定某一个字段的错误，而是多个字段造成的错误。可以在前端判断，如果出现<code>non_field_errors</code>字段，则表示整体的错误，不需要写在某个表单下面提示。</p>
-<p>取消收藏前 <code>user_operation_userfav</code></p>
-<figure class="highlight sql"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">+<span class="comment">------------------+------------------+--------------------+</span></span><br><span class="line">| id  | add_time         | is_delete       | goods_id | user_id |</span><br><span class="line">+<span class="comment">------------------------------------------+---------------+-</span></span><br><span class="line">| 1   | 2021-05-31 15:31:54.767265  |  0   |   1   |   1      |</span><br><span class="line">| 2   | 2021-05-31 16:11:07.655320  |  0   |   4   |   1      |</span><br><span class="line">| 3   | 2021-05-31 16:11:22.720074  |  0   |  10   |   6      |</span><br><span class="line">| 8   | 2021-05-31 22:30:30.567272  |  0   |   2   |   1      |</span><br><span class="line">+<span class="comment">------------------------------------------+---------------+-</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.01</span> sec)</span><br></pre></td></tr></tbody></table></figure>
-
-<p>取消收藏，例如取消商品goods_id=10</p>
-<p><img src="/2021/05/31/drf-yong-hu-shou-cang-jie-kou-shi-xian/6.png" alt="description"><br><img src="/2021/05/31/drf-yong-hu-shou-cang-jie-kou-shi-xian/7.png" alt="description"></p>
-<figure class="highlight sql"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">+<span class="comment">------------------+------------------+--------------------+</span></span><br><span class="line">| id  | add_time          | is_delete    | goods_id | user_id |</span><br><span class="line">+<span class="comment">------------------------------------------+---------------+-</span></span><br><span class="line">| 1 | 2021-05-31 15:31:54.767265 |  0    |       1 | 1        |</span><br><span class="line">| 2 | 2021-05-31 16:11:07.655320 |  0    |       4 | 1        |</span><br><span class="line">| 8 | 2021-05-31 22:30:30.567272 |  0    |       2 | 1        |</span><br><span class="line">+<span class="comment">------------------------------------------+---------------+-</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.01</span> sec)</span><br></pre></td></tr></tbody></table></figure>
-
-<p>第一次DELETE请求时返回信息204，说明删除成功，第二次再执行则返回未找到，再次印证删除成功。</p>
-<p><img src="/2021/05/31/drf-yong-hu-shou-cang-jie-kou-shi-xian/8.png" alt="description"><br><img src="/2021/05/31/drf-yong-hu-shou-cang-jie-kou-shi-xian/9.png" alt="description"></p>
-<h3 id="用户收藏商品详情"><a href="#用户收藏商品详情" class="headerlink" title="用户收藏商品详情"></a>用户收藏商品详情</h3><p>在前面已经写好了用户收藏和取消收藏商品的功能，访问 <a target="_blank" rel="noopener" href="http://127.0.0.1:8000/userfavs/">http://127.0.0.1:8000/userfavs/</a> 即可看到，但收藏的商品只显示了商品的id</p>
-<p>显示商品的具体信息，首先还得做序列化。直接使用商品已做好的序列化类，也可以自己写，只显示所需要的信息。</p>
-<p><code>user_operation/serializer.py</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> goods.serializers <span class="keyword">import</span> GoodsSerializer</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserFavDetailSerializer</span>(<span class="params">serializers.ModelSerializer</span>):</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    用户收藏详情</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    <span class="comment"># 通过商品id而不是收藏表id获取收藏的商品，需要嵌套商品的序列化</span></span><br><span class="line">    goods = GoodsSerializer()</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        model = UserFav</span><br><span class="line">        fields = [<span class="string">'id'</span>, <span class="string">'goods'</span>]</span><br></pre></td></tr></tbody></table></figure>
-
-<p>收藏商品和显示用户已收藏的商品使用了不同的序列化类，则也需要用到动态Serializer<br><code>user_operation/views.py</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework <span class="keyword">import</span> viewsets</span><br><span class="line"><span class="keyword">from</span> rest_framework <span class="keyword">import</span> mixins</span><br><span class="line"><span class="keyword">from</span> .models <span class="keyword">import</span> UserFav</span><br><span class="line"><span class="keyword">from</span> .serializers <span class="keyword">import</span> UserFavSerializer, UserFavDetailSerializer</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserFavViewSet</span>(<span class="params">mixins.CreateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin,</span></span></span><br><span class="line"><span class="class"><span class="params">                     mixins.DestroyModelMixin, viewsets.GenericViewSet</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    list:获取用户收藏商品列表</span></span><br><span class="line"><span class="string">    create:</span></span><br><span class="line"><span class="string">        添加一条用户收藏商品</span></span><br><span class="line"><span class="string">    retrieve:</span></span><br><span class="line"><span class="string">        根据商品ID获取用户收藏详情</span></span><br><span class="line"><span class="string">    destroy:</span></span><br><span class="line"><span class="string">        删除用户收藏商品</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    queryset = UserFav.objects.filter(is_delete=<span class="literal">False</span>)</span><br><span class="line">    <span class="comment"># IsAuthenticated：必须登录用户；IsOwnerOrReadOnly：必须是当前登录的用户</span></span><br><span class="line">    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]</span><br><span class="line">    authentication_classes = [JWTAuthentication, SessionAuthentication]</span><br><span class="line">    lookup_field = <span class="string">'goods_id'</span>  <span class="comment"># 单个模型实例的对象查找的模型字段，即查询单一数据库对象时使用的条件字段，默认为pk，即主键</span></span><br><span class="line">    <span class="comment"># 这样在数据接口中就可以直接传入商品id并根据该字段进行查询，</span></span><br><span class="line">    <span class="comment"># 而不再是根据UserFav的主键id进行查找，就到了自己设置查询使用字段的目的，可用性更高。</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_queryset</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="comment"># 只能查看当前登录用户的收藏，不会获取所有用户的收藏</span></span><br><span class="line">        <span class="keyword">return</span> UserFav.objects.filter(user=self.request.user, is_delete=<span class="literal">False</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_serializer_class</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="string">'''不同的action使用不同的序列化'''</span></span><br><span class="line">        <span class="keyword">if</span> self.action == <span class="string">'list'</span>:</span><br><span class="line">            <span class="keyword">return</span> UserFavDetailSerializer</span><br><span class="line">        <span class="keyword">elif</span> self.action == <span class="string">'create'</span>:</span><br><span class="line">            <span class="keyword">return</span> UserFavSerializer</span><br><span class="line">        <span class="keyword">return</span> UserFavSerializer</span><br></pre></td></tr></tbody></table></figure>
-
-<p><img src="/2021/05/31/drf-yong-hu-shou-cang-jie-kou-shi-xian/10.png" alt="description"><br><img src="/2021/05/31/drf-yong-hu-shou-cang-jie-kou-shi-xian/11.jpeg" alt="description"></p>
-<h2 id="商品收藏数"><a href="#商品收藏数" class="headerlink" title="商品收藏数"></a>商品收藏数</h2><p>法一</p>
-<p><code>user_operation/view.py</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserFavViewSet</span>(<span class="params">mixins.CreateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin,</span></span></span><br><span class="line"><span class="class"><span class="params">                     mixins.DestroyModelMixin, viewsets.GenericViewSet</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    list:获取用户收藏商品列表</span></span><br><span class="line"><span class="string">    create:</span></span><br><span class="line"><span class="string">        添加一条用户收藏商品</span></span><br><span class="line"><span class="string">    retrieve:</span></span><br><span class="line"><span class="string">        根据商品ID获取用户收藏详情</span></span><br><span class="line"><span class="string">    destroy:</span></span><br><span class="line"><span class="string">        删除用户收藏商品</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    queryset = UserFav.objects.filter(is_delete=<span class="literal">False</span>)</span><br><span class="line">    <span class="comment"># IsAuthenticated：必须登录用户；IsOwnerOrReadOnly：必须是当前登录的用户</span></span><br><span class="line">    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]</span><br><span class="line">    <span class="comment"># serializer_class = UserFavSerializer</span></span><br><span class="line">    authentication_classes = [JWTAuthentication, SessionAuthentication]</span><br><span class="line">    lookup_field = <span class="string">'goods_id'</span>  <span class="comment"># 单个模型实例的对象查找的模型字段，即查询单一数据库对象时使用的条件字段，默认为pk，即主键</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 这样在数据接口中就可以直接传入商品id并根据该字段进行查询，</span></span><br><span class="line">    <span class="comment"># 而不再是根据UserFav的主键id进行查找，就到了自己设置查询使用字段的目的，可用性更高。</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_queryset</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="comment"># 只能查看当前登录用户的收藏，不会获取所有用户的收藏</span></span><br><span class="line">        <span class="keyword">return</span> UserFav.objects.filter(user=self.request.user, is_delete=<span class="literal">False</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_serializer_class</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="string">'''不同的action使用不同的序列化'''</span></span><br><span class="line">        <span class="keyword">if</span> self.action == <span class="string">'list'</span>:</span><br><span class="line">            <span class="keyword">return</span> UserFavDetailSerializer</span><br><span class="line">        <span class="keyword">elif</span> self.action == <span class="string">'create'</span>:</span><br><span class="line">            <span class="keyword">return</span> UserFavSerializer</span><br><span class="line">        <span class="keyword">return</span> UserFavSerializer</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 使用信号实现，该处代码不需要了</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">perform_create</span>(<span class="params">self, serializer</span>):</span></span><br><span class="line">        <span class="comment"># 重写实现添加收藏商品，商品收藏数+1</span></span><br><span class="line">        <span class="comment"># 序列化保存，然后将它赋值给一个实例，也就是UserFav(models.Model)对象</span></span><br><span class="line">        instance = serializer.save()</span><br><span class="line">        <span class="comment"># 这里instance相当于UserFav model，通过它找到goods获取其中的商品</span></span><br><span class="line">        goods = instance.goods</span><br><span class="line">        <span class="comment"># 商品收藏数+1</span></span><br><span class="line">        goods.fav_num += <span class="number">1</span></span><br><span class="line">        goods.save()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">perform_destroy</span>(<span class="params">self, instance</span>):</span></span><br><span class="line">        <span class="comment"># 删除收藏商品，商品收藏数-1</span></span><br><span class="line">        goods = instance.goods</span><br><span class="line">        <span class="comment"># 商品收藏数-1</span></span><br><span class="line">        goods.fav_num -= <span class="number">1</span></span><br><span class="line">        <span class="keyword">if</span> goods.fav_num &lt; <span class="number">0</span>:</span><br><span class="line">            goods.fav_num = <span class="number">0</span></span><br><span class="line">        goods.save()</span><br><span class="line">        instance.delete()</span><br></pre></td></tr></tbody></table></figure>
-
-<p>法二 收藏注释掉上方的<code>perform_create(self, serializer)</code>和<code>perform_destroy(self, instance)</code></p>
-<p><code>django.db.models.signals.pre_delete</code><br>在模型的 <code>delete()</code> 方法和查询集的 <code>delete()</code> 方法开始时发送。</p>
-<p>用此信号发送的参数：</p>
-<p><code>sender</code>模型类<br><code>instance</code>实际被删除的实例。<br><code>using</code>正在使用的数据库别名。</p>
-<p>post_delete<br><code>django.db.models.signals.post_delete</code><br>就像 <code>pre_delete</code> 一样，但在模型的 <code>delete()</code> 方法和查询集的 <code>delete()</code> 方法结束时发送。</p>
-<p>用此信号发送的参数：</p>
-<p><code>sender</code>模型类<br><code>instance</code>实际被删除的实例。<br>请注意，该对象将不再在数据库中，所以要非常小心地处理这个实例。<br><code>using</code>正在使用的数据库别名。</p>
-<p><code>user_operation/signals.py</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.db.models.signals <span class="keyword">import</span> post_save, post_delete</span><br><span class="line"><span class="keyword">from</span> django.dispatch <span class="keyword">import</span> receiver</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> .models <span class="keyword">import</span> UserFav</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># post_save:接收信号的方式</span></span><br><span class="line"><span class="comment"># sender: 接收信号的model</span></span><br><span class="line"><span class="meta">@receiver(post_save, sender=UserFav)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">create_userfav</span>(<span class="params">sender, instance=None, created=False, **kwargs</span>):</span></span><br><span class="line">    <span class="keyword">if</span> created:</span><br><span class="line">        goods = instance.goods</span><br><span class="line">        goods.fav_num += <span class="number">1</span></span><br><span class="line">        goods.save()</span><br><span class="line"></span><br><span class="line"><span class="comment"># post_delete指定信号触发类型，</span></span><br><span class="line"><span class="comment"># sender指定到具体对象</span></span><br><span class="line"><span class="meta">@receiver(post_delete, sender=UserFav)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">delete_userfav</span>(<span class="params">sender, instance=None, created=False, **kwargs</span>):</span></span><br><span class="line">    <span class="comment"># instance表示被删除的对象</span></span><br><span class="line">    goods = instance.goods</span><br><span class="line">    goods.fav_num -= <span class="number">1</span></span><br><span class="line">    <span class="keyword">if</span> goods.fav_num &lt; <span class="number">0</span>:</span><br><span class="line">        goods.fav_num = <span class="number">0</span></span><br><span class="line">    goods.save()</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>user_operation/apps.py</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.apps <span class="keyword">import</span> AppConfig</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserOperationConfig</span>(<span class="params">AppConfig</span>):</span></span><br><span class="line">    name = <span class="string">'user_operation'</span></span><br><span class="line">    verbose_name = <span class="string">'用户操作模块'</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">ready</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="string">"""在子类中重写此方法，以便在Django启动时运行代码"""</span></span><br><span class="line">        <span class="keyword">import</span> user_operation.signals</span><br></pre></td></tr></tbody></table></figure>
-<script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
