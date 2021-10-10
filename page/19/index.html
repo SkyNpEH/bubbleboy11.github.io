@@ -119,7 +119,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">359</span>
+          <span class="site-state-item-count">362</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -160,6 +160,372 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/io-duo-lu-fu-yong/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/io-duo-lu-fu-yong/" class="post-title-link" itemprop="url">HTML</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-04-05 14:11:43" itemprop="dateModified" datetime="2021-04-05T14:11:43Z">2021-04-05</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Markdown/" itemprop="url" rel="index"><span itemprop="name">Markdown</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>Unix网络编程中提到了5种网络模型</p>
+<ul>
+<li>Blocking IO 阻塞式IO，一次只能处理一个请求。</li>
+<li>Noblocking IO 非阻塞式IO</li>
+<li>IO multiplexing IO多路复用（高并发框架使用）</li>
+<li>Signal Driven IO 信号驱动的IO</li>
+<li>Asynchronous IO 异步IO</li>
+</ul>
+<p>现在服务器基本使用 IO多路复用，实现单进程同时处理多个 socket 请求。</p>
+<h3 id="IO多路复用？"><a href="#IO多路复用？" class="headerlink" title="IO多路复用？"></a>IO多路复用？</h3><p>IO多路复用就是操作系统提供的同时监听多个 socket 的机制</p>
+<ul>
+<li>为了实现高并发需要一种机制并发处理多个 socket</li>
+<li>Linux 常见的是 select / poll / epoll 系统调用</li>
+<li>可以使用单线程单进程处理多个 socket<br>为什么 select 就能实现高并发呢？<br>select 可以同时处理多个 socket，有一个就绪应用程序代码就可以处理它<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 使用IO复用代码格式</span></span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    events = sel.select()    <span class="comment"># 系统阻塞在select，直到有一个socket就绪</span></span><br><span class="line">    <span class="keyword">for</span> key,mask <span class="keyword">in</span> events:   <span class="comment"># 当socket就绪之后就遍历事件</span></span><br><span class="line">        callback = key.data</span><br><span class="line">        callback(key.fileobj, mask)</span><br></pre></td></tr></tbody></table></figure>
+
+</li>
+</ul>
+<p>重点是索引就绪文件的时间复杂度，一般优先使用epoll,O(1)</p>
+<p>Python 封装了操作系统的IO多路复用<br>Python 的IO多路复用基于操作系统实现( select / poll / epoll )<br>Python2 select 模块<br>Python3 selectors 模块<br>selectors模块<br>事件类型: </p>
+<ul>
+<li>EVENT_READ 表示socket可读，</li>
+<li>EVENT_WRITE 表示socket可写</li>
+</ul>
+<p>Default selector:自动根据平台选取合适的o模型</p>
+<ul>
+<li>register(fileobj, events, data=None)</li>
+<li>unregister(fileobj)</li>
+<li>modify(fileobj, events, data=None)</li>
+<li>select(timeout=None): returns[(key, events)]</li>
+<li>close()</li>
+</ul>
+<p>下面是一个简单的echo服务器实现 ：异步的TCP回显,它能够并发的处理客户端请求，把客户端发的再发回去，这就是TCP回显服务器。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> selectors</span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"> </span><br><span class="line">sel = selectors.DefaultSelector()</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">accept</span>(<span class="params">sock, mask</span>):</span></span><br><span class="line">    conn, addr = sock.accept()  <span class="comment"># Should be ready</span></span><br><span class="line">    print(<span class="string">'accepted'</span>, conn, <span class="string">'from'</span>, addr)</span><br><span class="line">    conn.setblocking(<span class="literal">False</span>)</span><br><span class="line">    sel.register(conn, selectors.EVENT_READ, read)  <span class="comment"># 注册read回调</span></span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">read</span>(<span class="params">conn, mask</span>):</span></span><br><span class="line">    data = conn.recv(<span class="number">1000</span>)  <span class="comment"># Should be ready</span></span><br><span class="line">    <span class="keyword">if</span> data:</span><br><span class="line">        print(<span class="string">'echoing'</span>, repr(data), <span class="string">'to'</span>, conn)</span><br><span class="line">        conn.send(data)  <span class="comment"># Hope it won't block</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        print(<span class="string">'closing'</span>, conn)</span><br><span class="line">        sel.unregister(conn)</span><br><span class="line">        conn.close()</span><br><span class="line"> </span><br><span class="line"><span class="comment"># 服务端</span></span><br><span class="line">sock = socket.socket()</span><br><span class="line">sock.bind((<span class="string">'localhost'</span>, <span class="number">1234</span>))</span><br><span class="line">sock.listen(<span class="number">100</span>)</span><br><span class="line">sock.setblocking(<span class="literal">False</span>)</span><br><span class="line">sel.register(sock, selectors.EVENT_READ, accept) <span class="comment"># 注册accept回调</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:       <span class="comment"># 事件循环</span></span><br><span class="line">    events = sel.select()</span><br><span class="line">    <span class="keyword">for</span> key, mask <span class="keyword">in</span> events:</span><br><span class="line">        callback = key.data</span><br><span class="line">        callback(key.fileobj, mask)</span><br></pre></td></tr></tbody></table></figure><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/mvc/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/mvc/" class="post-title-link" itemprop="url">MVC</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-04-24 12:20:07" itemprop="dateModified" datetime="2021-04-24T12:20:07Z">2021-04-24</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>什么是 MVC模式？<br>mvc出现的意义就是解耦，比如：模型代表数据，视图代表展示层，控制器代表操作，<br>解耦数据、展示和操作。</p>
+<p>M=Mode 模型：负责业务对象和数据库的交互(ORM)。数据模型层，通常对数据加工和一些其它处理 ( 数据相关操作 )。<br>V=View 视图：负责与用户的交互展示，前端输出的内容,比如:颜色、文字、表单等等。视图层，跟用户交互的页面上东西。<br>一个视图的工作就是：从参数获取数据，装载一个HTML页面模板，然后将根据获取的数据对模板进行渲染。<br>C= Controller控制器：起到粘合剂的作用，接收请求参数调用模型和视图完成请求，C进行处理，与M和V进行交互，返回应答，实现的功能,比如:加减乘除、增删改写。业务处理层，处理业务逻辑。</p>
+<p>M:model，模型，和MVC中M功能相同，和数据库进行交互<br>V：view，视图，和MVC中C功能相同，接受请求，进行处理，和M和T进行交互，返回应答<br>T：Template模板，和MVC中V功能相同，产生HTML页面</p>
+<p>&nbsp; &nbsp; &nbsp;图解：典型的一个web框架使用MVC模式怎么处理请求。首先用户在浏览器输入url之后，后端web框架通过url的routes，寻找url匹配之后调用那个controller，在controller通过model跟数据库一个交互，然后通过调用view层去展示逻辑这里一般指模板渲染。但随着现在这种前后分离比较流行之后，视图层只是做序列化的工作。</p>
+<h3 id="ORM-Object-Relational-Mapping，对象关系映射"><a href="#ORM-Object-Relational-Mapping，对象关系映射" class="headerlink" title="ORM Object Relational Mapping，对象关系映射"></a>ORM Object Relational Mapping，对象关系映射</h3><p>&nbsp; &nbsp;用于实现业务对象与数据表中的字段映射 ，比较流行 Sqlalchemy / Django自带的 Django ORM / 轻量级Peewee 。<br>优势：代码更加面向对象面向对象的编程思想，代码量更少，灵活性高，方便扩充，提升开发效率。<br>◆少写(几乎不写)SQL,提升开发效率<br>◆支持多种类型的数据库,方便切换<br>◆ORM技术成熟,能解决绝大部分问题</p>
+<p>缺点：拼接对象比较耗时，有一定性能影响<br>一般都是优先使用 ORM 框架提升开发效率和可维护性</p>
+<p>Django框架提供了ORM来解决数据持久化问题，<br>因为Python是面向对象的编程语言，在Python程序中使用对象模型来保存数据，<br>而关系型数据库使用关系模型，用二维表来保存数据，这两种模型并不匹配。<br>使用ORM是为了实现对象模型到关系模型的<strong>双向转换</strong>，这样就不用在Python代码中书写SQL语句和游标操作，因为这些都会由ORM自动完成。</p>
+<p>模型类都直接或间接继承自<code>Model</code>类，<br>模型类跟关系型数据库的二维表对应，<br>模型对象跟表中的记录对应，<br>模型对象的属性跟表中的字段对应。</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/lrucache/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/lrucache/" class="post-title-link" itemprop="url">HTML</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-04-02 12:24:45" itemprop="dateModified" datetime="2021-04-02T12:24:45Z">2021-04-02</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Markdown/" itemprop="url" rel="index"><span itemprop="name">Markdown</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>假如空间有限怎么办，我们不可能一直向缓存塞东西，当缓存达到一定个数之后，当缓存空间不够用的时候需要一种方法剔除key，我们需要一种策略踢出一些元素，用来给新的元素腾出空间。</p>
+<ul>
+<li>缓存剔除（失效）策略</li>
+<li>LFU(Least-Frequently-Used): 缓存污染问题(一个先前流行的缓存对象会在缓存中驻留很长时间)、(从使用次数下手把次数最少剔除掉)，</li>
+<li>First in First out(FIFO)</li>
+<li>Random Cache: 随机选一个删除</li>
+</ul>
+<h3 id="LRUCache-Least-Recently-Used-替换掉最近最少使用的对象"><a href="#LRUCache-Least-Recently-Used-替换掉最近最少使用的对象" class="headerlink" title="LRUCache Least-Recently-Used 替换掉最近最少使用的对象"></a>LRUCache Least-Recently-Used 替换掉最近最少使用的对象</h3><ul>
+<li>(从使用的时间下手把时间长剔除掉), 实际中使用最广。cpu缓存淘汰和虚拟内存效果好，web应用欠佳，比如 redis 就实现了这个策略，</li>
+<li>LRU通过使用一个循环双端队列不断把最新访问的 Key 放到表头，就是把最新访问的放到最前(右边)，把最远的访问保持在尾部(左边)，把最远访问的key剔除就可以了。</li>
+</ul>
+<h3 id="146-LRUCache-缓存机制的实现"><a href="#146-LRUCache-缓存机制的实现" class="headerlink" title="146. LRUCache 缓存机制的实现"></a>146. LRUCache 缓存机制的实现</h3><p>   字典用来缓存，循环双端链表用来记录访问顺序</p>
+<ul>
+<li>利用Python 内置的 dict +collections.OderedDict(它可以记录key访问顺序) 实现</li>
+<li>dict 用来当做 k/v 键值对的缓存</li>
+<li>OderedDict 用来实现更新最近访问的 key</li>
+</ul>
+<p>要想实现一个 LRU，我们需要一种方式能够记录访问的顺序，并且每次访问之后我们要把最新使用到的元素放到最后（表示最新访问）。<br>当容量满了以后，我们踢出最早访问的元素。假如用一个链表来表示的话：</p>
+<p>[1] -&gt; [2] -&gt; [3]</p>
+<p>假设最后边是最后访问的，当访问到一个元素以后，我们把它放到最后。当容量满了，我们踢出第一个元素就行了。<br>一开始的想法可能是用一个链表来记录访问顺序，但是单链表有个问题就是如果访问了中间一个元素，我们需要拿掉它并且放到链表尾部。<br>而单链表无法在O(1)的时间内删除一个节点（必须要先搜索到它），但是双端链表可以，因为一个节点记录了它的前后节点，<br>只需要把要删除的节点的前后节点链接起来就行了。<br>还有个问题是如何把删除后的节点放到链表尾部，如果是循环双端链表就可以啦，我们有个 root 节点链接了首位节点，<br>只需要让 root 的前一个指向这个被删除节点，然后让之前的最后一个节点也指向它就行了。</p>
+<p>使用了循环双端链表之后，我们的操作就都是 O(1) 的了。这也就是使用一个 dict 和一个 循环双端链表 实现LRU 的思路。<br>不过一般我们使用内置的 OrderedDict(原理和这个类似)就好了，要实现一个循环双端链表是一个不简单的事情，因为链表操作很容易出错。</p>
+<p>补充：其实 lru 有个缺点就是额外的链表比较占用空间，如果你感兴趣的话可以看看 redis 如何实现的 lru 算法</p>
+<p>运用你所掌握的数据结构，设计和实现一个 LRU (最近最少使用) 缓存机制。<br>它应该支持以下操作： 获取数据 get 和 写入数据 put 。<br>实现 LRUCache 类：</p>
+<ul>
+<li>LRUCache(int capacity) 以正整数作为容量&nbsp;capacity 初始化 LRU 缓存</li>
+<li>获取数据 get(key) - 如果关键字 (key) 存在于缓存中，则获取关键字的值（总是正数），否则返回 -1。</li>
+<li>写入数据 put(key, value) - 如果关键字已经存在，则变更其数据值；如果关键字不存在，则插入该组「关键字/值」。当缓存容量达到上限时，它应该在写入新数据之前删除最久未使用的数据值，从而为新的数据值留出空间。<br>进阶:<br>你是否可以在 O(1) 时间复杂度内完成这两种操作？</li>
+</ul>
+<p>示例：</p>
+<figure class="highlight angelscript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">输入</span><br><span class="line">[<span class="string">"LRUCache"</span>, <span class="string">"put"</span>, <span class="string">"put"</span>, <span class="string">"get"</span>, <span class="string">"put"</span>, <span class="string">"get"</span>, <span class="string">"put"</span>, <span class="string">"get"</span>, <span class="string">"get"</span>, <span class="string">"get"</span>]</span><br><span class="line">[[<span class="number">2</span>], [<span class="number">1</span>, <span class="number">1</span>], [<span class="number">2</span>, <span class="number">2</span>], [<span class="number">1</span>], [<span class="number">3</span>, <span class="number">3</span>], [<span class="number">2</span>], [<span class="number">4</span>, <span class="number">4</span>], [<span class="number">1</span>], [<span class="number">3</span>], [<span class="number">4</span>]]</span><br><span class="line">输出</span><br><span class="line">[<span class="literal">null</span>, <span class="literal">null</span>, <span class="literal">null</span>, <span class="number">1</span>, <span class="literal">null</span>, <span class="number">-1</span>, <span class="literal">null</span>, <span class="number">-1</span>, <span class="number">3</span>, <span class="number">4</span>]</span><br><span class="line"></span><br><span class="line">解释</span><br><span class="line">LRUCache lRUCache = new LRUCache(<span class="number">2</span>);</span><br><span class="line">lRUCache.put(<span class="number">1</span>, <span class="number">1</span>); <span class="comment">// 缓存是 {1=1}</span></span><br><span class="line">lRUCache.put(<span class="number">2</span>, <span class="number">2</span>); <span class="comment">// 缓存是 {1=1, 2=2}</span></span><br><span class="line">lRUCache.<span class="keyword">get</span>(<span class="number">1</span>);    <span class="comment">// 返回 1</span></span><br><span class="line">lRUCache.put(<span class="number">3</span>, <span class="number">3</span>); <span class="comment">// 该操作会使得关键字 2 作废，缓存是 {1=1, 3=3}</span></span><br><span class="line">lRUCache.<span class="keyword">get</span>(<span class="number">2</span>);    <span class="comment">// 返回 -1 (未找到)</span></span><br><span class="line">lRUCache.put(<span class="number">4</span>, <span class="number">4</span>); <span class="comment">// 该操作会使得关键字 1 作废，缓存是 {4=4, 3=3}</span></span><br><span class="line">lRUCache.<span class="keyword">get</span>(<span class="number">1</span>);    <span class="comment">// 返回 -1 (未找到)</span></span><br><span class="line">lRUCache.<span class="keyword">get</span>(<span class="number">3</span>);    <span class="comment">// 返回 3</span></span><br><span class="line">lRUCache.<span class="keyword">get</span>(<span class="number">4</span>);    <span class="comment">// 返回 4</span></span><br><span class="line"></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">链接：https:<span class="comment">//leetcode-cn.com/problems/lru-cache</span></span><br><span class="line">著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span><br><span class="line"></span><br><span class="line">LRUCache cache = new LRUCache( <span class="number">2</span> <span class="comment">/* 缓存容量 */</span> );</span><br><span class="line"></span><br><span class="line">cache.put(<span class="number">1</span>, <span class="number">1</span>);</span><br><span class="line">cache.put(<span class="number">2</span>, <span class="number">2</span>);</span><br><span class="line">cache.<span class="keyword">get</span>(<span class="number">1</span>); <span class="comment">// 返回 1</span></span><br><span class="line">cache.put(<span class="number">3</span>, <span class="number">3</span>); <span class="comment">// 该操作会使得关键字 2 作废</span></span><br><span class="line">cache.<span class="keyword">get</span>(<span class="number">2</span>); <span class="comment">// 返回 -1 (未找到)</span></span><br><span class="line">cache.put(<span class="number">4</span>, <span class="number">4</span>); <span class="comment">// 该操作会使得关键字 1 作废</span></span><br><span class="line">cache.<span class="keyword">get</span>(<span class="number">1</span>); <span class="comment">// 返回 -1 (未找到)</span></span><br><span class="line">cache.<span class="keyword">get</span>(<span class="number">3</span>); <span class="comment">// 返回 3</span></span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> OrderedDict</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LRUCache</span>():</span></span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, capacity=<span class="number">128</span></span>):</span> </span><br><span class="line">        <span class="comment"># 参数capacity表示容量,允许128个key/value存在</span></span><br><span class="line">        self.od = OrderedDict() </span><br><span class="line">        self.capacity = capacity  </span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span>(<span class="params">self, key</span>):</span> <span class="comment"># 每次访问更新最新使用的 key</span></span><br><span class="line">        <span class="keyword">if</span> key <span class="keyword">in</span> self.od: </span><br><span class="line">            val = self.od[key]  <span class="comment"># 取出key对应value值</span></span><br><span class="line">            <span class="comment"># 把key放到最尾部，就是最近访问的放到最右边</span></span><br><span class="line">            self.od.move_to_end(key) </span><br><span class="line">            <span class="keyword">return</span> val</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="number">-1</span></span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">put</span>(<span class="params">self, key, value</span>):</span> <span class="comment"># 更新key/value的值</span></span><br><span class="line">        <span class="keyword">if</span> key <span class="keyword">in</span> self.od:</span><br><span class="line">            <span class="keyword">del</span> self.od[key] <span class="comment"># 删除</span></span><br><span class="line">            self.od[key] = value  <span class="comment"># 重新赋值，跟新key到表头</span></span><br><span class="line">        <span class="keyword">else</span>: <span class="comment"># insert</span></span><br><span class="line">            self.od[key] = value</span><br><span class="line">            <span class="comment"># 判断当前容量是否已经满了</span></span><br><span class="line">            <span class="keyword">if</span> len(self.od) &gt; self.capacity:</span><br><span class="line">                self.od.popitem(last=<span class="literal">False</span>) <span class="comment"># 把最早的key删除</span></span><br></pre></td></tr></tbody></table></figure>
+
+
+
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ListNode</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, key=None, value=None</span>):</span></span><br><span class="line">        self.key = key</span><br><span class="line">        self.value = value</span><br><span class="line">        self.prev = <span class="literal">None</span></span><br><span class="line">        self.next = <span class="literal">None</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LRUCache</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, capacity: int</span>):</span></span><br><span class="line">        self.capacity = capacity</span><br><span class="line">        self.hashmap = {}  <span class="comment"># 集合</span></span><br><span class="line">        <span class="comment"># 新建两个节点 head 和 tail</span></span><br><span class="line">        self.head = ListNode()</span><br><span class="line">        self.tail = ListNode()</span><br><span class="line">        <span class="comment"># 初始化链表为 head &lt;-&gt; tail</span></span><br><span class="line">        self.head.next = self.tail</span><br><span class="line">        self.tail.prev = self.head</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 因为get与put操作都可能需要将双向链表中的某个节点移到末尾，所以定义一个方法</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">move_node_to_tail</span>(<span class="params">self, key</span>):</span></span><br><span class="line">        <span class="comment"># 先将哈希表key指向的节点拎出来，为了简洁起名node</span></span><br><span class="line">        <span class="comment">#      hashmap[key]                               hashmap[key]</span></span><br><span class="line">        <span class="comment">#           |                                          |</span></span><br><span class="line">        <span class="comment">#           V              --&gt;                         V</span></span><br><span class="line">        <span class="comment"># prev &lt;-&gt; node &lt;-&gt; next         pre &lt;-&gt; next   ...   node</span></span><br><span class="line">        node = self.hashmap[key]</span><br><span class="line">        node.prev.next = node.next</span><br><span class="line">        node.next.prev = node.prev</span><br><span class="line">        <span class="comment"># 之后将node插入到尾节点前</span></span><br><span class="line">        <span class="comment">#                 hashmap[key]                 hashmap[key]</span></span><br><span class="line">        <span class="comment">#                      |                            |</span></span><br><span class="line">        <span class="comment">#                      V        --&gt;                 V</span></span><br><span class="line">        <span class="comment"># prev &lt;-&gt; tail  ...  node                prev &lt;-&gt; node &lt;-&gt; tail</span></span><br><span class="line">        node.prev = self.tail.prev</span><br><span class="line">        node.next = self.tail</span><br><span class="line">        self.tail.prev.next = node</span><br><span class="line">        self.tail.prev = node</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span>(<span class="params">self, key: int</span>) -&gt; int:</span></span><br><span class="line">        res = self.hashmap.get(key, <span class="number">-1</span>)</span><br><span class="line">        <span class="keyword">if</span> res == <span class="number">-1</span>:</span><br><span class="line">            <span class="keyword">return</span> res</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="comment"># 如果已经在链表中了久把它移到末尾（变成最新访问的）</span></span><br><span class="line">            self.move_node_to_tail(key)</span><br><span class="line">            <span class="keyword">return</span> res.value</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">put</span>(<span class="params">self, key: int, value: int</span>) -&gt; <span class="keyword">None</span>:</span></span><br><span class="line">        <span class="keyword">if</span> key <span class="keyword">in</span> self.hashmap:</span><br><span class="line">            <span class="comment"># 如果key本身已经在哈希表中了就不需要在链表中加入新的节点</span></span><br><span class="line">            <span class="comment"># 但是需要更新字典该值对应节点的value</span></span><br><span class="line">            self.hashmap[key].value = value</span><br><span class="line">            <span class="comment"># 之后将该节点移到末尾</span></span><br><span class="line">            self.move_node_to_tail(key)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">if</span> len(self.hashmap) == self.capacity:</span><br><span class="line">                <span class="comment"># 去掉哈希表对应项</span></span><br><span class="line">                self.hashmap.pop(self.head.next.key)</span><br><span class="line">                <span class="comment"># 去掉最久没有被访问过的节点，即头节点之后的节点</span></span><br><span class="line">                self.head.next = self.head.next.next</span><br><span class="line">                self.head.next.prev = self.head</span><br><span class="line">            <span class="comment"># 如果不在的话就插入到尾节点前</span></span><br><span class="line">            new = ListNode(key, value)</span><br><span class="line">            self.hashmap[key] = new</span><br><span class="line">            new.prev = self.tail.prev</span><br><span class="line">            new.next = self.tail</span><br><span class="line">            self.tail.prev.next = new</span><br><span class="line">            self.tail.prev = new</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    cache = LRUCache(<span class="number">2</span>)</span><br><span class="line">    cache.put(<span class="number">1</span>, <span class="number">1</span>)</span><br><span class="line">    cache.put(<span class="number">2</span>, <span class="number">2</span>)</span><br><span class="line">    print(cache.get(<span class="number">1</span>))</span><br><span class="line">    cache.put(<span class="number">3</span>, <span class="number">3</span>)</span><br><span class="line">    print(cache.get(<span class="number">2</span>))</span><br><span class="line">    cache.put(<span class="number">4</span>, <span class="number">4</span>)</span><br><span class="line">    print(cache.get(<span class="number">1</span>))</span><br><span class="line">    print(cache.get(<span class="number">3</span>))</span><br><span class="line">    print(cache.get(<span class="number">4</span>))</span><br></pre></td></tr></tbody></table></figure><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1128,429 +1494,8 @@
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/url/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/url/" class="post-title-link" itemprop="url">URL Uniform Resource Locator</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-07-20 11:49:02" itemprop="dateModified" datetime="2021-07-20T11:49:02Z">2021-07-20</time>
-      </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>URL Uniform Resource Locator 统一资源定位符）是对可以从互联网上得到对资源位置和访问方法对一种简洁的表示，是互联网上标准资源的地址。<br>⼀般统⼀资源定位符的开始标志着⼀个计算机⽹络所使⽤的⽹络协议<br>互联网上的每个文件都有一个唯一的URL，且⼀个URL指向⼀个数据资源⽂件的路径</p>
-<p>URL是通过HTTP协议存取资源的Internet路径，</p>
-<p>URL是URI的子集，URI还包括URN，在互联网中，我们一般的网页链接、网址可以被称为URL或者URI，大多数人称为URL。</p>
-<p>用于描述一个网络上的资源, 基本格式如下<br>基本URL包含模式（或称协议）、服务器名称（或IP地址）、文件所在路径和文件名<br>scheme://host[:port#]/path/…/[;url-params][?query-string][#anchor]</p>
-<p>URL格式 <code>http://host[:port][path]</code></p>
-<p>scheme         指定底层使用的协议(例如：http, https, ftp)</p>
-<p>host           HTTP服务器的合法的Internet主机域名或IP地址</p>
-<p>port#          HTTP服务器的默认端口是80，这种情况下端口号可以省略。如果使用了别的端口，必须指明，例如 <a target="_blank" rel="noopener" href="http://www.luboke.com/">http://www.luboke.com:80</a></p>
-<p>path：请求访问资源的路径</p>
-<p>query-string   发送给http服务器的数据</p>
-<p>anchor         锚</p>
-<p>代理服务器位于客户端和真正的服务器之间，充当一个中间人的角色。当跟客户端交互的时候，是服务器。跟服务器交互的时候，又充当客户端，</p>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/vuex-zhuang-tai-guan-li-jie-shao/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/vuex-zhuang-tai-guan-li-jie-shao/" class="post-title-link" itemprop="url">Vuex状态管理介绍</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-08-01 04:03:19" itemprop="dateModified" datetime="2021-08-01T04:03:19Z">2021-08-01</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/vue/" itemprop="url" rel="index"><span itemprop="name">vue</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h3 id="Vuex状态管理介绍"><a href="#Vuex状态管理介绍" class="headerlink" title="Vuex状态管理介绍"></a>Vuex状态管理介绍</h3><ul>
-<li><p>专为 Vue.js 应用程序开发的状态管理模式</p>
-</li>
-<li><p>state: 驱动应用的数据源，<code>data</code>中的数据</p>
-</li>
-<li><p>view: 以声明方式将 state 映射到视图，在模板中使用<code>{{}}</code></p>
-</li>
-<li><p>actions: 响应在 view 上的用户输入导致的状态变化</p>
-</li>
-<li><p>跨组件和页面直接来全局共享数据<br>单例模式：vue项目生命周期当中只有一个vuex的实例<br>提交订单会读取当前登录用户的昵称和手机号信息</p>
-</li>
-</ul>
-<h3 id="Vuex的工作流程"><a href="#Vuex的工作流程" class="headerlink" title="Vuex的工作流程"></a>Vuex的工作流程</h3><ul>
-<li>state：存放数据</li>
-<li>mutation：同步提交数据</li>
-<li>action：异步提交数据</li>
-</ul>
-<p>安装及配置</p>
-<ul>
-<li>第一步，安装</li>
-</ul>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cnpm install vuex -S</span><br></pre></td></tr></tbody></table></figure>
-
-<ul>
-<li>第二步，配置<br><code>src\main.js</code></li>
-</ul>
-<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> store <span class="keyword">from</span> <span class="string">'./store'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">new</span> Vue({</span><br><span class="line">  store,  <span class="comment">// store: store,</span></span><br><span class="line">  render: <span class="function"><span class="params">h</span> =&gt;</span> h(App),</span><br><span class="line">}).$mount(<span class="string">'#app'</span>)</span><br></pre></td></tr></tbody></table></figure>
-
-<p>新建<code>src\store\index.js</code></p>
-<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> Vue <span class="keyword">from</span> <span class="string">'vue'</span></span><br><span class="line"><span class="keyword">import</span> Vuex <span class="keyword">from</span> <span class="string">'vuex'</span></span><br><span class="line"></span><br><span class="line">Vue.use(Vuex)</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="keyword">new</span> Vuex.Store({</span><br><span class="line">  state: {</span><br><span class="line">    user: {</span><br><span class="line">      username: <span class="string">'zhangsan'</span>,</span><br><span class="line">      nickname: <span class="string">'张三'</span></span><br><span class="line">    }</span><br><span class="line">  },</span><br></pre></td></tr></tbody></table></figure>
-
-<h4 id="state"><a href="#state" class="headerlink" title="state"></a>state</h4><ul>
-<li>含义<br>单一状态树，全局唯一数据源<br>查询state中的数据</li>
-<li>示例代码</li>
-</ul>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;!-- view --&gt;</span><br><span class="line">    &lt;h1&gt;首页&lt;/h1&gt;</span><br><span class="line">    &lt;p&gt;当前计数: {{ count }} &lt;/p&gt;</span><br><span class="line">    &lt;input type="button" value="+1" @click="increment"&gt;</span><br><span class="line">    &lt;p&gt;</span><br><span class="line">      当前登录的用户是：{{ user.username }}</span><br><span class="line">    &lt;/p&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line"></span><br><span class="line">export default {</span><br><span class="line">  // state</span><br><span class="line">  data () {</span><br><span class="line">    return {</span><br><span class="line">      count: 0,</span><br><span class="line">      uname: ''</span><br><span class="line">    }</span><br><span class="line">  },  </span><br><span class="line">  computed: {</span><br><span class="line">    user () {</span><br><span class="line">      return this.$store.state.user</span><br><span class="line">    }</span><br><span class="line">  }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p>使用Vuex保存用户信息</p>
-<h4 id="mutation"><a href="#mutation" class="headerlink" title="mutation"></a>mutation</h4><ul>
-<li>示例代码</li>
-<li>更改store中状态的唯一方法，注意不要通过赋值语法去修改store中的状态<br>定义的函数参数是<code>state</code></li>
-</ul>
-<p>场景1<br><code>src\store\index.js</code></p>
-<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="keyword">new</span> Vuex.Store({</span><br><span class="line">  mutations: {</span><br><span class="line">    updateUsername (state) {</span><br><span class="line">      <span class="built_in">console</span>.log(state)</span><br><span class="line">      <span class="comment">// 变更状态</span></span><br><span class="line">      <span class="built_in">this</span>.state.user.username = <span class="string">'lisi'</span></span><br><span class="line">    }</span><br><span class="line">  }</span><br><span class="line">})</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>src\views\Home.vue</code></p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&lt;script&gt;</span><br><span class="line"></span><br><span class="line">export default {</span><br><span class="line">  // state</span><br><span class="line">  data () {</span><br><span class="line">    return {</span><br><span class="line">      count: 0,</span><br><span class="line">      uname: ''</span><br><span class="line">    }</span><br><span class="line">  },</span><br><span class="line">  // actions</span><br><span class="line">  methods: {</span><br><span class="line">    increment () {</span><br><span class="line">      this.count++</span><br><span class="line">    },</span><br><span class="line">    submit () {  // 改变state里面的username</span><br><span class="line">      this.$store.commit('updateUsername')</span><br><span class="line">  }</span><br><span class="line">}</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></tbody></table></figure>
-
-<p>场景2<br><code>src\store\index.js</code></p>
-<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="keyword">new</span> Vuex.Store({</span><br><span class="line">  mutations: {</span><br><span class="line">    updateUsername (state) {</span><br><span class="line">      <span class="built_in">console</span>.log(state)</span><br><span class="line">      <span class="comment">// 变更状态</span></span><br><span class="line">      <span class="built_in">this</span>.state.user.username = <span class="string">'lisi'</span></span><br><span class="line">    }</span><br><span class="line">  }</span><br><span class="line">})</span><br></pre></td></tr></tbody></table></figure>
-<p>不用<code>commit</code><br><code>src\views\Home.vue</code></p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&lt;script&gt;</span><br><span class="line"></span><br><span class="line">export default {</span><br><span class="line">  // state</span><br><span class="line">  data () {</span><br><span class="line">    return {</span><br><span class="line">      count: 0,</span><br><span class="line">      uname: ''</span><br><span class="line">    }</span><br><span class="line">  },</span><br><span class="line">  // actions</span><br><span class="line">  methods: {</span><br><span class="line">    increment () {</span><br><span class="line">      this.count++</span><br><span class="line">    },</span><br><span class="line">    submit () {  // 改变state里面的username</span><br><span class="line">      this.$store.state.user.username = 'wangwu'</span><br><span class="line">  }</span><br><span class="line">}</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></tbody></table></figure>
-
-<p>场景3<br><code>src\store\index.js</code></p>
-<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="keyword">new</span> Vuex.Store({</span><br><span class="line">  mutations: {</span><br><span class="line">    updateUsername (state, payload) {</span><br><span class="line">      <span class="comment">// 变更状态</span></span><br><span class="line">      <span class="built_in">console</span>.log(state, payload)</span><br><span class="line">      <span class="built_in">this</span>.state.user.username = payload.uname</span><br><span class="line">    }</span><br><span class="line">  }</span><br><span class="line">})</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>src\views\Home.vue</code></p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">&lt;script&gt;</span><br><span class="line"></span><br><span class="line">export default {</span><br><span class="line">  // state</span><br><span class="line">  data () {</span><br><span class="line">    return {</span><br><span class="line">      count: 0,</span><br><span class="line">      uname: ''</span><br><span class="line">    }</span><br><span class="line">  },</span><br><span class="line">  // actions</span><br><span class="line">  methods: {</span><br><span class="line">    increment () {</span><br><span class="line">      this.count++</span><br><span class="line">    },</span><br><span class="line">    submit () {  // 改变state里面的username</span><br><span class="line">      this.$store.commit('updateUsername', {</span><br><span class="line">        uname: this.uname</span><br><span class="line">      })</span><br><span class="line">  }</span><br><span class="line">}</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></tbody></table></figure>
-
-<p>场景4<br><code>src\store\index.js</code></p>
-<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="keyword">new</span> Vuex.Store({</span><br><span class="line">  mutations: {</span><br><span class="line">    updateUsername2 (state, uname) {</span><br><span class="line">      <span class="built_in">console</span>.log(state, uname)</span><br><span class="line">      <span class="comment">// 变更状态</span></span><br><span class="line">      <span class="built_in">this</span>.state.user.username = uname</span><br><span class="line">    }</span><br><span class="line">  }</span><br><span class="line">})</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>src\views\Home.vue</code></p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&lt;script&gt;</span><br><span class="line"></span><br><span class="line">export default {</span><br><span class="line">  // state</span><br><span class="line">  data () {</span><br><span class="line">    return {</span><br><span class="line">      count: 0,</span><br><span class="line">      uname: ''</span><br><span class="line">    }</span><br><span class="line">  },</span><br><span class="line">  // actions</span><br><span class="line">  methods: {</span><br><span class="line">    increment () {</span><br><span class="line">      this.count++</span><br><span class="line">    },</span><br><span class="line">    submit () {  // 改变state里面的username</span><br><span class="line">      this.$store.commit('updateUsername2', this.uname)</span><br><span class="line">  }</span><br><span class="line">}</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></tbody></table></figure>
-
-<h4 id="action"><a href="#action" class="headerlink" title="action"></a>action</h4><ul>
-<li>示例代码</li>
-<li>提交的是mutation，可异步<br>定义的函数参数是<code>context</code><br><code>store.dispatch('mutation函数名')</code>触发action<br><code>src\store\index.js</code></li>
-</ul>
-<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="keyword">new</span> Vuex.Store({</span><br><span class="line">  state: {</span><br><span class="line">    user: {</span><br><span class="line">      username: <span class="string">'zhangsan'</span>,</span><br><span class="line">      nickname: <span class="string">'张三'</span></span><br><span class="line">    }</span><br><span class="line">  },</span><br><span class="line">  mutations: {</span><br><span class="line">    <span class="comment">// updateUsername (state) {</span></span><br><span class="line">    <span class="comment">//   console.log(state)</span></span><br><span class="line">    <span class="comment">//   this.state.user.username = 'lisi'</span></span><br><span class="line">    <span class="comment">// }</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// updateUsername (state, payload) {</span></span><br><span class="line">    <span class="comment">//   console.log(state, payload)</span></span><br><span class="line">    <span class="comment">//   this.state.user.username = payload.uname</span></span><br><span class="line">    <span class="comment">// }</span></span><br><span class="line"></span><br><span class="line">    updateUsername2 (state, uname) {</span><br><span class="line">      <span class="built_in">console</span>.log(state, uname)</span><br><span class="line">      <span class="built_in">this</span>.state.user.username = uname</span><br><span class="line">    }</span><br><span class="line">  },</span><br><span class="line">  actions: {</span><br><span class="line">    updateUser (context, payload) {</span><br><span class="line">      <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> {</span><br><span class="line">        context.commit(<span class="string">'updateUsername2'</span>, payload.uname)</span><br><span class="line">      }, <span class="number">5000</span>)</span><br><span class="line">    }</span><br><span class="line">  },</span><br><span class="line">})</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>src\views\Home.vue</code></p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">&lt;script&gt;</span><br><span class="line"></span><br><span class="line">export default {</span><br><span class="line">  // state</span><br><span class="line">  data () {</span><br><span class="line">    return {</span><br><span class="line">      count: 0,</span><br><span class="line">      uname: ''</span><br><span class="line">    }</span><br><span class="line">  },</span><br><span class="line">  // actions</span><br><span class="line">  methods: {</span><br><span class="line">    increment () {</span><br><span class="line">      this.count++</span><br><span class="line">    },</span><br><span class="line">    submit () {  // 改变state里面的username</span><br><span class="line">      this.$store.dispatch('updateUser', {</span><br><span class="line">        uname: this.uname</span><br><span class="line">      })</span><br><span class="line">  }</span><br><span class="line">}</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></tbody></table></figure>
-
-
-<p>辅助函数使我们的代码更加精简<br>箭头函数可使代码更简练</p>
-<h4 id="mapState"><a href="#mapState" class="headerlink" title="mapState"></a>mapState</h4><p>方便在vue组件中获取vuex的状态，即state的内容</p>
-<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="keyword">new</span> Vuex.Store({</span><br><span class="line">  state: {</span><br><span class="line">    user: {</span><br><span class="line">      username: <span class="string">'zhangsan'</span>,</span><br><span class="line">      nickname: <span class="string">'张三'</span></span><br><span class="line">    },</span><br><span class="line">    profile: {</span><br><span class="line">      name: <span class="string">'我的详细信息'</span></span><br><span class="line">    }</span><br><span class="line">  }</span><br><span class="line">})</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;!-- view --&gt;</span><br><span class="line">      &lt;!-- 当前登录的用户是：{{ user.username }} --&gt;</span><br><span class="line">      &lt;!-- 当前登录的用户是：{{ username }} - {{ nname }} --&gt;</span><br><span class="line">      当前登录的用户是：{{ user.username }} - {{ profile.name }}</span><br><span class="line">    &lt;/p&gt;</span><br><span class="line">    &lt;p&gt;</span><br><span class="line">      &lt;input type="text" v-model="uname"&gt;</span><br><span class="line">      &lt;input type="button" value="提交" @click="submit"&gt;</span><br><span class="line">    &lt;/p&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">import { mapState } from 'vuex'</span><br><span class="line">export default {</span><br><span class="line">  // state</span><br><span class="line">  data () {</span><br><span class="line">    return {</span><br><span class="line">      uname: ''</span><br><span class="line">    }</span><br><span class="line">  },</span><br><span class="line">  // actions</span><br><span class="line">  methods: {</span><br><span class="line">    submit () {  // 改变state里面的username</span><br><span class="line">      this.$store.dispatch('updateUser', {  // 触发action</span><br><span class="line">        uname: this.uname</span><br><span class="line">      })</span><br><span class="line">    }</span><br><span class="line">  },</span><br><span class="line"></span><br><span class="line">  // 传递对象</span><br><span class="line">  // computed: mapState({</span><br><span class="line">  //   username: state =&gt; state.user.username,</span><br><span class="line">  //   nname: state =&gt; state.user.nickname</span><br><span class="line">  // })</span><br><span class="line"></span><br><span class="line">  // 传递数组法一</span><br><span class="line">  // computed: mapState(['user', 'profile']),</span><br><span class="line">  // 传递数组法二</span><br><span class="line">  computed: {</span><br><span class="line">    conent () {</span><br><span class="line">      return ''</span><br><span class="line">    },</span><br><span class="line">    ...mapState(['user', 'profile'])</span><br><span class="line">  }</span><br><span class="line">}</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></tbody></table></figure>
-
-<h4 id="mapMutations"><a href="#mapMutations" class="headerlink" title="mapMutations"></a>mapMutations</h4><p><code>index.js</code></p>
-<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="keyword">new</span> Vuex.Store({</span><br><span class="line">  state: {</span><br><span class="line">    user: {</span><br><span class="line">      username: <span class="string">'zhangsan'</span>,</span><br><span class="line">      nickname: <span class="string">'张三'</span></span><br><span class="line">    },</span><br><span class="line">    profile: {</span><br><span class="line">      name: <span class="string">'我的详细信息'</span></span><br><span class="line">    }</span><br><span class="line">  },</span><br><span class="line">  mutations: {</span><br><span class="line">    updateUsername (state, payload) {</span><br><span class="line">      <span class="built_in">console</span>.log(state, payload)</span><br><span class="line">      <span class="built_in">this</span>.state.user.username = payload.uname</span><br><span class="line">    },</span><br><span class="line"></span><br><span class="line">    updateUsername2 (state, uname) {</span><br><span class="line">      <span class="built_in">console</span>.log(state, uname)</span><br><span class="line">      <span class="built_in">this</span>.state.user.username = uname</span><br><span class="line">    }</span><br><span class="line">  },</span><br><span class="line">  actions: {</span><br><span class="line">    updateUser (context, payload) {</span><br><span class="line">      <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> {</span><br><span class="line">        context.commit(<span class="string">'updateUsername2'</span>, payload.uname)</span><br><span class="line">      }, <span class="number">5000</span>)</span><br><span class="line">    }</span><br><span class="line">  },</span><br><span class="line">  modules: {</span><br><span class="line">  }</span><br><span class="line">})</span><br></pre></td></tr></tbody></table></figure>
-
-
-<p><code>src\views\Home.vue</code></p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;!-- view --&gt;</span><br><span class="line">    &lt;p&gt;</span><br><span class="line">      当前登录的用户是：{{ user.username }} - {{ profile.name }}</span><br><span class="line">    &lt;/p&gt;</span><br><span class="line">    &lt;p&gt;</span><br><span class="line">      &lt;input type="text" v-model="uname"&gt;</span><br><span class="line">      &lt;input type="button" value="提交" @click="submit"&gt;</span><br><span class="line">    &lt;/p&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">import { mapState, mapMutations } from 'vuex'</span><br><span class="line">export default {</span><br><span class="line">  // state</span><br><span class="line">  data () {</span><br><span class="line">    return {</span><br><span class="line">      uname: ''</span><br><span class="line">    }</span><br><span class="line">  },</span><br><span class="line">  // actions</span><br><span class="line">  methods: {</span><br><span class="line">    // 场景1  数组</span><br><span class="line">    // ...mapMutations(['updateUsername']),</span><br><span class="line"></span><br><span class="line">    // 场景2  对象</span><br><span class="line">    ...mapMutations({</span><br><span class="line">      update: 'updateUsername'</span><br><span class="line">    }),</span><br><span class="line"></span><br><span class="line">    increment () {</span><br><span class="line">      this.count++</span><br><span class="line">    },</span><br><span class="line">    submit () {  // 改变state里面的username</span><br><span class="line">      // 使用mapMutations之后</span><br><span class="line">      // 场景1 数组方式</span><br><span class="line">      // this.updateUsername({uname: this.uname})</span><br><span class="line"></span><br><span class="line">      // 场景2 对象      </span><br><span class="line">      this.update({uname: this.uname})</span><br><span class="line">    }</span><br><span class="line">  },</span><br><span class="line">  computed: {</span><br><span class="line">    conent () {</span><br><span class="line">      return ''</span><br><span class="line">    },</span><br><span class="line">    ...mapState(['user', 'profile'])</span><br><span class="line">  }</span><br><span class="line">}</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></tbody></table></figure>
-
-<h3 id="mapActions"><a href="#mapActions" class="headerlink" title="mapActions"></a>mapActions</h3><p>```````</p>
-<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;!-- view --&gt;</span><br><span class="line">    &lt;p&gt;</span><br><span class="line">      当前登录的用户是：{{ user.username }} - {{ profile.name }}</span><br><span class="line">    &lt;/p&gt;</span><br><span class="line">    &lt;p&gt;</span><br><span class="line">      &lt;input type="text" v-model="uname"&gt;</span><br><span class="line">      &lt;input type="button" value="提交" @click="submit"&gt;</span><br><span class="line">    &lt;/p&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">import { mapState, mapMutations, mapActions } from 'vuex'</span><br><span class="line">export default {</span><br><span class="line">  // state</span><br><span class="line">  data () {</span><br><span class="line">    return {</span><br><span class="line">      count: 0,</span><br><span class="line">      uname: ''</span><br><span class="line">    }</span><br><span class="line">  },</span><br><span class="line">  // actions</span><br><span class="line">  methods: {</span><br><span class="line">    // ...mapMutations(['updateUsername']),</span><br><span class="line">    ...mapMutations({</span><br><span class="line">      update: 'updateUsername'</span><br><span class="line">    }),</span><br><span class="line">    // 场景1  数组    </span><br><span class="line">    // ...mapActions(['updateUser']),</span><br><span class="line"></span><br><span class="line">    // 场景2  对象</span><br><span class="line">    ...mapActions({</span><br><span class="line">      updateUserInfo: 'updateUser'</span><br><span class="line">    }),</span><br><span class="line">    increment () {</span><br><span class="line">      this.count++</span><br><span class="line">    },</span><br><span class="line">    submit () {  // 改变state里面的username</span><br><span class="line">      // 使用mapActions之后</span><br><span class="line">      // 场景1  数组       </span><br><span class="line">      // this.updateUser({uname: this.uname})</span><br><span class="line">      // 场景2  对象 </span><br><span class="line">      this.updateUserInfo({uname: this.uname})</span><br><span class="line">    }</span><br><span class="line">  },</span><br><span class="line">  computed: {</span><br><span class="line">    conent () {</span><br><span class="line">      return ''</span><br><span class="line">    },</span><br><span class="line">    ...mapState(['user', 'profile'])</span><br><span class="line">  }</span><br><span class="line">}</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></tbody></table></figure><script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/wsgi/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/wsgi/" class="post-title-link" itemprop="url">WSGI</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-05-27 05:13:34" itemprop="dateModified" datetime="2021-05-27T05:13:34Z">2021-05-27</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/web/" itemprop="url" rel="index"><span itemprop="name">web</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>WSGI(Web Server Gateway Interface (pep3333) web服务器网关接口<br>为什么Flask/Django都可以运行部署在 uwsgi / gunicorn 之上？<br>存在意义：是 Python的 web server 跟 web application 或者 web 框架 之间定义的一种交互规范。，因为有了规范之后，如果遵守这个规范就，能让任意的Python Web框架运行在 web server上，这就是所说的WSGI。所有的web 应用都可以跑在实现相同的WSGI服务器上。</p>
-<p>PEP 3333 - Python Web服务器网关接口：web服务器和Python web应用程序或框架之间拟议的标准接口，以促进跨各种web服务器的web应用程序可移植性。</p>
-<p>出现的意义：解决 Python Web Server 乱象 mod_python，CGI，FastCGI等</p>
-<p>Web框架致力于如何生成HTML代码，而Web服务器用于处理和响应HTTP请求。<br>Web框架和Web服务器之间的通信，需要一套双方都遵守的接口协议。WSGI协议就是用来统一这两者的接口的。<br>解决的问题：描述了Web Server (Gunicorn / uWSGI)如何与 web框架(Flask/Django)交互，Web框架如何处理请求</p>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install uwsgi</span><br></pre></td></tr></tbody></table></figure>
-
-<p>2.WSGI规范定义</p>
-<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">application</span>(<span class="params">environ, start_response</span>)</span></span><br></pre></td></tr></tbody></table></figure>
-<p>① application 就是 WSGI app，一个可调用对象</p>
-<p>② 参数：<br>     environ：一个包含 WSGI 环境信息的字典，由 WSGI 服务器提供，常见的 key 有 PATH_INFO，QUERY_STRING等</p>
-<pre><code> start_response：生成 WSGI 响应的回调函数，接收两个参数，status 和 headers
-</code></pre>
-<p>③ 函数返回响应体的可迭代对象 </p>
-<p>编写一个简单兼容 WSGI 的 web应用并运行</p>
-<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">myapp</span>(<span class="params">environ, start_response</span>):</span></span><br><span class="line">    print(environ[<span class="string">'QUERY_STRING'</span>])  <span class="comment"># 打印环境变量参数, 建议打印出来这个字典看看有哪些参数</span></span><br><span class="line">    status = <span class="string">'200 OK'</span>  <span class="comment"># 定义状态码</span></span><br><span class="line">    headers = [(<span class="string">'Content-Type'</span>, <span class="string">'text/html; charset=utf8'</span>)]  <span class="comment"># 返回的响应头</span></span><br><span class="line"></span><br><span class="line">    start_response(status, headers)  <span class="comment"># 调用回调函数</span></span><br><span class="line">    <span class="keyword">return</span> [<span class="string">b'&lt;h1&gt;Hello World&lt;/h1&gt;'</span>]  <span class="comment"># 返回可迭代对象，同时返回字节</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    <span class="keyword">from</span> wsgiref.simple_server <span class="keyword">import</span> make_server  <span class="comment"># 引入 web server</span></span><br><span class="line">    httpd = make_server(<span class="string">'127.0.0.1'</span>, <span class="number">8888</span>, myapp)  <span class="comment"># 设置server IP/端口号等</span></span><br><span class="line">    httpd.serve_forever()  <span class="comment"># 启动server</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p>运行WSGI Server (Web Server)代码后，在浏览器访问 127.0.0.1:8888 ,网页返回Hello World。</p>
-<p>到这里没有使用任何框架就实现了一个简单的 web 应用。</p>
-<p>3). web server(WSGI 服务器) 把 HTTP参数信息通过 environ 传递给框架<br>在浏览器输入 <a target="_blank" rel="noopener" href="http://127.0.0.1:6666/?name=ipython">http://127.0.0.1:6666/?name=ipython</a></p>
-<p>命令端窗口返回内容</p>
-<figure class="highlight accesslog"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">name=ipython</span><br><span class="line"><span class="number">127.0.0.1</span> - - <span class="string">[19/Dec/2020 18:06:31]</span> <span class="string">"<span class="keyword">GET</span> /?name=ipython HTTP/1.1"</span> <span class="number">200</span> <span class="number">20</span></span><br><span class="line"></span><br><span class="line"><span class="number">127.0.0.1</span> - - <span class="string">[19/Dec/2020 18:06:32]</span> <span class="string">"<span class="keyword">GET</span> /favicon.ico HTTP/1.1"</span> <span class="number">200</span> <span class="number">20</span></span><br></pre></td></tr></tbody></table></figure>
-<p>平常在使用web框架的时候，可以通过web框架提供的一些函数获取到用户信息，如查询字符串。其实这个就是框架去把这个一些请求的信息，从environment ( environ )里面拿出来之后给你。</p>
-<p>3). 使用Tornado的时候，可以去初始化一个application，然后启动这个application</p>
-<pre class=" language-python"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">Application</span><span class="token punctuation">(</span>object<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> routers<span class="token punctuation">,</span> <span class="token operator">**</span>kwargs<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        self<span class="token punctuation">.</span>routers <span class="token operator">=</span> routers
-        
-    <span class="token comment" spellcheck="true"># 把定义的可调用对象放入类的call方法，实现WSGI的规定</span>
-    <span class="token keyword">def</span> <span class="token function">__call__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> environ<span class="token punctuation">,</span> start_response<span class="token punctuation">)</span><span class="token punctuation">:</span>  
-        <span class="token keyword">try</span><span class="token punctuation">:</span>
-            request <span class="token operator">=</span> Request<span class="token punctuation">(</span>environ<span class="token punctuation">)</span>
-            callback<span class="token punctuation">,</span> args <span class="token operator">=</span> routers<span class="token punctuation">.</span>match<span class="token punctuation">(</span>request<span class="token punctuation">.</span>path<span class="token punctuation">)</span>
-            response <span class="token operator">=</span> callback<span class="token punctuation">(</span>request<span class="token punctuation">,</span> <span class="token operator">*</span>args<span class="token punctuation">)</span>
-        <span class="token keyword">except</span> NotFoundError<span class="token punctuation">:</span>
-            response <span class="token operator">=</span> Response<span class="token punctuation">(</span><span class="token string">"&lt;h1>Not found&lt;/h1>"</span><span class="token punctuation">,</span> status<span class="token operator">=</span><span class="token number">404</span><span class="token punctuation">)</span>
-        start_response<span class="token punctuation">(</span>response<span class="token punctuation">.</span>status<span class="token punctuation">,</span> response<span class="token punctuation">.</span>headers<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-        <span class="token keyword">return</span> iter<span class="token punctuation">(</span>response<span class="token punctuation">)</span>
-</code></pre>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/18/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/18/">18</a><span class="page-number current">19</span><a class="page-number" href="/page/20/">20</a><span class="space">&hellip;</span><a class="page-number" href="/page/36/">36</a><a class="extend next" rel="next" href="/page/20/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/18/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/18/">18</a><span class="page-number current">19</span><a class="page-number" href="/page/20/">20</a><span class="space">&hellip;</span><a class="page-number" href="/page/37/">37</a><a class="extend next" rel="next" href="/page/20/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 </div>

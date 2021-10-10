@@ -119,7 +119,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">359</span>
+          <span class="site-state-item-count">362</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -160,6 +160,367 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/django-zhong-jian-jian-zhi-xian-zhi-ip-fang-wen-ci-shu-he-hei-ming-dan/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/django-zhong-jian-jian-zhi-xian-zhi-ip-fang-wen-ci-shu-he-hei-ming-dan/" class="post-title-link" itemprop="url">Django中间件之限制ip访问次数和黑名单</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-06-06 11:30:54" itemprop="dateModified" datetime="2021-06-06T11:30:54Z">2021-06-06</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="限制ip访问频率"><a href="#限制ip访问频率" class="headerlink" title="限制ip访问频率"></a>限制ip访问频率</h2><figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">from</span> django.utils.deprecation <span class="keyword">import</span> MiddlewareMixin</span><br><span class="line"><span class="keyword">from</span> django.http.response <span class="keyword">import</span> HttpResponse</span><br><span class="line"><span class="keyword">from</span> django.core.cache <span class="keyword">import</span> caches</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 频率限制访问</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">IpLimitMiddleware</span>(<span class="params">MiddlewareMixin</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">process_request</span>(<span class="params">self, request</span>):</span></span><br><span class="line">        ip = request.META.get(<span class="string">"REMOTE_ADDR"</span>)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 选择缓存的数据库 redis缓存</span></span><br><span class="line">        cache = caches[<span class="string">'redis_backend'</span>]</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 首先缓存中，根据ip获取数据，假如没有数据，值为空列表 []</span></span><br><span class="line">        requests = cache.get(ip, [])</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 如果值存在，且当前时间 - 最后一个时间 &gt; 30 则清洗掉这个值  这里我们插入请求的时间为头插</span></span><br><span class="line">        <span class="keyword">while</span> requests <span class="keyword">and</span> time.time() - requests[<span class="number">-1</span>] &gt; <span class="number">30</span>:</span><br><span class="line">            requests.pop()</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 若没有存在值，则添加，过期时间为30秒，这个过期时间与上面判断的30 保持一致</span></span><br><span class="line">        requests.insert(<span class="number">0</span>, time.time())</span><br><span class="line">        cache.set(ip, requests, timeout=<span class="number">30</span>)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 限制访问次数为 5 次</span></span><br><span class="line">        print(len(requests))</span><br><span class="line">        <span class="keyword">if</span> len(requests) &gt; <span class="number">5</span>:</span><br><span class="line">            <span class="keyword">return</span> HttpResponse(<span class="string">"请求过于频繁，请稍后重试！"</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="黑名单"><a href="#黑名单" class="headerlink" title="黑名单"></a>黑名单</h2><figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">from</span> django.utils.deprecation <span class="keyword">import</span> MiddlewareMixin</span><br><span class="line"><span class="keyword">from</span> django.http.response <span class="keyword">import</span> HttpResponse</span><br><span class="line"><span class="keyword">from</span> django.core.cache <span class="keyword">import</span> caches</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 频率限制访问</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">IpLimitMiddleware</span>(<span class="params">MiddlewareMixin</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">process_request</span>(<span class="params">self, request</span>):</span></span><br><span class="line">        ip = request.META.get(<span class="string">"REMOTE_ADDR"</span>)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 选择缓存的数据库 redis缓存</span></span><br><span class="line">        cache = caches[<span class="string">'redis_backend'</span>]</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 获取黑名单</span></span><br><span class="line">        black_list = cache.get(<span class="string">'black'</span>, [])</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> ip <span class="keyword">in</span> black_list:</span><br><span class="line">            <span class="keyword">return</span> HttpResponse(<span class="string">"黑名单用户！"</span>)</span><br><span class="line"></span><br><span class="line">        requests = cache.get(ip, [])</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 如果值存在，且当前时间 - 最后一个时间 &gt; 30 则清洗掉这个值  这里我们插入请求的时间为头插</span></span><br><span class="line">        <span class="keyword">while</span> requests <span class="keyword">and</span> time.time() - requests[<span class="number">-1</span>] &gt; <span class="number">60</span>:</span><br><span class="line">            requests.pop()</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 若没有存在值，则添加，过期时间为30秒，这个过期时间与上面判断的30 保持一致</span></span><br><span class="line">        requests.insert(<span class="number">0</span>, time.time())</span><br><span class="line">        cache.set(ip, requests, timeout=<span class="number">60</span>)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 如果访问次数大于30次，假如黑名单，封2分钟</span></span><br><span class="line">        <span class="keyword">if</span> len(requests) &gt; <span class="number">30</span>:</span><br><span class="line">            black_list.append(ip)</span><br><span class="line">            cache.set(<span class="string">'black'</span>, black_list, timeout=<span class="number">60</span> * <span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 限制访问次数为 5 次</span></span><br><span class="line">        print(len(requests))</span><br><span class="line">        <span class="keyword">if</span> len(requests) &gt; <span class="number">5</span>:</span><br><span class="line">            <span class="keyword">return</span> HttpResponse(<span class="string">"请求过于频繁，请稍后重试！"</span>)</span><br></pre></td></tr></tbody></table></figure><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/django-zi-ding-yi-cha-xun/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/django-zi-ding-yi-cha-xun/" class="post-title-link" itemprop="url">django自定义查询</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-06-12 03:09:10" itemprop="dateModified" datetime="2021-06-12T03:09:10Z">2021-06-12</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>自定义查询函数Q(条件判断)<br>Q对象：用于条件之间的逻辑关系（&amp; | <del>）<br>多个可选的查询条件：<br>    实现复杂的查询<br>    优先级从高到低：</del> &amp; | 非  或 与，对应SQL中的AND和OR<br>    可以混合使用 Q 对象和关键字参数，<br>    Q 对象和关键字参数是用”and”拼在一起的（即将逗号看成 and ），<br>    但是 Q 对象必须位于所有关键字参数的前面。</p>
+<p>自定义查询函数F(“字段名称”)<br>之前构造的过滤器都只是将字段值与某个常量做比较，<br>如果想要对两个字段的值做比较，就需要用到 F()。<br>F() 的实例可以在查询中引用字段，<br>来比较同一个 model 实例中两个不同字段的值。</p>
+<p>F()函数从数据库操作层面修改数据<br>F()函数可避免同时操作时竞态条件</p>
+<p>F对象：用于类属性之间的比较。</p>
+<p>使用前要先从 django.db.models 引入 F:<br>from django.db.models import F<br>F 动态获取对象字段的值，可以进行运算。<br>Django 支持 F() 对象之间以及 F() 对象和常数之间的加减乘除和取余的操作。<br>修改操作（update）也可以使用 F() 函数。</p>
+<p>使用SQL查询<br>关联多张表的时候需要使用sql查询</p>
+<p>在视图中获取表单值<br>◆GET请求<br>request.GET.get( name, None)<br>◆POST请求<br>request.POST.get( name, None)</p>
+<p>管理器raw(sql)查询<br>Python<br>1    raw(raw_query,params=None,translations=None)<br>2    # 返回django.db.models.query.RawQuerySet实例<br>def raw_sql(request):</p>
+<h1 id="通过url传入指定参数，在视图中获取表单值"><a href="#通过url传入指定参数，在视图中获取表单值" class="headerlink" title="通过url传入指定参数，在视图中获取表单值"></a>通过url传入指定参数，在视图中获取表单值</h1><p>username = request.GET.get(‘name’, None)<br>sql = (<br>‘SELECT id FROM weibo_user ‘<br>‘WHERE username=%s’<br>)<br>user_list = WeiboUser.objects.raw(sql, (username,))</p>
+<h1 id="user-list对象是一个RawQuerySet"><a href="#user-list对象是一个RawQuerySet" class="headerlink" title="user_list对象是一个RawQuerySet"></a>user_list对象是一个RawQuerySet</h1><p>for user in user_list:</p>
+<h1 id="user也只是单个Query-可指定其字段"><a href="#user也只是单个Query-可指定其字段" class="headerlink" title="user也只是单个Query,可指定其字段"></a>user也只是单个Query,可指定其字段</h1><p>print(user.nickname)<br>return HttpResponse(‘ok’)</p>
+<p>获取数据库连接、游标、直接执行sql<br>类似于python操作数据库，举例：</p>
+<p>def sql(request):<br>    # 获取数据库的连接<br>    from django.db import connection<br>    # 根据连接获取游标<br>    cursor = connection.cursor()<br>    sql = (<br>        ‘SELECT id,username,nickname FROM weibo_user ‘<br>        ‘WHERE id=%s’<br>    )<br>    # 执行sql<br>    cursor.execute(sql, (3,))<br>    # 查询结果<br>    user_list = cursor.fetchall()<br>    # user_list对象是一个元组<br>    for user in user_list:<br>        print(user)<br>    return HttpResponse(‘ok’)</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/drf-huan-cun/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/21/drf-huan-cun/" class="post-title-link" itemprop="url">drf缓存</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-08-01 07:06:54" itemprop="dateModified" datetime="2021-08-01T07:06:54Z">2021-08-01</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>为了加速网站的访问速度，将一些经常访问的公开变化少数据放入缓存中，<br>可以加快网页响应的速度。<br>对于变化小的数据，将其保存到缓存中请求时直接获取的成本要源于每次请求再重新计算获取的成本，所以使用缓存是很有必要的。<br>Django支持的缓存包括Memcached、数据库高速缓存、文件系统缓存、本地内存缓存、虚拟缓存等，DRF的缓存机制建立在Django的基础上，并进行了一些优化，这里采用的是已经封装好的drf-extensions（DRF扩展），对DRF进行了很多方面的功能扩展，其中就包括缓存功能</p>
+<p>取数据的时候首先去缓存中去，然后再去数据库中取<br>缓存使用的是内存，每次重启之后就会失效</p>
+<p>而需要验证才能访问的私有数据则尽量不要使用缓存，可以根据自己的需要对不同的数据进行缓存配置。</p>
+<ul>
+<li>第一步，安装</li>
+</ul>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt; pip install drf-extensions</span><br></pre></td></tr></tbody></table></figure>
+
+<ul>
+<li>第二步，配置缓存过期时间<br><code>settings.py</code></li>
+</ul>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">REST_FRAMEWORK_EXTENSIONS = {</span><br><span class="line">    <span class="string">'DEFAULT_CACHE_RESPONSE_TIMEOUT'</span>: <span class="number">5</span>   <span class="comment">#5s过期，时间自己可以随便设定</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<ul>
+<li>第三步，</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="http://chibisov.github.io/drf-extensions/docs/#cacheresponsemixin">http://chibisov.github.io/drf-extensions/docs/#cacheresponsemixin</a></p>
+<h4 id="CacheResponseMixin"><a href="#CacheResponseMixin" class="headerlink" title="CacheResponseMixin"></a>CacheResponseMixin</h4><p>It is common to cache standard viewset <code>retrieve</code> and <code>list</code> methods. That is why <code>CacheResponseMixin</code> exists. Just mix it into viewset implementation and those methods will use functions, defined in <code>REST_FRAMEWORK_EXTENSIONS</code> settings:<br>缓存标准viewset的<code>retrieve</code>和<code>list</code>方法很常见。 这就是<code>CacheResponseMixin</code>存在的原因。 只需将其混合到viewset实现中，这些方法将使用<code>REST_FRAMEWORK_EXTENSIONS</code>设置中定义的函数：</p>
+<p>“DEFAULT_OBJECT_CACHE_KEY_FUNC” for <code>retrieve</code> method<br>“DEFAULT_LIST_CACHE_KEY_FUNC” for <code>list</code> method<br>By default those functions are using DefaultKeyConstructor and extends it:</p>
+<p>With <code>RetrieveSqlQueryKeyBit</code> for “DEFAULT_OBJECT_CACHE_KEY_FUNC”<br>With <code>ListSqlQueryKeyBit</code> and <code>PaginationKeyBit</code> for “DEFAULT_LIST_CACHE_KEY_FUNC”<br>You can change those settings for custom cache key generation:</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> myapps.serializers <span class="keyword">import</span> UserSerializer</span><br><span class="line"><span class="keyword">from</span> rest_framework_extensions.cache.mixins <span class="keyword">import</span> CacheResponseMixin</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserViewSet</span>(<span class="params">CacheResponseMixin, viewsets.ModelViewSet</span>):</span></span><br><span class="line">    serializer_class = UserSerializer</span><br></pre></td></tr></tbody></table></figure>
+
+<p>我们使用的主要是<code>CacheResponseMixin</code>，主要适用于<code>retrieve</code>和<code>list</code>方法，这主要是查询操作，对于新建、修改等操作一般是不能使用缓存的。</p>
+<h3 id="商品列表增加缓存"><a href="#商品列表增加缓存" class="headerlink" title="商品列表增加缓存"></a>商品列表增加缓存</h3><p><code>apps/goods/views.py</code>中的<code>GoodsListViewSet</code>，使之第一个继承自<code>CacheResponseMixin</code>，即可实现缓存，如下：</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework_extensions.cache.mixins <span class="keyword">import</span> CacheResponseMixin</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GoodsListViewSet</span>(<span class="params">CacheResponseMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet</span>):</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>现在重启服务器，使浏览器缓存失效（因为我们第一次进入该页面，已经将数据放入缓存了，重启服务器，内存中就没了，需要重新到后台获取），然后访问 <a target="_blank" rel="noopener" href="http://127.0.0.1:8000/goods/">http://127.0.0.1:8000/goods/</a> 按F12点击Network查看加载时间。可以看到首次访问需要437ms.再次刷新该页面，第二次以及后面多次访问基本就是13ms</p>
+<p>在视图中配置CacheResponseMixin缓存后，可以使用redis作为缓存后端来存储数据。且针对不同的url以不同的参数，都会生成不同的键值，不同的键缓存不同的内存。如果没有配置CacheResponseMixin缓存，访问这些URL，是不会生成redis键值的。</p>
+<h3 id="限流-DRF的throttle设置API的访问速率"><a href="#限流-DRF的throttle设置API的访问速率" class="headerlink" title="限流 DRF的throttle设置API的访问速率"></a>限流 DRF的throttle设置API的访问速率</h3><p>接口访问速率过快，会导致其它业务受影响，网站打不开，</p>
+<p>因为爬虫的存在，如果爬虫的速率过快、不考虑网站的承受能力，会对服务器造成很大的压力，甚至影响正常用户的访问，因此对关键数据、对性能要求高的数据接口进行限速。</p>
+<p>DRF自带了限速功能，直接使用throttling进行限速即可实现，throttling与权限类似，它决定是否应授权请求。节流指示临时状态，并用于控制客户端可以向API发出的请求的速率，一般对未经身份验证的请求进行限制，而对于经过身份验证的请求则进行限制较少。</p>
+<p><a target="_blank" rel="noopener" href="https://www.django-rest-framework.org/api-guide/throttling/#setting-the-throttling-policy">https://www.django-rest-framework.org/api-guide/throttling/#setting-the-throttling-policy</a></p>
+<h4 id="设置全局限制策略"><a href="#设置全局限制策略" class="headerlink" title="设置全局限制策略"></a>设置全局限制策略</h4><p>The default throttling policy may be set globally, using the <code>DEFAULT_THROTTLE_CLASSES</code> and <code>DEFAULT_THROTTLE_RATES</code> settings.<br>可以使用<code>DEFAULT_THROTTLE_CLASSES</code>和<code>DEFAULT_THROTTLE_RATES</code>设置全局设置默认限制策略。</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SimpleRateThrottle</span>(<span class="params">BaseThrottle</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    A simple cache implementation, that only requires `.get_cache_key()`</span></span><br><span class="line"><span class="string">    to be overridden.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    The rate (requests / seconds) is set by a `rate` attribute on the View</span></span><br><span class="line"><span class="string">    class.  The attribute is a string of the form 'number_of_requests/period'.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    Period should be one of: ('s', 'sec', 'm', 'min', 'h', 'hour', 'd', 'day')</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    Previous request information used for throttling is stored in the cache.</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    cache = default_cache</span><br><span class="line">    timer = time.time</span><br><span class="line">    cache_format = <span class="string">'throttle_%(scope)s_%(ident)s'</span></span><br><span class="line">    scope = <span class="literal">None</span></span><br><span class="line">    THROTTLE_RATES = api_settings.DEFAULT_THROTTLE_RATES</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> getattr(self, <span class="string">'rate'</span>, <span class="literal">None</span>):</span><br><span class="line">            self.rate = self.get_rate()</span><br><span class="line">        self.num_requests, self.duration = self.parse_rate(self.rate)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_cache_key</span>(<span class="params">self, request, view</span>):</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        Should return a unique cache-key which can be used for throttling.</span></span><br><span class="line"><span class="string">        Must be overridden.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">        May return `None` if the request should not be throttled.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="keyword">raise</span> NotImplementedError(<span class="string">'.get_cache_key() must be overridden'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_rate</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        Determine the string representation of the allowed request rate.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> getattr(self, <span class="string">'scope'</span>, <span class="literal">None</span>):</span><br><span class="line">            msg = (<span class="string">"You must set either `.scope` or `.rate` for '%s' throttle"</span> %</span><br><span class="line">                   self.__class__.__name__)</span><br><span class="line">            <span class="keyword">raise</span> ImproperlyConfigured(msg)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            <span class="keyword">return</span> self.THROTTLE_RATES[self.scope]</span><br><span class="line">        <span class="keyword">except</span> KeyError:</span><br><span class="line">            msg = <span class="string">"No default throttle rate set for '%s' scope"</span> % self.scope</span><br><span class="line">            <span class="keyword">raise</span> ImproperlyConfigured(msg)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">parse_rate</span>(<span class="params">self, rate</span>):</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        Given the request rate string, return a two tuple of:</span></span><br><span class="line"><span class="string">        &lt;allowed number of requests&gt;, &lt;period of time in seconds&gt;</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="keyword">if</span> rate <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">            <span class="keyword">return</span> (<span class="literal">None</span>, <span class="literal">None</span>)</span><br><span class="line">        num, period = rate.split(<span class="string">'/'</span>)</span><br><span class="line">        num_requests = int(num)</span><br><span class="line">        duration = {<span class="string">'s'</span>: <span class="number">1</span>, <span class="string">'m'</span>: <span class="number">60</span>, <span class="string">'h'</span>: <span class="number">3600</span>, <span class="string">'d'</span>: <span class="number">86400</span>}[period[<span class="number">0</span>]]</span><br><span class="line">        <span class="keyword">return</span> (num_requests, duration)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">allow_request</span>(<span class="params">self, request, view</span>):</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        Implement the check to see if the request should be throttled.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">        On success calls `throttle_success`.</span></span><br><span class="line"><span class="string">        On failure calls `throttle_failure`.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="keyword">if</span> self.rate <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line"></span><br><span class="line">        self.key = self.get_cache_key(request, view)</span><br><span class="line">        <span class="keyword">if</span> self.key <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line"></span><br><span class="line">        self.history = self.cache.get(self.key, [])</span><br><span class="line">        self.now = self.timer()</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Drop any requests from the history which have now passed the</span></span><br><span class="line">        <span class="comment"># throttle duration</span></span><br><span class="line">        <span class="keyword">while</span> self.history <span class="keyword">and</span> self.history[<span class="number">-1</span>] &lt;= self.now - self.duration:</span><br><span class="line">            self.history.pop()</span><br><span class="line">        <span class="keyword">if</span> len(self.history) &gt;= self.num_requests:</span><br><span class="line">            <span class="keyword">return</span> self.throttle_failure()</span><br><span class="line">        <span class="keyword">return</span> self.throttle_success()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">throttle_success</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        Inserts the current request's timestamp along with the key</span></span><br><span class="line"><span class="string">        into the cache.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        self.history.insert(<span class="number">0</span>, self.now)</span><br><span class="line">        self.cache.set(self.key, self.history, self.duration)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">throttle_failure</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        Called when a request to the API has failed due to throttling.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">wait</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        Returns the recommended next request time in seconds.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="keyword">if</span> self.history:</span><br><span class="line">            remaining_duration = self.duration - (self.now - self.history[<span class="number">-1</span>])</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            remaining_duration = self.duration</span><br><span class="line"></span><br><span class="line">        available_requests = self.num_requests - len(self.history) + <span class="number">1</span></span><br><span class="line">        <span class="keyword">if</span> available_requests &lt;= <span class="number">0</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> remaining_duration / float(available_requests)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AnonRateThrottle</span>(<span class="params">SimpleRateThrottle</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    Limits the rate of API calls that may be made by a anonymous users.</span></span><br><span class="line"><span class="string">    匿名未认证登用户录请求限速</span></span><br><span class="line"><span class="string">    The IP address of the request will be used as the unique cache key.</span></span><br><span class="line"><span class="string">    通过请求的IP地址判断区分用户。</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    scope = <span class="string">'anon'</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_cache_key</span>(<span class="params">self, request, view</span>):</span></span><br><span class="line">        <span class="keyword">if</span> request.user.is_authenticated:</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">None</span>  <span class="comment"># Only throttle unauthenticated requests.</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> self.cache_format % {</span><br><span class="line">            <span class="string">'scope'</span>: self.scope,</span><br><span class="line">            <span class="string">'ident'</span>: self.get_ident(request)</span><br><span class="line">        }</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserRateThrottle</span>(<span class="params">SimpleRateThrottle</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    Limits the rate of API calls that may be made by a given user.</span></span><br><span class="line"><span class="string">    用户登录后请求限速，通过token或Session判断</span></span><br><span class="line"><span class="string">    The user id will be used as a unique cache key if the user is</span></span><br><span class="line"><span class="string">    authenticated. 使用User id 来区分。</span></span><br><span class="line"><span class="string">    For anonymous requests, the IP address of the request will be used.</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    scope = <span class="string">'user'</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_cache_key</span>(<span class="params">self, request, view</span>):</span></span><br><span class="line">        <span class="keyword">if</span> request.user.is_authenticated:</span><br><span class="line">            ident = request.user.pk</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            ident = self.get_ident(request)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> self.cache_format % {</span><br><span class="line">            <span class="string">'scope'</span>: self.scope,</span><br><span class="line">            <span class="string">'ident'</span>: ident</span><br><span class="line">        }</span><br></pre></td></tr></tbody></table></figure>
+
+<p>修改 DjangoOnlineFreshSupermarket/settings.py 在<code>REST_FRAMEWORK</code>添加配置</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 全局配置</span></span><br><span class="line">REST_FRAMEWORK = {</span><br><span class="line">    <span class="comment"># throttle对接口访问限速</span></span><br><span class="line">    <span class="string">'DEFAULT_THROTTLE_CLASSES'</span>: [</span><br><span class="line">        <span class="string">'rest_framework.throttling.AnonRateThrottle'</span>,</span><br><span class="line">        <span class="string">'rest_framework.throttling.UserRateThrottle'</span></span><br><span class="line">    ],</span><br><span class="line">    <span class="string">'DEFAULT_THROTTLE_RATES'</span>: {</span><br><span class="line">        <span class="string">'anon'</span>: <span class="string">'5/minute'</span>,  <span class="comment"># 使用DEFAULT_THROTTLE_RATES['anon'] 来设置频次</span></span><br><span class="line">        <span class="string">'user'</span>: <span class="string">'10/minute'</span>  <span class="comment"># 使用DEFAULT_THROTTLE_RATES['user'] 来设置频次</span></span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>在具体视图中通过 <code>throttle_classes</code> 属性来配置局部</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework.throttling <span class="keyword">import</span> AnonRateThrottle, UserRateThrottle</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GoodsListViewSet</span>(<span class="params">CacheResponseMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet</span>):</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    商品列表页，并实现分页、搜索、过滤、排序</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    throttle_classes = [AnonRateThrottle, UserRateThrottle]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>这是所有API调用次数总数计算，并非单个API都有指定的次数。</p>
+<p>单个API限速<br>ScopedRateThrottle</p>
+<p>The <code>ScopedRateThrottle</code> class can be used to restrict access to specific parts of the API. This throttle will only be applied if the view that is being accessed includes a <code>.throttle_scope</code> property. The unique throttle key will then be formed by concatenating the “scope” of the request with the unique user id or IP address.限制用户对于每个视图的访问频次，使用ip或user id,先找的用户id，没有设置用户id的话就会使用ip地址。</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ScopedRateThrottle</span>(<span class="params">SimpleRateThrottle</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    Limits the rate of API calls by different amounts for various parts of</span></span><br><span class="line"><span class="string">    the API.  Any view that has the `throttle_scope` property set will be</span></span><br><span class="line"><span class="string">    throttled.  The unique cache key will be generated by concatenating the</span></span><br><span class="line"><span class="string">    user id of the request, and the scope of the view being accessed.</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    scope_attr = <span class="string">'throttle_scope'</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="comment"># Override the usual SimpleRateThrottle, because we can't determine</span></span><br><span class="line">        <span class="comment"># the rate until called by the view.</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">allow_request</span>(<span class="params">self, request, view</span>):</span></span><br><span class="line">        <span class="comment"># We can only determine the scope once we're called by the view.</span></span><br><span class="line">        self.scope = getattr(view, self.scope_attr, <span class="literal">None</span>)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># If a view does not have a `throttle_scope` always allow the request</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> self.scope:</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># Determine the allowed request rate as we normally would during</span></span><br><span class="line">        <span class="comment"># the `__init__` call.</span></span><br><span class="line">        self.rate = self.get_rate()</span><br><span class="line">        self.num_requests, self.duration = self.parse_rate(self.rate)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># We can now proceed as normal.</span></span><br><span class="line">        <span class="keyword">return</span> super().allow_request(request, view)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_cache_key</span>(<span class="params">self, request, view</span>):</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        If `view.throttle_scope` is not set, don't apply this throttle.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">        Otherwise generate the unique cache key by concatenating the user id</span></span><br><span class="line"><span class="string">        with the '.throttle_scope` property of the view.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="keyword">if</span> request.user.is_authenticated:</span><br><span class="line">            ident = request.user.pk</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            ident = self.get_ident(request)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> self.cache_format % {</span><br><span class="line">            <span class="string">'scope'</span>: self.scope,</span><br><span class="line">            <span class="string">'ident'</span>: ident</span><br><span class="line">        }</span><br></pre></td></tr></tbody></table></figure>
+
+<p>还可以使用基于APIView类的视图在每个视图或每个视图集的基础上设置限制策略。</p>
+<p>The allowed request rate is determined by the <code>DEFAULT_THROTTLE_RATES</code> setting using a key from the request “scope”.</p>
+<p>For example, given the following views…</p>
+<p>首先配置限速范围，修改 <code>settings.py</code> ，注释掉全局限速，增加自定义权限</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># DRF配置</span></span><br><span class="line">REST_FRAMEWORK = {</span><br><span class="line">    <span class="comment"># throttle对接口访问限速</span></span><br><span class="line">    <span class="string">'DEFAULT_THROTTLE_CLASSES'</span>: [</span><br><span class="line">        <span class="comment"># 'rest_framework.throttling.AnonRateThrottle',</span></span><br><span class="line">        <span class="comment"># 'rest_framework.throttling.UserRateThrottle'</span></span><br><span class="line">        <span class="string">'rest_framework.throttling.ScopedRateThrottle'</span>,</span><br><span class="line">    ],</span><br><span class="line">    <span class="string">'DEFAULT_THROTTLE_RATES'</span>: {</span><br><span class="line">        <span class="comment"># 'anon': '5/minute',  # 限制所有匿名未认证用户，使用IP区分用户。使用DEFAULT_THROTTLE_RATES['anon'] 来设置频次</span></span><br><span class="line">        <span class="comment"># 'user': '10/minute'  # 限制认证用户，使用User id 来区分。使用DEFAULT_THROTTLE_RATES['user'] 来设置频次</span></span><br><span class="line">        <span class="string">'goods_list'</span>: <span class="string">'3/minute'</span>  <span class="comment"># 单个API限速</span></span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GoodsListViewSet</span>(<span class="params">mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet</span>):</span></span><br><span class="line">    throttle_scope = <span class="string">'goods_list'</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="/2020/08/21/drf-huan-cun/1.png" alt="description"></p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -979,252 +1340,8 @@
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/06/30/hai-xiang-yun-suan-fu/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/06/30/hai-xiang-yun-suan-fu/" class="post-title-link" itemprop="url">海象运算符</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-06-29 16:21:41" itemprop="dateCreated datePublished" datetime="2020-06-29T16:21:41Z">2020-06-29</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-07-31 07:56:45" itemprop="dateModified" datetime="2021-07-31T07:56:45Z">2021-07-31</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>python3.8提供了一个新的运算符 - 海象运算符 Assignment Expresions ，<br>即 赋值表达式。</p>
-<p>由一个 : 和 一个 = 组成，即：<code>:=</code> 。我们一般称作 walrus operator（海象运算符），因为它看起来就是一个海象旋转 90° 而成。</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(variable_name := expression <span class="keyword">or</span> value)</span><br></pre></td></tr></tbody></table></figure>
-
-<p>即一个变量名后跟一个表达式或者一个值，这个和赋值运算符 = 类似，可以看作是一种新的赋值运算符。<br>可以将两行代码变成一行</p>
-<h4 id="用于-if-else-条件表达式"><a href="#用于-if-else-条件表达式" class="headerlink" title="用于 if-else 条件表达式"></a>用于 if-else 条件表达式</h4><figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">course_list = [<span class="string">"django"</span>, <span class="string">"scrapy"</span>, <span class="string">"tornado"</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment"># len(course_list)要执行两次</span></span><br><span class="line"><span class="keyword">if</span> len(course_list) &gt;= <span class="number">3</span>:</span><br><span class="line">    print(<span class="string">"课程较多， 课程数量： {}"</span>.format(len(course_list)))</span><br><span class="line">    <span class="comment"># 课程较多， 课程数量： 3</span></span><br><span class="line"></span><br><span class="line">course_size = len(course_list)  <span class="comment"># 多了一行</span></span><br><span class="line"><span class="keyword">if</span> course_size &gt;= <span class="number">3</span>:</span><br><span class="line">    print(<span class="string">"课程较多， 课程数量： {}"</span>.format(course_size))</span><br><span class="line">    <span class="comment"># 课程较多， 课程数量： 3</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> course_size := len(course_list) &gt;= <span class="number">3</span>:</span><br><span class="line">    <span class="comment"># if course_size := (len(course_list) &gt;= 3): 因为&gt;=的优先级高于:=</span></span><br><span class="line">    print(<span class="string">"课程较多， 课程数量： {}"</span>.format(course_size))</span><br><span class="line">    <span class="comment"># 课程较多， 课程数量： True</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (course_size := len(course_list)) &gt;= <span class="number">3</span>:</span><br><span class="line">    print(<span class="string">"课程较多， 课程数量： {}"</span>.format(course_size))</span><br><span class="line">    <span class="comment"># 课程较多， 课程数量： 3</span></span><br><span class="line"></span><br><span class="line">course_size = len(course_list)</span><br><span class="line">powers = [course_size, course_size**<span class="number">2</span>, course_size**<span class="number">3</span>]</span><br><span class="line">print(powers)  <span class="comment"># [3, 9, 27]</span></span><br><span class="line"></span><br><span class="line">powers = [course_size := len(course_list), course_size**<span class="number">2</span>, course_size**<span class="number">3</span>]</span><br><span class="line">print(powers)  <span class="comment"># [3, 9, 27]</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"></span><br><span class="line">desc = <span class="string">"bobby:18"</span></span><br><span class="line"></span><br><span class="line">m = re.match(<span class="string">"bobby:(.*)"</span>, desc)</span><br><span class="line"><span class="keyword">if</span> m:</span><br><span class="line">    age = m.group(<span class="number">1</span>)</span><br><span class="line">    print(age)  <span class="comment"># 18</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> m := re.match(<span class="string">"bobby:(.*)"</span>, desc):</span><br><span class="line">    age = m.group(<span class="number">1</span>)</span><br><span class="line">    print(age)  <span class="comment"># 18</span></span><br><span class="line"></span><br><span class="line">age = <span class="number">18</span></span><br><span class="line"><span class="comment"># 海象运算符不能赋值，go可以</span></span><br><span class="line"><span class="comment"># age := 18  # SyntaxError: invalid syntax</span></span><br><span class="line">age += <span class="number">5</span></span><br><span class="line"><span class="comment"># 海象运算符不能加减，go可以</span></span><br><span class="line"><span class="comment"># age :+= 5  # SyntaxError: invalid syntax</span></span><br></pre></td></tr></tbody></table></figure>
-
-<h4 id="用于-while-循环"><a href="#用于-while-循环" class="headerlink" title="用于 while 循环"></a>用于 while 循环</h4><p>常规写法：</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">n = <span class="number">6</span></span><br><span class="line"><span class="keyword">while</span> n:</span><br><span class="line">    print(<span class="string">'hello word!'</span>)</span><br><span class="line">    n -= <span class="number">1</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p>海象运算符：</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">n = <span class="number">6</span></span><br><span class="line"><span class="keyword">while</span> (n := n - <span class="number">1</span>) + <span class="number">1</span>: <span class="comment"># 需要加1是因为执行输出前n就减1了</span></span><br><span class="line">    print(<span class="string">'hello word!'</span>)</span><br></pre></td></tr></tbody></table></figure>
-
-<p>读取文件：</p>
-<p>常规写法：</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">fp = open(<span class="string">"test.txt"</span>, <span class="string">"r"</span>)</span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    line = fp.readline()</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> line:</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">    print(line.strip())</span><br><span class="line">fp.close()</span><br></pre></td></tr></tbody></table></figure>
-
-<p>海象运算符：</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">fp = open(<span class="string">"test.txt"</span>, <span class="string">"r"</span>)</span><br><span class="line"><span class="keyword">while</span> line := fp.readline():</span><br><span class="line">    print(line.strip())</span><br></pre></td></tr></tbody></table></figure><script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/04/08/python-cheng-xu-ru-kou-name-main/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/04/08/python-cheng-xu-ru-kou-name-main/" class="post-title-link" itemprop="url">Python程序入口 __name__ == '__main__'</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-04-07 16:21:41" itemprop="dateCreated datePublished" datetime="2020-04-07T16:21:41Z">2020-04-07</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-06-28 14:20:23" itemprop="dateModified" datetime="2021-06-28T14:20:23Z">2021-06-28</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>Python的文件头：</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/bin/bash/python3  # 在代码被执行时，主动说明该选哪个路径下的编译器</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p>Python程序入口 <strong>name</strong> == ‘<strong>main</strong>‘</p>
-<p>既没有写一个被调用的库和多进程的容易错误地认为「程序的入口」没什么用、是编码习惯。<br>事实上程序的入口非常有用，绝非可有可无，例如在Python自带的多线程库要求必须把主进程写在 if入口内部才能正常运行</p>
-<p>直接写在Python最左端没有缩进的代码，在这个 <code>*.py</code> 文件被直接运行、或者被调用时会被执行</p>
-<p>Python用这个方法来判断当前的模块是<strong>被直接运行</strong>还是<strong>被调用</strong><br>一个模块中有<code>__name__</code> 是当前模块名，</p>
-<ul>
-<li>当 <code>*.py</code> 文件模块被直接运行时，<code>模块名</code>为 <code>__main__</code>，即<code>__name__</code>置为 <code>__main__</code>，<code>if __name__ == '__main__'</code>之下的代码块将被运行。</li>
-<li>当 <code>*.py</code> 文件模块以模块形式被导入调用时，在终端命令行运行时， <code>__name__</code> 为被调用模块的 模块名，<code>if __name__ == '__main__'</code>之下的代码块不被运行。</li>
-</ul>
-<p>这种if测试可以让一个模块通过命令行运行时执行一些额外的代码，最常见的就是运行测试。</p>
-<p>假如你叫小明.py，在朋友眼中，你是小明(<strong>name</strong> == ‘小明’)；<br>在你自己眼中，你是你自己(<strong>name</strong> == ‘<strong>main</strong>‘)。</p>
-<p>main文件不能直接用相对路径导入，加个-m</p>
-<ul>
-<li>把不想在被调用时执行的代码放在程序入口的if内部，比如自检程序。</li>
-<li>把多线程的主线程写在程序入口的if内部。只能这么做，避免自己调用自己时重复执行主进程，下面会详细解释。</li>
-</ul>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Python的程序入口</span></span><br><span class="line"><span class="keyword">if</span> __name__ ==<span class="string">'__main__'</span>: <span class="comment"># 它对多进程非常重要</span></span><br><span class="line">    <span class="comment"># 这里是主程序</span></span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># C语言的程序入口</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">main</span><span class="params">()</span></span>{</span><br><span class="line">    <span class="comment">/* 这里是主程序 */</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># Java的程序入口</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span></span>{</span><br><span class="line">    <span class="comment">// 这里是主程序</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 新建一个名为【run1.py】的文件，填入下方代码</span></span><br><span class="line"><span class="comment"># 然后在终端输入【python3 run1.py】并运行</span></span><br><span class="line"></span><br><span class="line">print(__name__, <span class="string">'run1-outside'</span>)  <span class="comment"># __main__ run1-outside</span></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    print(__name__, <span class="string">'run1-inside'</span>)  <span class="comment"># __main__ run1-inside</span></span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 新建另一个名为【run2.py】的文件，填入下方代码，并放在与【run1.py】的相同目录下，</span></span><br><span class="line"><span class="comment"># 然后在终端命令行输入【python3 run2.py】并运行。用run2 调用run1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> run1  <span class="comment"># 这一行代码调用了外部的代码 run1，它只会print出：</span></span><br><span class="line"><span class="comment"># run1 run1-outside # 它只print出这一行东西，并且run1.py的【__main__】变成了【run1】</span></span><br><span class="line"><span class="comment"># run1 run1-inside  # 写在run1【if】缩进里的东西都没有被执行</span></span><br><span class="line"></span><br><span class="line">print(__name__, <span class="string">'run2-outside'</span>)  <span class="comment"># __main__ run2-outside</span></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    print(__name__, <span class="string">'run2-inside'</span>)  <span class="comment"># __main__ run2-inside</span></span><br></pre></td></tr></tbody></table></figure>
-
-
-<p>程序入口与自检程序<br>当一个开发者编写一个库时（例如把它命名为 utils.py），如</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 这个库（模块）被命名为 utils.py</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">C1</span>:</span></span><br><span class="line">   ...</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func1</span>():</span></span><br><span class="line">   ...</span><br><span class="line"></span><br><span class="line">c1 = C1()  <span class="comment"># 这是错误的做法，应该挪到 程序入口if内部</span></span><br><span class="line">func1()    <span class="comment"># 这是错误的做法，应该挪到 程序入口if内部</span></span><br><span class="line"><span class="keyword">if</span> __name__ ==<span class="string">'__main__'</span>:</span><br><span class="line">    c = C1()</span><br><span class="line">    func1()</span><br></pre></td></tr></tbody></table></figure>
-<p>当其他人只想调用 <code>C1</code> 或者 <code>func1</code> 时，他在另一个Python文件中，用 <code>import utils</code> 导入 <code>utils</code> 这个库时就不会运行程序入口if内部的任何代码了。</p>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/35/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/35/">35</a><span class="page-number current">36</span>
+    <a class="extend prev" rel="prev" href="/page/35/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/35/">35</a><span class="page-number current">36</span><a class="page-number" href="/page/37/">37</a><a class="extend next" rel="next" href="/page/37/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 </div>

@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css" integrity="sha256-2H3fkXt6FEmrReK448mDVGKb3WW2ZZw35gI7vqHOE4Y=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"bubbleboy11.github.io","root":"/","images":"/images","scheme":"Muse","version":"8.6.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="第2章 Go内部机制垃圾回收垃圾回收是释放掉那些不再使用的内存空间的过程.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="外心人D的博客">
+<meta property="og:url" content="https://bubbleboy11.github.io/2021/10/10/go-de-la-ji-hui-shou/index.html">
+<meta property="og:site_name" content="外心人D的博客">
+<meta property="og:description" content="第2章 Go内部机制垃圾回收垃圾回收是释放掉那些不再使用的内存空间的过程.">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://bubbleboy11.github.io/2021/10/10/go-de-la-ji-hui-shou/6328562-1021941531ecffc3.png">
+<meta property="og:image" content="https://bubbleboy11.github.io/2021/10/10/go-de-la-ji-hui-shou/6328562-9ae46a88a13613ee.png">
+<meta property="og:image" content="https://bubbleboy11.github.io/2021/10/10/go-de-la-ji-hui-shou/6328562-21bc289a81b75236.png">
+<meta property="og:image" content="https://bubbleboy11.github.io/2021/10/10/go-de-la-ji-hui-shou/6328562-e0535bd79c7996e8.png">
+<meta property="og:image" content="https://bubbleboy11.github.io/2021/10/10/go-de-la-ji-hui-shou/6328562-6c9ecb92555f14e2.png">
+<meta property="og:image" content="https://bubbleboy11.github.io/2021/10/10/go-de-la-ji-hui-shou/6328562-0c915b27be3f258d.png">
+<meta property="og:image" content="https://bubbleboy11.github.io/2021/10/10/go-de-la-ji-hui-shou/6328562-1306d93ef2c96426.png">
+<meta property="og:image" content="https://bubbleboy11.github.io/2021/10/10/go-de-la-ji-hui-shou/6328562-75599afe8b517f5c.png">
+<meta property="og:image" content="https://bubbleboy11.github.io/2021/10/10/go-de-la-ji-hui-shou/6328562-57b2f544aa5ff318.png">
+<meta property="og:image" content="https://bubbleboy11.github.io/2021/10/10/go-de-la-ji-hui-shou/6328562-714367c5511b3cf4.png">
+<meta property="article:published_time" content="2021-10-10T04:15:07.546Z">
+<meta property="article:modified_time" content="2021-10-10T04:15:09.350Z">
+<meta property="article:author" content="外心人D">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://bubbleboy11.github.io/2021/10/10/go-de-la-ji-hui-shou/6328562-1021941531ecffc3.png">
+
+
+<link rel="canonical" href="https://bubbleboy11.github.io/2021/10/10/go-de-la-ji-hui-shou/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://bubbleboy11.github.io/2021/10/10/go-de-la-ji-hui-shou/","path":"2021/10/10/go-de-la-ji-hui-shou/","title":""}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title> | 外心人D的博客</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="外心人D的博客" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">外心人D的博客</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC2%E7%AB%A0-Go%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6"><span class="nav-text">第2章 Go内部机制</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6"><span class="nav-text">垃圾回收</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#golang-GC%E7%AE%97%E6%B3%95%E6%BC%94%E5%8F%98%E8%BF%87%E7%A8%8B"><span class="nav-text">golang GC算法演变过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%87%E8%AE%B0%E6%B8%85%E9%99%A4%E7%AE%97%E6%B3%95-mark-and-sweep"><span class="nav-text">标记清除算法(mark and sweep)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E5%8C%85%E5%90%AB%E4%B8%A4%E4%B8%AA%E6%AD%A5%E9%AA%A4"><span class="nav-text">主要包含两个步骤:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%87%E8%AE%B0%E6%B8%85%E9%99%A4%E7%AE%97%E6%B3%95%E5%AD%98%E5%9C%A8%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-text">标记清除算法存在的问题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E8%89%B2%E6%A0%87%E8%AE%B0%E6%B8%85%E9%99%A4%E7%AE%97%E6%B3%95"><span class="nav-text">三色标记清除算法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%99%E5%B1%8F%E9%9A%9C"><span class="nav-text">写屏障</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E8%89%B2%E6%A0%87%E8%AE%B0%E8%BF%87%E7%A8%8B"><span class="nav-text">三色标记过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#gc%E5%92%8C%E7%94%A8%E6%88%B7%E9%80%BB%E8%BE%91%E5%A6%82%E4%BD%95%E5%B9%B6%E8%A1%8C%E6%93%8D%E4%BD%9C"><span class="nav-text">gc和用户逻辑如何并行操作</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-overview">
+            <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">外心人D</p>
+  <div class="site-description" itemprop="description">本博客大多内容为慕课和网上博客，并非原创</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">362</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+          </div>
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/10/10/go-de-la-ji-hui-shou/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2021-10-10 04:15:07 / 修改时间：04:15:09" itemprop="dateCreated datePublished" datetime="2021-10-10T04:15:07Z">2021-10-10</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="第2章-Go内部机制"><a href="#第2章-Go内部机制" class="headerlink" title="第2章 Go内部机制"></a>第2章 Go内部机制</h1><h2 id="垃圾回收"><a href="#垃圾回收" class="headerlink" title="垃圾回收"></a>垃圾回收</h2><p>垃圾回收是释放掉那些不再使用的内存空间的过程.</p>
+<a id="more"></a>
+
+
+<h2 id="golang-GC算法演变过程"><a href="#golang-GC算法演变过程" class="headerlink" title="golang GC算法演变过程"></a>golang GC算法演变过程</h2><table>
+<thead>
+<tr>
+<th align="center">版本</th>
+<th align="center">GC算法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">v1.1</td>
+<td align="center">STW(stop the word)</td>
+</tr>
+<tr>
+<td align="center">v1.3</td>
+<td align="center">Mark STW,Sweep(标记清除)</td>
+</tr>
+<tr>
+<td align="center">v1.5</td>
+<td align="center">三色标记</td>
+</tr>
+<tr>
+<td align="center">v1.8</td>
+<td align="center">hybrid write barrier(三色标记基础上加入写屏障)</td>
+</tr>
+</tbody></table>
+<h2 id="标记清除算法-mark-and-sweep"><a href="#标记清除算法-mark-and-sweep" class="headerlink" title="标记清除算法(mark and sweep)"></a>标记清除算法(mark and sweep)</h2><h3 id="主要包含两个步骤"><a href="#主要包含两个步骤" class="headerlink" title="主要包含两个步骤:"></a>主要包含两个步骤:</h3><p>1.找出不可达对象,然后做上标记<br>2.回收标记好的对象</p>
+<blockquote>
+<p>mark and sweep 算法在执行的时候,需要程序暂停,即stop the world</p>
+</blockquote>
+<h3 id="标记清除算法存在的问题"><a href="#标记清除算法存在的问题" class="headerlink" title="标记清除算法存在的问题"></a>标记清除算法存在的问题</h3><ul>
+<li>stop the world 程序暂停,即程序会出现卡顿</li>
+<li>标记需要扫描整个堆(heap)</li>
+<li>清楚数据会产生heap碎片</li>
+</ul>
+<h2 id="三色标记清除算法"><a href="#三色标记清除算法" class="headerlink" title="三色标记清除算法"></a>三色标记清除算法</h2><p>三色标记清除算法背后的首要原则就是它把堆中的对象根据它们的颜色分到不同集合里面，颜色是根据算法进行标记的  </p>
+<ul>
+<li>黑色集合 指针指向白色集合。</li>
+<li>白色集合中的对象允许有指针指向黑色集合,白色集合中的对象就是垃圾回收的候选对象。</li>
+<li>灰色集合可能会有指针指向白色集合里的对象。</li>
+</ul>
+<h3 id="写屏障"><a href="#写屏障" class="headerlink" title="写屏障"></a>写屏障</h3><p>每次堆中的指针被修改写屏障都会去执行。如果堆中对象的指针被修改，就意味着那个对象现在是可触达的，写屏障会把它标记为灰色并把它放到灰色集合中。<br>修改器 运行写屏障,从而保证黑色集合中没有任何元素的指针去指向白色集合中的元素。<br>写屏障直观作用有两个:<br>1.process新生成的内存对象会被直接标记成灰色<br>2.位于黑色集合中的内存对象引用了一个白色集合中的对象,写屏障会将白色集合的这个对象标记为灰色  </p>
+<h3 id="三色标记过程"><a href="#三色标记过程" class="headerlink" title="三色标记过程"></a>三色标记过程</h3><p>1.首先：程序创建的对象都标记为白色。<br><img src="/2021/10/10/go-de-la-ji-hui-shou/6328562-1021941531ecffc3.png"><br>2.gc开始：扫描所有可到达的对象，标记为灰色<br><img src="/2021/10/10/go-de-la-ji-hui-shou/6328562-9ae46a88a13613ee.png"><br>3.从灰色对象中找到其引用对象标记为灰色，把灰色对象本身标记为黑色<br><img src="/2021/10/10/go-de-la-ji-hui-shou/6328562-21bc289a81b75236.png"><br>4.监视对象中的内存修改，并持续上一步的操作，直到灰色标记的对象不存在<br><img src="/2021/10/10/go-de-la-ji-hui-shou/6328562-e0535bd79c7996e8.png"><br>5.此时，gc回收白色对象。<br><img src="/2021/10/10/go-de-la-ji-hui-shou/6328562-6c9ecb92555f14e2.png"><br>6.最后，将所有黑色对象变为白色，并重复以上所有过程。<br><img src="/2021/10/10/go-de-la-ji-hui-shou/6328562-0c915b27be3f258d.png"></p>
+<h3 id="gc和用户逻辑如何并行操作"><a href="#gc和用户逻辑如何并行操作" class="headerlink" title="gc和用户逻辑如何并行操作"></a>gc和用户逻辑如何并行操作</h3><p>标记-清除(mark and sweep)算法的STW(stop the world)操作，就是runtime把所有的线程全部冻结掉，所有的线程全部冻结意味着用户逻辑是暂停的。这样所有的对象都不会被修改了，这时候去扫描是绝对安全的。<br>Go如何减短这个过程呢？标记-清除(mark and sweep)算法包含两部分逻辑：标记和清除。<br>我们知道Golang三色标记法中最后只剩下的黑白两种对象，黑色对象是程序恢复后接着使用的对象，如果不碰触黑色对象，只清除白色的对象，肯定不会影响程序逻辑。所以：清除操作和用户逻辑可以并发。<br>标记操作和用户逻辑也是并发的，用户逻辑会时常生成对象或者改变对象的引用，那么标记和用户逻辑如何并发呢？<br><strong>process新生成对象的时候，GC该如何操作呢？不会乱吗？</strong><br>我们看如下图，在此状态下：process程序又新生成了一个对象，我们设想会变成这样：<br><img src="/2021/10/10/go-de-la-ji-hui-shou/6328562-1306d93ef2c96426.png"><br>但是这样显然是不对的，因为按照三色标记法的步骤，这样新生成的对象A最后会被清除掉，这样会影响程序逻辑。<br>Golang为了解决这个问题，引入了写屏障这个机制。<br>写屏障：该屏障之前的写操作和之后的写操作相比，先被系统其它组件感知。<br>通俗的讲：就是在gc跑的过程中，可以监控对象的内存修改，并对对象进行重新标记。(实际上也是超短暂的stw，然后对对象进行标记)<br>在上述情况中，新生成的对象，一律都标位灰色！<br><img src="/2021/10/10/go-de-la-ji-hui-shou/6328562-75599afe8b517f5c.png"><br><strong>那么，灰色或者黑色对象的引用改为白色对象的时候，Golang是该如何操作的？</strong><br>看如下图，一个黑色对象引用了曾经标记的白色对象。<br><img src="/2021/10/10/go-de-la-ji-hui-shou/6328562-57b2f544aa5ff318.png"><br>这时候，写屏障机制被触发，向GC发送信号，GC重新扫描对象并标位灰色。<br><img src="/2021/10/10/go-de-la-ji-hui-shou/6328562-714367c5511b3cf4.png"><br>因此，gc一旦开始，无论是创建对象还是对象的引用改变，都会先变为灰色。</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/10/07/windows-sheng-cheng-xiang-mu-mu-lu-jie-gou/" rel="prev" title="Windows生成项目目录结构">
+                  <i class="fa fa-chevron-left"></i> Windows生成项目目录结构
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">外心人D</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

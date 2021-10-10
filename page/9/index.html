@@ -119,7 +119,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">359</span>
+          <span class="site-state-item-count">362</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -160,6 +160,423 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/06/10/drf-gou-wu-che/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/06/10/drf-gou-wu-che/" class="post-title-link" itemprop="url">drf购物车</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-06-09 16:21:41" itemprop="dateCreated datePublished" datetime="2021-06-09T16:21:41Z">2021-06-09</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-06-17 07:28:50" itemprop="dateModified" datetime="2021-06-17T07:28:50Z">2021-06-17</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>商品详情页添加商品到购物车，就可以把商品加入到数据库【创建】。<br>对于购物车已存在的商品，如果将商品重复加入购物车，或者减少商品数量，就将它的数量进行加减【更新】。<br>购物车也支持对商品进行删除【删除】，以及列表展示【查询】。</p>
+<p>综上，购物车就需要用到mixins中的所有功能。</p>
+<p>修改购物车数量功能实现</p>
+<p>如果用户对某个商品添加到购物车，之后再对该商品进行重复添加，再向购物车添加同一个商品，不希望得到验证说这个商品已经存在，而是希望在当前数量上加1，那么是需要将购物车中的数据进行修改，也就是当前用户的购物车中的每一种商品都是唯一的，那么修改一下models，为其增加联合唯一的限定。</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ShoppingCart</span>(<span class="params">models.Model</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    购物车</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    user = models.ForeignKey(User, verbose_name=<span class="string">'用户'</span>, help_text=<span class="string">'用户'</span>, on_delete=models.CASCADE, related_name=<span class="string">'shopping_carts'</span>)</span><br><span class="line">    goods = models.ForeignKey(Goods, verbose_name=<span class="string">'商品'</span>, help_text=<span class="string">'商品'</span>, on_delete=models.CASCADE)</span><br><span class="line">    nums = models.IntegerField(default=<span class="number">0</span>, verbose_name=<span class="string">'购买数量'</span>, help_text=<span class="string">'购买数量'</span>)</span><br><span class="line">    add_time = models.DateTimeField(auto_now_add=<span class="literal">True</span>, verbose_name=<span class="string">'添加时间'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        verbose_name_plural = verbose_name = <span class="string">'购物车'</span></span><br><span class="line">        unique_together = [<span class="string">'user'</span>, <span class="string">'goods'</span>]  <span class="comment"># 用户和商品联合唯一</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>如果使用的是<code>serializers.ModelSerializer</code>，<br>模型中定义了<code>unique_together = ['user', 'goods']</code>，进行validate时就会抛出异常，<br>就算是重写<code>def create(self, validated_data)</code>方法也是无效的，因为在进行该方法前，就已经进行了validate。<br><code>ShoppingCartViewSet</code>继承的是<code>viewsets.ModelViewSet</code>，在这里面有个<code>mixins.CreateModelMixin</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CreateModelMixin</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    Create a model instance.</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">create</span>(<span class="params">self, request, *args, **kwargs</span>):</span></span><br><span class="line">        serializer = self.get_serializer(data=request.data)</span><br><span class="line">        serializer.is_valid(raise_exception=<span class="literal">True</span>)</span><br><span class="line">        self.perform_create(serializer)</span><br><span class="line">        headers = self.get_success_headers(serializer.data)</span><br><span class="line">        <span class="keyword">return</span> Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">perform_create</span>(<span class="params">self, serializer</span>):</span></span><br><span class="line">        serializer.save()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_success_headers</span>(<span class="params">self, data</span>):</span></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            <span class="keyword">return</span> {<span class="string">'Location'</span>: str(data[api_settings.URL_FIELD_NAME])}</span><br><span class="line">        <span class="keyword">except</span> (TypeError, KeyError):</span><br><span class="line">            <span class="keyword">return</span> {}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>这个<code>CreateModelMixin</code>在<code>create</code>的时候首先会调用<code>serializer.is_valid(raise_exception=True)</code>，<br>接下来会调用<code>self.perform_create(serializer)</code>执行数据保存<code>serializer.save()</code>，<br>因为在<code>ModelSerializer</code>中的<code>create()</code>方法会因为插入数据时重复而验证不通过导致抛出异常，无法继续执行，所以是无法保存成功的。</p>
+<p>当然，我们也可以重写<code>CreateModelMixin</code>中的<code>create</code>的方法，就可以控制该方法的所有步骤。<br>如果不用<code>serializer</code>，那么它的验证功能就享受不到了，不用<code>serializer</code>做，就需要在views中去完成；另外生成文档的时候，字段是从<code>serializer</code>中取得，如果不用那么文档的功能就缺失了。</p>
+<p>在定义序列化的<code>ShoppingCartSerializer</code>继承自<code>Serializer</code>而不能继承自<code>ModelSerializer</code>，自己来做validate，自己重写<code>create()</code>实现<code>save</code>功能，</p>
+<p>用户在添加购物车时，也就是在数据库中添加一条记录。还要分为两种情况，<br>当购物车数据库中没有这个商品时，执行添加；<br>当已存在该商品时，执行数量更新。</p>
+<p><code>validated_data</code>也就是上方定义的字段传过来之前已经处理好的数据，例如，<code>nums</code>如果数量为负数，那么该数据到不了<code>create()</code>方法。</p>
+<p>而Serializer又继承自<code>BaseSerializer</code>，<code>BaseSerializer</code>中声明了<code>update(instance, validated_data)</code>方法但是直接抛出异常，</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 源码：rest_framework.serializers.BaseSerializer#update</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">update</span>(<span class="params">self, instance, validated_data</span>):</span></span><br><span class="line">        <span class="keyword">raise</span> NotImplementedError(<span class="string">'`update()` must be implemented.'</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>并且Serializer中并未重写<code>update()</code>方法，因此如果在<code>ShoppingCartSerializer</code>中不重写该方法会导致在修改购物车详情时会抛出上面的异常，如果继承自<code>ModelSerializer</code>则有该方法不需要重写，在<code>ShoppingCartSerializer</code>中重写<code>update(instance, validated_data)</code>方法</p>
+<p><code>trade/serializer.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework <span class="keyword">import</span> serializers</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> .models <span class="keyword">import</span> ShoppingCart</span><br><span class="line"><span class="keyword">from</span> goods.models <span class="keyword">import</span> Goods</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ShoppingCartSerializer</span>(<span class="params">serializers.Serializer</span>):</span></span><br><span class="line">    <span class="comment"># 表示user为隐藏字段，默认为获取当前登录用</span></span><br><span class="line">    user = serializers.HiddenField(default=serializers.CurrentUserDefault())</span><br><span class="line">    nums = serializers.IntegerField(required=<span class="literal">True</span>, min_value=<span class="number">1</span>, label=<span class="string">'数量'</span>,</span><br><span class="line">                                    error_messages={</span><br><span class="line">                                        <span class="string">'required'</span>: <span class="string">'请选择商品数量'</span>,</span><br><span class="line">                                        <span class="string">'min_value'</span>: <span class="string">'商品数量至少为1'</span></span><br><span class="line">                                    })</span><br><span class="line">    <span class="comment"># 这里是继承Serializer，必须指定queryset对象，如果继承ModelSerializer则不需要指定</span></span><br><span class="line">    <span class="comment"># goods是一个外键，可以通过这方法获取goods object中所有的值</span></span><br><span class="line">    goods = serializers.PrimaryKeyRelatedField(required=<span class="literal">True</span>, queryset=Goods.objects.filter(is_delete=<span class="literal">False</span>))</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">create</span>(<span class="params">self, validated_data</span>):</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        反序列化保存数据</span></span><br><span class="line"><span class="string">        :param validated_data:上方定义的字段传过来之前已经验证过的dict类型数据</span></span><br><span class="line"><span class="string">        :return:</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        <span class="comment"># 获取当前用户</span></span><br><span class="line">        <span class="comment"># view中:self.request.user；</span></span><br><span class="line">        <span class="comment"># serizlizer中:self.context["request"].user</span></span><br><span class="line">        user = self.context[<span class="string">'request'</span>].user</span><br><span class="line">        nums = validated_data[<span class="string">'nums'</span>]</span><br><span class="line">        goods = validated_data[<span class="string">'goods'</span>]</span><br><span class="line">        existed = ShoppingCart.objects.filter(is_delete=<span class="literal">False</span>, user=user, goods=goods)</span><br><span class="line">        <span class="keyword">if</span> existed:  <span class="comment"># 如果购物车中有记录</span></span><br><span class="line">            existed = existed[<span class="number">0</span>]</span><br><span class="line">            existed.nums += nums</span><br><span class="line">            existed.save()  <span class="comment"># queryset结果集的save方法</span></span><br><span class="line">        <span class="keyword">else</span>:  <span class="comment"># 如果购物车车没有记录，添加到购物车</span></span><br><span class="line">            existed = ShoppingCart.objects.create(**validated_data)</span><br><span class="line">        <span class="keyword">return</span> existed</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">update</span>(<span class="params">self, instance, validated_data</span>):</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        修改购物车商品数量</span></span><br><span class="line"><span class="string">        :param instance: 要更新的对象实例</span></span><br><span class="line"><span class="string">        :param validated_data: </span></span><br><span class="line"><span class="string">        :return: </span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        instance.nums = validated_data[<span class="string">'nums'</span>]</span><br><span class="line">        instance.save()  <span class="comment"># 模型类对象的save方法</span></span><br><span class="line">        <span class="keyword">return</span> instance</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ShoppingCartListSerializer</span>(<span class="params">serializers.ModelSerializer</span>):</span></span><br><span class="line">    <span class="comment"># 购物车中除了有商品的id，但要显示商品的图片、名称、单价等信息。</span></span><br><span class="line">    goods = GoodsSerializer(many=<span class="literal">False</span>)  <span class="comment"># 一个购物车对应一个商品，默认many=False，也就是可以不写</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        model = ShoppingCart</span><br><span class="line">        fields = <span class="string">'__all__'</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>apps/trade/views.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework <span class="keyword">import</span> viewsets</span><br><span class="line"><span class="keyword">from</span> rest_framework.permissions <span class="keyword">import</span> IsAuthenticated</span><br><span class="line"><span class="keyword">from</span> rest_framework_simplejwt.authentication <span class="keyword">import</span> JWTAuthentication</span><br><span class="line"><span class="keyword">from</span> rest_framework.authentication <span class="keyword">import</span> SessionAuthentication</span><br><span class="line"><span class="keyword">from</span> .serializers <span class="keyword">import</span> ShopCartSerializer</span><br><span class="line"><span class="keyword">from</span> .models <span class="keyword">import</span> ShoppingCart</span><br><span class="line"><span class="keyword">from</span> utils.permissions <span class="keyword">import</span> IsOwnerOrReadOnly</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ShoppingCartViewSet</span>(<span class="params">viewsets.ModelViewSet</span>):</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    list:</span></span><br><span class="line"><span class="string">        获取购物车列表</span></span><br><span class="line"><span class="string">    create:</span></span><br><span class="line"><span class="string">        添加商品到购物车</span></span><br><span class="line"><span class="string">    update:</span></span><br><span class="line"><span class="string">        更新购物车商品数量</span></span><br><span class="line"><span class="string">    delete:</span></span><br><span class="line"><span class="string">        从购物车中删除商品</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    queryset = ShoppingCart.objects.filter(is_delete=<span class="literal">False</span>)</span><br><span class="line">    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]  <span class="comment"># 用户必须登录才能访问</span></span><br><span class="line">    authentication_classes = [JWTAuthentication, SessionAuthentication]  <span class="comment"># 配置登录认证：支持JWT认证和DRF基本认证</span></span><br><span class="line">    <span class="comment"># serializer_class = ShoppingCartSerializer  # 使用get_serializer_class()，这个就不需要了</span></span><br><span class="line">    lookup_field = <span class="string">'goods_id'</span>  <span class="comment"># 单个模型实例的对象查找的模型字段，即查询单一数据库对象时使用的条件字段，默认为pk，即主键，并根据该字段进行查询就可以获取到该记录。</span></span><br><span class="line">    <span class="comment"># 不再是根据ShoppingCart的主键id进行查找，</span></span><br><span class="line">    <span class="comment"># 由于每个用户的购物车商品都是唯一的，</span></span><br><span class="line">    <span class="comment"># 在数据接口中直接传入商品id</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_serializer_class</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">if</span> self.action == <span class="string">'list'</span>:</span><br><span class="line">            <span class="comment"># 当获取购物车列表时，使用ModelSerializer，可以显示购物车商品详情</span></span><br><span class="line">            <span class="keyword">return</span> ShoppingCartListSerializer</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">return</span> ShoppingCartSerializer</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_queryset</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="comment"># 只能显示当前用户的购物车列表</span></span><br><span class="line">        <span class="keyword">return</span> ShoppingCart.objects.filter(user=self.request.user, is_delete=<span class="literal">False</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">perform_create</span>(<span class="params">self, serializer</span>):</span></span><br><span class="line">        <span class="string">'''创建购物车更新库存量'''</span></span><br><span class="line">        shop_cart = serializer.save()</span><br><span class="line">        goods = shop_cart.goods</span><br><span class="line">        goods.goods_num -= shop_cart.nums</span><br><span class="line">        goods.save()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">perform_destroy</span>(<span class="params">self, instance</span>):</span></span><br><span class="line">        <span class="string">'''删除购物车更新库存量'''</span></span><br><span class="line">        goods = instance.goods</span><br><span class="line">        goods.goods_num += instance.nums</span><br><span class="line">        goods.save()</span><br><span class="line">        instance.delete()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">perform_update</span>(<span class="params">self, serializer</span>):</span></span><br><span class="line">        <span class="string">'''修改购物车更新库存量'''</span></span><br><span class="line">        existed_record = ShoppingCart.objects.filter(is_delete=<span class="literal">False</span>).get(id=serializer.instance.id)</span><br><span class="line">        existed_nums = existed_record.nums</span><br><span class="line">        saved_record = serializer.save()</span><br><span class="line">        nums = saved_record.nums - existed_nums</span><br><span class="line">        goods = saved_record.goods</span><br><span class="line">        goods.goods_num -= nums</span><br><span class="line">        goods.save()</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>url.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">router.register(<span class="string">'shopcarts'</span>, ShoppingCartViewSet)</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="/2021/06/10/drf-gou-wu-che/0.jpeg" alt="description"><br><img src="/2021/06/10/drf-gou-wu-che/1.png" alt="description"><br><img src="/2021/06/10/drf-gou-wu-che/2.png" alt="description"><br><img src="/2021/06/10/drf-gou-wu-che/3.png" alt="description"><br><img src="/2021/06/10/drf-gou-wu-che/4.png" alt="description"><br><img src="/2021/06/10/drf-gou-wu-che/5.png" alt="description"><br><img src="/2021/06/10/drf-gou-wu-che/6.png" alt="description"></p>
+<h2 id="商品库存数量"><a href="#商品库存数量" class="headerlink" title="商品库存数量"></a>商品库存数量</h2><p>商品库存数量的行为：</p>
+<ul>
+<li>新增商品到购物车</li>
+<li>修改购物车数量</li>
+<li>删除购物车记录</li>
+<li>订单取消，库存增加</li>
+</ul>
+<p>新增商品到购物车重写<code>CreateModelMixin</code>类的<code>perform_create(serializer)</code>方法，<br>修改购物车数量重写<code>UpdateModelMixin</code>类的<code>perform_update(serializer)</code>方法，<br>删除购物车记录重写<code>DestroyModelMixin</code>类的<code>perform_destroy(instance)</code>方法，如下：</p>
+<p><code>trade/views.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ShoppingCartViewSet</span>(<span class="params">viewsets.ModelViewSet</span>):</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    list:</span></span><br><span class="line"><span class="string">        获取购物车列表</span></span><br><span class="line"><span class="string">    create:</span></span><br><span class="line"><span class="string">        添加商品到购物车</span></span><br><span class="line"><span class="string">    update:</span></span><br><span class="line"><span class="string">        更新购物车商品数量</span></span><br><span class="line"><span class="string">    delete:</span></span><br><span class="line"><span class="string">        从购物车中删除商品</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    queryset = ShoppingCart.objects.filter(is_delete=<span class="literal">False</span>)</span><br><span class="line">    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]  <span class="comment"># 用户必须登录才能访问</span></span><br><span class="line">    authentication_classes = [JWTAuthentication, SessionAuthentication]  <span class="comment"># 配置登录认证：支持JWT认证和DRF基本认证</span></span><br><span class="line">    <span class="comment"># serializer_class = ShoppingCartSerializer  # 使用get_serializer_class()，这个就不需要了</span></span><br><span class="line">    lookup_field = <span class="string">'goods_id'</span>  <span class="comment"># 单个模型实例的对象查找的模型字段，即查询单一数据库对象时使用的条件字段，默认为pk，即主键</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 不再是根据ShoppingCart的主键id进行查找，</span></span><br><span class="line">    <span class="comment"># 在数据接口中就可以直接传入商品id并根据该字段进行查询</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_serializer_class</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">if</span> self.action == <span class="string">'list'</span>:</span><br><span class="line">            <span class="comment"># 当获取购物车列表时，使用ModelSerializer，可以显示购物车商品详情</span></span><br><span class="line">            <span class="keyword">return</span> ShoppingCartListSerializer</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">return</span> ShoppingCartSerializer</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_queryset</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="comment"># 只能显示当前用户的购物车列表</span></span><br><span class="line">        <span class="keyword">return</span> ShoppingCart.objects.filter(user=self.request.user, is_delete=<span class="literal">False</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">perform_create</span>(<span class="params">self, serializer</span>):</span></span><br><span class="line">        <span class="string">'''添加到购物车，库存量减少'''</span></span><br><span class="line">        shop_cart = serializer.save()</span><br><span class="line">        goods = shop_cart.goods</span><br><span class="line">        goods.goods_num -= shop_cart.nums</span><br><span class="line">        goods.save()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">perform_destroy</span>(<span class="params">self, instance</span>):</span></span><br><span class="line">        <span class="string">'''删除购物车，库存量增加'''</span></span><br><span class="line">        goods = instance.goods</span><br><span class="line">        goods.goods_num += instance.nums</span><br><span class="line">        goods.save()</span><br><span class="line">        instance.delete()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">perform_update</span>(<span class="params">self, serializer</span>):</span></span><br><span class="line">        <span class="string">'''修改购物车更新库存量'''</span></span><br><span class="line">        existed_record = ShoppingCart.objects.filter(is_delete=<span class="literal">False</span>).get(id=serializer.instance.id)</span><br><span class="line">        <span class="comment"># 获取购物车中该商品修改之前的库存数量</span></span><br><span class="line">        existed_nums = existed_record.nums</span><br><span class="line">        saved_record = serializer.save()</span><br><span class="line">        <span class="comment"># 现在的数量减去以前的数量</span></span><br><span class="line">        diff_nums = saved_record.nums - existed_nums</span><br><span class="line">        goods = saved_record.goods</span><br><span class="line">        <span class="comment"># 得到商品对象，更改库存量</span></span><br><span class="line">        goods.goods_num -= diff_nums</span><br><span class="line">        goods.save()</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="/2021/06/10/drf-gou-wu-che/7.png" alt="description"><br>添加3个到购物车<br><img src="/2021/06/10/drf-gou-wu-che/8.png" alt="description"><br><img src="/2021/06/10/drf-gou-wu-che/9.png" alt="description"><br><img src="/2021/06/10/drf-gou-wu-che/10.png" alt="description"><br>修改购物车中的数量</p>
+<p>从购物车删除该商品<br>库存量恢复到10<br><img src="/2021/06/10/drf-gou-wu-che/11.png" alt="description"></p>
+<p>用户下单后，将购物车中的商品放到订单商品中。订单一旦取消，商品并未返回购物车，所以，需要将库存数量修改。</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">OrderInfoViewSet</span>(<span class="params">mixins.CreateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin,</span></span></span><br><span class="line"><span class="class"><span class="params">                       mixins.DestroyModelMixin,</span></span></span><br><span class="line"><span class="class"><span class="params">                       viewsets.GenericViewSet</span>):</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    订单管理，不能修改，不需要继承自UpdateModelMixin</span></span><br><span class="line"><span class="string">    list:</span></span><br><span class="line"><span class="string">        订单列表</span></span><br><span class="line"><span class="string">    retrieve:</span></span><br><span class="line"><span class="string">        订单详情</span></span><br><span class="line"><span class="string">    delete:</span></span><br><span class="line"><span class="string">        删除订单</span></span><br><span class="line"><span class="string">    create:</span></span><br><span class="line"><span class="string">        新增订单</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    queryset = OrderInfo.objects.all()</span><br><span class="line">    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]  <span class="comment"># 用户必须登录才能访问</span></span><br><span class="line">    authentication_classes = [JWTAuthentication, SessionAuthentication]  <span class="comment"># 配置登录认证：支持JWT认证和DRF基本认证</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># serializer_class = OrderListSerializer</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_queryset</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> OrderInfo.objects.filter(user=self.request.user, is_delete=<span class="literal">False</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_serializer_class</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">if</span> self.action == <span class="string">'retrieve'</span>:</span><br><span class="line">            <span class="keyword">return</span> OrderDetailSerializer</span><br><span class="line">        <span class="keyword">return</span> OrderListSerializer</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">perform_destroy</span>(<span class="params">self, instance</span>):</span></span><br><span class="line">        <span class="comment"># 取消（删除）商品库存量增加</span></span><br><span class="line">        <span class="keyword">for</span> order_goods <span class="keyword">in</span> instance.goods.all():</span><br><span class="line">            goods = order_goods.goods</span><br><span class="line">            <span class="comment"># 获取订单商品的数量，修改库存量</span></span><br><span class="line">            goods.goods_num += order_goods.goods_num</span><br><span class="line">            goods.save()</span><br><span class="line">        instance.delete()</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="商品销量"><a href="#商品销量" class="headerlink" title="商品销量"></a>商品销量</h2><p>只有在支付成功后才会更新</p>
+<p><code>trade/views.py</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AliPayView</span>(<span class="params">APIView</span>):</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    通知验证 支付宝的返回</span></span><br><span class="line"><span class="string">    get:</span></span><br><span class="line"><span class="string">        处理支付宝return_url请求</span></span><br><span class="line"><span class="string">    post:</span></span><br><span class="line"><span class="string">        处理支付宝notify_url请求</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">post</span>(<span class="params">self, request</span>):</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        处理支付宝的notify_url 验签处理订单状态</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="comment"># 请求参数（假设是POST请求）中包括订单号、支付流水号、交易金额和签名</span></span><br><span class="line">        data = dict(request.POST.items())</span><br><span class="line">        <span class="comment"># 把sign pop掉，文档有说明</span></span><br><span class="line">        signature = data.pop(<span class="string">"sign"</span>, <span class="literal">None</span>)</span><br><span class="line">        <span class="comment"># 调用验证操作</span></span><br><span class="line">        success = self.alipay.verify(data, signature)</span><br><span class="line">        order_sn = data.get(<span class="string">'out_trade_no'</span>, <span class="literal">None</span>)  <span class="comment"># 原支付请求的商户订单号</span></span><br><span class="line">        trade_status = self.alipay.api_alipay_trade_query(out_trade_no=order_sn).get(<span class="string">"trade_status"</span>, <span class="literal">None</span>)</span><br><span class="line">        <span class="keyword">if</span> success <span class="keyword">and</span> trade_status <span class="keyword">in</span> (<span class="string">"TRADE_SUCCESS"</span>, <span class="string">"TRADE_FINISHED"</span>):</span><br><span class="line">            trade_no = data.get(<span class="string">'trade_no'</span>, <span class="literal">None</span>)  <span class="comment"># 支付宝交易凭证号</span></span><br><span class="line">            <span class="comment"># 订单商品</span></span><br><span class="line">            existed_orders = OrderInfo.objects.filter(order_sn=order_sn, is_delete=<span class="literal">False</span>)</span><br><span class="line">            print(len(existed_orders))</span><br><span class="line">            <span class="keyword">if</span> existed_orders:</span><br><span class="line">                <span class="keyword">for</span> order <span class="keyword">in</span> existed_orders:</span><br><span class="line">                    order_goods = order.goods.all()</span><br><span class="line">                    <span class="comment"># 商品销量增加订单中数值</span></span><br><span class="line">                    <span class="keyword">for</span> order_good <span class="keyword">in</span> order_goods:</span><br><span class="line">                        <span class="comment"># 获取订单中商品</span></span><br><span class="line">                        goods = order_good.goods</span><br><span class="line">                        <span class="comment"># 销量根据订单商品数量增加增加</span></span><br><span class="line">                        goods.sold_num += order_good.goods_num</span><br><span class="line">                        goods.save()</span><br><span class="line">                    <span class="comment"># 更新数据库订单状态</span></span><br><span class="line">                    order.pay_status = trade_status</span><br><span class="line">                    order.trade_no = trade_no</span><br><span class="line">                    order.pay_time = datetime.now()</span><br><span class="line">                    order.save()</span><br><span class="line">                response = HttpResponseRedirect(<span class="string">'http://127.0.0.1:8080/#/app/home/member/order'</span>)</span><br><span class="line">                response.set_cookie(<span class="string">'nextPath'</span>, <span class="string">'pay'</span>, max_age=<span class="number">2</span>)</span><br><span class="line">                print(<span class="string">'cookie'</span>, response.cookies)</span><br><span class="line">                <span class="keyword">return</span> response</span><br><span class="line">        <span class="keyword">return</span> HttpResponseRedirect(<span class="string">'http://127.0.0.1:8080/#/app/shoppingcart/cart'</span>)</span><br></pre></td></tr></tbody></table></figure>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/06/07/pycharm-shang-chuan-wen-jian-dao-linux/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/06/07/pycharm-shang-chuan-wen-jian-dao-linux/" class="post-title-link" itemprop="url">pycharm上传文件到linux</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-06-06 16:21:41" itemprop="dateCreated datePublished" datetime="2021-06-06T16:21:41Z">2021-06-06</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-06-10 05:43:46" itemprop="dateModified" datetime="2021-06-10T05:43:46Z">2021-06-10</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>pycharm Tools-Deployment-configuration- SFTP</p>
+<p>最下面的Web server root URL是该项目在部署后的链接，点击open可打开该项目。Root path是指定自动上传到linux服务器的路径，这里就选择测试主机的/root目录。</p>
+<p>选择要上传的目录或文件，出现高亮，Tools-Deployment</p>
+<p>传递映射路径的是相对路径，不是把文件传到根路径，保持原来的目录结构，会创建所在的文件夹<br>可以upload到服务器，download到本地，sync同步</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@VM-0-9-centos ~]<span class="comment"># cd /root/project/mxshop_srvs/</span></span><br><span class="line">[root@VM-0-9-centos mxshop_srvs]<span class="comment"># ls</span></span><br><span class="line">order_srv</span><br><span class="line">[root@VM-0-9-centos mxshop_srvs]<span class="comment"># cd order_srv/</span></span><br><span class="line">[root@VM-0-9-centos order_srv]<span class="comment"># ls</span></span><br><span class="line">install.zip</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[root@VM-0-9-centos order_srv]<span class="comment"># unzip install.zip</span></span><br><span class="line">Archive:  install.zip</span><br><span class="line">  inflating: install/README.md</span><br><span class="line">   creating: install/conf/</span><br><span class="line">  inflating: install/conf/broker.conf</span><br><span class="line">  inflating: install/docker-compose.yml</span><br><span class="line">[root@VM-0-9-centos order_srv]<span class="comment"># ls</span></span><br><span class="line">install  install.zip</span><br><span class="line">[root@VM-0-9-centos order_srv]<span class="comment"># cd install/</span></span><br><span class="line">[root@VM-0-9-centos install]<span class="comment"># ls</span></span><br><span class="line">conf  docker-compose.yml  README.md</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="/2021/06/07/pycharm-shang-chuan-wen-jian-dao-linux/1.png" alt="description"></p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/06/05/drf-fan-xu-lie-hua-yan-zheng/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/06/05/drf-fan-xu-lie-hua-yan-zheng/" class="post-title-link" itemprop="url">drf反序列化验证</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-06-04 16:21:41" itemprop="dateCreated datePublished" datetime="2021-06-04T16:21:41Z">2021-06-04</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-07-29 08:13:34" itemprop="dateModified" datetime="2021-07-29T08:13:34Z">2021-07-29</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <ul>
+<li>验证处理：反序列化，前端post传递过来的dict类型数据放在<code>request.data</code> 的时候，要把他转换成模型类实例进行保存到数据表，对前端提交的数据进行验证</li>
+</ul>
+<h3 id="字段选项验证"><a href="#字段选项验证" class="headerlink" title="字段选项验证"></a>字段选项验证</h3><p>在定义序列化器时，指明每个字段的序列化类型和选项参数，本身就是一种验证行为。<br><code>required</code>、<code>max_length</code>、<code>min_length</code> <code>allow_blank</code>是否允许为空<br><code>trim_whitespace</code>是否截断空白字符<br><code>max_value</code> 最小值<br><code>min_value</code> 最大值等验证方式，<br><code>default</code></p>
+<h3 id="在序列化器或字段类上编写自定义显式验证方法，"><a href="#在序列化器或字段类上编写自定义显式验证方法，" class="headerlink" title="在序列化器或字段类上编写自定义显式验证方法，"></a>在序列化器或字段类上编写自定义显式验证方法，</h3><ul>
+<li><p>自定义单一字段验证，函数名必须：<code>validate_&lt;field_name&gt;</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">validate_code</span>(<span class="params">self, code</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    自定义单一字段验证，函数名必须：validate + _ + 验证字段名</span></span><br><span class="line"><span class="string">    验证验证码</span></span><br><span class="line"><span class="string">    形参名随便写</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="comment"># 用户以post方式提交注册信息，前端post的数据都保存在initial_data里面</span></span><br><span class="line">    <span class="comment"># username就是用户注册的手机号，</span></span><br><span class="line">    <span class="comment"># 验证码按添加时间倒序排序，为了后面验证过期，错误等</span></span><br><span class="line">    verify_records = VerifyCode.objects.filter(mobile=self.initial_data[<span class="string">"username"</span>]).order_by(<span class="string">"-add_time"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> verify_records:  <span class="comment"># 验证验证码是否存在</span></span><br><span class="line">        <span class="comment"># 最近的一个验证码</span></span><br><span class="line">        last_record = verify_records[<span class="number">0</span>]</span><br><span class="line">        <span class="comment"># 获取5分钟以前的时间</span></span><br><span class="line">        five_mintes_ago = datetime.now() - timedelta(hours=<span class="number">0</span>, minutes=<span class="number">5</span>, seconds=<span class="number">0</span>)</span><br><span class="line">        <span class="keyword">if</span> five_mintes_ago &gt; last_record.add_time:</span><br><span class="line">            <span class="keyword">raise</span> serializers.ValidationError(<span class="string">"验证码过期"</span>)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> last_record.code != code:</span><br><span class="line">            <span class="keyword">raise</span> serializers.ValidationError(<span class="string">"验证码错误"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">raise</span> serializers.ValidationError(<span class="string">"验证码错误"</span>)</span><br><span class="line">    <span class="keyword">return</span> code</span><br></pre></td></tr></tbody></table></figure>
+</li>
+<li><p>多个字段同时验证，函数名必须：<code>validate(self, attrs):</code></p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">validate</span>(<span class="params">self, attrs</span>):</span></span><br><span class="line">  <span class="string">"""</span></span><br><span class="line"><span class="string">  多个字段验证，函数名必须：validate</span></span><br><span class="line"><span class="string">  :param attrs: 所有字段验证合法之后返回的所有字段的dict，形参名随便写</span></span><br><span class="line"><span class="string">  :return:</span></span><br><span class="line"><span class="string">  """</span></span><br><span class="line">  <span class="comment"># 人为设定前端传递到后端的手机号数据变量名为username而非mobile</span></span><br><span class="line">  <span class="comment"># 把`username`的值赋值给`mobile`的值。</span></span><br><span class="line">  attrs[<span class="string">"mobile"</span>] = attrs[<span class="string">"username"</span>]</span><br><span class="line">  <span class="comment"># code字段只是为了验证临时生成的、不需要保存到用户数据表中，因此在验证之后需要删除</span></span><br><span class="line">  <span class="keyword">del</span> attrs[<span class="string">"code"</span>]</span><br><span class="line">  <span class="keyword">return</span> attrs</span><br></pre></td></tr></tbody></table></figure>
+
+</li>
+</ul>
+<h3 id="在视图中验证"><a href="#在视图中验证" class="headerlink" title="在视图中验证"></a>在视图中验证</h3><p>生成序列化器对象，<code>serializer=UserDetailSerializer()</code>或者<code>get_serializer_class</code>的<code>return get_serializer_class</code><br>调用<code>serializer.is_valid()</code>验证成功返回True，否则返回False。<br>在验证失败时抛出异常serializers.ValidationError，可以通过传递raise_exception=True参数开启，REST framework接收到此异常，会向前端返回HTTP 400 Bad Request响应。<br>调用<code>serializer.errors</code> 查看验证状态信息，如果验证成功，返回一个空字典，失败，返回一个有字段和字段的错误的字典<br>调用<code>serializer.validated_data</code>获取验证后的字段dict类型数据</p>
+<p>We now use single-step object creation, like so:</p>
+<ol>
+<li>Validating the data makes the cleaned data available as <code>serializer.validated_data</code>.</li>
+<li>Calling <code>serializer.save()</code> then saves and returns the new object instance.</li>
+</ol>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Modelviewset</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserViewSet</span>(<span class="params">CreateModelMixin</span>):</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    create:</span></span><br><span class="line"><span class="string">        创建添加一用户，用户注册成功携带token登录</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    queryset = User.objects.filter(is_delete=<span class="literal">False</span>)</span><br><span class="line">    <span class="comment"># serializer_class = UserSerializer  # 改用get_serializer_class</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">create</span>(<span class="params">self, request, *args, **kwargs</span>):</span></span><br><span class="line">        <span class="string">"""注册后自动登录需要携带token"""</span></span><br><span class="line">        serializer = self.get_serializer(data=request.data)</span><br><span class="line">        serializer.is_valid(raise_exception=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_serializer_class</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        动态选择用哪个序列化方式</span></span><br><span class="line"><span class="string">        1.UserSerializer（用户注册），只返回username和mobile，会员中心页面需要显示更多字段，</span></span><br><span class="line"><span class="string">        所以要创建一个UserDetailSerializer</span></span><br><span class="line"><span class="string">        2.问题又来了，如果注册的使用userdetailSerializer，又会导致验证失败，所以需要动态的使用serializer</span></span><br><span class="line"><span class="string">        :return:</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="keyword">if</span> self.action == <span class="string">"retrieve"</span>:</span><br><span class="line">            <span class="keyword">return</span> UserDetailSerializer</span><br><span class="line">        <span class="keyword">elif</span> self.action == <span class="string">"create"</span>:</span><br><span class="line">            <span class="keyword">return</span> UserSerializer</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> UserDetailSerializer</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># view</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Books</span>(<span class="params">View</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">post</span>(<span class="params">self, request</span>):</span></span><br><span class="line">        <span class="comment"># 1、获取前端数据</span></span><br><span class="line">        data = request.body.decode()</span><br><span class="line">        data_dict = json.loads(data)</span><br><span class="line">        <span class="comment"># 2、验证数据</span></span><br><span class="line">        ser = BookSerialzier(data=data_dict)</span><br><span class="line">        ser.is_valid()  <span class="comment"># 验证方法</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="DRF还提供了专业的验证器validators"><a href="#DRF还提供了专业的验证器validators" class="headerlink" title="DRF还提供了专业的验证器validators"></a>DRF还提供了专业的验证器<code>validators</code></h3><p><a target="_blank" rel="noopener" href="https://www.django-rest-framework.org/api-guide/validators/">https://www.django-rest-framework.org/api-guide/validators/</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.django-rest-framework.org/api-guide/validators/#uniquevalidator">https://www.django-rest-framework.org/api-guide/validators/#uniquevalidator</a></p>
+<p>Validation in REST framework</p>
+<p>Validation in Django REST framework serializers is handled a little differently to how validation works in Django’s ModelForm class.</p>
+<p>With ModelForm the validation is performed partially on the form, and partially on the model instance. With REST framework the validation is performed entirely on the serializer class. This is advantageous for the following reasons:</p>
+<p>It introduces a proper separation of concerns, making your code behavior more obvious.<br>It is easy to switch between using shortcut ModelSerializer classes and using explicit Serializer classes. Any validation behavior being used for ModelSerializer is simple to replicate.<br>Printing the repr of a serializer instance will show you exactly what validation rules it applies. There’s no extra hidden validation behavior being called on the model instance.<br>When you’re using ModelSerializer all of this is handled automatically for you. If you want to drop down to using Serializer classes instead, then you need to define the validation rules explicitly.</p>
+<ul>
+<li><p><code>UniqueValidator</code><br>This validator can be used to enforce the <code>unique=True</code> constraint on model fields. It takes a single required argument, and an optional <code>messages</code> argument:对模型字段强制<code>unique=True</code>约束。它接受一个必需的参数和一个可选的消息参数:</p>
+<ul>
+<li><p><code>queryset</code> required - This is the queryset against which uniqueness should be enforced.必须的，这是应该强制惟一性的queryset</p>
+</li>
+<li><p><code>message</code> - The error message that should be used when validation fails.验证失败时应该使用的错误消息。</p>
+</li>
+<li><p><code>lookup</code> - The lookup used to find an existing instance with the value being validated. Defaults to ‘exact’.<br>用于查找正在验证值的现有实例。默认为“精确”。</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework.validators <span class="keyword">import</span> UniqueValidator</span><br><span class="line"></span><br><span class="line">slug = SlugField(</span><br><span class="line">    max_length=<span class="number">100</span>,</span><br><span class="line">    validators=[UniqueValidator(queryset=BlogPost.objects.all())]</span><br><span class="line">)</span><br></pre></td></tr></tbody></table></figure>
+</li>
+</ul>
+</li>
+<li><p><code>UniqueTogetherValidator</code><br>This validator can be used to enforce <code>unique_together</code> constraints on model instances. 验证器可用于对模型实例强制<code>unique_together</code>约束。<br>It has two required arguments, and a single optional <code>messages</code> argument:它有两个必需的参数和一个可选的消息参数:</p>
+<ul>
+<li><p><code>queryset</code> required - This is the queryset against which uniqueness should be enforced.强制惟一性的queryset</p>
+</li>
+<li><p><code>fields</code> required - A list or tuple of field names which should make a unique set. These must exist as fields on the serializer class.段名的列表或元组，应该构成一个惟一的集合。这些字段必须作为字段存在于序列化器类中。</p>
+</li>
+<li><p><code>message</code> - The error message that should be used when validation fails.验证失败时应该使用的错误消息</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework.validators <span class="keyword">import</span> UniqueTogetherValidator</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ExampleSerializer</span>(<span class="params">serializers.Serializer</span>):</span></span><br><span class="line">    <span class="comment"># ...</span></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        <span class="comment"># ToDo items belong to a parent list, and have an ordering defined</span></span><br><span class="line">        <span class="comment"># by the 'position' field. No two items in a given list may share the same position.</span></span><br><span class="line">        validators = [</span><br><span class="line">            UniqueTogetherValidator(</span><br><span class="line">                queryset=ToDoItem.objects.all(),</span><br><span class="line">                fields=[<span class="string">'list'</span>, <span class="string">'position'</span>]</span><br><span class="line">            )</span><br><span class="line">        ]</span><br></pre></td></tr></tbody></table></figure>
+
+</li>
+</ul>
+</li>
+</ul>
+<p>Note: The <code>UniqueTogetherValidator</code> class always imposes an implicit constraint that all the fields it applies to are always treated as required. Fields with <code>default</code> values are an exception to this as they always supply a value even when omitted from user input.<br>注意：<code>UniqueTogetherValidation</code>类总是施加一个隐式的约束，它所应用的所有字段总是按需要处理。具有默认值的字段是一个例外，因为它们总是提供一个值，即使在用户输入中省略了这个值。</p>
+<p>以上<code>validators</code>不是作用域某个字段之上了，需要写在<code>Meta</code>中，因为<code>UniqueTogetherValidator</code>是作用域两个或两个字段以上的，不是针对一个字段，所以需要写在这。</p>
+<ul>
+<li><code>UniqueForDateValidator</code></li>
+</ul>
+<h3 id="Advanced-field-defaults"><a href="#Advanced-field-defaults" class="headerlink" title="Advanced field defaults"></a><code>Advanced field defaults</code></h3><p><a target="_blank" rel="noopener" href="https://www.django-rest-framework.org/api-guide/validators/#advanced-field-defaults">https://www.django-rest-framework.org/api-guide/validators/#advanced-field-defaults</a></p>
+<p>Validators that are applied across multiple fields in the serializer can sometimes require a field input that should not be provided by the API client, but that is available as input to the validator.<br>在序列化器中跨多个字段应用的验证器有时可能需要一个字段输入，这个字段不应该由API客户机提供，但是可以作为验证器的输入。</p>
+<p>Two patterns that you may want to use for this sort of validation include:<br>可能想要使用两种模式来进行这种验证:</p>
+<ul>
+<li><p>Using <code>HiddenField</code>. This field will be present in <code>validated_data</code> but will not be used in the serializer output representation.<br>使用<code>HiddenField</code>隐藏字段，该字段将出现在<code>validated_data</code>中，但序列化输出时不会显示出来</p>
+</li>
+<li><p>Using a standard field with <code>read_only=True</code>, but that also includes a <code>default=…</code> argument. This field will be used in the serializer output representation, but cannot be set directly by the user.<br>使用带有<code>read_only=True</code>的标准字段，但该字段也包含一个<code>default=…</code>参数。此字段将在序列化器输出表示中使用，但不能由用户直接设置。</p>
+</li>
+</ul>
+<p>REST framework includes a couple of defaults that may be useful in this context.REST框架包含一些缺省值，这些缺省值在此上下文中可能很有用。</p>
+<h4 id="CurrentUserDefault"><a href="#CurrentUserDefault" class="headerlink" title="CurrentUserDefault"></a><code>CurrentUserDefault</code></h4><p>A default class that can be used to represent the current user. In order to use this,<br>the ‘request’ must have been provided as part of the context dictionary when instantiating the serializer.<br>可用于表示当前用户的默认类。为了使用它，在实例化序列化器时，request必须作为上下文字典的一部分提供</p>
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BookInfoSerializer</span>(<span class="params">serializers.Serializer</span>):</span></span><br><span class="line">    <span class="string">"""图书数据序列化器"""</span></span><br><span class="line">    id = serializers.IntegerField(label=<span class="string">'ID'</span>, read_only=<span class="literal">True</span>)</span><br><span class="line">    btitle = serializers.CharField(label=<span class="string">'名称'</span>, max_length=<span class="number">20</span>)</span><br><span class="line">    bpub_date = serializers.DateField(label=<span class="string">'发布日期'</span>, required=<span class="literal">False</span>)</span><br><span class="line">    bread = serializers.IntegerField(label=<span class="string">'阅读量'</span>, required=<span class="literal">False</span>)</span><br><span class="line">    bcomment = serializers.IntegerField(label=<span class="string">'评论量'</span>, required=<span class="literal">False</span>)</span><br><span class="line">    image = serializers.ImageField(label=<span class="string">'图片'</span>, required=<span class="literal">False</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> booktest.serializers <span class="keyword">import</span> BookInfoSerializer</span><br><span class="line">data = {<span class="string">'bpub_date'</span>: <span class="number">123</span>}</span><br><span class="line">serializer = BookInfoSerializer(data=data)</span><br><span class="line">serializer.is_valid()  <span class="comment"># 返回False</span></span><br><span class="line">serializer.errors</span><br><span class="line"><span class="comment"># {'btitle': [ErrorDetail(string='This field is required.', code='required')], 'bpub_date': [ErrorDetail(string='Date has wrong format. Use one of these formats instead: YYYY[-MM[-DD]].', code='invalid')]}</span></span><br><span class="line">serializer.validated_data  <span class="comment"># {}</span></span><br><span class="line"></span><br><span class="line">data = {<span class="string">'btitle'</span>: <span class="string">'python'</span>}</span><br><span class="line">serializer = BookInfoSerializer(data=data)</span><br><span class="line">serializer.is_valid()  <span class="comment"># True</span></span><br><span class="line">serializer.errors  <span class="comment"># {}</span></span><br><span class="line">serializer.validated_data  <span class="comment">#  OrderedDict([('btitle', 'python')])</span></span><br></pre></td></tr></tbody></table></figure><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1345,670 +1762,8 @@
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/05/22/shang-pin-lei-bie-shu-ju-jie-kou/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/05/22/shang-pin-lei-bie-shu-ju-jie-kou/" class="post-title-link" itemprop="url">商品类别数据接口</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-05-21 16:21:41" itemprop="dateCreated datePublished" datetime="2021-05-21T16:21:41Z">2021-05-21</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-06-05 02:18:27" itemprop="dateModified" datetime="2021-06-05T02:18:27Z">2021-06-05</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h3 id="商品分类有两个接口"><a href="#商品分类有两个接口" class="headerlink" title="商品分类有两个接口"></a>商品分类有两个接口</h3><ul>
-<li><p>全部分类：一级二级三级<br><img src="/2021/05/22/shang-pin-lei-bie-shu-ju-jie-kou/0.png" alt="description"></p>
-</li>
-<li><p>某一类的分类导航栏以及商品详细信息：<br><img src="/2021/05/22/shang-pin-lei-bie-shu-ju-jie-kou/1.png" alt="description"></p>
-</li>
-</ul>
-<p>在搜索结果页只展示一级和二级分类</p>
-<h2 id="写商品分类的接口"><a href="#写商品分类的接口" class="headerlink" title="写商品分类的接口"></a>写商品分类的接口</h2><p><code>goods/serializers.py</code> 给分类添加三级分类的serializer<br>定义模型<code>GoodsCategory</code>的字段<code>parent_category</code>时指定的<code>related_name='sub_cat'</code>，此属性表示可以反向查询引用，即通过父类别可以通过该属性查询子类别，利用该属性实现Serializer的三层嵌套引用，从而实现类别的嵌套显示，</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework <span class="keyword">import</span> serializers</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> .models <span class="keyword">import</span> GoodsCategory</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ThirdCategorySerializer</span>(<span class="params">serializers.ModelSerializer</span>):</span></span><br><span class="line">    <span class="string">'''三级商品子类别序列化'''</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        model = GoodsCategory</span><br><span class="line">        fields = <span class="string">'__all__'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SecondCategorySerializer</span>(<span class="params">serializers.ModelSerializer</span>):</span></span><br><span class="line">    <span class="string">'''二级商品子类别序列化'''</span></span><br><span class="line">    <span class="comment"># model中parent_category字段中定义的related_name="sub_cat"</span></span><br><span class="line">    sub_cat = ThirdCategorySerializer(many=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        model = GoodsCategory</span><br><span class="line">        fields = <span class="string">'__all__'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CategorySerializer</span>(<span class="params">serializers.ModelSerializer</span>):</span></span><br><span class="line">    <span class="string">'''一级商品类别序列化'''</span></span><br><span class="line">    <span class="comment"># model中parent_category字段中定义的related_name="sub_cat"</span></span><br><span class="line">    sub_cat = SecondCategorySerializer(many=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        model = GoodsCategory</span><br><span class="line">        fields = <span class="string">'__all__'</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>goods/views.py</code></p>
-<p>只要使CategoryViewSet继承 <code>mixins.RetrieveModelMixin</code>在浏览器路由后面增加入商品类别对应的id就现获取某一个一级分类具体的详情（包括其基本信息和子类别），但是二级找不到？</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CategoryViewSet</span>(<span class="params">mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet</span>):</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    list:</span></span><br><span class="line"><span class="string">        列出所有商品分类</span></span><br><span class="line"><span class="string">    retrieve:</span></span><br><span class="line"><span class="string">        根据id获取单个商品分类详情</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line"></span><br><span class="line">    queryset = GoodsCategory.objects.filter(category_type=<span class="number">1</span>).filter(is_delete=<span class="literal">False</span>)</span><br><span class="line">    serializer_class = CategorySerializer</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>mxshop/url.py</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.urls <span class="keyword">import</span> path, include</span><br><span class="line"><span class="keyword">from</span> rest_framework.routers <span class="keyword">import</span> DefaultRouter</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> goods.views <span class="keyword">import</span> CategoryViewSet</span><br><span class="line"></span><br><span class="line">router = DefaultRouter()</span><br><span class="line"><span class="comment"># 视图集注册到路由实例</span></span><br><span class="line">router.register(<span class="string">'categories'</span>, CategoryViewSet)</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    path(<span class="string">''</span>, include(router.urls)),</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
-
-<p><img src="/2021/05/22/shang-pin-lei-bie-shu-ju-jie-kou/2.png" alt="description"><br><img src="/2021/05/22/shang-pin-lei-bie-shu-ju-jie-kou/3.png" alt="description"></p>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/05/08/drf-de-api-jie-kou-wen-dang/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/05/08/drf-de-api-jie-kou-wen-dang/" class="post-title-link" itemprop="url">DRF的API接口文档</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-05-07 16:21:41" itemprop="dateCreated datePublished" datetime="2021-05-07T16:21:41Z">2021-05-07</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-08-02 09:58:43" itemprop="dateModified" datetime="2021-08-02T09:58:43Z">2021-08-02</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h3 id="Schemas"><a href="#Schemas" class="headerlink" title="Schemas"></a>Schemas</h3><p>它允许一系列用例，包括生成参考文档，或者驱动可以与 API 交互的动态客户端库。<br>一个 schema 就是一个机器可读的文档，它对可用的 API 端点进行描述，给出它们的 URL，以及支持的操作。</p>
-<p>服务端可以生成 schema 文档，而客户端可以基于该 schema 文档，与服务端交互。</p>
-<h3 id="Core-API"><a href="#Core-API" class="headerlink" title="Core API"></a>Core API</h3><p><a target="_blank" rel="noopener" href="https://www.django-rest-framework.org/coreapi/7-schemas-and-client-libraries/#core-api">https://www.django-rest-framework.org/coreapi/7-schemas-and-client-libraries/#core-api</a></p>
-<p>REST 框架通过 Core API 提供 schema 支持。</p>
-<p>Core API 是一种用于描述 API 的文档标准。在服务端，通过 Core API 可以将 API 呈现成各种支持的 schema 或超媒体格式文件。而在客户端，在获取服务端生成的 schema 文件后，可以与服务端进行交互。</p>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install coreapi</span><br></pre></td></tr></tbody></table></figure>
-
-<h4 id="生成API接口文档"><a href="#生成API接口文档" class="headerlink" title="生成API接口文档"></a>生成API接口文档</h4><p><a target="_blank" rel="noopener" href="https://www.django-rest-framework.org/topics/documenting-your-api/">https://www.django-rest-framework.org/topics/documenting-your-api/</a><br>ViewSet的格式，更多请看官方文档</p>
-<p>drf文档的优点：</p>
-<ul>
-<li>自动生成的接口文档是继承自<code>APIView</code>及其子类的视图</li>
-<li>以网页的方式呈现</li>
-<li>一目了然看到各个模块的所有接口</li>
-<li>文档里可以做交互和测试</li>
-<li>生成Shell、JavaScript和Python等多种测试代码方式。</li>
-<li>权限验证，对于需要验证后才能访问的接口，必须先进行验证，然后才能进行测试，</li>
-</ul>
-<p>设置<code>DEFAULT_SCHEMA_CLASS</code>和<code>docs</code>路由，访问文档页面。</p>
-<p><code>setting.py</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># DRF 全局配置</span></span><br><span class="line">REST_FRAMEWORK = {</span><br><span class="line">    <span class="string">"DEFAULT_SCHEMA_CLASS"</span>: <span class="string">'rest_framework.schemas.openapi.AutoSchema'</span>,  <span class="comment"># 新版drf schema_class默认用的是</span></span><br><span class="line">    <span class="comment"># 如果报错AttributeError: ‘AutoSchema’ object has no attribute ‘get_link’</span></span><br><span class="line">    <span class="string">'DEFAULT_SCHEMA_CLASS'</span>: <span class="string">'rest_framework.schemas.AutoSchema'</span>,</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p>在总路由 <code>drf_tutorial\urls.py</code> 中添加接口文档路径。</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework.documentation <span class="keyword">import</span> include_docs_urls</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    path(<span class="string">"docs/"</span>, include_docs_urls(title=<span class="string">"DRF API文档"</span>, description=<span class="string">"Django REST framework快速入门"</span>)),</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
-
-<h3 id="文档描述说明的定义位置"><a href="#文档描述说明的定义位置" class="headerlink" title="文档描述说明的定义位置"></a>文档描述说明的定义位置</h3><p>对于每种类型的请求，都以固定的格式定义了说明 类定义的注释的内容<code>""" """</code>，</p>
-<p>1） 单一方法的视图，可直接使用类视图的文档字符串，如<br>这是在类中声明的注释，如果在方法中你声明了其他注释，会覆盖这个注释的</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BookListView</span>(<span class="params">generics.ListAPIView</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    返回所有图书信息.</span></span><br><span class="line"><span class="string">    """</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p>2）包含多个方法的视图，在类视图的文档字符串中，分开方法定义，如</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BookListCreateView</span>(<span class="params">generics.ListCreateAPIView</span>):</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    get:</span></span><br><span class="line"><span class="string">    返回所有图书信息.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    post:</span></span><br><span class="line"><span class="string">    新建图书.</span></span><br><span class="line"><span class="string">    """</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p>3）对于视图集ViewSet，仍在类视图的文档字符串中分开定义，但是应使用action名称区分，如<br>视图集ViewSet中的retrieve名称，在接口文档网站中叫做read</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GoodsListViewSet</span>(<span class="params">mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet</span>):</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    list:</span></span><br><span class="line"><span class="string">        商品列表页，并实现分页、搜索、过滤、排序</span></span><br><span class="line"><span class="string">    retrieve:</span></span><br><span class="line"><span class="string">        商品详情，并实现热卖商品接口</span></span><br><span class="line"><span class="string">    '''</span></span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserFavViewSet</span>(<span class="params">mixins.CreateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin,</span></span></span><br><span class="line"><span class="class"><span class="params">                     mixins.DestroyModelMixin, viewsets.GenericViewSet</span>):</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    list:用户收藏列表</span></span><br><span class="line"><span class="string">    create:</span></span><br><span class="line"><span class="string">        创建添加一条收藏</span></span><br><span class="line"><span class="string">    retrieve:</span></span><br><span class="line"><span class="string">        根据ID查询到用户收藏详情</span></span><br><span class="line"><span class="string">    destroy:</span></span><br><span class="line"><span class="string">        删除用户收藏</span></span><br><span class="line"><span class="string">    '''</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p><img src="/2021/05/08/drf-de-api-jie-kou-wen-dang/1.png" alt="description"><br><img src="/2021/05/08/drf-de-api-jie-kou-wen-dang/2.png" alt="description"><br><img src="/2021/05/08/drf-de-api-jie-kou-wen-dang/3.png" alt="description"></p>
-<p>goods文档<br><a target="_blank" rel="noopener" href="http://127.0.0.1:8000/docs/#goods">http://127.0.0.1:8000/docs/#goods</a> 很多字段描述不完整，先进行配置</p>
-<p>Query Parameters<br>The following parameters should be included as part of a URL query string.</p>
-<table>
-<thead>
-<tr>
-<th><strong>Parameter</strong></th>
-<th><strong>Description</strong></th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>AutoField</code></td>
-<td>自增ID字段</td>
-</tr>
-<tr>
-<td><code>page</code></td>
-<td>A page number within the paginated result set.</td>
-</tr>
-<tr>
-<td><code>page_size</code></td>
-<td>Number of results to return per page.</td>
-</tr>
-<tr>
-<td><code>name</code></td>
-<td>分类名模糊匹配</td>
-</tr>
-<tr>
-<td><code>pricemin</code></td>
-<td></td>
-</tr>
-<tr>
-<td><code>pricemax</code></td>
-<td></td>
-</tr>
-<tr>
-<td><code>is_hot</code></td>
-<td></td>
-</tr>
-<tr>
-<td><code>is_new</code></td>
-<td></td>
-</tr>
-<tr>
-<td><code>top_category</code></td>
-<td></td>
-</tr>
-<tr>
-<td><code>search</code></td>
-<td>A search term.</td>
-</tr>
-<tr>
-<td><code>ordering</code></td>
-<td>Which field to use when ordering the results.</td>
-</tr>
-</tbody></table>
-<p>本地化<a target="_blank" rel="noopener" href="http://djangobook.py3k.cn/2.0/chapter19/">http://djangobook.py3k.cn/2.0/chapter19/</a></p>
-<p>分页中文描述<br><code>apps/goods/views.py</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rest_framework.pagination <span class="keyword">import</span> PageNumberPagination</span><br><span class="line"><span class="keyword">from</span> django.utils.translation <span class="keyword">import</span> ugettext_lazy</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GoodsPagination</span>(<span class="params">PageNumberPagination</span>):</span></span><br><span class="line">    page_size = <span class="number">12</span>  <span class="comment"># 默认每页显示的个数</span></span><br><span class="line">    max_page_size = <span class="number">100</span>  <span class="comment"># 最多能显示多少页</span></span><br><span class="line">    page_size_query_param = <span class="string">'page_size'</span>  <span class="comment"># 页面大小对应的查询参数</span></span><br><span class="line">    page_query_param = <span class="string">'page'</span>  <span class="comment"># 页码参数?page=xx</span></span><br><span class="line">    page_query_description = ugettext_lazy(<span class="string">'使用分页后的页码'</span>)  <span class="comment"># 分页文档中文描述</span></span><br><span class="line">    page_size_query_description = ugettext_lazy(<span class="string">'每页返回的结果数'</span>)</span><br></pre></td></tr></tbody></table></figure>
-
-<table>
-<thead>
-<tr>
-<th><strong>Parameter</strong></th>
-<th><strong>Description</strong></th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>AutoField</code></td>
-<td>自增ID字段</td>
-</tr>
-<tr>
-<td><code>page</code></td>
-<td>使用分页后的页码</td>
-</tr>
-<tr>
-<td><code>page_size</code></td>
-<td>每页返回的结果数</td>
-</tr>
-<tr>
-<td><code>name</code></td>
-<td>分类名模糊匹配</td>
-</tr>
-<tr>
-<td><code>pricemin</code></td>
-<td></td>
-</tr>
-<tr>
-<td><code>pricemax</code></td>
-<td></td>
-</tr>
-<tr>
-<td><code>is_hot</code></td>
-<td></td>
-</tr>
-<tr>
-<td><code>is_new</code></td>
-<td></td>
-</tr>
-<tr>
-<td><code>top_category</code></td>
-<td></td>
-</tr>
-<tr>
-<td><code>search</code></td>
-<td>A search term.</td>
-</tr>
-<tr>
-<td><code>ordering</code></td>
-<td>Which field to use when ordering the results.</td>
-</tr>
-</tbody></table>
-<p>添加字段参数的Description描述需要在<code>model</code>模型类或<code>serializer</code>序列化器类或<code>filter</code>过滤类的字段中指定<code>help_text</code>属性</p>
-<p><code>apps/goods/filters.py</code></p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GoodsFilter</span>(<span class="params">django_filters.rest_framework.FilterSet</span>):</span></span><br><span class="line">    <span class="string">'''商品过滤类'''</span></span><br><span class="line">    <span class="comment"># 两个参数，name是要过滤的字段，lookup是执行的行为，‘小与等于本店价格’</span></span><br><span class="line">    name = django_filters.CharFilter(field_name=<span class="string">"name"</span>, lookup_expr=<span class="string">'contains'</span>, help_text=<span class="string">'分类名模糊匹配'</span>)  <span class="comment"># 包含关系，模糊匹配</span></span><br><span class="line">    pricemin = django_filters.NumberFilter(field_name=<span class="string">"market_price"</span>, lookup_expr=<span class="string">'gte'</span>, help_text=<span class="string">'最低价格'</span>)  <span class="comment"># 自定义字段</span></span><br><span class="line">    pricemax = django_filters.NumberFilter(field_name=<span class="string">"market_price"</span>, lookup_expr=<span class="string">'lte'</span>, help_text=<span class="string">'最高价格'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 自定义过滤，过滤某个一级分类</span></span><br><span class="line">    top_category = django_filters.NumberFilter(method=<span class="string">'top_category_filter'</span>, help_text=<span class="string">'自定义过滤某个一级分类'</span>)</span><br></pre></td></tr></tbody></table></figure>
-
-<table>
-<thead>
-<tr>
-<th><strong>Parameter</strong></th>
-<th><strong>Description</strong></th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>AutoField</code></td>
-<td>自增ID字段</td>
-</tr>
-<tr>
-<td><code>page</code></td>
-<td>使用分页后的页码</td>
-</tr>
-<tr>
-<td><code>page_size</code></td>
-<td>每页返回的结果数</td>
-</tr>
-<tr>
-<td><code>name</code></td>
-<td>分类名模糊匹配</td>
-</tr>
-<tr>
-<td><code>pricemin</code></td>
-<td>最低价格</td>
-</tr>
-<tr>
-<td><code>pricemax</code></td>
-<td>最高价格</td>
-</tr>
-<tr>
-<td><code>is_hot</code></td>
-<td></td>
-</tr>
-<tr>
-<td><code>is_new</code></td>
-<td></td>
-</tr>
-<tr>
-<td><code>top_category</code></td>
-<td>自定义过滤某个一级分类</td>
-</tr>
-<tr>
-<td><code>search</code></td>
-<td>A search term.</td>
-</tr>
-<tr>
-<td><code>ordering</code></td>
-<td>Which field to use when ordering the results.</td>
-</tr>
-</tbody></table>
-<p>多个应用使用同一个序列化器，可能会导致help_text的内容显示有些问题</p>
-<figure class="highlight py"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">StudentSerializer</span>(<span class="params">serializers.ModelSerializer</span>):</span></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        model = Student</span><br><span class="line">        fields = <span class="string">"__all__"</span></span><br><span class="line">        extra_kwargs = {</span><br><span class="line">            <span class="string">'age'</span>: {</span><br><span class="line">                <span class="string">'required'</span>: <span class="literal">True</span>,</span><br><span class="line">                <span class="string">'help_text'</span>: <span class="string">'年龄'</span></span><br><span class="line">            }</span><br><span class="line">        }</span><br></pre></td></tr></tbody></table></figure>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/05/08/mq/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/05/08/mq/" class="post-title-link" itemprop="url">mq（message queue）</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-05-07 16:21:41" itemprop="dateCreated datePublished" datetime="2021-05-07T16:21:41Z">2021-05-07</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-06-26 12:41:57" itemprop="dateModified" datetime="2021-06-26T12:41:57Z">2021-06-26</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>消息队列是一种“先进先出”的数据结构<br>消息传输过程中存放消息的容器</p>
-<p>什么时候不使用MQ？<br>上游实时关注执行结果</p>
-<p>什么时候使用MQ？<br>1）数据驱动的任务依赖，多个任务需要轮流执行，轮流订阅上一个任务。</p>
-<p>2）上游不关心多下游执行结果，上游执行完发送到MQ，多下游订阅MQ。</p>
-<p>3）异步返回执行时间长</p>
-<h3 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h3><ul>
-<li>应用解耦<br>系统的耦合性越高，容错性就越低。以电商应用为例，用户创建订单后，如果耦合调用库存系统、物流系统、支付系统，任何一个子系统出了故障或者因为升级等原因暂时不可用，都会造成下单操作异常，影响用户使用体验。</li>
-</ul>
-<p>使用消息队列解耦合，系统的耦合性就会提高了。比如物流系统发生故障，需要几分钟才能来修复，在这段时间内，物流系统要处理的数据被缓存到消息队列中，用户的下单操作正常完成。当物流系统回复后，补充处理存在消息队列中的订单消息即可，终端系统感知不到物流系统发生过几分钟故障。</p>
-<ul>
-<li>流量削峰</li>
-</ul>
-<p>应用系统如果遇到系统请求流量的瞬间猛增，有可能会将系统压垮。<br>有了消息队列可以将大量请求缓存起来，分散到很长一段时间处理，这样可以大大提到系统的稳定性和用户体验。<br>性能考虑，一般采用下游队列限速<br>每秒5k个请求MQ用户A系统从MQ中每秒拉取2k个请求A系统MySQL</p>
-<p>一般情况，为了保证系统的稳定性，如果系统负载超过阈值，就会阻止用户请求，这会影响用户体验，而如果使用消息队列将请求缓存起来，等待系统处理完毕后通知用户下单完毕，这样总不能下单体验要好。</p>
-<p>出于经济考量目的：<br>业务系统正常时段的QPS如果是1000，流量最高峰是10000，为了应对流量高峰配置高性能的服务器显然不划算，这时可以使用消息队列对峰值流量削峰</p>
-<ul>
-<li>数据分发</li>
-</ul>
-<p>通过消息队列可以让数据在多个系统更加之间进行流通。数据的产生方不需要关心谁来使用数据，只需要将数据发送到消息队列，数据使用方直接在消息队列中直接获取数据即可。</p>
-<ul>
-<li>跨系统间的调用(比如：发短信，防止由于第三方平台原因导致我们系统的逻辑问题)</li>
-<li>系统内的异步调用，非必要、没有实时性的逻辑 比如发邮件功能</li>
-<li>消息驱动的场景 当满足一个条件后，触发一系列的操作</li>
-<li>跨语言之间的调用</li>
-</ul>
-<h3 id="MQ的优点和缺点"><a href="#MQ的优点和缺点" class="headerlink" title="MQ的优点和缺点"></a>MQ的优点和缺点</h3><p>优点</p>
-<ul>
-<li>跨语言的，支持PHP，GO，JAVA，C# ，Python</li>
-<li>解耦、</li>
-<li>削峰、</li>
-<li>数据分发</li>
-<li>异步<br>高可用，扩展性，多语言客户端，管理界面等</li>
-</ul>
-<p>缺点包含以下几点：</p>
-<ul>
-<li><p>系统可用性降低<br>系统引入的外部依赖越多，系统稳定性越差。一旦MQ宕机，就会对业务造成影响。<br>如何保证MQ的高可用？</p>
-</li>
-<li><p>系统复杂度提高<br>MQ的加入大大增加了系统的复杂度，以前系统间是同步的远程调用，现在是通过MQ进行异步调用。<br>如何保证消息没有被重复消费？怎么处理消息丢失情况？那么保证消息传递的顺序性？</p>
-</li>
-<li><p>一致性问题<br>A系统处理完业务，通过MQ给B、C、D三个系统发消息数据，如果B系统、C系统处理成功，D系统处理失败。<br>如何保证消息数据处理的一致性？</p>
-</li>
-</ul>
-<p>结论:</p>
-<p>(1)中小型软件公司，建议选RabbitMQ.一方面，erlang语言天生具备高并发的特性，而且他的管理界面用起来十分方便。正所谓，成也萧何，败也萧何！<br>他的弊端也在这里，虽然RabbitMQ是开源的，然而国内有几个能定制化开发erlang的程序员呢？<br>所幸，RabbitMQ的社区十分活跃，可以解决开发过程中遇到的bug，这点对于中小型公司来说十分重要。<br>不考虑rocketmq和kafka的原因是，一方面中小型软件公司不如互联网公司，数据量没那么大，选消息中间件，应首选功能比较完备的，所以kafka排除。<br>但是rocketmq已经交给apache管理，所以rocketmq的未来发展趋势看好。</p>
-<p>(2)大型软件公司，根据具体使用在rocketMq和kafka之间二选一。一方面，大型软件公司，具备足够的资金搭建分布式环境，也具备足够大的数据量。针对rocketMQ,大型软件公司也可以抽出人手对rocketMQ进行定制化开发，毕竟国内有能力改JAVA源码的人，还是相当多的。至于kafka，根据业务场景选择，如果有日志采集功能，肯定是首选kafka了。具体该选哪个，看使用场景。</p>
-<p>典型的应用案例<br>1、注册时发送邮件或发送短信<br>2、日志分析使用，多个服务产生的数据发送到中间件发送到分析服务。<br>3、消息复制，用于跨机房数据传输、搜索、离线数据计算等。<br>4、延迟消息发送和暂存，把中间件当成可靠的消息暂存地。接受消息，暂时先不发送</p>
-<h3 id="选择rocketmq，基于两点考虑"><a href="#选择rocketmq，基于两点考虑" class="headerlink" title="选择rocketmq，基于两点考虑"></a>选择rocketmq，基于两点考虑</h3><ul>
-<li>延迟消息简单高效</li>
-<li>死信队列</li>
-<li>完善的事务消息功能</li>
-</ul>
-<h3 id="安装rocket-mq"><a href="#安装rocket-mq" class="headerlink" title="安装rocket mq"></a>安装rocket mq</h3><figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">[root@VM-0-9-centos ~]<span class="comment"># cd /root/project/mxshop_srvs/order_srv/</span></span><br><span class="line">[root@VM-0-9-centos order_srv]<span class="comment"># ls</span></span><br><span class="line">install  install.zip</span><br><span class="line">[root@VM-0-9-centos order_srv]<span class="comment"># cd install/</span></span><br><span class="line">[root@VM-0-9-centos install]<span class="comment"># ls</span></span><br><span class="line">conf  docker-compose.yml  README.md</span><br><span class="line">[root@VM-0-9-centos install]<span class="comment"># cd conf/</span></span><br><span class="line">[root@VM-0-9-centos conf]<span class="comment"># vim broker.conf</span></span><br><span class="line">brokerIP1=81.69.41.250  <span class="comment"># linux的ip</span></span><br><span class="line">[root@VM-0-9-centos conf]<span class="comment"># cd ..</span></span><br><span class="line">[root@VM-0-9-centos install]<span class="comment"># ls</span></span><br><span class="line">conf  docker-compose.yml  logs  README.md  store</span><br><span class="line">[root@VM-0-9-centos install]<span class="comment"># docker ps -a</span></span><br><span class="line">CONTAINER ID   IMAGE                           COMMAND                  CREATED          STATUS                       PORTS                                                  NAMES</span><br><span class="line">bd592bce48b8   styletang/rocketmq-console-ng   <span class="string">"sh -c 'java <span class="variable">$JAVA_O</span>…"</span>   16 minutes ago   Exited (137) 6 minutes ago                                                          rmqconsole</span><br><span class="line">01a559d554f8   foxiswho/rocketmq:broker        <span class="string">"mqbroker -c /etc/ro…"</span>   16 minutes ago   Exited (137) 6 minutes ago                                                          rmqbroker</span><br><span class="line">bff14878447c   foxiswho/rocketmq:server        <span class="string">"/bin/sh -c 'cd <span class="variable">${RO…"   16 minutes ago   Exited (137) 6 minutes ago                                                          rmqnamesrv</span></span></span><br><span class="line"><span class="string"><span class="variable">a7df53a51485   mysql:5.7                       "docker-entrypoint.s…"   11 hours ago     Up 11 hours                  0.0.0.0:3306-&gt;3306/tcp, :::3306-&gt;3306/tcp, 33060/tcp   mymysql</span></span></span><br><span class="line"><span class="string"><span class="variable">[root@VM-0-9-centos install]# docker-compose up</span></span></span><br></pre></td></tr></tbody></table></figure>
-
-<p><a target="_blank" rel="noopener" href="http://81.69.41.250:8080/#/">http://81.69.41.250:8080/#/</a></p>
-<h3 id="消息队列的相关术语"><a href="#消息队列的相关术语" class="headerlink" title="消息队列的相关术语"></a>消息队列的相关术语</h3><ul>
-<li>Publisher生产者 投递消息的一方，生产者将消息投递到交换机。</li>
-<li>Producer生产者 发送消息到队列 </li>
-<li>Consumer消费者 从队列中取出消息消费掉 接收消息的一方，消费者可以监听一个或多个队列，接收到消息后需要返回应答；多个消费者监听同一队列时，RabbitMQ并不会以广播的形式让每个消费者都接收到全部消息，而是多个消费者以轮询的方式接收并处理消息。</li>
-<li>Queue 存储消息的容器 队列 消息的载体，接收消息，每个队列都至少会绑定一个交换机，从交换机接收消息。</li>
-<li>连接Connection&amp;信道 消息通道Channel<br>和RabbitMQ建立连接 连接中可以有多个通道<br>连接就是一个普通的TCP连接，信道是建立在连接上的虚拟连接，无论消费者还是生产者都是通过信道发送指令，信道复用了TCP连接，节省资源。</li>
-</ul>
-<ul>
-<li><p>Exchange交换机 决定消息按照什么规则发送到哪个队列中<br>生产者将消息投递到交换机后，交换机根据路由键、绑定键和交换机类型将消息路由到具体的队列中。<br>一共有4中类型：<br>fanout：向所有绑定的队列发送消息。<br>direct：对路由键和绑定键进行精准匹配，完全一致的队列会收到消息。<br>topic：对路由键和绑定键进行模糊匹配，符合匹配规则的队列会收到消息，路由键和绑定键都是由“.”分隔的一个字符串，每一个被“.”分隔开的独立的子字符串称作“单词”，绑定键中有两种通配符：①*，星号表示匹配一个单词；②#，井号表示匹配多个单词(可以是0个)。<br>header：根据绑定队列与交换机时的额外参数进行路由匹配，性能很差，基本不用。</p>
-</li>
-<li><p>Routing Key 路由键&amp;绑定键 交换机通过它来确定发送到哪个队列中<br>路由键是生产者发送消息给交换机的时候指定的，绑定键是队列与交换机绑定的时候指定的，根据交换机的类型，将会对路由键和绑定键进行精准匹配或模糊匹配，以此确定消息应该发往哪个队列。在direct模式的交换机下，可以将路由键和绑定键看作是一个东西，因为这时执行的是精准匹配。</p>
-</li>
-</ul>
-<ul>
-<li><p>消息 包含两部分，分别是标签(Label，用来描述这则消息如交换机名称、路由键、优先权等)以及消息体(payload，消息的具体内容)。</p>
-</li>
-<li><p>Virtual Host 虚拟主机<br>可以看做一个文件夹，里面装了一组交换机、队列和绑定关系等相关对象，每个Broker可以有多个Virtual Host，在建立连接时必须指定一个Virtual Host，默认是“/”。隔离数据</p>
-</li>
-<li><p>Broker 消息队列服务器实体。</p>
-</li>
-</ul>
-<h3 id="消息队列的工作模式"><a href="#消息队列的工作模式" class="headerlink" title="消息队列的工作模式"></a>消息队列的工作模式</h3><ul>
-<li>简单模式：不需要交换机，场景：一对一聊天</li>
-<li>工作模式 高并发时容易造成同一个消息到多个消费者同时消费(可以加唯一键值解决)<br>场景：红包</li>
-<li>订阅模式 每个队列收到的消息都是一样的 E代表交换机</li>
-<li>路由模式 根据routing key发送到不同的消息队列中，场景：不同等级日志</li>
-<li>主题模式 根据<code>*</code>或<code>#</code>和路由模糊匹配，发送到不同的消息队列中，<br><code>#</code>匹配一个或多个单词，<code>*</code>匹配一个单词</li>
-</ul>
-<ol>
-<li>RabbitMQ是面向消息的中间件,用于组件之间的解耦,主要体现在消息的发送者和消费者之间无强依赖关系;</li>
-</ol>
-<p>比如 a 系统发送消息要 b 系统处理的时候，我们的 a 系统可以将消息发送到 mq, 等待着 b 系统去消费，这就实现了 a 和 b 系统之间的解耦</p>
-<h3 id="安装rabbit-mq"><a href="#安装rabbit-mq" class="headerlink" title="安装rabbit mq"></a>安装rabbit mq</h3><figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">yum update -y</span><br><span class="line">yum install -y erlang-23.3.4</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># For Red Hat 7 or CentOS 7, replace "el8" with "el7".</span></span><br><span class="line">wget https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.8.17/rabbitmq-server-3.8.17-1.el7.noarch.rpm</span><br></pre></td></tr></tbody></table></figure>
-
-
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/profile</span><br><span class="line"><span class="built_in">export</span> PATH=<span class="variable">$PATH</span>:/usr/<span class="built_in">local</span>/erlang/bin/erl</span><br><span class="line"><span class="built_in">export</span> PATH=<span class="variable">$PATH</span>:/usr/<span class="built_in">local</span>/erlang/bin</span><br><span class="line"></span><br><span class="line">ERLANG_HOME=/home/yutao/programe/erlang</span><br><span class="line">RABITMQ_HOME=/home/yutao/programe/rabbitmq</span><br><span class="line"><span class="built_in">export</span> PATH=<span class="variable">$PATH</span>:<span class="variable">$ERLANG_HOME</span>/bin:<span class="variable">$RABITMQ_HOME</span>/sbin</span><br><span class="line"><span class="built_in">export</span> ERLANG_HOME</span><br><span class="line"><span class="built_in">export</span> RABITMQ_HOME</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[root@VM-0-9-centos ~]<span class="comment"># find / -name erl</span></span><br><span class="line">/usr/<span class="built_in">local</span>/erlang/lib/erlang/erts-12.0/bin/erl</span><br><span class="line">/usr/<span class="built_in">local</span>/erlang/lib/erlang/bin/erl</span><br><span class="line">/usr/<span class="built_in">local</span>/erlang/bin/erl</span><br><span class="line">/usr/bin/erl</span><br><span class="line">/usr/lib64/erlang/erts-11.2.2/bin/erl</span><br><span class="line">/usr/lib64/erlang/bin/erl</span><br><span class="line"></span><br><span class="line">[root@VM-0-9-centos ~]<span class="comment"># erl -version</span></span><br><span class="line">Erlang (SMP,ASYNC_THREADS,HIPE) (BEAM) emulator version 11.2.2</span><br><span class="line">[root@VM-0-9-centos ~]<span class="comment"># erl -v</span></span><br><span class="line">Erlang/OTP 23 [erts-11.2.2] [<span class="built_in">source</span>] [64-bit] [smp:1:1] [ds:1:1:10] [async-threads:1] [hipe]</span><br></pre></td></tr></tbody></table></figure>
-
-<p>有几种退出Erlang Shell的方法<br>命令方式1：执行init:stop().<br>命令方式2：执行halt().<br>快捷键方式1：Control+C 然后选a<br>快捷键方式2：Control+G 然后按q</p>
-<figure class="highlight shell"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo firewall-cmd --zone=public --permanent --add-port=4369/tcp --add-port=25672/tcp --add-port=5671-5672/tcp --add-port=15672/tcp --add-port=61613-61614/tcp --add-port=1883/tcp --add-port=8883/tcp</span><br><span class="line">sudo firewall-cmd --reload</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight shell"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/yum.repos.d/rabbitmq_erlang.repo</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在其中添加以下内容</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> In /etc/yum.repos.d/rabbitmq.repo</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># Zero dependency Erlang RPM</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#</span></span></span><br><span class="line"></span><br><span class="line">[rabbitmq_erlang]</span><br><span class="line">name=rabbitmq_erlang</span><br><span class="line">baseurl=https://dl.cloudsmith.io/public/rabbitmq/rabbitmq-erlang/rpm/el/8/$basearch</span><br><span class="line">repo_gpgcheck=1</span><br><span class="line">enabled=1</span><br><span class="line"><span class="meta">#</span><span class="bash"> Cloudsmith<span class="string">'s repository key and RabbitMQ package signing key</span></span></span><br><span class="line">gpgkey=https://dl.cloudsmith.io/public/rabbitmq/rabbitmq-erlang/gpg.E495BB49CC4BBE5B.key</span><br><span class="line">       https://github.com/rabbitmq/signing-keys/releases/download/2.0/rabbitmq-release-signing-key.asc</span><br><span class="line">gpgcheck=1</span><br><span class="line">sslverify=1</span><br><span class="line">sslcacert=/etc/pki/tls/certs/ca-bundle.crt</span><br><span class="line">metadata_expire=300</span><br><span class="line">pkg_gpgcheck=1</span><br><span class="line">autorefresh=1</span><br><span class="line">type=rpm-md</span><br><span class="line"></span><br><span class="line">[rabbitmq_erlang-noarch]</span><br><span class="line">name=rabbitmq_erlang-noarch</span><br><span class="line">baseurl=https://dl.cloudsmith.io/public/rabbitmq/rabbitmq-erlang/rpm/el/8/noarch</span><br><span class="line">repo_gpgcheck=1</span><br><span class="line">enabled=1</span><br><span class="line"><span class="meta">#</span><span class="bash"> Cloudsmith<span class="string">'s repository key and RabbitMQ package signing key</span></span></span><br><span class="line">gpgkey=https://dl.cloudsmith.io/public/rabbitmq/rabbitmq-erlang/gpg.E495BB49CC4BBE5B.key</span><br><span class="line">       https://github.com/rabbitmq/signing-keys/releases/download/2.0/rabbitmq-release-signing-key.asc</span><br><span class="line">gpgcheck=1</span><br><span class="line">sslverify=1</span><br><span class="line">sslcacert=/etc/pki/tls/certs/ca-bundle.crt</span><br><span class="line">metadata_expire=300</span><br><span class="line">pkg_gpgcheck=1</span><br><span class="line">autorefresh=1</span><br><span class="line">type=rpm-md</span><br><span class="line"></span><br><span class="line">[rabbitmq_erlang-source]</span><br><span class="line">name=rabbitmq_erlang-source</span><br><span class="line">baseurl=https://dl.cloudsmith.io/public/rabbitmq/rabbitmq-erlang/rpm/el/8/SRPMS</span><br><span class="line">repo_gpgcheck=1</span><br><span class="line">enabled=1</span><br><span class="line">gpgkey=https://dl.cloudsmith.io/public/rabbitmq/rabbitmq-erlang/gpg.E495BB49CC4BBE5B.key</span><br><span class="line">gpgcheck=0</span><br><span class="line">sslverify=1</span><br><span class="line">sslcacert=/etc/pki/tls/certs/ca-bundle.crt</span><br><span class="line">metadata_expire=300</span><br><span class="line">pkg_gpgcheck=1</span><br><span class="line">autorefresh=1</span><br><span class="line">type=rpm-md</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># RabbitMQ Server</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#</span></span></span><br><span class="line"></span><br><span class="line">[rabbitmq_server]</span><br><span class="line">name=rabbitmq_server</span><br><span class="line">baseurl=https://dl.cloudsmith.io/public/rabbitmq/rabbitmq-server/rpm/el/8/$basearch</span><br><span class="line">repo_gpgcheck=1</span><br><span class="line">enabled=1</span><br><span class="line"><span class="meta">#</span><span class="bash"> Cloudsmith<span class="string">'s repository key and RabbitMQ package signing key</span></span></span><br><span class="line">gpgkey=https://dl.cloudsmith.io/public/rabbitmq/rabbitmq-server/gpg.9F4587F226208342.key</span><br><span class="line">       https://github.com/rabbitmq/signing-keys/releases/download/2.0/rabbitmq-release-signing-key.asc</span><br><span class="line">gpgcheck=1</span><br><span class="line">sslverify=1</span><br><span class="line">sslcacert=/etc/pki/tls/certs/ca-bundle.crt</span><br><span class="line">metadata_expire=300</span><br><span class="line">pkg_gpgcheck=1</span><br><span class="line">autorefresh=1</span><br><span class="line">type=rpm-md</span><br><span class="line"></span><br><span class="line">[rabbitmq_server-noarch]</span><br><span class="line">name=rabbitmq_server-noarch</span><br><span class="line">baseurl=https://dl.cloudsmith.io/public/rabbitmq/rabbitmq-server/rpm/el/8/noarch</span><br><span class="line">repo_gpgcheck=1</span><br><span class="line">enabled=1</span><br><span class="line"><span class="meta">#</span><span class="bash"> Cloudsmith<span class="string">'s repository key and RabbitMQ package signing key</span></span></span><br><span class="line">gpgkey=https://dl.cloudsmith.io/public/rabbitmq/rabbitmq-server/gpg.9F4587F226208342.key</span><br><span class="line">       https://github.com/rabbitmq/signing-keys/releases/download/2.0/rabbitmq-release-signing-key.asc</span><br><span class="line">gpgcheck=1</span><br><span class="line">sslverify=1</span><br><span class="line">sslcacert=/etc/pki/tls/certs/ca-bundle.crt</span><br><span class="line">metadata_expire=300</span><br><span class="line">pkg_gpgcheck=1</span><br><span class="line">autorefresh=1</span><br><span class="line">type=rpm-md</span><br><span class="line"></span><br><span class="line">[rabbitmq_server-source]</span><br><span class="line">name=rabbitmq_server-source</span><br><span class="line">baseurl=https://dl.cloudsmith.io/public/rabbitmq/rabbitmq-server/rpm/el/8/SRPMS</span><br><span class="line">repo_gpgcheck=1</span><br><span class="line">enabled=1</span><br><span class="line">gpgkey=https://dl.cloudsmith.io/public/rabbitmq/rabbitmq-server/gpg.9F4587F226208342.key</span><br><span class="line">gpgcheck=0</span><br><span class="line">sslverify=1</span><br><span class="line">sslcacert=/etc/pki/tls/certs/ca-bundle.crt</span><br><span class="line">metadata_expire=300</span><br><span class="line">pkg_gpgcheck=1</span><br><span class="line">autorefresh=1</span><br><span class="line">type=rpm-md</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight shell"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line">rpm -ivh rabbitmq-server-3.8.17.rc.1-1.el7.noarch.rpm</span><br><span class="line">rpm -ivh rabbitmq-server-3.8.17-1.el7.noarch.rpm</span><br><span class="line"></span><br><span class="line">[root@VM-0-9-centos sbin]# cd /usr/lib/rabbitmq/lib/rabbitmq_server-3.8.17/sbin</span><br><span class="line">[root@VM-0-9-centos sbin]# ./rabbitmq-server start</span><br><span class="line"><span class="meta">#</span><span class="bash"> 守护进程的方式启动</span></span><br><span class="line">[root@VM-0-9-centos sbin]# ./rabbitmq-server -detached</span><br><span class="line">[root@VM-0-9-centos sbin]# ./rabbitmqctl stop</span><br><span class="line">[root@VM-0-9-centos sbin]# ls</span><br><span class="line">erl_crash.dump  rabbitmqctl  rabbitmq-defaults  rabbitmq-diagnostics  rabbitmq-env  rabbitmq-plugins  rabbitmq-queues  rabbitmq-server  rabbitmq-upgrade</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动 management 插件</span></span><br><span class="line">[root@VM-0-9-centos sbin]# rabbitmq-plugins enable rabbitmq_management</span><br><span class="line">Enabling plugins on node rabbit@VM-0-9-centos:</span><br><span class="line">rabbitmq_management</span><br><span class="line">The following plugins have been configured:</span><br><span class="line">  rabbitmq_management</span><br><span class="line">  rabbitmq_management_agent</span><br><span class="line">  rabbitmq_web_dispatch</span><br><span class="line">Applying plugin configuration to rabbit@VM-0-9-centos...</span><br><span class="line">Plugin configuration unchanged.</span><br><span class="line"></span><br><span class="line">[root@VM-0-9-centos sbin]# ./rabbitmqctl list_users  # 查看所有用户列表</span><br><span class="line">Listing users ...</span><br><span class="line">user    tags</span><br><span class="line">guest   [administrator]</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 添加新用户，用户名为<span class="string">"root"</span>，密码为<span class="string">"root"</span></span></span><br><span class="line">[root@VM-0-9-centos sbin]# ./rabbitmqctl add_user root root</span><br><span class="line">Adding user "root" ...</span><br><span class="line">Done. Don't forget to grant the user permissions to some virtual hosts! See 'rabbitmqctl help set_permissions' to learn more.</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 为root用户设置所有权限 授权远程访问</span></span><br><span class="line">[root@VM-0-9-centos sbin]# ./rabbitmqctl set_permissions -p / root ".*" ".*" ".*"</span><br><span class="line">Setting permissions for user "root" in vhost "/" ...</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置用户为管理员角色</span></span><br><span class="line">[root@VM-0-9-centos sbin]# ./rabbitmqctl set_user_tags root administrator</span><br><span class="line">Setting tags for user "root" to [administrator] ...</span><br><span class="line"></span><br><span class="line">[root@VM-0-9-centos sbin]# ./rabbitmqctl list_permissions -p /</span><br><span class="line">Listing permissions for vhost "/" ...</span><br><span class="line">user    configure       write   read</span><br><span class="line">root    .*      .*      .*</span><br><span class="line">guest   .*      .*      .*</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看指定用户权限</span></span><br><span class="line">[root@VM-0-9-centos sbin]# ./rabbitmqctl list_user_permissions root</span><br><span class="line">Listing permissions for user "root" ...</span><br><span class="line">vhost   configure       write   read</span><br><span class="line">/       .*      .*      .*</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除用户（安全起见，删除默认用户）</span></span><br><span class="line">./rabbitmqctl delete_user guest</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看运行状态</span></span><br><span class="line">[root@VM-0-9-centos sbin]# ./rabbitmqctl status</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看集群状态，目前只有一个RabbitMQ服务节点，可以看作单节点集群</span></span><br><span class="line">[root@VM-0-9-centos sbin]# ./rabbitmqctl cluster_status</span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
-
-<p>配置好用户之后重新启动 rabbitmq 然后用你新的账号登录即可，这样不仅可以本地登录也可以远程登录了！</p>
-<p>netstat -lnp|grep 25672<br>netstat -ntpl |grep</p>
-<p>RABBITMQ_DEFAULT_USER：默认的用户名；<br>RABBITMQ_DEFAULT_PASS：默认用户名的密码）</p>
-<p>日志</p>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@VM-0-9-centos ~]<span class="comment"># cd /var/log/rabbitmq</span></span><br><span class="line">[root@VM-0-9-centos rabbitmq]<span class="comment"># ls</span></span><br><span class="line">erl_crash.dump  <span class="built_in">log</span>  rabbit@VM-0-9-centos.log  rabbit@VM-0-9-centos_upgrade.log</span><br><span class="line">[root@VM-0-9-centos rabbitmq]<span class="comment"># vim rabbit@VM-0-9-centos.log</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p>用户角色说明<br>默认情况下，访问RabbitMQ服务的用户名和密码都是”guest”,这个账户有限制，<br>默认只能通过本地网络(如localhost)访问，也就是只能登陆localhost:15672。<br>远程网络访问受限，<br>使用默认的用户 guest / guest （此也为管理员用户）登陆，会发现无法登陆，报错：User can only log in via localhost。<br>所以在实现生产和消费消息之前，需要另外添加一个用户，并设置相应的访问权限</p>
-<p>1、 超级管理员(administrator)<br>可登陆管理控制台，可查看所有的信息，并且可以对用户，策略(policy)进行操作。</p>
-<p>2、 监控者(monitoring)<br>可登陆管理控制台，同时可以查看rabbitmq节点的相关信息(进程数，内存使用情况，磁盘使用情况等)</p>
-<p>3、 策略制定者(policymaker)<br>可登陆管理控制台, 同时可以对policy进行管理。但无法查看节点的相关信息(上图红框标识的部分)。</p>
-<p>4、 普通管理者(management)<br>仅可登陆管理控制台，无法看到节点信息，也无法对策略进行管理。</p>
-<p>5、 其他<br>无法登陆管理控制台，通常就是普通的生产者和消费者。</p>
-<p>死信队列多了一个过期的机制，到期会自动去尝试消费，通过死信交换机做匹配，选择想要的消费失败的消息。<br>消息中间件是在消息传输过程中保存消息的容器。队列的主要目的是提供路由并保证消息的传递。<br>特点：<br>1异步处理模式<br>2多个应用程序调用关系为松耦合关系<br>传递模型：<br>1、点多点模型PTP<br>每个消息只用一个消费者<br>发送者和接收者没有时间依赖<br>接受者确认消息接受和处理成功<br>2、发布-订阅模型Pub/Sub<br>一对多关系，通过订阅主题，发布者建立一个订阅，订阅者保持持续的活动状态以接收消息。<br>每个消息可以有多个订阅者<br>客户端只有订阅后才能接收到消息，有时间依赖。<br>持久订阅 订阅关系建立后，消息不会消失，不管订阅者是否都在线<br>非持久订阅 订阅者为了接受消息，必须一直在线</p>
-<h3 id="docker安装rabbitmq"><a href="#docker安装rabbitmq" class="headerlink" title="docker安装rabbitmq"></a>docker安装rabbitmq</h3><p>1、进入docker hub镜像仓库地址：<a target="_blank" rel="noopener" href="https://hub.docker.com/">https://hub.docker.com/</a></p>
-<p>2、搜索rabbitMq，进入官方的镜像，可以看到以下几种类型的镜像；我们选择带有“mangement”的版本（包含web管理页面）；<br>‘<br>1.拉取镜像</p>
-<figure class="highlight shell"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> docker pull rabbitmq:3.8.17-management</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p>2.创建容器，如果没有拉取会自动拉取</p>
-<figure class="highlight shell"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> docker run -d --hostname my-rabbit --name some-rabbit rabbitmq:3</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> docker run -d --hostname my-rabbit --name some-rabbit -p 8080:15672 rabbitmq:3-management</span></span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> docker run -d --name rabbitmq3.7.7 -p 5672:5672 -p 15672:15672 -v `<span class="built_in">pwd</span>`/data:/var/lib/rabbitmq --hostname myRabbit -e RABBITMQ_DEFAULT_VHOST=my_vhost  -e RABBITMQ_DEFAULT_USER=admin -e RABBITMQ_DEFAULT_PASS=admin df80af9ca0c9</span></span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> docker run -p 5672:5672 -p 15672:15672 -d --name rabbitmq -v /docker/rabbitmq:/var/lib/rabbitmq --privileged=<span class="literal">true</span> --hostname myRabbitmq -e RABBITMQ_DEFAULT_VHOST=my_vhost -e RABBITMQ_DEFAULT_USER=admin -e RABBITMQ_DEFAULT_PASS=admin rabbitmq</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p>-d 后台运行容器；</p>
-<p>–name 指定容器名；</p>
-<p>-p 指定服务运行的端口（5672：应用访问端口；15672：控制台Web端口号）；</p>
-<p>-v 映射目录或文件；</p>
-<p>–hostname  主机名（RabbitMQ的一个重要注意事项是它根据所谓的 “节点名称” 存储数据，默认为主机名）；</p>
-<p>-e 指定环境变量；（RABBITMQ_DEFAULT_VHOST：默认虚拟机名；</p>
-<p>3.进入容器安装可视化工具</p>
-<figure class="highlight shell"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@VM-0-9-centos ~]# docker exec -it rabbitmq bash</span><br><span class="line">root@myRabbitmq:/# rabbitmq-plugins list</span><br><span class="line">root@myRabbitmq:/# rabbitmq-plugins enable rabbitmq_management</span><br><span class="line">root@myRabbitmq:/# rabbitmq-plugins disable rabbitmq_management</span><br><span class="line">root@myRabbitmq:/# rabbitmqctl list_users  # 查看当前用户列表</span><br><span class="line">Listing users ...</span><br><span class="line">user    tags</span><br><span class="line">admin   [administrator]</span><br><span class="line">root@myRabbitmq:/# rabbitmqctl  change_password  Username  'Newpassword' </span><br></pre></td></tr></tbody></table></figure>
-
-<p>rabbitmq 是自己的容器中 RabbitMQ 的名称，可通过 docker ps 进行查看，然后替换自己容器中的 名称 即可’</p>
-<p>4.浏览器访问<a target="_blank" rel="noopener" href="http://ip:15672/">http://IP:15672/</a> </p>
-<p>输入用户名和密码就OK了</p>
-<p>wget <a target="_blank" rel="noopener" href="https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.8.17/rabbitmq-server-3.8.17-1.el7.noarch.rpm">https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.8.17/rabbitmq-server-3.8.17-1.el7.noarch.rpm</a></p>
-<p>make &amp;&amp; make install<br>rpm -ivh rabbitmq-server-<br>yum install rabbitmq-server-3.8.17-1.el8.noarch.rpm</p>
-<p>查看SELinux状态：</p>
-<p>1、/usr/sbin/sestatus -v &nbsp; &nbsp; &nbsp;##如果SELinux status参数为enabled即为开启状态</p>
-<p>SELinux status: &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; enabled</p>
-<p>2、getenforce &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ##也可以用这个命令检查</p>
-<p>关闭SELinux：</p>
-<p>1、临时关闭（不用重启机器）：</p>
-<p>setenforce 0 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;##设置SELinux 成为permissive模式</p>
-<p>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ##setenforce 1 设置SELinux 成为enforcing模式</p>
-<p>2、修改配置文件需要重启机器：</p>
-<p>修改/etc/selinux/config 文件</p>
-<p>将SELINUX=enforcing改为SELINUX=disabled</p>
-<p>重启机器即可</p>
-<p>/etc/yum.repos.d/rabbitmq_rabbitmq-server.repo</p>
-<p>/var/lib/rabbitmq</p>
-<figure class="highlight awk"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@VM-<span class="number">0</span>-<span class="number">9</span>-centos rabbitmq]<span class="comment"># find / -name rabbitmq-defaults</span></span><br><span class="line"><span class="regexp">/var/</span>lib<span class="regexp">/docker/</span>overlay2<span class="regexp">/05538f7e5407845c520f64a09e8dfa0b851aacd62f1fd02c6301d30b1b124206/</span>diff<span class="regexp">/opt/</span>rabbitmq<span class="regexp">/sbin/</span>rabbitmq-defaults</span><br><span class="line"><span class="regexp">/usr/</span>lib<span class="regexp">/rabbitmq/</span>lib<span class="regexp">/rabbitmq_server-3.8.17/</span>sbin/rabbitmq-defaults</span><br><span class="line"><span class="regexp">/usr/</span>lib<span class="regexp">/rabbitmq/</span>bin/rabbitmq-defaults</span><br></pre></td></tr></tbody></table></figure><script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/8/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><span class="page-number current">9</span><a class="page-number" href="/page/10/">10</a><span class="space">&hellip;</span><a class="page-number" href="/page/36/">36</a><a class="extend next" rel="next" href="/page/10/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/8/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><span class="page-number current">9</span><a class="page-number" href="/page/10/">10</a><span class="space">&hellip;</span><a class="page-number" href="/page/37/">37</a><a class="extend next" rel="next" href="/page/10/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 </div>
