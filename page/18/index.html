@@ -119,7 +119,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">362</span>
+          <span class="site-state-item-count">363</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -160,6 +160,116 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2021/04/01/lu-you-wang-men-piao-zhi-fu-jie-kou-lian-diao/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="外心人D">
+      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="外心人D的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/04/01/lu-you-wang-men-piao-zhi-fu-jie-kou-lian-diao/" class="post-title-link" itemprop="url">旅游网门票支付接口联调</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-04-01 15:29:44" itemprop="dateCreated datePublished" datetime="2021-04-01T15:29:44Z">2021-04-01</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-05-02 12:31:04" itemprop="dateModified" datetime="2021-05-02T12:31:04Z">2021-05-02</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%97%85%E6%B8%B8%E7%BD%91%E9%A1%B9%E7%9B%AE/" itemprop="url" rel="index"><span itemprop="name">旅游网项目</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="门票支付接口联调"><a href="#门票支付接口联调" class="headerlink" title="门票支付接口联调"></a>门票支付接口联调</h2><h4 id="实现步骤"><a href="#实现步骤" class="headerlink" title="实现步骤"></a>实现步骤</h4><ul>
+<li>第一步，阅读接口文档</li>
+<li>第二步，配置接口地址<br>在填写订单提交之后跳转订单支付页面，会把流水id从url传递到订单支付页面，显示订单下面的门票的信息，通过ajax的http的get请求获取订单的详细信息，通过ajax的post请求点击立即支付，跳转到我的订单列表<br><code>src\utils\apis.js</code><figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> SightApis = {</span><br><span class="line">  <span class="comment">// 订单详情、订单支付、订单删除、订单取消</span></span><br><span class="line">  orderDetailUrl: apiHost + <span class="string">'/order/order/detail/#{sn}/'</span>,</span><br><span class="line">}</span><br><span class="line"><span class="keyword">export</span> {</span><br><span class="line">  OrderApis</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+</li>
+</ul>
+<p><code>src\views\order\Pay.vue</code></p>
+<figure class="highlight html"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 订单确认及支付 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"page-order-pay"</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- 订单号 --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">van-cell</span> <span class="attr">title</span>=<span class="string">"订单号"</span> <span class="attr">:value</span>=<span class="string">"sn"</span> <span class="attr">class</span>=<span class="string">"order-mum"</span> /&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- 描述信息 --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"order-info"</span> <span class="attr">v-for</span>=<span class="string">"item in orderDetail.items"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">:key</span>=<span class="string">"item.pk"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"left"</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">h3</span>&gt;</span>{{ item.flash_name }}<span class="tag">&lt;/<span class="name">h3</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">div</span>&gt;</span><span class="tag">&lt;<span class="name">van-icon</span> <span class="attr">name</span>=<span class="string">"clock-o"</span> /&gt;</span> {{ item.remark }}<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">      <span class="comment">&lt;!-- &lt;div class="tips"&gt;短信接收&lt;/div&gt; --&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"right"</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">van-icon</span> <span class="attr">name</span>=<span class="string">"arrow"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- //描述信息 --&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- 提交表单 --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">van-submit-bar</span> <span class="attr">:price</span>=<span class="string">"orderDetail.buy_amount * 100"</span> <span class="attr">button-text</span>=<span class="string">"立即支付"</span> @<span class="attr">submit</span>=<span class="string">"onSubmit"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { OrderApis } <span class="keyword">from</span> <span class="string">'@/utils/apis'</span></span><br><span class="line"><span class="keyword">import</span> { ajax } <span class="keyword">from</span> <span class="string">'@/utils/ajax'</span></span><br><span class="line"><span class="keyword">import</span> * <span class="keyword">as</span> constants <span class="keyword">from</span> <span class="string">'@/utils/constants'</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> {</span><br><span class="line">  data () {</span><br><span class="line">    <span class="keyword">return</span> {</span><br><span class="line">      <span class="comment">// 订单的流水号</span></span><br><span class="line">      sn: <span class="string">''</span>,</span><br><span class="line">      <span class="comment">// 订单的信息</span></span><br><span class="line">      orderDetail: {}</span><br><span class="line">    }</span><br><span class="line">  },</span><br><span class="line">  methods: {</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 获取订单的详细信息</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    getOrderDetail () {</span><br><span class="line">      <span class="comment">// SightApis.ticketDetailUrl的#{sn}替换为通过created函数里面从url中动态传递过来的sn</span></span><br><span class="line">      <span class="keyword">const</span> url = OrderApis.orderDetailUrl.replace(<span class="string">'#{sn}'</span>, <span class="built_in">this</span>.sn)</span><br><span class="line">      ajax.get(url).then(<span class="function">(<span class="params">{ data }</span>) =&gt;</span> {</span><br><span class="line">        <span class="built_in">this</span>.orderDetail = data</span><br><span class="line">      })</span><br><span class="line">    },</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 确认支付</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    onSubmit () {</span><br><span class="line">      <span class="built_in">this</span>.$dialog.confirm({</span><br><span class="line">        title: <span class="string">'温馨提示'</span>,</span><br><span class="line">        message: <span class="string">`确认支付<span class="subst">${<span class="built_in">this</span>.orderDetail.buy_amount}</span>吗？`</span></span><br><span class="line">      }).then(<span class="function">() =&gt;</span> {</span><br><span class="line">        <span class="keyword">const</span> url = OrderApis.orderDetailUrl.replace(<span class="string">'#{sn}'</span>, <span class="built_in">this</span>.sn)</span><br><span class="line">        <span class="comment">// 调用支付接口</span></span><br><span class="line">        ajax.post(url).then(<span class="function">() =&gt;</span> {</span><br><span class="line">          <span class="comment">// 提示语</span></span><br><span class="line">          <span class="built_in">this</span>.$notify({</span><br><span class="line">            type: <span class="string">'success'</span>,</span><br><span class="line">            message: <span class="string">'支付成功, 已为您跳转到订单列表'</span></span><br><span class="line">          })</span><br><span class="line">          <span class="comment">// 跳转到我的订单列表</span></span><br><span class="line">          <span class="built_in">this</span>.$router.replace({ <span class="attr">name</span>: <span class="string">'OrderList'</span>, <span class="attr">params</span>: { <span class="attr">status</span>: constants.ORDER_STATUS_ALL}})</span><br><span class="line">        })</span><br><span class="line">      })</span><br><span class="line">    },</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 后退</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    goBack () {</span><br><span class="line">      <span class="built_in">this</span>.$dialog.confirm({</span><br><span class="line">        title: <span class="string">'温馨提示'</span>,</span><br><span class="line">        message: <span class="string">'您还没有支付，确认放弃支付吗？'</span></span><br><span class="line">      }).then(<span class="function">() =&gt;</span> {</span><br><span class="line">        <span class="built_in">this</span>.$router.go(<span class="number">-1</span>)</span><br><span class="line">        <span class="comment">// on confirm</span></span><br><span class="line">      })</span><br><span class="line">    },</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 取消订单</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    onCancelOrder () {</span><br><span class="line">      <span class="built_in">this</span>.$dialog.confirm({</span><br><span class="line">        title: <span class="string">'温馨提示'</span>,</span><br><span class="line">        message: <span class="string">'确认取消该订单？'</span></span><br><span class="line">      }).then(<span class="function">() =&gt;</span> {</span><br><span class="line">        <span class="comment">// TODO 调用接口on confirm</span></span><br><span class="line">        <span class="built_in">this</span>.$router.go(<span class="number">-1</span>)</span><br><span class="line">      })</span><br><span class="line">    }</span><br><span class="line">  },</span><br><span class="line">  created () {</span><br><span class="line">    <span class="comment">// 组件被挂载或创建的时候获取订单流水号</span></span><br><span class="line">    <span class="built_in">this</span>.sn = <span class="built_in">this</span>.$route.params.sn</span><br><span class="line">    <span class="comment">// 获取订单信息</span></span><br><span class="line">    <span class="built_in">this</span>.getOrderDetail()</span><br><span class="line">  }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+<ul>
+<li>第三步，使用axios获取数据</li>
+<li>第四步，将数据设置到模型层</li>
+</ul>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1228,150 +1338,6 @@
 
 <figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建文件 myapp.py, 添加内容如下</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">app</span>(<span class="params">environ, start_response</span>):</span>  <span class="comment"># 一个web应用</span></span><br><span class="line">    data = <span class="string">b'Hello, World!\n'</span></span><br><span class="line">    start_response( <span class="string">"200 OK"</span>, [</span><br><span class="line">        (<span class="string">"Content-Type"</span>, <span class="string">"text/plain"</span>),</span><br><span class="line">        (<span class="string">"Content-Length"</span>, str(len(data))</span><br><span class="line">    ])</span><br><span class="line">    <span class="keyword">return</span> iter([data])</span><br><span class="line">``` </span><br><span class="line">```shell </span><br><span class="line">$ gunicorn -w <span class="number">4</span> myapp:app  <span class="comment"># 使用gunicorn指定4个worker启动 web应用</span></span><br></pre></td></tr></tbody></table></figure>
 <p>由于gunicorn部署个启动都非常容易，所以很多公司都使用 Gunicorn来作为 WSGI server。</p>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://bubbleboy11.github.io/2020/08/21/http-fang-fa/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="外心人D">
-      <meta itemprop="description" content="本博客大多内容为慕课和网上博客，并非原创">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="外心人D的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/08/21/http-fang-fa/" class="post-title-link" itemprop="url">HTTP 方法</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-08-20 16:21:41" itemprop="dateCreated datePublished" datetime="2020-08-20T16:21:41Z">2020-08-20</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-07-20 08:50:14" itemprop="dateModified" datetime="2021-07-20T08:50:14Z">2021-07-20</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">计算机网络</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>常见的 HTTP 方法、接口的分类： </p>
-<p>GET 请求</p>
-<ul>
-<li><p>可以用浏览器地址栏直接输入网址访问</p>
-</li>
-<li><p>请求参数直接放在URL后面，明文传递明文显示</p>
-</li>
-<li><p>请求访问已被 URI 识别的资源。指定的资源经服务器端解析后返回响应内容。</p>
-</li>
-</ul>
-<ul>
-<li>可以用来提交表单和其他数据，会带来安全问题，比如一个登录页面，通过GET方式提交数据时，用户名和密码将出现在URL上，如果页面可以被缓存或者其他人可以访问这台机器，就可以从历史记录获得该用户的账号和密码<br>GET 方法是从指定的资源请求数据<br>GET 请求所包含的参数会被缓存(浏览器cache)，而post不会<br>GET 请求保留在浏览器历史记录中<br>GET 请求可被收藏为书签 get的url能被存为标签，post不会<br>get只能被url编码，而post可以被多种编码<br>get只接受ASCII字符，而post没有限制<br>get后退无害，而post后退会再次发送请求<br>GET 请求不应在处理敏感数据时使用<br>GET提交的数据大小有限制（因为浏览器对URL的长度有限制），<br>请求只应当用于取回数据</li>
-</ul>
-<p>POST请求</p>
-<ul>
-<li>不能使用浏览器地址栏直接输入网址访问</li>
-<li>传输实体的主体。</li>
-<li>主要目的不是获取响应主体的内容。</li>
-</ul>
-<ul>
-<li>放在Http报文实体的主体请求体，更安全。</li>
-</ul>
-<ul>
-<li>可以用来上传文件、登录注册等需求</li>
-<li>通过 request body 传递参数，加密传递数据</li>
-</ul>
-<p>幂等性(Idempotent): 发送一次和多次请求引起的边界效应是一致的，都得到相同请求结果的 HTTP 方法<br>幂等的方法客户端可以安全地重新请求，因为不会对服务器上的数据造成什么影响。<br>例如：a = 4 是幂等的，但是 a += 4 就是非幂等的</p>
-<p>GET 是幂等的，就是对服务器没有副作用；<br>POST 非幂等，就是每一次创建一个新的东西会影响数据库的数据。<br>PUT是幂等的，将PUT方法用作传输资源。更新：从客户端向服务器传送的数据取代指定的文档的内容。</p>
-<p>我们可以看到GET请求消息体为空没有请求体，POST请求带有消息体。</p>
-<p>POST方法提交的数据没有限制。<br>post请求携带的数据量比get请求多，常用于传输大文本的时候<br>从客户端向服务器传送的数据取代指定的文档的内容。</p>
-<p>高级区别：<br>HTTP的底层是TCP/IP。所以GET和POST的底层也是TCP/IP，也就是说，GET/POST都是TCP链接。<br>GET和POST能做的事情是一样一样的。你要给GET加上request body，给POST带上url参数，技术上是完全行的通的。<br>    • get产生一个tcp数据包，post产生两个数据包。<br>对于GET方式的请求，浏览器会把http header和data一并发送出去，服务器响应200（返回数据）；<br>而对于POST，浏览器先发送header，服务器响应100 continue，浏览器再发送data，服务器响应200 ok（返回数据）。</p>
-<p>也就是说，GET只需要汽车跑一趟就把货送到了，而POST得跑两趟，第一趟，先去和服务器打个招呼“嗨，我等下要送一批货来，你们打开门迎接我”，然后再回头把货送过去。</p>
-<p>因为POST需要两步，时间上消耗的要多一点，看起来GET比POST更有效。因此Yahoo团队有推荐用GET替换POST来优化网站性能。但这是一个坑！跳入需谨慎。为什么？</p>
-<ol>
-<li>GET与POST都有自己的语义，不能随便混用。</li>
-<li>据研究，在网络环境好的情况下，发一次包的时间和发两次包的时间差别基本可以无视。而在网络环境差的情况下，两次包的TCP在验证数据包完整性上，有非常大的优点。</li>
-<li>并不是所有浏览器都会在POST中发送两次包，Firefox就只发送一次。</li>
-</ol>
-<p>（1）web开发中 Post 和 Get 有哪些区别，各适合用于什么情况 ？<br> ① 功能差异：<br>    get ：获取数据，客户端去向服务器请求取数据资源<br>    post：提交数据，从客户端向服务器送处上传数据。<br>② 数据传输：<br>   get：通过URL里面加上参数去把数据传输给服务器端，然后服务器端根据发送过来参数返回对应内容。<br>   get把请求的数据拼接在URL后面，在地址栏里提交<br>   浏览器的地址栏会显示出来当前URL，get会把所有的数据放到url部分，数据会以明文显示对于用户来说是可见的，并且浏览器会有历史记录的功能。</p>
-<p>  post：URL唯一标识，通过唯一标识向唯一标识路径下提交一些数据，<br>  Post把所有请求的数据放到Body里面不在URL里，页面里面通过form表单或者Ajax等方式发送一个请求给服务器端,服务器会把Body(消息主体)里面的数据存储到服务器端数据库。<br>地址栏也是无法直接发送一个post请求，post把所有数据放到Body部分对于用户来说是不可见的 浏览器无法记录，</p>
-<p>③ 安全性：post相对于get更安全。安全指的是是否会修改数据。<br>安全性：GET,HEAD 和 OPTIONS 均被认为是安全的方法，因为它们旨在实现对数据的获取，并不具有’边界效应(side effect)’<br>无论是get还是post如果传输的数据未经过加密，通过第三方抓包工具依然是可以把数据抓取到的，一旦抓取到数据还是可以看到传输的数据内容都包含哪些。<br>为了保证传输的内容安全，一般对关键信息或者敏感信息都会采用这种加密的形式。</p>
-<p>GET提交的数据会放在URL之后，以?分割URL和传输数据，参数之间以&amp;相连，如EditPosts.aspx?name=test1&amp;id=123456。POST方法是把提交的数据放在HTTP包的body中。</p>
-<p>POST 方法向指定资源提交要被处理的数据<br>POST 请求不会被缓存<br>POST 请求不会保留在浏览器历史记录中<br>POST 不能被收藏为书签</p>
-<p>HEAD 类似于 GET 请求，返回的响应中没有具体的内容，用于获取资源的报头元数据<br>⑤ DELETE 请求服务器删除指定的资源<br>⑥ OPTIONS 用来查询针对请求 URI 指定的资源支持的方法，获取信息，关于资源的哪些属性是客户端可以改变的</p>
-<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">[root@VM-0-9-centos ~]<span class="comment"># curl -X OPTIONS http://www.baidu.com -i</span></span><br><span class="line">HTTP/1.1 302 Found</span><br><span class="line">Connection: keep-alive</span><br><span class="line">Content-Length: 17931</span><br><span class="line">Content-Type: text/html</span><br><span class="line">Date: Tue, 27 Apr 2021 04:11:06 GMT</span><br><span class="line">Etag: <span class="string">"54d97487-460b"</span></span><br><span class="line">Server: bfe/1.0.8.18</span><br><span class="line"></span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">&lt;meta http-equiv=<span class="string">"content-type"</span> content=<span class="string">"text/html;charset=utf-8"</span>&gt;</span><br><span class="line"></span><br><span class="line">&lt;meta http-equiv=<span class="string">"X-UA-Compatible"</span> content=<span class="string">"IE=Edge"</span>&gt;</span><br><span class="line">&lt;title&gt;页面不存在_百度搜索&lt;/title&gt;</span><br><span class="line"></span><br><span class="line">&lt;/head&gt;</span><br><span class="line"></span><br><span class="line">&lt;body link=<span class="string">"#0000cc"</span>&gt;</span><br><span class="line">&lt;div id=<span class="string">"wrapper"</span> style=<span class="string">""</span> class=<span class="string">"wrapper_s"</span>&gt;</span><br><span class="line"></span><br><span class="line"> &lt;div id=<span class="string">"head"</span>&gt; &lt;div class=<span class="string">"head_wrapper"</span>&gt; &lt;div class=<span class="string">"s_form"</span>&gt; &lt;div class=<span class="string">"s_form_wrapper"</span>&gt; &lt;div id=<span class="string">"lg"</span>&gt; &lt;img hidefocus=<span class="string">"true"</span> src=<span class="string">"//www.baidu.com/img/bd_logo1.png"</span> width=<span class="string">"270"</span> height=<span class="string">"129"</span>&gt; &lt;/div&gt; &lt;a href=<span class="string">"/"</span> id=<span class="string">"result_logo"</span> onmousedown=<span class="string">"return c({'fm':'tab','tab':'logo'})"</span>&gt; &lt;img src=<span class="string">"//www.baidu.com/img/baidu_jgylogo3.gif"</span> alt=<span class="string">"到百度首页"</span> title=<span class="string">"到百度首页"</span>&gt; &lt;/a&gt; &lt;form id=<span class="string">"form"</span> name=<span class="string">"f"</span> action=<span class="string">"/s"</span> class=<span class="string">"fm"</span>&gt; &lt;input <span class="built_in">type</span>=<span class="string">"hidden"</span> name=<span class="string">"ie"</span> value=<span class="string">"utf-8"</span>&gt; &lt;input <span class="built_in">type</span>=<span class="string">"hidden"</span> name=<span class="string">"f"</span> value=<span class="string">"8"</span>&gt; &lt;input <span class="built_in">type</span>=<span class="string">"hidden"</span> name=<span class="string">"rsv_bp"</span> value=<span class="string">"1"</span>&gt; &lt;input <span class="built_in">type</span>=<span class="string">"hidden"</span> name=<span class="string">"rsv_idx"</span> value=<span class="string">"1"</span>&gt; &lt;input <span class="built_in">type</span>=<span class="string">"hidden"</span> name=<span class="string">"ch"</span> value=<span class="string">""</span>&gt; &lt;input <span class="built_in">type</span>=<span class="string">"hidden"</span> name=<span class="string">"tn"</span> value=<span class="string">"baiduerr"</span>&gt; &lt;input <span class="built_in">type</span>=<span class="string">"hidden"</span> name=<span class="string">"bar"</span> value=<span class="string">""</span>&gt; &lt;span class=<span class="string">"bg s_ipt_wr"</span>&gt; &lt;input id=<span class="string">"kw_tip"</span> unselectable=<span class="string">"on"</span> onselectstart=<span class="string">"return false;"</span> class=<span class="string">"s_ipt s_ipt_tip"</span> disabled=<span class="string">""</span> autocomplete=<span class="string">"off"</span> value=<span class="string">""</span> maxlength=<span class="string">"100"</span> style=<span class="string">"display: none;"</span>&gt; &lt;input id=<span class="string">"kw"</span> name=<span class="string">"wd"</span> class=<span class="string">"s_ipt"</span> value=<span class="string">""</span> maxlength=<span class="string">"100"</span> autocomplete=<span class="string">"off"</span>&gt; &lt;/span&gt;&lt;span class=<span class="string">"bg s_btn_wr"</span>&gt; &lt;input <span class="built_in">type</span>=<span class="string">"submit"</span> id=<span class="string">"su"</span> value=<span class="string">"百度一下"</span> class=<span class="string">"bg s_btn"</span>&gt; &lt;/span&gt;&lt;span class=<span class="string">"tools"</span>&gt; &lt;span id=<span class="string">"mHolder"</span>&gt; &lt;div id=<span class="string">"mCon"</span>&gt; &lt;span&gt;输入法&lt;/span&gt; &lt;/div&gt; &lt;ul id=<span class="string">"mMenu"</span>&gt; &lt;li&gt;&lt;a href=<span class="string">"javascript:;"</span> name=<span class="string">"ime_hw"</span>&gt;手写&lt;/a&gt; &lt;/li&gt; &lt;li&gt;&lt;a href=<span class="string">"javascript:;"</span> name=<span class="string">"ime_py"</span>&gt;拼音&lt;/a&gt; &lt;/li&gt; &lt;li class=<span class="string">"ln"</span>&gt;&lt;/li&gt; &lt;li&gt;&lt;a href=<span class="string">"javascript:;"</span> name=<span class="string">"ime_cl"</span>&gt;关闭&lt;/a&gt; &lt;/li&gt; &lt;/ul&gt; &lt;/span&gt; &lt;span class=<span class="string">"shouji"</span> style=<span class="string">"display: none;"</span>&gt;&lt;a href=<span class="string">"http://w.x.baidu.com/go/mini/8/10000020"</span> onmousedown=<span class="string">"return ns_c({'fm':'behs','tab':'bdbrowser'})"</span>&gt;百度浏览器，打开网页快2秒！&lt;/a&gt; &lt;/span&gt; &lt;/span&gt; &lt;input <span class="built_in">type</span>=<span class="string">"hidden"</span> name=<span class="string">"rn"</span> value=<span class="string">""</span>&gt; &lt;input <span class="built_in">type</span>=<span class="string">"hidden"</span> name=<span class="string">"rsv_enter"</span> value=<span class="string">"1"</span>&gt; &lt;/form&gt; &lt;div id=<span class="string">"m"</span>&gt;&lt;/div&gt; &lt;/div&gt;&lt;/div&gt; &lt;/div&gt;&lt;/div&gt; &lt;div class=<span class="string">"s_tab"</span> id=<span class="string">"s_tab"</span>&gt; &lt;b&gt;网页&lt;/b&gt; &lt;a href=<span class="string">"http://news.baidu.com/ns?cl=2&amp;amp;rn=20&amp;amp;tn=news&amp;amp;word="</span> wdfield=<span class="string">"word"</span> onmousedown=<span class="string">"return c({'fm':'tab','tab':'news'})"</span>&gt;新闻&lt;/a&gt;&lt;a href=<span class="string">"http://tieba.baidu.com/f?kw=&amp;amp;fr=wwwt"</span> wdfield=<span class="string">"kw"</span> onmousedown=<span class="string">"return c({'fm':'tab','tab':'tieba'})"</span>&gt;贴吧&lt;/a&gt;&lt;a href=<span class="string">"http://zhidao.baidu.com/q?ct=17&amp;amp;pn=0&amp;amp;tn=ikaslist&amp;amp;rn=10&amp;amp;word=&amp;amp;fr=wwwt"</span> wdfield=<span class="string">"word"</span> onmousedown=<span class="string">"return c({'fm':'tab','tab':'zhidao'})"</span>&gt;知道&lt;/a&gt;&lt;a href=<span class="string">"http://music.baidu.com/search?fr=ps&amp;amp;key="</span> wdfield=<span class="string">"key"</span> onmousedown=<span class="string">"return c({'fm':'tab','tab':'music'})"</span>&gt;音乐&lt;/a&gt;&lt;a href=<span class="string">"http://image.baidu.com/i?tn=baiduimage&amp;amp;ps=1&amp;amp;ct=201326592&amp;amp;lm=-1&amp;amp;cl=2&amp;amp;nc=1&amp;amp;word="</span> wdfield=<span class="string">"word"</span> onmousedown=<span class="string">"return c({'fm':'tab','tab':'pic'})"</span>&gt;图片&lt;/a&gt;&lt;a href=<span class="string">"http://v.baidu.com/v?ct=301989888&amp;amp;rn=20&amp;amp;pn=0&amp;amp;db=0&amp;amp;s=25&amp;amp;word="</span> wdfield=<span class="string">"word"</span> onmousedown=<span class="string">"return c({'fm':'tab','tab':'video'})"</span>&gt;视频&lt;/a&gt;&lt;a href=<span class="string">"http://map.baidu.com/m?word=&amp;amp;fr=ps01000"</span> wdfield=<span class="string">"word"</span> onmousedown=<span class="string">"return c({'fm':'tab','tab':'map'})"</span>&gt;地图&lt;/a&gt;&lt;a href=<span class="string">"http://wenku.baidu.com/search?word=&amp;amp;lm=0&amp;amp;od=0"</span> wdfield=<span class="string">"word"</span> onmousedown=<span class="string">"return c({'fm':'tab','tab':'wenku'})"</span>&gt;文库&lt;/a&gt;&lt;a href=<span class="string">"//www.baidu.com/more/"</span> onmousedown=<span class="string">"return c({'fm':'tab','tab':'more'})"</span>&gt;更多»&lt;/a&gt; &lt;/div&gt;</span><br><span class="line">&lt;div id=<span class="string">"ftCon"</span>&gt;&lt;div id=<span class="string">"ftConw"</span>&gt;&lt;p id=<span class="string">"lh"</span>&gt; &lt;a id=<span class="string">"seth"</span> onclick=<span class="string">"h(this)"</span> href=<span class="string">"/"</span> onmousedown=<span class="string">"return ns_c({'fm':'behs','tab':'homepage','pos':0})"</span>&gt;把百度设为主页&lt;/a&gt;&lt;a id=<span class="string">"setf"</span> href=<span class="string">"http://www.baidu.com/cache/sethelp/index.html"</span> onmousedown=<span class="string">"return ns_c({'fm':'behs','tab':'favorites','pos':0})"</span> target=<span class="string">"_blank"</span> style=<span class="string">"display: inline;"</span>&gt;把百度设为主页&lt;/a&gt;&lt;a onmousedown=<span class="string">"return ns_c({'fm':'behs','tab':'tj_about'})"</span> href=<span class="string">"http://home.baidu.com"</span>&gt;关于百度&lt;/a&gt;&lt;a onmousedown=<span class="string">"return ns_c({'fm':'behs','tab':'tj_about_en'})"</span> href=<span class="string">"http://ir.baidu.com"</span>&gt;About Baidu&lt;/a&gt; &lt;/p&gt; &lt;p id=<span class="string">"cp"</span>&gt;©2014&amp;nbsp;Baidu&amp;nbsp;&lt;a href=<span class="string">"/duty/"</span> name=<span class="string">"tj_duty"</span>&gt;使用百度前必读&lt;/a&gt;&amp;nbsp;京ICP证030173号&amp;nbsp;&lt;i class=<span class="string">"c-icon-icrlogo"</span>&gt;&lt;/i&gt; &lt;/p&gt; &lt;/div&gt; &lt;/div&gt;</span><br><span class="line">&lt;div id=<span class="string">"wrapper_wrapper"</span> style=<span class="string">"display: block;"</span>&gt;</span><br><span class="line">        &lt;div id=<span class="string">"content_left"</span>&gt;</span><br><span class="line">                &lt;div class=<span class="string">"nors"</span>&gt;</span><br><span class="line">                        &lt;div class=<span class="string">"norsSuggest"</span>&gt;</span><br><span class="line">                                &lt;h3 class=<span class="string">"norsTitle"</span>&gt;很抱歉，您要访问的页面不存在！&lt;/h3&gt;</span><br><span class="line">                                &lt;p class=<span class="string">"norsTitle2"</span>&gt;温馨提示：&lt;/p&gt;</span><br><span class="line">                                &lt;ol&gt;</span><br><span class="line">                                        &lt;li&gt;请检查您访问的网址是否正确&lt;/li&gt; </span><br><span class="line">                                        &lt;li&gt;如果您不能确认访问的网址，请浏览&lt;a href=<span class="string">"http://www.baidu.com/more/index.html"</span>&gt;百度更多&lt;/a&gt;页面查看更多网址。&lt;/li&gt;</span><br><span class="line">                                        &lt;li&gt;回到顶部重新发起搜索&lt;/li&gt;</span><br><span class="line">                                        &lt;li&gt;如有任何意见或建议，请及时&lt;a href=<span class="string">"http://qingting.baidu.com/index"</span>&gt;反馈给我们&lt;/a&gt;。&lt;/li&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">                                &lt;/ol&gt;</span><br><span class="line">                        &lt;/div&gt;</span><br><span class="line">                &lt;/div&gt;</span><br><span class="line">        &lt;/div&gt;</span><br><span class="line"></span><br><span class="line">&lt;div id=<span class="string">"foot"</span>&gt;&lt;span class=<span class="string">"foot_c"</span>&gt;©2015&amp;nbsp;Baidu&amp;nbsp;&lt;span&gt;此内容系百度根据您的指令自动搜索的结果，不代表百度赞成被搜索网站的内容或立场&lt;/span&gt;&lt;/span&gt;</span><br><span class="line">&lt;span id=<span class="string">"help"</span>&gt;&lt;a href=<span class="string">"http://www.baidu.com/search/jubao.html"</span> target=<span class="string">"_blank"</span>&gt;举报&lt;/a&gt;&lt;/span&gt;&lt;/div&gt;</span><br><span class="line"></span><br><span class="line">&lt;div class=<span class="string">"c-tips-container"</span> id=<span class="string">"c-tips-container"</span>&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=<span class="string">"c-tips-container"</span> id=<span class="string">"c-tips-container"</span>&gt;&lt;/div&gt;</span><br></pre></td></tr></tbody></table></figure>
-
-<p>TRACE： 回显服务器收到的请求，主要用于测试或诊断。<br>CONNECT：开启一个客户端与所请求资源之间的双向沟通的通道。它可以用来创建隧道</p>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {

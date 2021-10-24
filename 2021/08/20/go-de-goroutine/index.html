@@ -20,15 +20,15 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"bubbleboy11.github.io","root":"/","images":"/images","scheme":"Muse","version":"8.6.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
-<meta name="description" content="场景一：不允许后面的逻辑，必需要等前面的完成才能执行场景二：批量操作相同的信息，批量发送信息 Goroutine Thread内存占⽤ 2KB -&gt; 1GB 从 8k 开始，服务端程序上限很多是 8M(⽤ulimit -a 可看)，调⽤多会 stack overflowContext switch ⼏⼗ NS 级 1-2 us由谁管理 Go runtime 操作系统通信⽅式 CSP&#x2F;传统共享">
+<meta name="description" content="go的协程本质是系统的线程调用，而Python中的协程是eventloop模型实现，所以虽然都叫协程，但并不是一个东西 场景一：不允许后面的逻辑，必需要等前面的完成才能执行场景二：批量操作相同的信息，批量发送信息 Goroutine Thread内存占⽤ 2KB -&gt; 1GB 从 8k 开始，服务端程序上限很多是 8M(⽤ulimit -a 可看)，调⽤多会 stack overflowCo">
 <meta property="og:type" content="article">
 <meta property="og:title" content="go的goroutine">
 <meta property="og:url" content="https://bubbleboy11.github.io/2021/08/20/go-de-goroutine/index.html">
 <meta property="og:site_name" content="外心人D的博客">
-<meta property="og:description" content="场景一：不允许后面的逻辑，必需要等前面的完成才能执行场景二：批量操作相同的信息，批量发送信息 Goroutine Thread内存占⽤ 2KB -&gt; 1GB 从 8k 开始，服务端程序上限很多是 8M(⽤ulimit -a 可看)，调⽤多会 stack overflowContext switch ⼏⼗ NS 级 1-2 us由谁管理 Go runtime 操作系统通信⽅式 CSP&#x2F;传统共享">
+<meta property="og:description" content="go的协程本质是系统的线程调用，而Python中的协程是eventloop模型实现，所以虽然都叫协程，但并不是一个东西 场景一：不允许后面的逻辑，必需要等前面的完成才能执行场景二：批量操作相同的信息，批量发送信息 Goroutine Thread内存占⽤ 2KB -&gt; 1GB 从 8k 开始，服务端程序上限很多是 8M(⽤ulimit -a 可看)，调⽤多会 stack overflowCo">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-08-19T16:21:41.000Z">
-<meta property="article:modified_time" content="2021-10-04T13:56:24.545Z">
+<meta property="article:modified_time" content="2021-10-14T12:53:48.178Z">
 <meta property="article:author" content="外心人D">
 <meta name="twitter:card" content="summary">
 
@@ -122,7 +122,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">362</span>
+          <span class="site-state-item-count">363</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -204,7 +204,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-10-04 13:56:24" itemprop="dateModified" datetime="2021-10-04T13:56:24Z">2021-10-04</time>
+        <time title="修改时间：2021-10-14 12:53:48" itemprop="dateModified" datetime="2021-10-14T12:53:48Z">2021-10-14</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -226,7 +226,8 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <p>场景一：<br>不允许后面的逻辑，必需要等前面的完成才能执行<br>场景二：<br>批量操作相同的信息，批量发送信息</p>
+        <p>go的协程本质是系统的线程调用，而Python中的协程是eventloop模型实现，所以虽然都叫协程，但并不是一个东西</p>
+<p>场景一：<br>不允许后面的逻辑，必需要等前面的完成才能执行<br>场景二：<br>批量操作相同的信息，批量发送信息</p>
 <p>Goroutine Thread<br>内存占⽤ 2KB -&gt; 1GB 从 8k 开始，服务端程序上限很多是 8M(⽤ulimit -a 可看)，调⽤多会 stack overflow<br>Context switch ⼏⼗ NS 级 1-2 us<br>由谁管理 Go runtime 操作系统<br>通信⽅式 CSP/传统共享内存 传统共享内存<br>ID 有，⽤户⽆法访问 有<br>抢占 1.13 以前需主动让出 1.14 开始可由信号中断  | 内核抢占</p>
 <p>简介<br>因为并发程序要考虑很多的细节，以保证对共享变量的正确访问，使得并发编程在很多情况下变得很复杂。<br>但是Go语言在开发并发时，是比较简洁的。它通过channel来传递数据。数据竞争这个问题在golang的设计上就进行了规避了。</p>
 <blockquote>
@@ -402,7 +403,7 @@
 <ol>
 <li>没有超时机制</li>
 <li>无法限制内存使用量</li>
-<li>GC 全部清掉</li>
+<li>GC 全部清掉<br>sync.Pool是可以在多协程的情况下使用的，但是在访问共享池时，会有锁的开销。 -协程安全，会有锁的开销</li>
 </ol>
 <p>sync.Pool 的一般使用步骤（以user为例）</p>
 <ol>
